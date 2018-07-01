@@ -55,7 +55,7 @@
     <dependency>
       <groupId>org.scalaz</groupId>
       <artifactId>scalaz-core_${scala.compat.version}</artifactId>
-      <version>7.2.15</version>  <!-- (..._2.10_) 7.2.15: 2017-08-13 -->
+      <version>7.2.23</version>  <!-- (..._2.10_) 7.2.23: 2018-05-15 -->
     </dependency>
 
     <dependency>
