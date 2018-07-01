@@ -9,7 +9,7 @@ object PatternsInForsExplApp extends App {
   /*
     Patterns in for comprehensions:
     - For filtering, (generally) needs to be in parentheses:
-      - in "for (v: T <- coll)", T must covers element type of coll
+      - in "for (v: T <- coll)", T must cover element type of coll
 
       - in "for ((v: T) <- e)",  v gets only the T in coll  ???? NO
   */
