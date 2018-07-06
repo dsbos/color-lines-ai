@@ -1,17 +1,15 @@
 package com.us.dsb.explore.syntax
 
 
-object xPatternBraceEtcSyntaxExplApp extends App {
-
-
+object PatternBraceEtcSyntaxExplApp extends App {
 
   case class C(a: Int, b: Int)
-  class B
-  case class D1(x: Any) extends B
-  case class D2(x: Any) extends B
+  class Base
+  case class Der1(x: Any) extends Base
+  case class Der2(x: Any) extends Base
 
-  val c1 = List(new B, D1(1), D1("2"), D2(1))
-  val c2 = List((1, 101), (2, "1 0 2"), 3, (4, 404, "FOUR"))
+  val c1 = List(new Base, Der1(1), Der1("2"), Der2(1))
+  val c2: List[Any] = List((1, 101), (2, "1 0 2"), 3, (4, 404, "FOUR"))
 
 
   c1.foreach _
@@ -31,35 +29,35 @@ object xPatternBraceEtcSyntaxExplApp extends App {
   //c1.foreach(v: B => {println; println})  // syntax: ill. start of decl. at first "println"
   //c1.foreach(v: B => (println; println))  // syntax: expected ")" at the ";"
 
-  c1  .foreach((v: B) => println)
+  c1  .foreach((v: Base) => println)
   //c1.foreach((v: B) => println; println)    // syntax: expected ")" at the ";"
-  c1  .foreach((v: B) => {println; println})
+  c1  .foreach((v: Base) => {println; println})
   //c1.foreach((v: B) => (println; println))  // syntax: expected ")" at the ";"
 
-  //c1.foreach((v: D1) => println)             // type mismatch; was D1 => Unit,  req'd: B => ?
-  //c1.foreach((v: D1) => println; println)    // syntax: expected ")" at the ";"
-  //c1.foreach((v: D1) => {println; println})  // type mismatch; was D1 => Unit,  req'd: B => ?
-  //c1.foreach((v: D1) => (println; println))  // syntax: expected ")" at the ";"
+  //c1.foreach((v: Der1) => println)             // type mismatch; was Der1 => Unit,  req'd: B => ?
+  //c1.foreach((v: Der1) => println; println)    // syntax: expected ")" at the ";"
+  //c1.foreach((v: Der1) => {println; println})  // type mismatch; was Der1 => Unit,  req'd: B => ?
+  //c1.foreach((v: Der1) => (println; println))  // syntax: expected ")" at the ";"
 
 
   c1.foreach(v => {println; println})
-  c1.foreach((v: B) => {println; println})
-  //c1.foreach((v: D1) => {println; println})  // type mismatch; was D1 => Unit,  req'd: B => ?
+  c1.foreach((v: Base) => {println; println})
+  //c1.foreach((v: Der1) => {println; println})  // type mismatch; was Der1 => Unit,  req'd: B => ?
   c1.foreach({v => println; println})
-  c1.foreach({v: B => println; println})
-  //c1.foreach({v: D1 => println; println})  // type mismatch; was D1 => Unit,  req'd: B => ?
+  c1.foreach({v: Base => println; println})
+  //c1.foreach({v: Der1 => println; println})  // type mismatch; was Der1 => Unit,  req'd: B => ?
 
   c1.foreach{v => {println; println}}
-  c1.foreach{(v: B) => {println; println}}
-  //c1.foreach{(v: D1) => {println; println}}  // type mismatch; was D1 => Unit,  req'd: B => ?
+  c1.foreach{(v: Base) => {println; println}}
+  //c1.foreach{(v: Der1) => {println; println}}  // type mismatch; was Der1 => Unit,  req'd: B => ?
   c1.foreach{{v => println; println}}
-  c1.foreach{{v: B => println; println}}
-  //c1.foreach{{v: D1 => println; println}}  // type mismatch; was D1 => Unit,  req'd: B => ?
+  c1.foreach{{v: Base => println; println}}
+  //c1.foreach{{v: Der1 => println; println}}  // type mismatch; was Der1 => Unit,  req'd: B => ?
 
 
   /*
-- Braces/parentheses/patterns/function literals after, e.g,. .map
-*/
+   - Braces/parentheses/patterns/function literals after, e.g,. .map
+   */
 
 
 
@@ -113,7 +111,6 @@ object xPatternBraceEtcSyntaxExplApp extends App {
 
     TypePat         ::=  Type
 
-
     varid           ::=  lower idrest
     Literal         ::= ...
     Type            ::= ....
@@ -125,8 +122,5 @@ object xPatternBraceEtcSyntaxExplApp extends App {
                       |  [id ‘.’] this
     ClassQualifier  ::= ‘[’ id ‘]’
   */
-
-
-
 
 }
