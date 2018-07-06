@@ -2,7 +2,7 @@ package com.us.dsb.explore.syntax
 
 
 /**
-  *  Re patterns in for loop/comprehensions.
+  * Re patterns in for loop/comprehensions.  (Doesn't explore partial functions.)
   */
 object PatternsInForsExplApp extends App {
 
@@ -14,59 +14,75 @@ object PatternsInForsExplApp extends App {
       - in "for ((v: T) <- e)",  v gets only the T in coll  ???? NO
   */
 
-  class B
-  case class D1(x: Any) extends B
-  case class D2(x: Any) extends B
+  class Base
+  case class DerivedOne(x: Any) extends Base
+  case class DerivedTwo(x: Any) extends Base
 
-  val c1 = List(new B, D1(1), D1("2"), D2(1))
-  val c2 = List((1, 101), (2, "1 0 2"), 3, (4, 404, "FOUR"))
+  val coll1: List[Base] = List(new Base,
+                               DerivedOne(1),
+                               DerivedOne("one"),
+                               DerivedTwo(2))
+  /** Four items, two Tuple2. */
+  val coll2: List[Any] = List((1, 101), (2, "1 0 2"), 3, (4, 404, "FOUR"))
 
 
   // 1.  Type at top level does _not_ filter:
-  //     - type must cover element type of collection
+  //     - type must cover element type of collection (as of 2.10.4)
   //     - contradicts section 8.1.2 of the language spec. (as of 2016-11-13):
 
-  for (v: B <- c1) {           // changing "B" to "D1" yields "type mismatch"
-    println("L1: v = " + v)
+  for (v: Base <- coll1) {
+    println("L1: v = " + v)  // Lists all, of course
   }
+  // for ((v: Base) <- coll1) ... - same as (v: Base <- coll1) ...
+
+  // Error: (...) type mismatch; found: DerivedOne => Unit; required: Base => ?:
+  // for (v: DerivedOne <- coll1) {
+  //   println("L1b: v = " + v)
+  // }
+  // for ((v: DerivedOne) <- coll1) ... - same as for (v: DerivedOne <- coll1) ...
+  // (2.10.4 bug?)
+
 
   // 2.  Type inside tuple or constructor (or extractor?) pattern syntax does
   // filter:
 
-  for ((v1, v2) <- c2) {          // tuple syntax filters
-    println("L2.0: v1 = " + v1 + ", v2 = " + v2)
+  for ((v1, v2) <- coll2) {          // tuple syntax filters
+    println("L2.0: v1 = " + v1 + ", v2 = " + v2)  // Lists only Tuple2[_, _]
   }
-  for ((v1, v2: Int) <- c2) {     // non--top-level type filters (more)
-    println("L2.1: v1 = " + v1 + ", v2 = " + v2)
+  for ((v1, v2: Int) <- coll2) {     // non--top-level type also filters
+    println("L2.1: v1 = " + v1 + ", v2 = " + v2)  // Lists only Tuple2[_, Int]
   }
-  for (D1(v) <- c1) {             // constructor/extract syntax filters)
-    println("L2.2: v = " + v)
+  for (DerivedOne(v) <- coll1) {     // constructor/extractor syntax filters)
+    println("L2.2: v = " + v)        // Lists only DerivedOne with Any
   }
-  for (D1(v: Int) <- c1) {        // non--top-level type filters (more)
-    println("L2.2: v = " + v)
+  for (DerivedOne(v: Int) <- coll1) {  // non--top-level type also filters
+    println("L2.3: v = " + v)          // Lists only DerivedOne with Int
   }
 
   // 3:  Top-level type can be filtered on by wrapping in pattern binder:
 
-  for (v1 @ (v2: D1) <- c1) {
+  for (v1 @ (v2: DerivedOne) <- coll1) {
     println("L3.1: v1 = " + v1 + ", v2 = " + v2)
   }
+  // all fail:
+  // for (v1 @ (_ : DerivedOne) <- coll1) ...
+  // for (v1 @ (    DerivedOne) <- coll1) ...
+  // for (_  @ (v2: DerivedOne) <- coll1) ...
+  // for (     (v2: DerivedOne) <- coll1) ...
+  //}
 
-  // for (v @ (_: D1) <- c1) { ... }  // doesn't work
+  // for (v @ (_: D1) <- coll1) { ... }  // doesn't work
 
-  // - Workaround extractor object can reduce per-use verbosity:
+  // 3a:  Workaround extractor object can reduce per-use verbosity:
 
   object Id { def unapply[T](x: T) = Some(x) }
 
-  for (Id(v: D2) <- c1) {
-    println("L3.2: v = " + v)
+  for (Id(v: DerivedTwo) <- coll1) {
+    println("L3.2: v = " + v)           // Lists only DerivedTwo
   }
 
   // Unsorted:
   // - Can apply extra parentheses (as if Tuple1[...]) (sometimes?):
-
-
-
 
   /*
     - For loops/comprehensions:
