@@ -6,7 +6,7 @@ import org.scalatest.FunSuite
 import org.scalatest.Matchers._
 
 
-object ValueClassesExplorationTest {
+object ValueClassTypeSafetyExplTest {
 
   case class PoiId(value: Int) extends AnyVal
 
@@ -25,10 +25,10 @@ object ValueClassesExplorationTest {
   * passing and assignment, but not good for strong typing with operations in
   * expressions ...
   */
-class ValueClassesExplorationTest extends FunSuite {
+class ValueClassTypeSafetyExplTest extends FunSuite {
   // (Review:  I thought object's members were automatically visible in companion
   // class, but they weren't in this case.)
-  import ValueClassesExplorationTest._
+  import ValueClassTypeSafetyExplTest._
 
 
   case class Bundle(origPoi: PoiId, origSp: SpNumber)
@@ -55,7 +55,7 @@ class ValueClassesExplorationTest extends FunSuite {
     "anotherPoi = 42" shouldNot typeCheck
     // Error:(...) type mismatch;
     //    found   : Int(42)
-    //    required: com.us.dsb.explore.types.strong.ValueClassesExplorationTest.PoiId
+    //    required: com.us.dsb.explore.types.strong.ValueClassTypeSafetyExplTest.PoiId
   }
 
 
