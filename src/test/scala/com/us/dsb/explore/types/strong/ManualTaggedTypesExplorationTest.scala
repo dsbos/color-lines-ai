@@ -3,8 +3,9 @@ package com.us.dsb.explore.types.strong
 import org.scalatest.FunSuite
 import org.scalatest.Matchers._
 
+
 /**
-  * Demo test of tagged types of <what?) form (old Scalaz form).
+  * Demo test of tagged types of <what?> form (old Scalaz form).
   */
 class ManualTaggedTypesExplorationTest extends FunSuite {
 
@@ -72,7 +73,9 @@ class ManualTaggedTypesExplorationTest extends FunSuite {
     def f(a: ThingAInt) = ()
     f(a0)
     //f(b0)
-    "f(b0) " shouldNot typeCheck
+    " f(b0) " shouldNot typeCheck
+    //f(1)
+    " f(1) " shouldNot typeCheck
 
     ////////////////////
     // Tagged-type expr. can be used as data-type expr., but methods do not propagate type:
@@ -114,6 +117,23 @@ class ManualTaggedTypesExplorationTest extends FunSuite {
 
     // Try:
     // def tag2[Repr, U](v: Repr): Repr @@ U = v.asInstanceOf[Repr @@ U]
+
+
+    // "Error: type mismatch; found   : Int; required: Int" - Huh?:
+    //val a21: ThingAInt = tag(a0 + a0)
+    //
+    // "Error: type mismatch; found   : Int; required: Int" - Huh?:
+    //val a21: ThingAInt = tag[ThingA](a0 + a0)
+
+    val a22:    Int          = tag[ThingA](12)
+    val a23: @@[Int, ThingA] = tag[ThingA](12)
+    val x1: Int = a22
+    val x2: Tagged[ThingA] = a23
+
+    // "Error: ... type mismatch; found   : Int(12); required: Int" - Huh?:
+    // val a24: Int with Tagged[ThingA] = tag[ThingA](12)
+
+    val z1 = 12
   }
 
 }
