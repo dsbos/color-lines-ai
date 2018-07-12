@@ -11,10 +11,37 @@ import org.scalatest.FunSpec
 class InterpreterPatternExpl1Test extends FunSpec {
 
   sealed trait Expr
+
   case class IntValue(value: Int) extends Expr
-  case class Plus(left: Expr, right: Expr) extends Expr
-  case class Times(left: Expr, right: Expr) extends Expr
   case class IntProp(name: String) extends Expr
+
+  sealed abstract class BinaryOpxx extends Expr
+  object BinaryOp {
+    def unapply(e: Expr): Option[(Expr, Expr)] = {
+      e match {
+        case Plus(left, right) => Some((left, right))
+        case Times(left, right)  => Some((left, right))
+        case x: BinaryOpxx =>
+          System.err.println("x  = " + x)
+          ???  // something new?
+        case _                   => None
+      }
+    }
+  }
+  case class Plus(left: Expr, right: Expr) extends BinaryOpxx
+  case class Times(left: Expr, right: Expr) extends BinaryOpxx
+
+  sealed abstract class TernaryOp extends Expr
+  object TernaryOp {
+    def unapply(e: Expr): Option[(Expr, Expr, Expr)] = {
+      e match {
+        case IfPositive(value, ifPos, isNonPos)  => Some((value, ifPos, isNonPos))
+        case _                  => None
+      }
+    }
+  }
+  case class IfPositive(value: Expr, ifPos: Expr, isNonPos: Expr) extends TernaryOp
+
 
   val expr1: Expr = IntValue(0)
   val expr2a: Expr = Plus(IntValue(1), IntValue(2))
@@ -28,14 +55,21 @@ class InterpreterPatternExpl1Test extends FunSpec {
 
   val expr7: Expr = Plus(Times(IntProp("a"), IntValue(3)), Times(IntProp("a"), IntValue(2)))
 
+  val expr11: Expr = IfPositive(IntValue(2), IntValue(1), IntValue(-10))
+  val expr12: Expr = IfPositive(IntValue(-2), IntValue(1), IntValue(-10))
+  val expr13: Expr = IfPositive(IntProp("a"), IntProp("b"), IntProp("c"))
 
   def evaluate(expr: Expr): IntValue = {
     val value =
       expr match {
-        case IntValue(v)      => v
+        case IntValue(v)         => v
         case Plus(left, right) => evaluate(left).value + evaluate(right).value
-        case Times(left, right) => evaluate(left).value * evaluate(right).value
-        case IntProp("a")     => 100
+        case Times(left, right)  => evaluate(left).value * evaluate(right).value
+        case IntProp("a")        => 100
+        case IntProp("b")        => 200
+        case IntProp("c")        => 400
+        case IfPositive(cond, ifPos, ifNonPos) =>
+          if (evaluate(cond).value > 0) evaluate(ifPos).value else evaluate(ifNonPos).value
       }
     IntValue(value)
   }
@@ -46,6 +80,7 @@ class InterpreterPatternExpl1Test extends FunSpec {
       case Plus(left, right) => s"+( ${format(left)}, ${format(right)} )"
       case Times(left, right) => s"*( ${format(left)}, ${format(right)} )"
       case IntProp(name)    => s"$name"
+      case IfPositive(cond, ifPos, ifNonPos) => s"if( ${format(cond)}, ${format(ifPos)}, ${format(ifNonPos)} )"
     }
   }
 
@@ -61,7 +96,8 @@ class InterpreterPatternExpl1Test extends FunSpec {
         }
       case other @ (_: IntValue
                     | _: IntProp
-                    | _: Times) => other
+                    | _: Times
+                    | _: IfPositive) => other
     }
   }
 
@@ -82,10 +118,32 @@ class InterpreterPatternExpl1Test extends FunSpec {
       case Times(IntValue(1), arg) => simplify(arg)
       case Times(arg, IntValue(1)) => simplify(arg)
 
-      case Times(left, right)                   => Times(simplify(left), simplify(right))
+      case Times(left, right)      => Times(simplify(left), simplify(right))
 
+      case IfPositive(cond, ifPos, ifNonPos) =>
+        simplify(cond) match {
+          case IntValue(pos) if pos > 0 => simplify(ifPos)
+          case IntValue(pos)            => simplify(ifNonPos)
+          case nonValue                 =>
+            IfPositive(nonValue, simplify(ifPos), simplify(ifNonPos) )
+        }
     }
   }
+
+  def listProperties(expr: Expr): Set[String] = {
+    val value: Set[String] =
+      expr match {
+        case IntProp(name)      => Set(name)
+        case IntValue(v)        => Set[String]()
+        case BinaryOp(left, right) => listProperties(left) ++ listProperties(right)
+        //case Plus(left, right)  => listProperties(left) ++ listProperties(right)
+        //case Times(left, right) => listProperties(left) ++ listProperties(right)
+        case IfPositive(c, p, n) => List(c, p, n).map(listProperties(_)).flatten.toSet
+      }
+    value
+  }
+
+
 
   def nameThis(label: String, expr: Expr): Unit = {
     System.err.println()
@@ -95,6 +153,8 @@ class InterpreterPatternExpl1Test extends FunSpec {
     System.err.println(s"simplifyPlusZero($label) = " + simplifyPlusZero(expr))
     System.err.println(s"simplify($label)         = " + simplify(expr))
     System.err.println(s"format(simplify($label)) = " + format(simplify(expr)))
+    System.err.println(s"listProperties(simplify($label)) = " + listProperties(expr))
+    assert(evaluate(expr) == evaluate(simplify(expr)))
   }
 
 
@@ -109,6 +169,9 @@ class InterpreterPatternExpl1Test extends FunSpec {
   nameThis("expr6", expr6)
   nameThis("expr7", expr7)
 
+  nameThis("expr11", expr11)
+  nameThis("expr12", expr12)
+  nameThis("expr13", expr13)
 
   ////////////////////////////
   //????????????
