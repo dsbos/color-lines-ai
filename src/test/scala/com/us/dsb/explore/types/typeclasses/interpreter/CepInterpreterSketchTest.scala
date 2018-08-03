@@ -152,10 +152,25 @@ class CepInterpreterSketchTest extends FunSpec {
   - processing anything that needs to be processed after the event(s) are
   */
 
+  // Simulated CEP data (messages; thing events, state, definition; etc.)
+
   sealed trait Event
   case class StartEvent() extends Event
   case class CreationEvent() extends Event
 
+  sealed trait StateField
+  object StateFields {
+    // (Lower camel case because represents field in class.
+    case object miscData extends StateField
+  }
+
+  // Revisit:  Possibly use ~LabelOp instead of label parameter on every
+  // constructor
+  //  - +: to avoid clutter in constructor calls
+  //  - -: makes graph less regular (complicates graph manipulations)
+  //       - but regularization step could replace LabelOp around Op with
+  //         copy of Op with label set
+  //  - ~: can use alternative constructors to reduce call clutter (probably)
 
   sealed trait ProcessingOp {
     def label: String
@@ -164,28 +179,58 @@ class CepInterpreterSketchTest extends FunSpec {
   case class SequenceOp(label: String, steps: ProcessingOp*)
       extends ProcessingOp
 
-  case class PerEventKindOp(label: String, map: (Class[_ <: Event], ProcessingOp)*)
-      extends ProcessingOp
-
-  type LifecycleState = String
-  case class PerLifecyleStateOp(label: String, map: (LifecycleState, ProcessingOp)*)
-      extends ProcessingOp
-
-  case class SetLifecycleOp(label: String, lifecycleState: LifecycleState)
-      extends ProcessingOp
-
+  /** ... has no ProcessingOp descendants (can have other descendants, e.g., expr. trees)) */
+  sealed trait PrimitiveOp
 
   sealed trait KnownPrimitive
-  case object ProcessCreation                    extends KnownPrimitive
-  case object DummyClearMiscData                 extends KnownPrimitive
-  case class DummySuffixMiscData(suffix: String) extends KnownPrimitive
-  case class StringNamedPrimitive(name: String)  extends KnownPrimitive
+  object KnownPrimitive {
+    case object ProcessThingCreation               extends KnownPrimitive
+    case object DummyClearMiscData                 extends KnownPrimitive
+    case class DummySuffixMiscData(suffix: String) extends KnownPrimitive
+    case class TempStringNamedPrimitive(name: String)  extends KnownPrimitive
+  }
+  import KnownPrimitive._
 
   case class KnownPrimitiveOp(label: String, kind: KnownPrimitive)
       extends ProcessingOp
 
-  case class NamedPrimitiveOpxx(label: String, name: String)
+  /* ... semi-generic: different target fields, but always just clears */
+  case class SetStateFieldEmpty(label:String, field: StateField)
       extends ProcessingOp
+
+
+  // ... (life-cycle state field is domain-specific, but is very significant)
+  case class SetLifecycleOp(label: String, lifecycleState: LifecycleState)
+      extends ProcessingOp
+  type LifecycleState = String
+  case class PerLifecyleStateOp(label: String, map: (LifecycleState, ProcessingOp)*)
+      extends ProcessingOp
+
+  case class PerEventKindOp(label: String, map: (Class[_ <: Event], ProcessingOp)*)
+      extends ProcessingOp
+
+
+
+  /**
+    * Primitive operation that doesn't need case in interpreters but supports
+    * only fixed set of interpretations.
+    * For convenience (putting execution code in instantiation, vs. separately
+    * in evaluation interpretation method (and creating new KnownPrimitive
+    * subclass).  Is temporary/interim HACK:  Supports only two interpretations
+    * (adding interpretation would require updating all instantiations), so
+    * instances should be converted to KnownPrimitiveOp instances with new
+    * KnownPrimitive cases.
+    *
+    * @param label
+    * @param formatString
+    * @param executionFn
+    */
+  case class HackAdHocPrimitiveOp(override val label: String,
+                                  formatString: String,
+                                  executionFn: InAndOutData => InAndOutData)
+      extends ProcessingOp
+
+
 
   //////////
   // Interpreter 1:  Evaluation:
@@ -201,14 +246,20 @@ class CepInterpreterSketchTest extends FunSpec {
       op.kind match {
         case DummySuffixMiscData(suffix) =>
           data.copy(miscData = data.miscData + suffix)
-        case kind @ ProcessCreation =>
+        case kind @ ProcessThingCreation =>
           data  // imagine processing a creation event
-        case StringNamedPrimitive(kind) =>
+        case TempStringNamedPrimitive(kind) =>
           data  // imagine processing according to string (e.g., match/case)
         case kind: KnownPrimitive =>
           "" + ??? + s"- '$label': UNDIFFERENTIATED known primitive op (enumerated): (${kind})"
           ???
+      }
+    }
 
+    def evaluateSetStateFieldEmpty(op: SetStateFieldEmpty, data: InAndOutData): InAndOutData = {
+      val label = op.label
+      op.field match {
+        case miscData => data.copy(miscData = "<EMPTIED>")
       }
     }
 
@@ -216,15 +267,14 @@ class CepInterpreterSketchTest extends FunSpec {
     System.err.println(s"(+$label)")
     val value: InAndOutData =
       op match {
-        case proc: KnownPrimitiveOp =>
-          evaluateKnownPrimitiveOp(proc, data)
+        case op: KnownPrimitiveOp   => evaluateKnownPrimitiveOp(op, data)
+        case op: SetStateFieldEmpty => evaluateSetStateFieldEmpty(op, data)
+        case HackAdHocPrimitiveOp(_, _, execFn) => execFn(data)
         case SetLifecycleOp(_, lifecycleState) =>
           data.copy(lifecycleState = lifecycleState)
         case SequenceOp(_, steps @ _*) =>
-          var dataN = data
-          steps.foreach(proc => dataN = evaluate(proc, dataN))
-          dataN
-        case PerEventKindOp(_, map @ _*) =>
+          steps.foldLeft(data)((data, step) => evaluate(step, data))
+        case PerEventKindOp(_, map @ _*) =>  //???? use fold
           locally {
             for (proc <- map.toMap.get(data.eventKind)) yield {
               evaluate(proc, data)
@@ -247,22 +297,33 @@ class CepInterpreterSketchTest extends FunSpec {
   //????? doesn't address non-tree nature of graph (reconvergence)
   def format(op: ProcessingOp): String = {
 
-    def KnownPrimitiveOp(indentation: String, op: KnownPrimitiveOp): String = {
+    def formatKnownPrimitiveOp(indentation: String, op: KnownPrimitiveOp): String = {
       val label = op.label
       op.kind match {
-        case kind @ ProcessCreation =>
+        case kind @ ProcessThingCreation =>
           indentation + s"- '$label': known process-creation-event primitive op (${kind})"
-        case StringNamedPrimitive(kind) =>
+        case TempStringNamedPrimitive(kind) =>
           indentation + s"- '$label': known primitive op, string-named: '${kind}'"
         case kind: KnownPrimitive =>
-          indentation + s"- '$label': UNDIFFERENTIATED known primitive op (enumerated): (${kind})"
+          indentation + s"- '$label': known primitive op, undifferentiated in formatting : (${kind})"
+      }
+    }
+    def formatSetStateFieldEmpty(indentation: String, op: SetStateFieldEmpty): String = {
+      val label = op.label
+      op.field match {
+        case miscData =>
+          indentation + s"- '$label': set state field $miscData to empty"
       }
     }
 
     def formatSub(indentation: String, op: ProcessingOp): String = {
       op match {
         case proc: KnownPrimitiveOp =>
-          KnownPrimitiveOp(indentation, proc)
+          formatKnownPrimitiveOp(indentation, proc)
+        case HackAdHocPrimitiveOp(label, description, fn) =>
+          indentation + s"- '$label': ad-hoc operation: '$description'"
+        case proc: SetStateFieldEmpty =>
+          formatSetStateFieldEmpty(indentation, proc)
         case SetLifecycleOp(label, value) =>
           indentation + s"- '$label': set lifecycleState to '$value'"
         case SequenceOp(label, steps @ _*) =>
@@ -301,20 +362,21 @@ class CepInterpreterSketchTest extends FunSpec {
     val creationEventProcessing =
       SequenceOp(
         "creationEventProcessing",
-        KnownPrimitiveOp("creationEventProcessing", ProcessCreation),
+        KnownPrimitiveOp("creationEventProcessing", ProcessThingCreation),
         SetLifecycleOp("...", "draft")
       )
 
 
     val startEventProcessing = {
       val badStartProcessing =
-        KnownPrimitiveOp("badStartProcessing", StringNamedPrimitive("StartEvent: RejectedStartEvent"))
+        SequenceOp("???", SetStateFieldEmpty("", StateFields.miscData),
+        KnownPrimitiveOp("badStartProcessing", TempStringNamedPrimitive("StartEvent: RejectedStartEvent")))
       PerLifecyleStateOp(
         "startEventProcessing",
         ("draft",
             SequenceOp(
               "...",
-              KnownPrimitiveOp("(good start.1)", StringNamedPrimitive("StartEvent processing")),
+              KnownPrimitiveOp("(good start.1)", TempStringNamedPrimitive("StartEvent processing")),
               SetLifecycleOp("(good start.2)", "ready"),
               KnownPrimitiveOp("(good start.3 - suffix ...)",
                                        DummySuffixMiscData("_suffix2")))
@@ -325,7 +387,7 @@ class CepInterpreterSketchTest extends FunSpec {
     }
 
     val preEventProcessing =
-      KnownPrimitiveOp("preEventProcessing", StringNamedPrimitive("pre-event processing"))
+      KnownPrimitiveOp("preEventProcessing", TempStringNamedPrimitive("pre-event processing"))
 
     val eventProcessing  =
       PerEventKindOp(
@@ -335,10 +397,12 @@ class CepInterpreterSketchTest extends FunSpec {
       )
 
     val postEventProcessing =
-      KnownPrimitiveOp("postEventProcessing", StringNamedPrimitive("post-event processing"))
+      KnownPrimitiveOp("postEventProcessing", TempStringNamedPrimitive("post-event processing"))
 
     SequenceOp(
       "messageProcessing",
+      HackAdHocPrimitiveOp("ad-hoc op try", "Print \"Ad-hoc test\"",
+                           data => {println("Ad-hoc test"); data}),
       preEventProcessing,
       eventProcessing,
       postEventProcessing
@@ -349,8 +413,8 @@ class CepInterpreterSketchTest extends FunSpec {
     List(
       SequenceOp(
         "someLabel",
-        KnownPrimitiveOp("...", StringNamedPrimitive("Primitive step 1")),
-        KnownPrimitiveOp("...", StringNamedPrimitive("Primitive step 1")))
+        KnownPrimitiveOp("...", TempStringNamedPrimitive("Primitive step 1")),
+        KnownPrimitiveOp("...", TempStringNamedPrimitive("Primitive step 1")))
     )
 
 
