@@ -11,6 +11,7 @@ import org.scalatest.FunSpec
 class CepInterpreterSketchTest extends FunSpec {
 
   /*
+  Basic idea, iso(?)morphism with straight method calls.
 
   (currenty ignoring passing input and output data0
 
@@ -20,15 +21,6 @@ class CepInterpreterSketchTest extends FunSpec {
     processEventSet
     processPostEventThings
   }
-
-  (#1.5: --computation function built from isomorphic tree of methods creating
-           higher-level function from lower-level functions; _deferred_ execution,
-           but still direct and opaque)
-    val processMessageFn =
-      processPreEventThingsFn
-        andThen processEventSetFn
-        andThen processPostEventThingsFn
-  )
 
   #2:  Tree of data nodes representing computation, build from ~isomorphic
       tree of data-assembly expressions/variable; processing of computation is
@@ -48,14 +40,6 @@ class CepInterpreterSketchTest extends FunSpec {
       postEventProcessing
     )
 
-  // Is following "interpret..." execution, or is it general traversal used by
-  // execution plus as well as any other interpretation/processing of the
-  // data tree?:
-  // (note that match/case-like construct is much different for execution
-  // (one branch only  vs. some operations (e.g., printing--all branches);
-  // (well, only one branch fully executes, though others could still be
-  // traversed as no-ops)
-
   def interpretCompoundProcessing(nameThis: CompoundProcessing) = {
    nameThis.processingSteps.foreach(step => interpretProcessing(step))
   }
@@ -69,87 +53,6 @@ class CepInterpreterSketchTest extends FunSpec {
   }
 
 
-  def processEventSet(...) = {
-    ... match {
-      case Set(singleEvent) =>
-         processEvent(singleEvent)
-      case Set(creation: ShipmentCreation, start: ShipmentStart) =>
-         processEvent(creation)
-         processEvent(start)
-      case _ =>
-         reportError "unsupported input event combination"
-    }
-  }
-
-
-  def processEvent(event: Event) = {
-    event match {
-      case creation: ShipmentCreation =>
-        ...
-      case start: ShipmentStart =>
-        ...
-      case geoUpd: GeolocationUpdate =>
-        processGeolocationUpdate(geoUpd)
-      case delLocArr: DeliveryLocationArrival =>
-        processDeliveryLocationArrival(delLocArr)
-      ...
-    }
-  }
-
-  val eventProcessing =
-    PerEventTypeProcessing(  // "per--event-type processing"
-      List(
-        (ShipmentCreation.type, shipmentStartProcessing),
-        (GeolocationUpdate.type, geolocationUpdateProcessing),
-        (DeliveryLocationArrival.type, deliveryLocationArrivalProcessing),
-        ...
-      )
-
-  def interpretPerEventTypeProcessing(nameThis: CompoundProcessing) = {
-    get event type from input data,
-    look up by type to and get corresponding BaseProcessinng subclass instance,
-    interpretProcessing(>looked-up BaseProcessing>)
-  }
-
-
-  val geolocationUpdateProcessing =
-    CompoundProcessing(
-      trustedGeolocationProcessing,
-      ...
-    )
-
-  val deliveryLocationArrivalProcessing =
-    CompoundProcessing(
-      untrustedGeolocationProcessing,
-      otherDeliveryLocationArrivalProcessing
-      ...
-    )
-
-  val trustedGeolocationProcessing = GeolocationProcessing(..., xxx)
-  val untrustedGeolocationProcessing = GeolocationProcessing(..., yyy)
-
-  case class PrimitiveProcessing extends BaseProcessing
-  case class OtherDeliveryLocationArrivalProcession extends PrimitiveProcessing  // except can't extend like that
-
-
-  val otherDeliveryLocationArrivalProcessiong =
-    OtherDeliveryLocationArrivalProcession
-
-  interpretOtherDeliveryLocationArrivalProcessing() = {
-    // "primitive" in processing node/computation tree--
-    // specific interpreter knows its interpretation of OtherDeliveryLocationArrivalProcessing;
-    // (possibly we could have PrimitiveProcessing define an abstract method
-    // or abstract variable for a function for doing the "main" interpretation--
-    // CEP execution
-
-  }
-
-
-
-  Processing a message devolves to:
-  - processing anything that needs to be processed before the event(s) are
-  - processing the set of event(s) in the message
-  - processing anything that needs to be processed after the event(s) are
   */
 
   // Simulated CEP data (messages; thing events, state, definition; etc.)
