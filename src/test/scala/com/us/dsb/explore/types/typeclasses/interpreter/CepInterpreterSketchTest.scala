@@ -157,79 +157,80 @@ class CepInterpreterSketchTest extends FunSpec {
   case class CreationEvent() extends Event
 
 
-  //???? name: ...Computation?  ...Calculation?  ...Comp?  ...Calc?
-  //           ...Action? ...Step?  ...Opertation?  *** ...Op? ***
-  sealed trait BaseProcessing {
+  sealed trait ProcessingOp {
     def label: String
   }
 
-  case class SequenceProcessing(label: String, steps: BaseProcessing*)
-      extends BaseProcessing
+  case class SequenceOp(label: String, steps: ProcessingOp*)
+      extends ProcessingOp
 
-  case class PerEventKindProcessing(label: String, map: (Class[_ <: Event], BaseProcessing)*)
-      extends BaseProcessing
+  case class PerEventKindOp(label: String, map: (Class[_ <: Event], ProcessingOp)*)
+      extends ProcessingOp
 
   type LifecycleState = String
-  case class PerLifecyleStateProcessing(label: String, map: (LifecycleState, BaseProcessing)*)
-      extends BaseProcessing
+  case class PerLifecyleStateOp(label: String, map: (LifecycleState, ProcessingOp)*)
+      extends ProcessingOp
 
-  case class SetLifecycleProcessing(label: String, lifecycleState: LifecycleState)
-      extends BaseProcessing
+  case class SetLifecycleOp(label: String, lifecycleState: LifecycleState)
+      extends ProcessingOp
 
 
-  sealed trait ProcessingKind
-  case class DummyClearMiscData()                extends ProcessingKind
-  case class DummySuffixMiscData(suffix: String) extends ProcessingKind
+  sealed trait KnownPrimitive
+  case object ProcessCreation                    extends KnownPrimitive
+  case object DummyClearMiscData                 extends KnownPrimitive
+  case class DummySuffixMiscData(suffix: String) extends KnownPrimitive
+  case class StringNamedPrimitive(name: String)  extends KnownPrimitive
 
-  case class KnownPrimitiveProcessing(label: String, kind: ProcessingKind)
-      extends BaseProcessing
+  case class KnownPrimitiveOp(label: String, kind: KnownPrimitive)
+      extends ProcessingOp
 
-  case class NamedPrimitiveProcessing(label: String, name: String)
-      extends BaseProcessing
+  case class NamedPrimitiveOpxx(label: String, name: String)
+      extends ProcessingOp
 
-  case class CustomPrimitiveProcessing(label: String, f: InAndOutData => InAndOutData)
-      extends BaseProcessing
-
+  //////////
+  // Interpreter 1:  Evaluation:
 
   case class InAndOutData(eventKind: Class[_ <: Event],
                           lifecycleState: LifecycleState,
                           miscData: String)
 
-  def evaluate(proc: BaseProcessing, data: InAndOutData): InAndOutData = {
+  def evaluate(op: ProcessingOp, data: InAndOutData): InAndOutData = {
 
-    def evaluateKP(proc: KnownPrimitiveProcessing, data: InAndOutData): InAndOutData = {
-      val label = proc.label
-      proc.kind match {
+    def evaluateKnownPrimitiveOp(op: KnownPrimitiveOp, data: InAndOutData): InAndOutData = {
+      val label = op.label
+      op.kind match {
         case DummySuffixMiscData(suffix) =>
           data.copy(miscData = data.miscData + suffix)
+        case kind @ ProcessCreation =>
+          data  // imagine processing a creation event
+        case StringNamedPrimitive(kind) =>
+          data  // imagine processing according to string (e.g., match/case)
+        case kind: KnownPrimitive =>
+          "" + ??? + s"- '$label': UNDIFFERENTIATED known primitive op (enumerated): (${kind})"
+          ???
+
       }
     }
 
-    val label = proc.label
+    val label = op.label
     System.err.println(s"(+$label)")
     val value: InAndOutData =
-      proc match {
-        case proc: KnownPrimitiveProcessing =>
-          evaluateKP(proc, data)
-        case NamedPrimitiveProcessing(_, name) =>
-          System.err.println(s"Doing '$name'")
-          data
-        case CustomPrimitiveProcessing(_, fn) =>
-          System.err.println(s"Calling <custom function>")
-          fn(data)
-        case SetLifecycleProcessing(_, lifecycleState) =>
+      op match {
+        case proc: KnownPrimitiveOp =>
+          evaluateKnownPrimitiveOp(proc, data)
+        case SetLifecycleOp(_, lifecycleState) =>
           data.copy(lifecycleState = lifecycleState)
-        case SequenceProcessing(_, steps @ _*) =>
+        case SequenceOp(_, steps @ _*) =>
           var dataN = data
           steps.foreach(proc => dataN = evaluate(proc, dataN))
           dataN
-        case PerEventKindProcessing(_, map @ _*) =>
+        case PerEventKindOp(_, map @ _*) =>
           locally {
             for (proc <- map.toMap.get(data.eventKind)) yield {
               evaluate(proc, data)
             }
           }.getOrElse(???)
-        case PerLifecyleStateProcessing(_, map @ _*) =>
+        case PerLifecyleStateOp(_, map @ _*) =>
           locally {
             for (proc <- map.toMap.get(data.lifecycleState)) yield {
               evaluate(proc, data)
@@ -240,35 +241,37 @@ class CepInterpreterSketchTest extends FunSpec {
     value
   }
 
+  //////////
+  // Interpreter 2:  Formatting/rendering specification:
+
   //????? doesn't address non-tree nature of graph (reconvergence)
-  def format(proc: BaseProcessing): String = {
+  def format(op: ProcessingOp): String = {
 
-
-    def formatXxx(indentation: String, proc: KnownPrimitiveProcessing): String = {
-      val label = proc.label
-      proc.kind match {
-        case DummySuffixMiscData(suffix) =>
-          indentation + s"- '$label': <custom function>"
+    def KnownPrimitiveOp(indentation: String, op: KnownPrimitiveOp): String = {
+      val label = op.label
+      op.kind match {
+        case kind @ ProcessCreation =>
+          indentation + s"- '$label': known process-creation-event primitive op (${kind})"
+        case StringNamedPrimitive(kind) =>
+          indentation + s"- '$label': known primitive op, string-named: '${kind}'"
+        case kind: KnownPrimitive =>
+          indentation + s"- '$label': UNDIFFERENTIATED known primitive op (enumerated): (${kind})"
       }
     }
 
-    def formatSub(indentation: String, proc: BaseProcessing): String = {
-      proc match {
-        case proc: KnownPrimitiveProcessing =>
-          formatXxx(indentation, proc)
-        case NamedPrimitiveProcessing(label, name) =>
-          indentation + s"- '$label': do '$name'"
-        case CustomPrimitiveProcessing(label, fn) =>
-          indentation + s"- '$label': <custom function>"
-        case SetLifecycleProcessing(label, value) =>
+    def formatSub(indentation: String, op: ProcessingOp): String = {
+      op match {
+        case proc: KnownPrimitiveOp =>
+          KnownPrimitiveOp(indentation, proc)
+        case SetLifecycleOp(label, value) =>
           indentation + s"- '$label': set lifecycleState to '$value'"
-        case SequenceProcessing(label, steps @ _*) =>
+        case SequenceOp(label, steps @ _*) =>
           List(
             indentation + s"- '$label': sequence {",
             steps.map(p => formatSub("  " + indentation, p)).mkString("\n"),
-            indentation + s"- } ('$label')"
+            indentation + s"- } /* sequence '$label'  */ )"
           ).mkString("\n")
-        case PerEventKindProcessing(label, map @ _*) =>
+        case PerEventKindOp(label, map @ _*) =>
           List(
             indentation + s"- '$label': per event kind: {",
             map.map(pair => {
@@ -276,9 +279,9 @@ class CepInterpreterSketchTest extends FunSpec {
               "\n" +
               formatSub("  " + indentation, pair._2)
             }).mkString("\n"),
-            indentation + s"- } ('$label')"
+            indentation + s"- } /* per event kind '$label' */"
           ).mkString("\n")
-        case PerLifecyleStateProcessing(label, map @ _*) =>
+        case PerLifecyleStateOp(label, map @ _*) =>
           List(
             indentation + s"- '$label': per lifecycle state: {",
             map.map(pair => {
@@ -286,37 +289,34 @@ class CepInterpreterSketchTest extends FunSpec {
               "\n" +
               formatSub("  " + indentation, pair._2)
             }).mkString("\n"),
-            indentation + s"- } ('$label')"
+            indentation + s"- } /* per lifecycle state '$label' */"
           ).mkString("\n")
       }
     }
-    formatSub("", proc)
+    formatSub("", op)
   }
 
 
   val tryingGraph = {
     val creationEventProcessing =
-      SequenceProcessing(
+      SequenceOp(
         "creationEventProcessing",
-        NamedPrimitiveProcessing("creationEventProcessing", "CreationEvent processing"),
-        SetLifecycleProcessing("...", "draft")
+        KnownPrimitiveOp("creationEventProcessing", ProcessCreation),
+        SetLifecycleOp("...", "draft")
       )
 
 
     val startEventProcessing = {
       val badStartProcessing =
-        NamedPrimitiveProcessing("badStartProcessing", "StartEvent: RejectedStartEvent")
-      PerLifecyleStateProcessing(
+        KnownPrimitiveOp("badStartProcessing", StringNamedPrimitive("StartEvent: RejectedStartEvent"))
+      PerLifecyleStateOp(
         "startEventProcessing",
         ("draft",
-            SequenceProcessing(
+            SequenceOp(
               "...",
-              NamedPrimitiveProcessing("(good start.1)", "StartEvent processing"),
-              SetLifecycleProcessing("(good start.2)", "ready"),
-              CustomPrimitiveProcessing(
-                "(good start.3)",
-                data => data.copy(miscData = data.miscData + "_suffix1")),
-              KnownPrimitiveProcessing("(good start.3)",
+              KnownPrimitiveOp("(good start.1)", StringNamedPrimitive("StartEvent processing")),
+              SetLifecycleOp("(good start.2)", "ready"),
+              KnownPrimitiveOp("(good start.3 - suffix ...)",
                                        DummySuffixMiscData("_suffix2")))
         ),
         ("ready", badStartProcessing),
@@ -324,19 +324,20 @@ class CepInterpreterSketchTest extends FunSpec {
       )
     }
 
-    val preEventProcessing = NamedPrimitiveProcessing("preEventProcessing", "pre-event processing")
+    val preEventProcessing =
+      KnownPrimitiveOp("preEventProcessing", StringNamedPrimitive("pre-event processing"))
 
     val eventProcessing  =
-      PerEventKindProcessing(
+      PerEventKindOp(
         "eventProcessing",
         (classOf[CreationEvent], creationEventProcessing),
         (classOf[StartEvent], startEventProcessing)
       )
 
     val postEventProcessing =
-      NamedPrimitiveProcessing("postEventProcessing", "post-event processing")
+      KnownPrimitiveOp("postEventProcessing", StringNamedPrimitive("post-event processing"))
 
-    SequenceProcessing(
+    SequenceOp(
       "messageProcessing",
       preEventProcessing,
       eventProcessing,
@@ -346,28 +347,28 @@ class CepInterpreterSketchTest extends FunSpec {
 
   val basicGraphs =
     List(
-      SequenceProcessing(
+      SequenceOp(
         "someLabel",
-        NamedPrimitiveProcessing("...", "Primitive step 1"),
-        NamedPrimitiveProcessing("...", "Primitive step 1"))
+        KnownPrimitiveOp("...", StringNamedPrimitive("Primitive step 1")),
+        KnownPrimitiveOp("...", StringNamedPrimitive("Primitive step 1")))
     )
 
 
   def runInterpretations(label: String,
-                         proc: BaseProcessing,
+                         op: ProcessingOp,
                          data: InAndOutData
                         ): InAndOutData = {
     System.err.println()
-    System.err.println(s"$label                   = " + proc)
+    System.err.println(s"$label = " + op)
 
     System.err.println(s"format($label):")
     System.err.println(s"----------:")
-    System.err.println(s"" + format(proc))
+    System.err.println(s"" + format(op))
     System.err.println(s":----------")
 
     System.err.println(s"evaluate($label, $data):")
     System.err.println(s"==========:")
-    val result = evaluate(proc, data)
+    val result = evaluate(op, data)
     System.err.println(s"= = = = = :")
     System.err.println(result)
     System.err.println(s":==========")
