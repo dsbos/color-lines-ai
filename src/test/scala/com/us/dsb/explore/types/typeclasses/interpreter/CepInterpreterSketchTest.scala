@@ -57,9 +57,15 @@ class CepInterpreterSketchTest extends FunSpec {
 
   // Simulated CEP data (messages; thing events, state, definition; etc.)
 
+  case class ThingDefinition(someField: String)
+
   sealed trait Event
+
   case class StartEvent() extends Event
-  case class CreationEvent() extends Event
+
+  //???? what about carried definition?; common vs. interpreter-specific data; event classes vs. just event kinds
+  //???(thing definition specification (not necessarily whole definition)
+  case class CreationEvent(definition: ThingDefinition) extends Event
 
   sealed trait StateField
   object StateFields {
@@ -67,7 +73,7 @@ class CepInterpreterSketchTest extends FunSpec {
     case object miscData extends StateField
   }
 
-  // Revisit:  Possibly use ~LabelOp instead of label parameter on every
+  // TODO:  Revisit:  Possibly use ~LabelOp instead of label parameter on every
   // constructor
   //  - +: to avoid clutter in constructor calls
   //  - -: makes graph less regular (complicates graph manipulations)
@@ -87,10 +93,14 @@ class CepInterpreterSketchTest extends FunSpec {
 
   sealed trait KnownPrimitive
   object KnownPrimitive {
-    case object ProcessThingCreation               extends KnownPrimitive
+
+    case object Creation_ValidateEvent   extends KnownPrimitive
+    case object Creation_CopyDefinition  extends KnownPrimitive  //???? finding all updaters of definition would be nice
+    case object Creation_ModifyMiscState extends KnownPrimitive
+    //
     case object DummyClearMiscData                 extends KnownPrimitive
     case class DummySuffixMiscData(suffix: String) extends KnownPrimitive
-    case class TempStringNamedPrimitive(name: String)  extends KnownPrimitive
+    case class TempStringNamedPrimitive(name: String) extends KnownPrimitive
   }
   import KnownPrimitive._
 
@@ -112,8 +122,6 @@ class CepInterpreterSketchTest extends FunSpec {
   case class PerEventKindOp(label: String, map: (Class[_ <: Event], ProcessingOp)*)
       extends ProcessingOp
 
-
-
   /**
     * Primitive operation that doesn't need case in interpreters but supports
     * only fixed set of interpretations.
@@ -121,12 +129,8 @@ class CepInterpreterSketchTest extends FunSpec {
     * in evaluation interpretation method (and creating new KnownPrimitive
     * subclass).  Is temporary/interim HACK:  Supports only two interpretations
     * (adding interpretation would require updating all instantiations), so
-    * instances should be converted to KnownPrimitiveOp instances with new
-    * KnownPrimitive cases.
-    *
-    * @param label
-    * @param formatString
-    * @param executionFn
+    * instantiations should be converted to KnownPrimitiveOp instantiations
+    * with new KnownPrimitive cases.
     */
   case class HackAdHocPrimitiveOp(override val label: String,
                                   formatString: String,
@@ -139,18 +143,27 @@ class CepInterpreterSketchTest extends FunSpec {
   // Interpreter 1:  Evaluation:
 
   case class InAndOutData(eventKind: Class[_ <: Event],
+                          event: Event,
                           lifecycleState: LifecycleState,
-                          miscData: String)
+                          miscData: String,
+                          definition: Option[ThingDefinition])
+
+  // ?? Scala:  Type classes?
 
   def evaluate(op: ProcessingOp, data: InAndOutData): InAndOutData = {
+
+    // ?? Scala:  Implicit parameter for repeated InAndOutData?
 
     def evaluateKnownPrimitiveOp(op: KnownPrimitiveOp, data: InAndOutData): InAndOutData = {
       val label = op.label
       op.kind match {
         case DummySuffixMiscData(suffix) =>
           data.copy(miscData = data.miscData + suffix)
-        case kind @ ProcessThingCreation =>
-          data  // imagine processing a creation event
+        case kind @ Creation_ValidateEvent => data
+        case kind @ Creation_CopyDefinition =>
+          // ?? Scala:  Can we eliminate(/move/hide) cast(s)? (Maybe via method on Creation_xxx object(s)?
+          data.copy(definition = Some(data.event.asInstanceOf[CreationEvent].definition))
+        case kind @ Creation_ModifyMiscState => data
         case TempStringNamedPrimitive(kind) =>
           data  // imagine processing according to string (e.g., match/case)
         case kind: KnownPrimitive =>
@@ -167,7 +180,7 @@ class CepInterpreterSketchTest extends FunSpec {
     }
 
     val label = op.label
-    System.err.println(s"(+$label)")
+    System.err.println(s"(+'$label')")
     val value: InAndOutData =
       op match {
         case op: KnownPrimitiveOp   => evaluateKnownPrimitiveOp(op, data)
@@ -177,8 +190,8 @@ class CepInterpreterSketchTest extends FunSpec {
           data.copy(lifecycleState = lifecycleState)
         case SequenceOp(_, steps @ _*) =>
           steps.foldLeft(data)((data, step) => evaluate(step, data))
-        case PerEventKindOp(_, map @ _*) =>  //???? use fold
-          locally {
+        case PerEventKindOp(_, map @ _*) =>
+          {
             for (proc <- map.toMap.get(data.eventKind)) yield {
               evaluate(proc, data)
             }
@@ -190,7 +203,7 @@ class CepInterpreterSketchTest extends FunSpec {
             }
           }.getOrElse(???)
       }
-    System.err.println(s"(-$label): value = " + value)
+    System.err.println(s"(-'$label'): value = " + value)
     value
   }
 
@@ -203,12 +216,13 @@ class CepInterpreterSketchTest extends FunSpec {
     def formatKnownPrimitiveOp(indentation: String, op: KnownPrimitiveOp): String = {
       val label = op.label
       op.kind match {
-        case kind @ ProcessThingCreation =>
-          indentation + s"- '$label': known process-creation-event primitive op (${kind})"
+        case kind @ Creation_ValidateEvent =>
+          indentation + s"- '$label': known validate-creation-event op (${kind})"
+
         case TempStringNamedPrimitive(kind) =>
           indentation + s"- '$label': known primitive op, string-named: '${kind}'"
         case kind: KnownPrimitive =>
-          indentation + s"- '$label': known primitive op, undifferentiated in formatting : (${kind})"
+          indentation + s"- '$label': known primitive op, undifferentiated in formatting: ${kind}"
       }
     }
     def formatSetStateFieldEmpty(indentation: String, op: SetStateFieldEmpty): String = {
@@ -265,8 +279,10 @@ class CepInterpreterSketchTest extends FunSpec {
     val creationEventProcessing =
       SequenceOp(
         "creationEventProcessing",
-        KnownPrimitiveOp("creationEventProcessing", ProcessThingCreation),
-        SetLifecycleOp("...", "draft")
+        KnownPrimitiveOp("", Creation_ValidateEvent),
+        KnownPrimitiveOp("", Creation_CopyDefinition),
+        SetLifecycleOp("", "draft"),
+        KnownPrimitiveOp("", Creation_ModifyMiscState)
       )
 
 
@@ -295,6 +311,7 @@ class CepInterpreterSketchTest extends FunSpec {
     val eventProcessing  =
       PerEventKindOp(
         "eventProcessing",
+        // ?? Scala:  Can we tie types together to avoid needing casting somewhere?
         (classOf[CreationEvent], creationEventProcessing),
         (classOf[StartEvent], startEventProcessing)
       )
@@ -343,9 +360,15 @@ class CepInterpreterSketchTest extends FunSpec {
   }
 
   locally {
-    val data1 = InAndOutData(classOf[StartEvent], "draft", "<initial>")
+    val creation = CreationEvent(ThingDefinition("someField's value"))
+    val data1 = InAndOutData(classOf[CreationEvent], creation, "preDraft", "<initial>", None)
     val data2 = runInterpretations("tryingGraph", tryingGraph, data1)
-    val data3 = runInterpretations("tryingGraph", tryingGraph, data2)
+
+    val data3 = data2.copy(eventKind = classOf[StartEvent], event = null/*??????*/)
+    val data4 = runInterpretations("tryingGraph", tryingGraph, data3)
+
+    val data5 = data4.copy(eventKind = classOf[StartEvent], event = null/*??????*/)
+    val data6 = runInterpretations("tryingGraph", tryingGraph, data5)
 
     /*
     List(
