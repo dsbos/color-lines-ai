@@ -60,12 +60,24 @@ class CepInterpreterSketchTest extends FunSpec {
   case class ThingDefinition(someField: String)
 
   sealed trait Event
-
   case class StartEvent() extends Event
-
   //???? what about carried definition?; common vs. interpreter-specific data; event classes vs. just event kinds
-  //???(thing definition specification (not necessarily whole definition)
+  //???(thing definition specification (not necessarily whole definition))
   case class CreationEvent(definition: ThingDefinition) extends Event
+
+
+  sealed trait LifecycleState
+  object LifecycleState {
+    case object Uninitialized extends LifecycleState
+    case object Predraft      extends LifecycleState
+    case object DRAFT         extends LifecycleState // DRAFT?      Draft?     draft?
+    case object Ready         extends LifecycleState
+    case object InTransit     extends LifecycleState // IN_TRANSIT? InTransit? inTransit?
+    case object Arrived       extends LifecycleState
+    case object Ended         extends LifecycleState
+  }
+  import LifecycleState._
+
 
   sealed trait StateField
   object StateFields {
@@ -87,6 +99,9 @@ class CepInterpreterSketchTest extends FunSpec {
 
   case class SequenceOp(label: String, steps: ProcessingOp*)
       extends ProcessingOp
+  object SequenceOp {
+    def apply(steps: ProcessingOp*) = new SequenceOp("", steps: _*)  //?? trying non-label version
+  }
 
   /** ... has no ProcessingOp descendants (can have other descendants, e.g., expr. trees)) */
   sealed trait PrimitiveOp
@@ -106,6 +121,9 @@ class CepInterpreterSketchTest extends FunSpec {
 
   case class KnownPrimitiveOp(label: String, kind: KnownPrimitive)
       extends ProcessingOp
+  object KnownPrimitiveOp {
+    def apply(kind: KnownPrimitive) = new KnownPrimitiveOp("", kind)  //?? trying non-label version
+  }
 
   /* ... semi-generic: different target fields, but always just clears */
   case class SetStateFieldEmpty(label:String, field: StateField)
@@ -115,7 +133,7 @@ class CepInterpreterSketchTest extends FunSpec {
   // ... (life-cycle state field is domain-specific, but is very significant)
   case class SetLifecycleOp(label: String, lifecycleState: LifecycleState)
       extends ProcessingOp
-  type LifecycleState = String
+
   case class PerLifecyleStateOp(label: String, map: (LifecycleState, ProcessingOp)*)
       extends ProcessingOp
 
@@ -279,29 +297,28 @@ class CepInterpreterSketchTest extends FunSpec {
     val creationEventProcessing =
       SequenceOp(
         "creationEventProcessing",
-        KnownPrimitiveOp("", Creation_ValidateEvent),
-        KnownPrimitiveOp("", Creation_CopyDefinition),
-        SetLifecycleOp("", "draft"),
-        KnownPrimitiveOp("", Creation_ModifyMiscState)
+        KnownPrimitiveOp(Creation_ValidateEvent),
+        KnownPrimitiveOp(Creation_CopyDefinition),
+        SetLifecycleOp("", DRAFT),
+        KnownPrimitiveOp(Creation_ModifyMiscState)
       )
-
 
     val startEventProcessing = {
       val badStartProcessing =
-        SequenceOp("???", SetStateFieldEmpty("", StateFields.miscData),
-        KnownPrimitiveOp("badStartProcessing", TempStringNamedPrimitive("StartEvent: RejectedStartEvent")))
+        SequenceOp(SetStateFieldEmpty("", StateFields.miscData),
+        KnownPrimitiveOp("badStartEventProcessing",
+                         TempStringNamedPrimitive("Emit RejectedStartEvent replacing StartEvent")))
       PerLifecyleStateOp(
-        "startEventProcessing",
-        ("draft",
+        "goodStartEventProcessing",
+        (DRAFT,
             SequenceOp(
-              "...",
               KnownPrimitiveOp("(good start.1)", TempStringNamedPrimitive("StartEvent processing")),
-              SetLifecycleOp("(good start.2)", "ready"),
+              SetLifecycleOp("(good start.2)", Ready),
               KnownPrimitiveOp("(good start.3 - suffix ...)",
                                        DummySuffixMiscData("_suffix2")))
         ),
-        ("ready", badStartProcessing),
-        ("inTransit", badStartProcessing)
+        (Ready, badStartProcessing),
+        (InTransit, badStartProcessing)
       )
     }
 
@@ -333,8 +350,8 @@ class CepInterpreterSketchTest extends FunSpec {
     List(
       SequenceOp(
         "someLabel",
-        KnownPrimitiveOp("...", TempStringNamedPrimitive("Primitive step 1")),
-        KnownPrimitiveOp("...", TempStringNamedPrimitive("Primitive step 1")))
+        KnownPrimitiveOp(TempStringNamedPrimitive("Primitive step 1")),
+        KnownPrimitiveOp(TempStringNamedPrimitive("Primitive step 1")))
     )
 
 
@@ -361,7 +378,7 @@ class CepInterpreterSketchTest extends FunSpec {
 
   locally {
     val creation = CreationEvent(ThingDefinition("someField's value"))
-    val data1 = InAndOutData(classOf[CreationEvent], creation, "preDraft", "<initial>", None)
+    val data1 = InAndOutData(classOf[CreationEvent], creation, Uninitialized, "<initial>", None)
     val data2 = runInterpretations("tryingGraph", tryingGraph, data1)
 
     val data3 = data2.copy(eventKind = classOf[StartEvent], event = null/*??????*/)
