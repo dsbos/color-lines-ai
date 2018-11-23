@@ -96,28 +96,31 @@ class TypesafeBuilder3ExplTest extends FunSuite {
                                                       end:    Option[Double] = None,
                                                       length: Option[Double] = None) {
     // (Can set start iff not already set.)
-    def withStart(start: Double)(implicit state: S#IsStartSet =:= BoolFalse): RangeBuilder[S {type IsStartSet = BoolTrue}] = {
+    def withStart(start: Double)
+                 (implicit state: S#IsStartSet =:= BoolFalse
+                 ): RangeBuilder[S {type IsStartSet = BoolTrue}] = {
       // (Don't need to check at value level whether start is already set.)
-      // (also set third if first is already set)
       this.copy(start = Some(start))
     }
 
     // (Can set end iff neither end nor length already set.)
-    def withEnd(end: Double)(implicit state: S#IsEndSet || S#IsLengthSet =:= BoolFalse): RangeBuilder[S {type IsEndSet = BoolTrue}] = {
-      // (Don't need to check at value level whether end is already set.)
-      // (also set third if first is already set)
+    def withEnd(end: Double)
+               (implicit state: S#IsEndSet || S#IsLengthSet =:= BoolFalse
+               ): RangeBuilder[S {type IsEndSet = BoolTrue}] = {
       this.copy(end = Some(end))
     }
 
     // (Can set length iff neither length nor end already set.)
-    def withLength(length: Double)(implicit state: S#IsLengthSet || S#IsEndSet =:= BoolFalse): RangeBuilder[S {type IsLengthSet = BoolTrue}] = {
-      // (check if length already set (explicitly))
-      // (also set third if first is already set)
+    def withLength(length: Double)
+                  (implicit state: S#IsLengthSet || S#IsEndSet =:= BoolFalse
+                  ): RangeBuilder[S {type IsLengthSet = BoolTrue}] = {
       this.copy(length = Some(length))
     }
 
     // (Can build iff both start and (end or length) are set.)
-    def build()(implicit state: S#IsStartSet && (S#IsLengthSet || S#IsEndSet) =:= BoolTrue): Range = {
+    def build()
+             (implicit state: S#IsStartSet && (S#IsLengthSet || S#IsEndSet) =:= BoolTrue
+             ): Range = {
       val netEnd = end.getOrElse(start.get + length.get)
       Range(start.get, netEnd)
     }
@@ -131,7 +134,7 @@ class TypesafeBuilder3ExplTest extends FunSuite {
     def apply() =
       new RangeBuilder[
         // Type-level instantiation of type-level class with type-level members
-        // set to type-level boolean values:
+        // set to type-level initial boolean values:
         BuilderState {
           type IsStartSet = BoolFalse
           type IsLengthSet = BoolFalse
@@ -170,7 +173,7 @@ class TypesafeBuilder3ExplTest extends FunSuite {
   }
 
   test("Test bad: given nothing") {
-     assertTypeError("RangeBuilder().build")
+    assertTypeError("RangeBuilder().build")
   }
 
   test("Test bad: given only start") {
