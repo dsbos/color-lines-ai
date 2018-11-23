@@ -1,5 +1,6 @@
 package com.us.dsb.explore.tlp
 
+
 /**
   * Open/closed door state with phantom types only (no open/closed value),
   * and *non-static* open/closed methods on trait.
@@ -63,6 +64,4 @@ object DoorState2ExplApp extends App {
   // Allows inferring target type:
   val d2e_c /* : Door[Closed] with Object */ = d1a_o.close()
   val d2h_o /* : Door[Open]   with Object */ = d1b_c.open
-
-
 }

@@ -17,11 +17,7 @@ object DoorState3ExplApp extends App {
   }
   object AbstractDoor {
     def apply[state <: OpennessState]()(implicit tt: TypeTag[state]) = {
-      //println("tt = " + tt)
-      //println("tt.tpe = " + tt.tpe)
-      //println("tt.tpe.typeArgs = " + tt.tpe.typeArgs)
       val x = if (tt.tpe =:= typeOf[Open]) "open1" else "closed1"
-      //println("x = " + x)
       new Door[state](isOpen = x)
     }
 
@@ -72,7 +68,4 @@ object DoorState3ExplApp extends App {
 
   //AbstractDoor.openDoor(d2e2)
   AbstractDoor.closeDoor(d2e2)
-
-
-
 }

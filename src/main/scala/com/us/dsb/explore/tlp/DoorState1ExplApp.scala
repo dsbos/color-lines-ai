@@ -63,6 +63,4 @@ object DoorState1ExplApp extends App {
   // Allows inferring target type:
   val d2e_c /* : Door[Closed] with Object */ = Door.closeDoor(d1a_o)
   val d2h_o /* : Door[Open]   with Object */ = Door.openDoor(d1b_c)
-
-
 }
