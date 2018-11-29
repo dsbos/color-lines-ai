@@ -4,7 +4,7 @@ import java.time.LocalTime
 import java.util.regex.Pattern
 
 
-case class Order(id: String, northing: Int, easting: Int, time: LocalTime) {
+case class Order(id: String, time: LocalTime, northing: Int, easting: Int) {
   import Math._
   val distance = sqrt(pow(northing, 2) + pow(easting, 2))
 }
@@ -46,7 +46,7 @@ object Order {
       }
 
     val orderTime = LocalTime.parse(timeStr)
-    Order(orderId, northing, easting, orderTime)
+    Order(orderId, orderTime, northing, easting)
 
     //??? check out Scala regular expression matching (for match/case)
   }

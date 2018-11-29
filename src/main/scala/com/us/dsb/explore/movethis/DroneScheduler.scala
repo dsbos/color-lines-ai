@@ -11,23 +11,26 @@ object DroneScheduler extends App {
       /*
       Order("XX0001",  0, 100, LocalTime.parse("05:00:00")),
       */
-      Order("XX0002",  0,   5, LocalTime.parse("05:01:00")),
-      Order("XX0003",  0,  50, LocalTime.parse("05:02:00")),
-      Order("XX0004",  0,  10, LocalTime.parse("05:59:00")),
+      Order("XX0002", LocalTime.parse("05:01:00"),  0,   5),
+      Order("XX0003", LocalTime.parse("05:02:00"),  0,  50),
+      Order("XX0004", LocalTime.parse("05:59:00"),  0,  10),
       /*
-      Order("XX0005",  0,  71, LocalTime.parse("16:00:00")),
+      Order("XX0005", LocalTime.parse("16:00:00"),  0,  71),
 
-      Order("XX0007", 70,  70, LocalTime.parse("16:00:00")),
+      Order("XX0007", LocalTime.parse("16:00:00"), 70,  70),
 
       */
-      Order("XX0008",  0,  15, LocalTime.parse("16:00:00")),
-      //Order("XX0010", 99,  99, LocalTime.parse("16:00:00")),
-      //Order("XX0021", 64,  64, LocalTime.parse("16:00:00")),
-      Order("XX0022", 32,  32, LocalTime.parse("16:00:00")),
+      Order("XX0008", LocalTime.parse("16:00:00"),  0,  15),
+      //Order("XX0010", LocalTime.parse("16:00:00"), 99,  99),
+      //Order("XX0021", LocalTime.parse("16:00:00"), 64,  64),
+      Order("XX0022", LocalTime.parse("16:00:00"), 32,  32),
 
-      Order("XX0023", 16,  16, LocalTime.parse("16:00:00")),
-      Order("XX0024",  8,   8, LocalTime.parse("16:00:00"))
-    ).take(10)
+      Order("XX0023", LocalTime.parse("16:00:00"), 16,  16),
+      Order("XX0024", LocalTime.parse("16:00:00"),  8,   8)
+    ).take(
+      // 0
+      7
+    )
 
 
   if (false) for (order <- orders1) {

@@ -31,7 +31,7 @@ object OrderingScorer {
                                         order: Order
                                        ): OrderScoringIncrement = {
 
-    val startTime2 =
+    val startTime =
       if (order.time.isAfter(scoringStateIn.nextAvailableTime)) {
         // Order time is after time drone became available--can't schedule
         // before order was received, so delay start to order time.
@@ -43,42 +43,42 @@ object OrderingScorer {
         scoringStateIn.nextAvailableTime
       }
 
-
-    val startTime1 = scoringStateIn.nextAvailableTime
-
     if (false) {
-      println
-      println(f"@$startTime2: try $Order ${order.id}" +
+      println()
+      println(f"@$startTime: try $Order ${order.id}" +
               f" (${order.northing}%2d N / ${order.easting}%2d E - ${order.distance}%5.2f away):")
     }
 
-    val oneWayTimeSecs = (order.distance / MiscConstants.UNITS_PER_SEC).toLong
+    val oneWayTimeSecs = (order.distance / MiscConstants.SPEED_UNITS_PER_SEC).toInt
 
-    val deliveryTimeIfToday = calcLaterTimeToday(startTime2, oneWayTimeSecs)
+    val deliveryTimeIfToday = calcLaterTimeToday(startTime, oneWayTimeSecs)
     val returnTimeIfToday =
       deliveryTimeIfToday.flatMap(calcLaterTimeToday(_, oneWayTimeSecs))
 
     val (newNextAvailableTime, satCat: SatisfactionCategory) =
       if (returnTimeIfToday.fold(true)(_.isAfter(DroneParameters.WINDOW_END))) {
-        // Can't return by time window end today, so can't deliver order
-        // today--so next-availability time stays same, and customer will be
-        // detractor.
+        // Return time would be after window end today (including overflowing
+        // flowed LocalTime and therefore today), so can't deliver order
+        // today--so next-availability time stays same (for some other order),
+        // and customer will be detractor.
         if (false) println(s"- misses ${DroneParameters.WINDOW_END} 'curfew'")
-        (startTime2, Detractor)
+        (startTime, Detractor)
       }
       else {
+        //?? TODO:  Try to rework to elimimate .get calls (without duplicating
+        //  big comment just above).
         val deliveryLatencySecs =
-          order.time.until(deliveryTimeIfToday.get, ChronoUnit.SECONDS)       //??? FIX .get
-        (returnTimeIfToday.get, SatisfactionCategory.categorizeLatency(deliveryLatencySecs))        //??? FIX .get
+          order.time.until(deliveryTimeIfToday.get, ChronoUnit.SECONDS)
+        (returnTimeIfToday.get,
+            SatisfactionCategory.categorizeLatency(deliveryLatencySecs))
       }
 
     if (false) {
-      println(f"@$startTime2: try $Order ${order.id}" +
-              f" (${order.northing}%2d N / ${order.easting}%2d E - ${order.distance}%5.2f away):  $newNextAvailableTime, $satCat")
+      println(f"@$startTime: try $Order ${order.id}" +
+              f" (${order.northing}%2d N / ${order.easting}%2d E" +
+              f" - ${order.distance}%5.2f away):  $newNextAvailableTime, $satCat")
     }
 
-
-    //println(s"- satCat = $satCat")
     OrderScoringIncrement(newNextAvailableTime, satCat)
   }
 

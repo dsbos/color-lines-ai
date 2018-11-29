@@ -3,24 +3,24 @@ package com.us.dsb.explore.movethis
 
 object ScoringState {
   def apply[TIME](nextAvailableTime: TIME): ScoringState[TIME] = {
-    ScoringState(nextAvailableTime, 0, 0, 0)
+    ScoringState(0, 0, 0, nextAvailableTime)
   }
 }
 
 /**
-  * Minimum state need to score subsequent orders.  (Does not include scheduled
+  * Minimum state needed to score subsequent orders.  (Does not include scheduled
   * order(s).)
   *
-  * @param  nextAvailableTime  next time drone is available to start delivery
   * @param  promCount  number of orders expecting promoter-level satisfaction
   * @param  neutCount  number of orders expecting neutral satisfaction
   * @param  detrCount  number of orders expecting detractor-level satisfaction
+  * @param  nextAvailableTime  time drone is available to start next delivery
   * @tparam  TIME
   */
-case class ScoringState[TIME](nextAvailableTime: TIME,
-                              promCount: Int,
+case class ScoringState[TIME](promCount: Int,
                               neutCount: Int,
-                              detrCount: Int) {
+                              detrCount: Int,
+                              nextAvailableTime: TIME) {
   private def npsOf(promCount: Int, neutCount: Int, detrCount: Int): Float = {
     val total = promCount + neutCount + detrCount
     val promPct = 100f * promCount / total  //???? address "/ 0.0f (-> NaN)"
