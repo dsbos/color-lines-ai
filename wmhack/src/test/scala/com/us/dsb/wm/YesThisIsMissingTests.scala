@@ -1,4 +1,4 @@
-package com.us.dsb.explore.movethis
+package com.us.dsb.wm
 
 import org.scalatest.FunSuite
 
