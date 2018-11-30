@@ -1,14 +1,22 @@
 package com.us.dsb.explore.movethis
 
 
-object ScoringState {
-  def apply[TIME](nextAvailableTime: TIME): ScoringState[TIME] = {
-    ScoringState(0, 0, 0, nextAvailableTime)
+object ScheduleStep {
+  def apply[TIME](startingAvailableTime: TIME,
+                  departureTime: TIME,
+                  deliveryTime: TIME,
+                  nextAvailableTime: TIME): ScheduleStep[TIME] = {
+    ScheduleStep(startingAvailableTime,
+                 "DUMMY",
+                 departureTime,
+                   None,
+                 0, 0, 0,
+                 nextAvailableTime)
   }
 }
 
 /**
-  * Minimum state needed to score subsequent orders.  (Does not include scheduled
+  * Minimum state needed to score subsequent orders.  (Does not include scheduled  //????? turning into schedule step
   * order(s).)
   *
   * @param  promCount  number of orders expecting promoter-level satisfaction
@@ -17,10 +25,40 @@ object ScoringState {
   * @param  nextAvailableTime  time drone is available to start next delivery
   * @tparam  TIME
   */
-case class ScoringState[TIME](promCount: Int,
+case class ScheduleStep[TIME](startingAvailableTime: TIME,
+                              orderId: String,
+                              departureTime: TIME,
+                              deliveryTime: Option[TIME],
+                              promCount: Int,
                               neutCount: Int,
                               detrCount: Int,
                               nextAvailableTime: TIME) {
+println("Instantiated: " + this)
+
+  def withStartingAvailableTime(newValue: TIME): ScheduleStep[TIME] = {
+    copy(startingAvailableTime = newValue)
+  }
+  def withOrderId(newValue: String): ScheduleStep[TIME] = {
+    copy(orderId = newValue)
+  }
+  def withDepartureTime(newValue: TIME): ScheduleStep[TIME] = {
+    copy(departureTime = newValue)
+  }
+  def withDeliveryTime(newValue: Option[TIME]): ScheduleStep[TIME] = {
+    copy(deliveryTime = newValue)
+  }
+  def withIncrementedSatCat(satCat: SatisfactionCategory): ScheduleStep[TIME] = {
+    satCat match {
+      case Promoter  => copy(promCount = promCount + 1)
+      case Neutral   => copy(neutCount = neutCount + 1)
+      case Detractor => copy(detrCount = detrCount + 1)
+    }
+  }
+  def withNextAvailableTime(newValue: TIME): ScheduleStep[TIME] = {
+    copy(nextAvailableTime = newValue)
+  }
+
+
   private def npsOf(promCount: Int, neutCount: Int, detrCount: Int): Float = {
     val total = promCount + neutCount + detrCount
     val promPct = 100f * promCount / total  //???? address "/ 0.0f (-> NaN)"
@@ -32,18 +70,7 @@ case class ScoringState[TIME](promCount: Int,
   /**
     * Expected net-promoter score.
     */
-  val npsPct = npsOf(promCount, neutCount,detrCount)
-
-  def withNextAvailableTime(newValue: TIME): ScoringState[TIME] = {
-    copy(nextAvailableTime = newValue)
-  }
-  def withIncrementedSatCat(satCat: SatisfactionCategory): ScoringState[TIME] = {
-    satCat match {
-      case Promoter  => copy(promCount = promCount + 1)
-      case Neutral   => copy(neutCount = neutCount + 1)
-      case Detractor => copy(detrCount = detrCount + 1)
-    }
-  }
+  val npsPctxx = npsOf(promCount, neutCount, detrCount)
 
   /**
     * Calculates the maximum NPS that is possible from this state with a given

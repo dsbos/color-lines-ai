@@ -23,7 +23,7 @@ object NextOrderPicker1 {
                                   ordering: List[Order],
                                   npsPct: Float)
 
-    def pickNextOrder(scoreSoFar: ScoringState[LocalTime],
+    def pickNextOrder(scoreSoFar: ScheduleStep[LocalTime],
                       ordersSoFar: List[Order],
                       remainingOrders: List[Order]
                      ): OrderAndHighestNps = {
@@ -38,13 +38,13 @@ object NextOrderPicker1 {
       val temp =
         if (! scoreSoFar.nextAvailableTime.isBefore(DroneParameters.WINDOW_END)) {
           ???
-          OrderAndHighestNps(None, Nil, scoreSoFar.npsPct)
+          OrderAndHighestNps(None, Nil, scoreSoFar.npsPctxx)
         }
         else {
           remainingOrders match {
             case Nil =>
               //println(s"$indentation- pickNextOrder(...) . Nil")
-              OrderAndHighestNps(None, Nil, scoreSoFar.npsPct)
+              OrderAndHighestNps(None, Nil, scoreSoFar.npsPctxx)
             case list =>
               //println(s"$indentation- pickNextOrder(...) . list")
               var bestSoFar = OrderAndHighestNps(None, ordersSoFar, -101.0f)
@@ -69,7 +69,12 @@ object NextOrderPicker1 {
       temp
     }
 
-    val nameThis1 = pickNextOrder(ScoringState(availabilityTime), Nil, orders)
+    val nameThis1 =
+      pickNextOrder(ScheduleStep(DroneParameters.WINDOW_START,
+                                 DroneParameters.WINDOW_START,
+                                 DroneParameters.WINDOW_START,
+                                 availabilityTime),
+                    Nil, orders)
     println("nameThis1 = " + nameThis1)
     nameThis1.nextOrder
   }

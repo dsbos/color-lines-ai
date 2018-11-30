@@ -6,6 +6,9 @@ import java.time.temporal.ChronoUnit
 
 object DroneScheduler extends App {
 
+  System.err.println("args = " + args)
+  this.args
+
   val orders1 =
     List[Order](
       /*
@@ -21,15 +24,15 @@ object DroneScheduler extends App {
 
       */
       Order("XX0008", LocalTime.parse("16:00:00"),  0,  15),
-      //Order("XX0010", LocalTime.parse("16:00:00"), 99,  99),
-      //Order("XX0021", LocalTime.parse("16:00:00"), 64,  64),
-      Order("XX0022", LocalTime.parse("16:00:00"), 32,  32),
+      //Order("XX0010", LocalTime.parse("16:00:00"), 0,  99),
+      //Order("XX0021", LocalTime.parse("16:00:00"), 0,  64),
+      Order("XX0022", LocalTime.parse("16:00:00"),  0,  32),
 
-      Order("XX0023", LocalTime.parse("16:00:00"), 16,  16),
-      Order("XX0024", LocalTime.parse("16:00:00"),  8,   8)
+      Order("XX0023", LocalTime.parse("16:00:00"),  0,  16),
+      Order("XX0024", LocalTime.parse("16:00:00"),  0,   8)
     ).take(
       // 0
-      7
+      5
     )
 
 

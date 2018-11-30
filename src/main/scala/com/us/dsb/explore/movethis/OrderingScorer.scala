@@ -23,11 +23,15 @@ object OrderingScorer {
   }
 
   /** ... data's needed to go from one ScoringState to next  */
-  private case class OrderScoringIncrement(newNextAvailableTime: LocalTime,
-                                           satCat: SatisfactionCategory)
+  private case class OrderScoringIncrement(startingAvailableTime: LocalTime,
+                                           orderId: String,
+                                           departureTime: LocalTime,  //??? optional (like deliveryTimexx4)
+                                           deliveryTime: Option[LocalTime],
+                                           satCat: SatisfactionCategory,
+                                           newNextAvailableTime: LocalTime)
 
 
-  private def calcOrderScoringIncrement(scoringStateIn: ScoringState[LocalTime],
+  private def calcOrderScoringIncrement(scoringStateIn: ScheduleStep[LocalTime],
                                         order: Order
                                        ): OrderScoringIncrement = {
 
@@ -55,14 +59,14 @@ object OrderingScorer {
     val returnTimeIfToday =
       deliveryTimeIfToday.flatMap(calcLaterTimeToday(_, oneWayTimeSecs))
 
-    val (newNextAvailableTime, satCat: SatisfactionCategory) =
+    val (newNextAvailableTime, satCat: SatisfactionCategory, deliveryTimeIfDelivered) =
       if (returnTimeIfToday.fold(true)(_.isAfter(DroneParameters.WINDOW_END))) {
         // Return time would be after window end today (including overflowing
         // flowed LocalTime and therefore today), so can't deliver order
         // today--so next-availability time stays same (for some other order),
         // and customer will be detractor.
         if (false) println(s"- misses ${DroneParameters.WINDOW_END} 'curfew'")
-        (startTime, Detractor)
+        (startTime, Detractor, None)
       }
       else {
         //?? TODO:  Try to rework to elimimate .get calls (without duplicating
@@ -70,7 +74,8 @@ object OrderingScorer {
         val deliveryLatencySecs =
           order.time.until(deliveryTimeIfToday.get, ChronoUnit.SECONDS)
         (returnTimeIfToday.get,
-            SatisfactionCategory.categorizeLatency(deliveryLatencySecs))
+            SatisfactionCategory.categorizeLatency(deliveryLatencySecs),
+            deliveryTimeIfToday)
       }
 
     if (false) {
@@ -79,28 +84,40 @@ object OrderingScorer {
               f" - ${order.distance}%5.2f away):  $newNextAvailableTime, $satCat")
     }
 
-    OrderScoringIncrement(newNextAvailableTime, satCat)
+    OrderScoringIncrement(scoringStateIn.nextAvailableTime,
+                          order.id,
+                          startTime,
+                          deliveryTimeIfDelivered,
+                          satCat,
+                          newNextAvailableTime)
   }
 
-  def calcScoringStateWithOrder(scoringStateIn: ScoringState[LocalTime],
+  def calcScoringStateWithOrder(scoringStateIn: ScheduleStep[LocalTime],
                                 order: Order
-                               ): ScoringState[LocalTime] = {
+                               ): ScheduleStep[LocalTime] = {
     val increment = calcOrderScoringIncrement(scoringStateIn, order)
     val scoringStateOut =
         scoringStateIn
-            .withNextAvailableTime(increment.newNextAvailableTime)
+            .withStartingAvailableTime(increment.startingAvailableTime)
+            .withOrderId(increment.orderId)
+            .withDepartureTime(increment.departureTime)
+            .withDeliveryTime(increment.deliveryTime)
             .withIncrementedSatCat(increment.satCat)
+            .withNextAvailableTime(increment.newNextAvailableTime)
     //println("- scoringStateOut = " + scoringStateOut)
     scoringStateOut
   }
 
 
   def scoreOrdering(ordering: List[Order]): Double = {
-    var scoringState = ScoringState[LocalTime](DroneParameters.WINDOW_START)
+    var scoringState = ScheduleStep[LocalTime](DroneParameters.WINDOW_START,
+                                               DroneParameters.WINDOW_START,
+                                               DroneParameters.WINDOW_START,
+                                               DroneParameters.WINDOW_START)  //????? maybe new constructor?
     for (order <- ordering) {
       scoringState = calcScoringStateWithOrder(scoringState, order)
     }
-    val npsPct = scoringState.npsPct
+    val npsPct = scoringState.npsPctxx
     //println("- npsPct = " + npsPct)
     npsPct
   }

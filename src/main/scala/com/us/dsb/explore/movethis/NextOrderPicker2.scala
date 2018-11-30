@@ -81,10 +81,10 @@ object NextOrderPicker2 {
   def pickNextOrderToDeliver(availabilityTime: LocalTime,
                              orders: List[Order]): Option[Order] = {
     //?? rename:
-    case class OrderAndHighestNps(nextOrder: Option[Order],  //??? first order, or next (after ordersSoFar)?
-                                  ordersSoFar: List[Order],  //????
-                                  PROBE:Int,scoringSoFar: List[ScoringState[LocalTime]],
-                                  npsPct: Float)  //????? add ... to return schedule to caller
+    case class SchedulingResults(nextOrder: Option[Order],  //??? first order, or next (after ordersSoFar)?
+                                ordersSoFar: List[Order],  //????
+                                scoringSoFar: List[ScheduleStep[LocalTime]],
+                                npsPct: Float)  //????? add ... to return schedule to caller
 
     var bestCompletedNpsSoFarQuickHack = -101f  //??? is this needed now that there's bestMinNpsSoFarHack?
     var bestMinNpsSoFarHack = -102f
@@ -102,10 +102,10 @@ object NextOrderPicker2 {
       * @return
       */
     def pickNextOrder(ordersSoFar: List[Order],
-                      scoringStateSoFar: ScoringState[LocalTime],
-                      scoringChainSoFar1: List[ScoringState[LocalTime]],   // turn into schedule (with more data)?
+                      scoringStateSoFar: ScheduleStep[LocalTime],
+                      scoringChainSoFar1: List[ScheduleStep[LocalTime]],   // turn into schedule (with more data)?
                       remainingOrders: List[Order]
-                     ): OrderAndHighestNps = {
+                     ): SchedulingResults = {
       callCount += 1
       val depth = orders.size - remainingOrders.size
       val indentation = (1 to depth).map(_ => "  ").mkString
@@ -125,14 +125,14 @@ object NextOrderPicker2 {
       val temp =
         if (! scoringStateSoFar.nextAvailableTime.isBefore(DroneParameters.WINDOW_END)) {
           ???
-          OrderAndHighestNps(None, Nil, 123,scoringChainSoFar1, scoringStateSoFar.npsPct)
+          SchedulingResults(None, Nil, scoringChainSoFar1, scoringStateSoFar.npsPctxx)
         }
         else {
           remainingOrders match {
             case Nil =>
               //println(s"$indentation- pickNextOrder(...) . Nil: scoringSoFar.npsPct = " + scoringSoFar.npsPct)
-              if (scoringStateSoFar.npsPct > bestCompletedNpsSoFarQuickHack) {
-                bestCompletedNpsSoFarQuickHack = scoringStateSoFar.npsPct
+              if (scoringStateSoFar.npsPctxx > bestCompletedNpsSoFarQuickHack) {
+                bestCompletedNpsSoFarQuickHack = scoringStateSoFar.npsPctxx
                 println(s"$indentation- pickNextOrder(...) . Nil: bestCompletedNpsSoFarQuickHack := " +
                         bestCompletedNpsSoFarQuickHack + " (for " + ordersSoFar.map(_.id).mkString(", ") + ")")
                 print("")
@@ -143,13 +143,13 @@ object NextOrderPicker2 {
                         bestMinNpsSoFarHack + " (for " + ordersSoFar.map(_.id).mkString(", "))
                 print("")
               }
-              OrderAndHighestNps(None,
-                                 remainingOrders /* Nil */,
-                                 321,scoringChainSoFar1,
-                                 scoringStateSoFar.npsPct)
+              SchedulingResults(None,
+                                remainingOrders /* Nil */,
+                                scoringChainSoFar1,
+                                scoringStateSoFar.npsPctxx)
             case list =>
               //println(s"$indentation- pickNextOrder(...) . list, size = ${list.size}")
-              var bestChildResults = OrderAndHighestNps(None, ordersSoFar, 123,scoringChainSoFar1, -103.0f)
+              var bestChildResults = SchedulingResults(None, ordersSoFar, scoringChainSoFar1, -103.0f)
 
               //???? sort by heuristic here?
               //???? or maybe get with-child scores first, and then order before recursing?
@@ -195,7 +195,7 @@ object NextOrderPicker2 {
                   print("")
 
                   //????? prune out this call if current best case is worse than bestMinNpsSoFarHack
-                  val OrderAndHighestNps(_, xWHICHordersSoFar, _,scoringChainSoFar2, headBestNpsPct) =
+                  val SchedulingResults(_, xWHICHordersSoFar, scoringChainSoFar2, headBestNpsPct) =
                     pickNextOrder(ordersSoFar :+ child,
                                   scoreWithChild,
                                   scoringChainSoFar1 :+ scoreWithChild,  //???? add here on way down, or below on way up?
@@ -203,9 +203,9 @@ object NextOrderPicker2 {
                   if (headBestNpsPct > bestChildResults.npsPct) {
                     val ordersSoFarWithChild = xWHICHordersSoFar :+ child
                     bestChildResults =
-                        OrderAndHighestNps(Some(child),
+                        SchedulingResults(Some(child),
                                            ordersSoFarWithChild,
-                                           123,scoringChainSoFar2 :+ childAndScoring._2,
+                                           scoringChainSoFar2,
                                            headBestNpsPct)
                     if (false) {
                       println(s"$indentation- pickNextOrder(...) . list . ${child.id}:" +
@@ -229,32 +229,25 @@ object NextOrderPicker2 {
       calcSecondsToNdBoundary(availabilityTime, order)
       //??order.distance
     })
-    val firstOrderPickingResults: OrderAndHighestNps =
+    val schedulingResults: SchedulingResults =
       pickNextOrder(Nil,
-                    ScoringState(availabilityTime),
+                    ScheduleStep(DroneParameters.WINDOW_START,  //???? dummy starting step
+                                 DroneParameters.WINDOW_START,
+                                 DroneParameters.WINDOW_START,
+                                 availabilityTime),
                     Nil,
                     if (false) sortedOrders else orders)
-    println("firstOrderPickingResults = " + firstOrderPickingResults)
-    println("firstOrderPickingResults.ordersSoFar:")
-    firstOrderPickingResults.ordersSoFar.foreach(order => {
-      println("  - " + order)
-    })
-    println("firstOrderPickingResults.scoringSoFar:")
-    firstOrderPickingResults.scoringSoFar.foreach(scoring => {
-      println("  - " + scoring)
-    })
-    val temp =
-      firstOrderPickingResults.scoringSoFar.zip(firstOrderPickingResults.ordersSoFar)
-    println("xxx:")
-    temp.foreach(temp2 => {
-      println("  - " + temp2)
+    println("schedulingResults = " + schedulingResults)
+    println("schedulingResults.scoringSoFar:")
+    schedulingResults.scoringSoFar.foreach(xx => {
+      println("  - xx: " + xx)
     })
 
-    println("firstOrderPickingResults.npsPct = " + firstOrderPickingResults.npsPct)
+    println("schedulingResults.npsPct = " + schedulingResults.npsPct)
     println("pruningCount = " + pruningCount)
     println("callCount = " + callCount)
 
-    firstOrderPickingResults.nextOrder  // ???? first order to schedule (only "next" assuming called in loop)
+    schedulingResults.nextOrder
   }
 
 
