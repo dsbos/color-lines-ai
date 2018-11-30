@@ -78,14 +78,15 @@ object NextOrderPicker2 {
   }
 
 
-  def pickNextOrderToDeliver(availabilityTime: LocalTime,
-                             orders: List[Order]): Option[Order] = {
-    //?? rename:
-    case class SchedulingResults(nextOrder: Option[Order],  //??? first order, or next (after ordersSoFar)?
-                                ordersSoFar: List[Order],  //????
-                                scoringSoFar: List[ScheduleStep[LocalTime]],
-                                npsPct: Float)  //????? add ... to return schedule to caller
+  //?? MOVE
+  case class SchedulingResults(nextOrder: Option[Order],
+                              ordersSoFar: List[Order],  //???? purge? (most in ScheduleStep now
+                              scoringSoFar: List[ScheduleStep[LocalTime]],
+                              npsPct: Float)
 
+
+  def pickNextOrderToDeliver(availabilityTime: LocalTime,
+                             orders: List[Order]): SchedulingResults = {
     var bestCompletedNpsSoFarQuickHack = -101f  //??? is this needed now that there's bestMinNpsSoFarHack?
     var bestMinNpsSoFarHack = -102f
     println(s"pickNextOrderToDeliver(...) . 0: bestCompletedNpsSoFarQuickHack := " + bestCompletedNpsSoFarQuickHack)
@@ -247,7 +248,7 @@ object NextOrderPicker2 {
     println("pruningCount = " + pruningCount)
     println("callCount = " + callCount)
 
-    schedulingResults.nextOrder
+    schedulingResults
   }
 
 
