@@ -11,53 +11,37 @@ case class Order(id: String, time: LocalTime, northing: Int, easting: Int) {
 
 
 object Order {
-
+  // Format: like "WM1234 N1E10 05:40:59"
   private val LOCATION_REGEXP = Pattern.compile("([NS])([0-9]+)([EW])([0-9]+)")
 
-  // Quick hack
-  def decode(orderLine: String): Order = { //???? Option?
+  // Quick hack (including: no explicit error checking/reporting.
+  def decode(orderLine: String): Order = {
+    // TODO:  Check out using Scala regular expression matching in Scala pattern
+    // matches.
 
-    // "WM1234 N1E10 05:40:59"
     val Array(orderId, locStr, timeStr) = orderLine.split(" ")
+    val matchResult = LOCATION_REGEXP.matcher(locStr)
 
-    val p = LOCATION_REGEXP
+    matchResult.matches()  // need to call to avoid "No match found" for .group(...)
+    val ns    = matchResult.group(1)
+    val nsVal = matchResult.group(2)
+    val ew    = matchResult.group(3)
+    val ewStr = matchResult.group(4)
 
-
-    //val t2 = t1.matcher(locStr)
-    val t2 = LOCATION_REGEXP.matcher("N1E10")
-    println("t2 = " + t2)
-    t2.matches()  // need to call to avoid "No match found" for .group(...)
-
-    val g1 = t2.group(1) ; println("g1 = " + g1)
-    val g2 = t2.group(2) ; println("g2 = " + g2)
-    val g3 = t2.group(3) ; println("g3 = " + g3)
-    val g4 = t2.group(4) ; println("g4 = " + g4)
-    val absNorthing = g2.toInt
+    val absNorthing = nsVal.toInt
     val northing =
-      g1 match {
+      ns match {
         case "N" => absNorthing
         case "S" => -absNorthing
       }
-    val absEasting = g4.toInt
+    val absEasting = ewStr.toInt
     val easting =
-      g3 match {
+      ew match {
         case "E" => absEasting
         case "W" => -absEasting
       }
 
     val orderTime = LocalTime.parse(timeStr)
     Order(orderId, orderTime, northing, easting)
-
-    //??? check out Scala regular expression matching (for match/case)
   }
-
-  def main(args: Array[String]): Unit = {
-    val testIn = "WM1234 N1E10 05:40:59"
-    val testOut = decode(testIn)
-    println("testIn  = " + testIn)
-    println("testOut = " + testOut)
-
-
-  }
-
 }
