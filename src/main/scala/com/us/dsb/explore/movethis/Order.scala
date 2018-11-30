@@ -14,7 +14,7 @@ object Order {
   // Format: like "WM1234 N1E10 05:40:59"
   private val LOCATION_REGEXP = Pattern.compile("([NS])([0-9]+)([EW])([0-9]+)")
 
-  // Quick hack (including: no explicit error checking/reporting.
+  // Quick hack (including: no explicit error checking/reporting):
   def decode(orderLine: String): Order = {
     // TODO:  Check out using Scala regular expression matching in Scala pattern
     // matches.

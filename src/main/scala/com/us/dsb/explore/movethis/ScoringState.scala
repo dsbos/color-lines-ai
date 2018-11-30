@@ -2,22 +2,24 @@ package com.us.dsb.explore.movethis
 
 
 object ScheduleStep {
-  def apply[TIME](startingAvailableTime: TIME,
-                  departureTime: TIME,
-                  deliveryTime: TIME,
-                  nextAvailableTime: TIME): ScheduleStep[TIME] = {
-    ScheduleStep(startingAvailableTime,
-                 "DUMMY",
-                 departureTime,
-                   None,
+
+  /**
+    * Creates dummy base scheduling step.
+    */
+  def apply[TIME](initialDroneAvailabilityTime: TIME): ScheduleStep[TIME] = {
+    ScheduleStep(initialDroneAvailabilityTime,
+                 "Dummy starting scheduling step",
+                 initialDroneAvailabilityTime,  // ??: -> None
+                 None,
                  0, 0, 0,
-                 nextAvailableTime)
+                 initialDroneAvailabilityTime)
   }
 }
 
 /**
-  * Minimum state needed to score subsequent orders.  (Does not include scheduled  //????? turning into schedule step
-  * order(s).)
+  * TODO: Update per changes to turn into ScheduleStop:
+  * Minimum state needed to score subsequent orders.  (Does not include
+  * scheduled order(s).)
   *
   * @param  promCount  number of orders expecting promoter-level satisfaction
   * @param  neutCount  number of orders expecting neutral satisfaction
@@ -27,13 +29,12 @@ object ScheduleStep {
   */
 case class ScheduleStep[TIME](startingAvailableTime: TIME,
                               orderId: String,
-                              departureTime: TIME,
+                              departureTime: TIME,  // TODO:  Add Option[] as for deliveryTime
                               deliveryTime: Option[TIME],
                               promCount: Int,
                               neutCount: Int,
                               detrCount: Int,
                               nextAvailableTime: TIME) {
-println("Instantiated: " + this)
 
   def withStartingAvailableTime(newValue: TIME): ScheduleStep[TIME] = {
     copy(startingAvailableTime = newValue)
@@ -61,7 +62,7 @@ println("Instantiated: " + this)
 
   private def npsOf(promCount: Int, neutCount: Int, detrCount: Int): Float = {
     val total = promCount + neutCount + detrCount
-    val promPct = 100f * promCount / total  //???? address "/ 0.0f (-> NaN)"
+    val promPct = 100f * promCount / total  // x / 0f yield NaN (not exception)
     val detrPct = 100f * detrCount / total
     val npsPct = promPct - detrPct
     npsPct
@@ -70,11 +71,11 @@ println("Instantiated: " + this)
   /**
     * Expected net-promoter score.
     */
-  val npsPctxx = npsOf(promCount, neutCount, detrCount)
+  val npsPct = npsOf(promCount, neutCount, detrCount)
 
   /**
     * Calculates the maximum NPS that is possible from this state with a given
-    * number of additional orders.
+    * number of additional orders.  (Intended for traversal pruning.)
     */
   def maxPossibleNps(additional: Int): Float = {
     val maxPossiblePromCount  = promCount + additional
@@ -85,9 +86,8 @@ println("Instantiated: " + this)
 
   /**
     * Calculates the minimum NPS that is possible from this state with a given
-    * number of additional orders.
+    * number of additional orders.  (Intended for traversal pruning.)
     */
-
   def minPossibleNps(additional: Int): Float = {
     val minPossiblePromCount  = promCount
     val maxPossibleDetrCount  = detrCount + additional

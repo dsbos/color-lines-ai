@@ -7,14 +7,14 @@ import java.time.temporal.ChronoUnit
 
 object OrderingScorer {
 
-
-  // (For dealing with having used LocalTime for times.)
+  // (For dealing with choice of using LocalTime for times (because the
+  // problem statement seemed to deal with one day in isolation).)
   private def calcLaterTimeToday(baseTime: LocalTime,
                                  intervalSecs: Long): Option[LocalTime] = {
     assert(0 <= intervalSecs)
     val rawSum = baseTime.plusSeconds(intervalSecs)
     if (rawSum.isBefore(baseTime)) {
-      // Overflowed LocalTime, so past midnight, so nonviable  //?? move
+      // Overflowed LocalTime, so past midnight, so not a time in same day.
       None
     }
     else {
@@ -22,19 +22,17 @@ object OrderingScorer {
     }
   }
 
-  /** ... data's needed to go from one ScoringState to next  */
+  /** ... data that's needed to go from one SchedulingStep to next  */
   private case class OrderScoringIncrement(startingAvailableTime: LocalTime,
                                            orderId: String,
-                                           departureTime: LocalTime,  //??? optional (like deliveryTimexx4)
+                                           departureTime: LocalTime,  // TODO: Option (like deliveryTime)
                                            deliveryTime: Option[LocalTime],
                                            satCat: SatisfactionCategory,
                                            newNextAvailableTime: LocalTime)
 
-
   private def calcOrderScoringIncrement(scoringStateIn: ScheduleStep[LocalTime],
                                         order: Order
                                        ): OrderScoringIncrement = {
-
     val startTime =
       if (order.time.isAfter(scoringStateIn.nextAvailableTime)) {
         // Order time is after time drone became available--can't schedule
@@ -46,12 +44,6 @@ object OrderingScorer {
       else {
         scoringStateIn.nextAvailableTime
       }
-
-    if (false) {
-      println()
-      println(f"@$startTime: try $Order ${order.id}" +
-              f" (${order.northing}%2d N / ${order.easting}%2d E - ${order.distance}%5.2f away):")
-    }
 
     val oneWayTimeSecs = (order.distance / MiscConstants.SPEED_UNITS_PER_SEC).toInt
 
@@ -65,7 +57,6 @@ object OrderingScorer {
         // flowed LocalTime and therefore today), so can't deliver order
         // today--so next-availability time stays same (for some other order),
         // and customer will be detractor.
-        if (false) println(s"- misses ${DroneParameters.WINDOW_END} 'curfew'")
         (startTime, Detractor, None)
       }
       else {
@@ -77,12 +68,6 @@ object OrderingScorer {
             SatisfactionCategory.categorizeLatency(deliveryLatencySecs),
             deliveryTimeIfToday)
       }
-
-    if (false) {
-      println(f"@$startTime: try $Order ${order.id}" +
-              f" (${order.northing}%2d N / ${order.easting}%2d E" +
-              f" - ${order.distance}%5.2f away):  $newNextAvailableTime, $satCat")
-    }
 
     OrderScoringIncrement(scoringStateIn.nextAvailableTime,
                           order.id,
@@ -104,21 +89,15 @@ object OrderingScorer {
             .withDeliveryTime(increment.deliveryTime)
             .withIncrementedSatCat(increment.satCat)
             .withNextAvailableTime(increment.newNextAvailableTime)
-    //println("- scoringStateOut = " + scoringStateOut)
     scoringStateOut
   }
 
 
-  def scoreOrdering(ordering: List[Order]): Double = {
-    var scoringState = ScheduleStep[LocalTime](DroneParameters.WINDOW_START,
-                                               DroneParameters.WINDOW_START,
-                                               DroneParameters.WINDOW_START,
-                                               DroneParameters.WINDOW_START)  //????? maybe new constructor?
+  def scoreOrdering(ordering: List[Order]): Float = {
+    var scoringState = ScheduleStep[LocalTime](DroneParameters.WINDOW_START)
     for (order <- ordering) {
       scoringState = calcScoringStateWithOrder(scoringState, order)
     }
-    val npsPct = scoringState.npsPctxx
-    //println("- npsPct = " + npsPct)
-    npsPct
+    scoringState.npsPct
   }
 }
