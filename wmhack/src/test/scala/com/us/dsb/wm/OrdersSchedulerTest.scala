@@ -117,7 +117,7 @@ class OrdersSchedulerTest extends FunSuite {
     assertResult(100)(actual.npsPct)
   }
 
-  test("unpreventable detractor distance should not block higher-possibility orders") {
+  test("unpreventable-detractor order should be deferred until after other orders") {
 
     // 3.5 hr * 60 = 210 min
     val ordersIn =
@@ -134,10 +134,23 @@ class OrdersSchedulerTest extends FunSuite {
     val expectedSchedule =
       List(ScheduleStep("06:00".t, "xxxTest1", "07:00".t, Some("07:11".t), 1, 0, 0, "07:22".t))
 
-    //assertResult(Some(simpleOrder))(actual.nextOrder)
-    assertResult(Nil)(actual.ordersSoFar)  //?? broken (off by one); purge that field anyway?
-    assertResult(expectedSchedule)(actual.schedule)
-    assertResult(100)(actual.npsPct)
+    assertResult(
+      List(
+        ("WM0002", "07:00:00".t),
+        ("WM0003", "07:04:00".t),
+        ("WM0004", "07:10:00".t),
+        ("WM0005", "07:18:00".t),
+        ("WM0006", "07:28:00".t),
+        ("WM0007", "07:40:00".t),
+        ("WM0001", "07:54:00".t)
+      )
+    ) {
+      actual.schedule.map(s => (s.orderId, s.departureTime))
+    }
+
+    assertResult(Nil)(actual.ordersSoFar)
+    // 6 promotors, 1 detractor, 7 orders, (6 - 1) / 7 * 100%  = 5/7 ~= 71.42857
+    assertResult(100f * 5 / 7)(actual.npsPct)  // (Float, not Double)
   }
 
 }
