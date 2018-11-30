@@ -118,7 +118,6 @@ class OrdersSchedulerTest extends FunSuite {
   }
 
   test("unpreventable-detractor order should be deferred until after other orders") {
-
     // 3.5 hr * 60 = 210 min
     val ordersIn =
       List(Order.decode("WM0001 N222E222 06:00:00"),
@@ -147,10 +146,39 @@ class OrdersSchedulerTest extends FunSuite {
     ) {
       actual.schedule.map(s => (s.orderId, s.departureTime))
     }
-
-    assertResult(Nil)(actual.ordersSoFar)
     // 6 promotors, 1 detractor, 7 orders, (6 - 1) / 7 * 100%  = 5/7 ~= 71.42857
     assertResult(100f * 5 / 7)(actual.npsPct)  // (Float, not Double)
+  }
+
+  test("... too much delivery for one day ... ") {
+    // 6 am - 10 pm = 16 hrs, 16 * 60 =  960 mins
+    // 3.5 hr * 60 = 210 min
+    val ordersIn =
+      List(Order.decode("WM0001 N0E100 06:00:00"),  // 200 min
+           Order.decode("WM0002 N0E100 07:00:00"),  // 400
+           Order.decode("WM0003 N0E100 07:01:00"),  // 600
+           Order.decode("WM0004 N0E100 07:02:00"),  // 800
+           Order.decode("WM0005 N0E100 07:03:00"),  // 1000
+           Order.decode("WM0006 N0E100 07:03:00")  // ??
+      )
+
+    val actual = OrdersScheduler.scheduleAllOrders(ordersIn)
+    val expectedSchedule =
+      List(ScheduleStep("06:00".t, "xxxTest1", "07:00".t, Some("07:11".t), 1, 0, 0, "07:22".t))
+
+    assertResult(
+      List(
+        ("WM0001", "06:00:00".t, Some("07:40:00".t)),
+        ("WM0002", "09:20:00".t, Some("11:00:00".t)),
+        ("WM0003", "12:40:00".t, Some("14:20:00".t)),
+        ("WM0004", "16:00:00".t, Some("17:40:00".t)),
+        ("WM0005", "19:20:00".t, None),
+        ("WM0006", "19:20:00".t, None)
+      )
+    ) {
+      actual.schedule.map(s => (s.orderId, s.departureTime, s.deliveryTime))
+    }
+    assertResult(100f * -5 / 6)(actual.npsPct)  // (Float, not Double)
   }
 
 }
