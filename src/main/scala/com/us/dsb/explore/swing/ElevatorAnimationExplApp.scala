@@ -28,7 +28,7 @@ private object ElevatorAnimationExplApp extends App {
     private val CarYPerTick = 0.1
     private val TickMs = 1
 
-    private var HoistwayRect = new Rectangle2D.Float(HorizontalSpace, 0, HoistwayWidth, HoistwayHeight)
+    private var HoistwayRect = new Rectangle2D.Float(HorizontalSpace.toFloat, 0, HoistwayWidth.toFloat, HoistwayHeight.toFloat)
 
     private object MovementState extends Enumeration {
       type MovementState = Value

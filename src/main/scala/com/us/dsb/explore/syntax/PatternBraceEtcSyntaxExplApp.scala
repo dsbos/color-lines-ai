@@ -12,47 +12,48 @@ object PatternBraceEtcSyntaxExplApp extends App {
   val c2: List[Any] = List((1, 101), (2, "1 0 2"), 3, (4, 404, "FOUR"))
 
 
-  c1.foreach _
+  c1.foreach _ : @annotation.nowarn
+
   if (false) {
     c1.foreach(null)
     c1.foreach{null}
   }
 
 
-  c1  .foreach(v => println)
-  //c1.foreach(v => println; println)        // syntax: expected ")" at the ";"
-  c1  .foreach(v => {println; println})
-  //c1.foreach(v => (println; println))      // syntax: expected ")" at the ";"
+  c1  .foreach(v => println())
+  //c1.foreach(v => println(); println())        // syntax: expected ")" at the ";"
+  c1  .foreach(v => {println(); println()})
+  //c1.foreach(v => (println(); println()))      // syntax: expected ")" at the ";"
 
-  //c1.foreach(v: B => println)             // ~syntax: "not found: type println"
-  //c1.foreach(v: B => println; println)    // syntax: expected ")" at the ";"
-  //c1.foreach(v: B => {println; println})  // syntax: ill. start of decl. at first "println"
-  //c1.foreach(v: B => (println; println))  // syntax: expected ")" at the ";"
+  //c1.foreach(v: B => println())             // ~syntax: "not found: type println"
+  //c1.foreach(v: B => println(); println())    // syntax: expected ")" at the ";"
+  //c1.foreach(v: B => {println(); println()})  // syntax: ill. start of decl. at first "println"
+  //c1.foreach(v: B => (println(); println()))  // syntax: expected ")" at the ";"
 
-  c1  .foreach((v: Base) => println)
-  //c1.foreach((v: B) => println; println)    // syntax: expected ")" at the ";"
-  c1  .foreach((v: Base) => {println; println})
-  //c1.foreach((v: B) => (println; println))  // syntax: expected ")" at the ";"
+  c1  .foreach((v: Base) => println())
+  //c1.foreach((v: B) => println(); println())    // syntax: expected ")" at the ";"
+  c1  .foreach((v: Base) => {println(); println()})
+  //c1.foreach((v: B) => (println(); println()))  // syntax: expected ")" at the ";"
 
-  //c1.foreach((v: Der1) => println)             // type mismatch; was Der1 => Unit,  req'd: B => ?
-  //c1.foreach((v: Der1) => println; println)    // syntax: expected ")" at the ";"
-  //c1.foreach((v: Der1) => {println; println})  // type mismatch; was Der1 => Unit,  req'd: B => ?
-  //c1.foreach((v: Der1) => (println; println))  // syntax: expected ")" at the ";"
+  //c1.foreach((v: Der1) => println())             // type mismatch; was Der1 => Unit,  req'd: B => ?
+  //c1.foreach((v: Der1) => println(); println())    // syntax: expected ")" at the ";"
+  //c1.foreach((v: Der1) => {println(); println()})  // type mismatch; was Der1 => Unit,  req'd: B => ?
+  //c1.foreach((v: Der1) => (println(); println()))  // syntax: expected ")" at the ";"
 
 
-  c1.foreach(v => {println; println})
-  c1.foreach((v: Base) => {println; println})
-  //c1.foreach((v: Der1) => {println; println})  // type mismatch; was Der1 => Unit,  req'd: B => ?
-  c1.foreach({v => println; println})
-  c1.foreach({v: Base => println; println})
-  //c1.foreach({v: Der1 => println; println})  // type mismatch; was Der1 => Unit,  req'd: B => ?
+  c1.foreach(v => {println(); println()})
+  c1.foreach((v: Base) => {println(); println()})
+  //c1.foreach((v: Der1) => {println(); println()})  // type mismatch; was Der1 => Unit,  req'd: B => ?
+  c1.foreach({v => println(); println()})
+  c1.foreach({v: Base => println(); println()})
+  //c1.foreach({v: Der1 => println(); println()})  // type mismatch; was Der1 => Unit,  req'd: B => ?
 
-  c1.foreach{v => {println; println}}
-  c1.foreach{(v: Base) => {println; println}}
-  //c1.foreach{(v: Der1) => {println; println}}  // type mismatch; was Der1 => Unit,  req'd: B => ?
-  c1.foreach{{v => println; println}}
-  c1.foreach{{v: Base => println; println}}
-  //c1.foreach{{v: Der1 => println; println}}  // type mismatch; was Der1 => Unit,  req'd: B => ?
+  c1.foreach{v => {println(); println()}}
+  c1.foreach{(v: Base) => {println(); println()}}
+  //c1.foreach{(v: Der1) => {println(); println()}}  // type mismatch; was Der1 => Unit,  req'd: B => ?
+  c1.foreach{{v => println(); println()}}
+  c1.foreach{{v: Base => println(); println()}}
+  //c1.foreach{{v: Der1 => println(); println()}}  // type mismatch; was Der1 => Unit,  req'd: B => ?
 
 
   /*

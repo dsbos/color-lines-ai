@@ -352,7 +352,7 @@ object EightQueens {
     //solve1()
     //solve2()
     (1 to 3).foreach(_ => {
-      println
+      println()
       val from = 8
       val to = from
       (from to to).foreach(order => solve3(order))

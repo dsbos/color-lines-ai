@@ -140,49 +140,49 @@ class TypesafeBuilder2ExplTest extends AnyFunSuite {
 
 
   test("Test good: given start and end") {
-    val r1 = RangeBuilder().withStart(1.0).withEnd(10.0).build
+    val r1 = RangeBuilder().withStart(1.0).withEnd(10.0).build()
     assert(((1.0, 9.0, 10.0)) == ((r1.start, r1.length, r1.end)))
   }
   test("Test good: given end and THEN start") {
-    val r1 = RangeBuilder().withEnd(10.0).withStart(1.0).build
+    val r1 = RangeBuilder().withEnd(10.0).withStart(1.0).build()
     assert(((1.0, 9.0, 10.0)) == ((r1.start, r1.length, r1.end)))
   }
 
   test("Test good: given start and length") {
-    val r1 = RangeBuilder().withStart(1.0).withLength(9.0).build
+    val r1 = RangeBuilder().withStart(1.0).withLength(9.0).build()
     assert(((1.0, 9.0, 10.0)) == ((r1.start, r1.length, r1.end)))
   }
   test("Test good: given length and THEN start") {
-    val r1 = RangeBuilder().withLength(9.0).withStart(1.0).build
+    val r1 = RangeBuilder().withLength(9.0).withStart(1.0).build()
     assert(((1.0, 9.0, 10.0)) == ((r1.start, r1.length, r1.end)))
   }
 
   test("Test bad: given length and end and no start") {
-    assertTypeError("RangeBuilder().withLength(9.0).withEnd(10.0).build")
+    assertTypeError("RangeBuilder().withLength(9.0).withEnd(10.0).build()")
   }
   test("Test bad: given both end and length (no start)") {
-    assertTypeError("RangeBuilder().withEnd(10.0).withLength(9.0).build")
+    assertTypeError("RangeBuilder().withEnd(10.0).withLength(9.0).build()")
   }
   test("Test bad: given both end and length (and start)") {
-    assertTypeError("RangeBuilder().withStart(1).withEnd(10.0).withLength(9.0).build")
+    assertTypeError("RangeBuilder().withStart(1).withEnd(10.0).withLength(9.0).build()")
   }
 
   test("Test bad: given nothing") {
-     assertTypeError("RangeBuilder().build")
+     assertTypeError("RangeBuilder().build()")
   }
 
   test("Test bad: given only start") {
-    assertTypeError("RangeBuilder().withStart(1.0).build")
+    assertTypeError("RangeBuilder().withStart(1.0).build()")
   }
   test("Test bad: given only length") {
-    assertTypeError("RangeBuilder().withLength(9.0).build")
+    assertTypeError("RangeBuilder().withLength(9.0).build()")
   }
   test("Test bad: given only end") {
-    assertTypeError("RangeBuilder().withEnd(10.0).build")
+    assertTypeError("RangeBuilder().withEnd(10.0).build()")
   }
 
   test("Test bad: given extra: start, start, end (full chain)") {
-    assertTypeError("RangeBuilder().withStart(1.0).withStart(1.0).withEnd(10.0).build")
+    assertTypeError("RangeBuilder().withStart(1.0).withStart(1.0).withEnd(10.0).build()")
   }
 
   test("Test bad: given extra: start, start (fail-fast short chain)") {

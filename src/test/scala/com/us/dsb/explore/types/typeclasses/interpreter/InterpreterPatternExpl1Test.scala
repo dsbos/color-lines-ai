@@ -70,6 +70,7 @@ class InterpreterPatternExpl1Test extends AnyFunSpec {
         case IntProp("c")        => 400
         case IfPositive(cond, ifPos, ifNonPos) =>
           if (evaluate(cond).value > 0) evaluate(ifPos).value else evaluate(ifNonPos).value
+        case _ => fail()
       }
     IntValue(value)
   }
@@ -139,6 +140,7 @@ class InterpreterPatternExpl1Test extends AnyFunSpec {
         //case Plus(left, right)  => listProperties(left) ++ listProperties(right)
         //case Times(left, right) => listProperties(left) ++ listProperties(right)
         case IfPositive(c, p, n) => List(c, p, n).map(listProperties(_)).flatten.toSet
+        case _ => fail()
       }
     value
   }

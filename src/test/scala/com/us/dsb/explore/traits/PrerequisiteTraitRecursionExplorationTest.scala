@@ -79,7 +79,7 @@ class PrerequisiteTraitRecursionExplorationTest extends AnyFunSuite {
       println("method2( 1) = " + x1.method2( 1))
       println("method2( 0) = " + x1.method2( 0))
       println("method2(-1) = " + x1.method2(-1))
-      println
+      println()
     }
 
     if (false) {
@@ -90,7 +90,7 @@ class PrerequisiteTraitRecursionExplorationTest extends AnyFunSuite {
       println("method2( 1) = " + x1.method2( 1))
       println("method2( 0) = " + x1.method2( 0))
       println("method2(-1) = " + x1.method2(-1))
-      println
+      println()
     }
 
 
@@ -102,7 +102,7 @@ class PrerequisiteTraitRecursionExplorationTest extends AnyFunSuite {
       println("method2( 1) = " + x1.method2( 1))
       println("method2( 0) = " + x1.method2( 0))
       println("method2(-1) = " + x1.method2(-1))
-      println
+      println()
     }
 
   }

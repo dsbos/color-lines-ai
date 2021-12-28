@@ -130,7 +130,7 @@ class ValueClassDeclarationsExplTest extends AnyFunSuite {
 
     Try1("")
     Try4("")
-    Try4("someString").m1
+    Try4("someString").m1()
     Try6("")  // ????
     Try7("")  // ????
     Try8("whole")  // ????

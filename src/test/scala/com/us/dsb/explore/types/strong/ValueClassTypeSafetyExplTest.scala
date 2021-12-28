@@ -72,9 +72,9 @@ class ValueClassTypeSafetyExplTest extends AnyFunSuite {
     assertResult(false)(movingTime1 == movingTime2)
 
     // Fails to catch wrong type (worse, it always returns false).
-    assertResult(false)(spNumber == movingTime1)
-    assertResult(false)(spNumber == 30)              // !
-    assertResult(false)(spNumber == spNumber.value)  // !
+    assertResult(false)(spNumber == movingTime1    : @annotation.nowarn )
+    assertResult(false)(spNumber == 30             : @annotation.nowarn )  // !
+    assertResult(false)(spNumber == spNumber.value : @annotation.nowarn )  // !
     // If warnings enabled:
     // "Warning:(...) comparing case class values of types ... SpNumber and
     //   MovingTime using `==' will always yield false

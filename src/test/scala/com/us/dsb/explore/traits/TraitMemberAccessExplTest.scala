@@ -48,14 +48,14 @@ class TraitMemberAccessExplTest extends AnyFunSuite {
     "val xc6 = Cls#O"     shouldNot compile  // "';' expected but '#' found"
 
     val xi1 = inst.v
-    val xi2 = inst.m
+    val xi2 = inst.m()
     val xi3: inst.T = 1
     "val xi4: inst#T = 1" shouldNot compile  // "not found: type inst"
     val xi5 = inst.O
     "val xi6 = inst#O"    shouldNot compile  // "';' expected but '#' found"
 
     val xo1 = Obj.v
-    val xo2 = Obj.m
+    val xo2 = Obj.m()
     val xo3: Obj.T = 1
     "val xo4: Obj#T = 1"  shouldNot compile  // "not found: type Obj"
     val xo5 = Obj.O

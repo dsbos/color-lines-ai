@@ -100,6 +100,7 @@ class InterpreterPatternExpl2Test extends AnyFunSpec {
       case Plus(left, right)  => evaluateDirectly(left) + evaluateDirectly(right)
       case Times(left, right) => evaluateDirectly(left) * evaluateDirectly(right)
       case IntProp("a")       => 100
+      case _ => fail()
     }
   }
 
@@ -117,7 +118,8 @@ class InterpreterPatternExpl2Test extends AnyFunSpec {
       litFn   = {case IntValue(value) => value},
       plusFn  = {case Plus(left, right) => evalViaFold2(left) + evalViaFold2(right)},
       timesFn = {case Times(left, right) => evalViaFold2(left) * evalViaFold2(right)},
-      propFn  = {case IntProp("a") => 100}
+      propFn  = {case IntProp("a") => 100 case _ => fail()
+      }
     )
   }
 

@@ -34,7 +34,7 @@ libraryDependencies ++= Seq(
 
 
   // Stronger types:  newtypes and refine's refinement types
-  // "io.estatico" %% "newtype"             % "0.4.3",
+  "io.estatico" %% "newtype"             % "0.4.3",
   // "eu.timepit"  %% "refined"                 % "0.9.28",/
   //"eu.timepit"  %% "refined-cats"            % "0.9.28", // optional
   //"eu.timepit"  %% "refined-eval"            % "0.9.28", // optional, JVM-only
@@ -46,12 +46,11 @@ libraryDependencies ++= Seq(
   //"eu.timepit"  %% "refined-scopt"           % "0.9.28", // optional
   //"eu.timepit"  %% "refined-shapeless"       % "0.9.28",  // optional
 
-
-  // "org.typelevel"  %% "cats-core"           % "2.1.0",
+  "org.typelevel"  %% "cats-core"           % "2.1.0",
   // "org.typelevel"  %% "cats-effect"         % "2.1.0",
 
 
-  // "com.github.cb372" %% "cats-retry" % "2.1.0",
+  "com.github.cb372" %% "cats-retry" % "2.1.0",
   // "org.typelevel"  %% "squants"  % "1.6.0",
 
   // https://github.com/typelevel/kind-projector:
@@ -75,10 +74,10 @@ libraryDependencies ++= Seq(
 )
 
 
-//??    lazy val buildFirst = (project in file("buildFirst"))
-//??    //    .settings(publishArtifact := false)
+lazy val buildFirst = (project in file("buildFirst"))
+//    .settings(publishArtifact := false)
 
 
-    lazy val root = (project in file("."))
-//??        .aggregate(buildFirst)
-//??        .dependsOn(buildFirst)
+lazy val root = (project in file("."))
+    .aggregate(buildFirst)
+    .dependsOn(buildFirst)

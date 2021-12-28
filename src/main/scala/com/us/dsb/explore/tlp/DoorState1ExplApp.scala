@@ -18,8 +18,8 @@ object DoorState1ExplApp extends App {
     def apply[state <: OpennessState]() = new Door[state]() { /* (non-abstract) */ }
 
     // (State-changing methods are static (not on Door trait/class). */
-    def openDoor[state <: Closed](d: Door[state]) = Door[Open]
-    def closeDoor[state <: Open](d: Door[state]) = Door[Closed]
+    def openDoor[state <: Closed](d: Door[state]) = Door[Open]()
+    def closeDoor[state <: Open](d: Door[state]) = Door[Closed]()
   }
 
   // Allows creating in either Open or Closed state:

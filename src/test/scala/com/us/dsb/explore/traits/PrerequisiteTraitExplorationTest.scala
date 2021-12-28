@@ -135,7 +135,7 @@ class PrerequisiteTraitExplorationTest extends AnyFunSuite {
 
     val x11 = new ClientClass1
     //val x12 = new ClientClass2
-    val x21 = x11.requiringMethod
+    val x21 = x11.requiringMethod()
     //val x22 = x12.method
     println("x21 = " + x21)
     //println("x22 = " + x22)

@@ -5,6 +5,10 @@ import java.awt.geom.{AffineTransform, Ellipse2D, Rectangle2D}
 import scala.swing.BorderPanel.Position
 import scala.swing._
 
+// re" reflective access of structural type member variable blockRot should be enabled" ...
+import scala.language.reflectiveCalls
+
+
 
 object DrawExplApp extends App {
   println("main started...")

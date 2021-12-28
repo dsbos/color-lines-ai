@@ -34,7 +34,7 @@ import org.specs2.runner.JUnitRunner
 
 class StackSuite extends Assertions {
 
-  @Test def stackShouldPopValuesIinLastInFirstOutOrder() {
+  @Test def stackShouldPopValuesIinLastInFirstOutOrder() = {
     val stack = new Stack[Int]
     stack.push(1)
     stack.push(2)
@@ -42,7 +42,7 @@ class StackSuite extends Assertions {
     assert(stack.pop() === 1)
   }
 
-  @Test def stackShouldThrowNoSuchElementExceptionIfAnEmptyStackIsPopped() {
+  @Test def stackShouldThrowNoSuchElementExceptionIfAnEmptyStackIsPopped() = {
     val emptyStack = new Stack[String]
     intercept[NoSuchElementException] {
       emptyStack.pop()
@@ -63,13 +63,13 @@ import org.scalatest._
 class ListSuite extends AnyFunSuite /*with Matchers/*ShouldMatchers*/*/ {
 
   test("An empty list should be empty") {
-    List() should be ('empty)
-    Nil should be ('empty)
+    List() should be (Symbol("empty"))
+    Nil should be (Symbol("empty"))
   }
 
   test("A non-empty list should not be empty") {
-    List(1, 2, 3) should not be ('empty)
-    List("fee", "fie", "foe", "fum") should not be ('empty)
+    List(1, 2, 3) should not be (Symbol("empty"))
+    List("fee", "fie", "foe", "fum") should not be (Symbol("empty"))
   }
 
   test("A list's length should equal the number of elements it contains") {
