@@ -18,7 +18,7 @@ scalacOptions += "-feature"
 libraryDependencies ++= Seq(
   "org.scalatest" %% "scalatest" % "3.2.9" % Test,
 
-  "junit" % "junit" % "4.12" % Test,
+  "junit" % "junit" % "4.13.1" % Test,
   "org.specs2" %% "specs2-junit" % "4.11.0" % Test,
 
   //"org.specs2" %% "specs2-core_2.12" % "3.9.4" % Test,
