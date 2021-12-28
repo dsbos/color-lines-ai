@@ -2,9 +2,9 @@
 
 package com.us.dsb.explore.types.strong
 
-import org.scalatest.FunSuite
-import org.scalatest.Matchers._
-
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers._
+import org.scalatest.matchers.should.Matchers._  // for "shouldNot compile"
 
 object ValueClassTypeSafetyExplTest {
 
@@ -25,7 +25,7 @@ object ValueClassTypeSafetyExplTest {
   * passing and assignment, but not good for strong typing with operations in
   * expressions ...
   */
-class ValueClassTypeSafetyExplTest extends FunSuite {
+class ValueClassTypeSafetyExplTest extends AnyFunSuite {
   // (Review:  I thought object's members were automatically visible in companion
   // class, but they weren't in this case.)
   import ValueClassTypeSafetyExplTest._

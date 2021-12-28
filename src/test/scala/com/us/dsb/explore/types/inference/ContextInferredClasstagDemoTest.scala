@@ -3,15 +3,16 @@ package com.us.dsb.explore.types.inference
 import scala.reflect.{ClassTag => StandardClassTag}
 import scala.annotation.unchecked.uncheckedVariance
 
-import org.scalatest.FunSuite
-import org.scalatest.Matchers._
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers._
+import org.scalatest.matchers.should.Matchers._  // for "shouldNot compile"
 
 
 /**
   * Demo of getting return type from context to be passed in through implicit
   * ClassTag parameter.
   */
-class ContextInferredClasstagDemoTest extends FunSuite {
+class ContextInferredClasstagDemoTest extends AnyFunSuite {
 
   class BaseThing
   class SubthingOne() extends BaseThing

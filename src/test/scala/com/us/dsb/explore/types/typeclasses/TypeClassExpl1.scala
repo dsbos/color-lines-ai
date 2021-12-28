@@ -2,14 +2,14 @@ package com.us.dsb.explore.types.typeclasses
 
 import scala.annotation.implicitNotFound
 
-import org.scalatest.FunSuite
-import org.scalatest.Matchers._
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers._
 
 
 /**
   * Basic demo of type class.
   */
-class TypeClassExpl1 extends FunSuite {
+class TypeClassExpl1 extends AnyFunSuite {
 
   // Type class declaration (always trait?):
   trait Dumpable[T] {

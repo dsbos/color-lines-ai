@@ -1,7 +1,8 @@
 package com.us.dsb.explore.traits
 
-import org.scalatest.FunSuite
-import org.scalatest.Matchers._
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers._
+import org.scalatest.matchers.should.Matchers._  // for "shouldNot compile"
 
 
 /**
@@ -9,7 +10,7 @@ import org.scalatest.Matchers._
   * says "... trait can only by mixed into a class that also extends [traits
   * mixed into that trait] ..."
   */
-class PrerequisiteTraitDemoTest extends FunSuite {
+class PrerequisiteTraitDemoTest extends AnyFunSuite {
 
   // Trait to be required by some other trait.
   trait RequiredTrait

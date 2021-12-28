@@ -4,8 +4,8 @@ import org.json4s.jackson.JsonMethods.compact
 //import org.json4s.native.JsonMethods.compact
 import org.json4s.jackson.Serialization
 import org.json4s.{DefaultFormats, Extraction, FieldSerializer, JField}
-import org.scalatest.FunSuite
-//import org.scalatest.Matchers._
+import org.scalatest.funsuite.AnyFunSuite
+import scala.annotation.meta.param
 
 
 class IntValueClass(val value1: Int) extends AnyVal
@@ -15,7 +15,7 @@ case class OptionValueClass(val value3: Option[String]) extends AnyVal
 class IntNonvalueClass(val value1: Int)
 
 //noinspection CaseClassParam
-class Json4sObjectMappingExplTest extends FunSuite {
+class Json4sObjectMappingExplTest extends AnyFunSuite {
 
 
   case class Tree1Root(val t1r_cp1: String, t1r_cp2: Tree1Child)
@@ -146,7 +146,7 @@ class Json4sObjectMappingExplTest extends FunSuite {
     private val t4r_privVal: Long = 2L
     def t4r_getter: Int = 42
   }
-  class Tree4Child(t4c_cp1: Int, @transient t4c_cp2: Int )
+  class Tree4Child(t4c_cp1: Int, @(transient @param) t4c_cp2: Int )
 
   val tree4Obj = Tree4Root(new IntValueClass(1),
                            new IntNonvalueClass(2),

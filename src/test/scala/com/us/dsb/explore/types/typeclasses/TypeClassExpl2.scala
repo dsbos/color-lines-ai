@@ -1,11 +1,11 @@
 package com.us.dsb.explore.types.typeclasses
 
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
 import scala.annotation.implicitNotFound
 
 
-class TypeClassExpl2 extends FunSuite {
+class TypeClassExpl2 extends AnyFunSuite {
 
   //////////
   // Type class:

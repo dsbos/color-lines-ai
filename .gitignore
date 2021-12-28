@@ -1,7 +1,7 @@
 # (gitignore notes:
 # - .gitignore files can be in multiple directories
-#   - patterns evaluates relative to .gitignore file
-# - (user-specific settings can go in file via ~/.gitconfig)
+#   - patterns evaluated relative to .gitignore file
+# - (user-specific settings can go in via file ~/.gitconfig)
 # - ?
 #   - leading slash anchors to first pathname segment (rel. to .gitignore)
 #   - trailing slash limits to matching directories
@@ -17,11 +17,15 @@
 
 
 # from Maven:
-target
+/target
 
-# from Editors (backup files):
-# - Emacs:
-*~
+# from SBT:
+/project/target
+/project/build.properties
+/buildFirst/target
+
+# from IntelliJ? SBT?:
+/.bsp
 
 # from IDEs:
 # - IntelliJ:
@@ -32,6 +36,11 @@ target
 /.project
 /.settings/
 
+
+
+# from Editors (backup files):
+# - Emacs:
+*~
 
 # From some Maven archetype:generate template:
 #

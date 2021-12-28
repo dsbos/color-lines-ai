@@ -2,14 +2,14 @@ package com.us.dsb.explore.bugs
 
 import org.json4s.DefaultFormats
 import org.json4s.Extraction.decompose
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
 
 /**
  * Test case for Json4s "Bug: Extraction's reflection breaks on type aliases
  * (loops endlessly or throws)" (https://github.com/json4s/json4s/issues/397).
  */
-class Json4sAliasBugTest extends FunSuite {
+class Json4sAliasBugTest extends AnyFunSuite {
 
   implicit val fmts = DefaultFormats
 

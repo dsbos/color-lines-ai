@@ -7,8 +7,8 @@ package com.us.dsb.explore.json4s.custom.ref
 import org.json4s.JsonAST.JInt
 import org.json4s.jackson.Serialization
 import org.json4s.{CustomSerializer, DefaultFormats, FieldSerializer}
-import org.scalatest.FunSuite
-import org.scalatest.Matchers._
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers._
 
 
 //case class PROBINGIntValueClass(value1: Int) extends AnyVal
@@ -39,7 +39,7 @@ case class Root(val time: TimeIntValueClass,
 
 
 //noinspection CaseClassParam
-class Json4sValueClassCustRefTest extends FunSuite {
+class Json4sValueClassCustRefTest extends AnyFunSuite {
 
   val tree4Obj2 = Root(TimeIntValueClass(11),
                        Some(TimeIntValueClass(12)),
@@ -64,7 +64,7 @@ class Json4sValueClassCustRefTest extends FunSuite {
       {
         case JInt(i) =>
           println("TimeIntValueClassSerializer.deserialization: i = " + i)
-          TimeIntValueClass(i.intValue())
+          TimeIntValueClass(i.intValue)
       },
       // Serialization partial function:
       {
@@ -81,7 +81,7 @@ class Json4sValueClassCustRefTest extends FunSuite {
                                                      extractor: T => Int)
       extends CustomSerializer[T](_ => (
           {
-            case JInt(i) => constructor(i.intValue())
+            case JInt(i) => constructor(i.intValue)
           },
           {
             case v: T =>    JInt(BigInt(extractor(v)))  // (when boxed)

@@ -1,10 +1,11 @@
 package com.us.dsb.explore.traits
 
-import org.scalatest.FunSuite
-import org.scalatest.Matchers._
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers._
+import org.scalatest.matchers.should.Matchers._  // for "shouldNot compile"
 
 
-class TraitMemberAccessExplTest extends FunSuite {
+class TraitMemberAccessExplTest extends AnyFunSuite {
 
   object Obj {
     val v = 1

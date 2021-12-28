@@ -1,14 +1,15 @@
 package com.us.dsb.explore.types.strong
 
-import org.scalatest.FunSuite
-import org.scalatest.Matchers._
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers._
+import org.scalatest.matchers.should.Matchers._  // for "shouldNot compile"
 
 import scalaz.Tag
 import scalaz.Tags
 import scalaz.@@   // Note: Definition depends on ScalaZ version.
 
 
-class ScalazTaggedTypesExplorationTest extends FunSuite {
+class ScalazTaggedTypesExplorationTest extends AnyFunSuite {
 
   test("Tagged ...") {
 

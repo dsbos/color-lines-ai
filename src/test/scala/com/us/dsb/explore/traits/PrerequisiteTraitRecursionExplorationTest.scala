@@ -1,13 +1,14 @@
 package com.us.dsb.explore.traits
 
-import org.scalatest.FunSuite
-import org.scalatest.Matchers._
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers._
+import org.scalatest.matchers.should.Matchers._  // for "shouldNot compile"
 
 
 /**
   * Demo test showing two mutually dependent traits.
   */
-class PrerequisiteTraitRecursionExplorationTest extends FunSuite {
+class PrerequisiteTraitRecursionExplorationTest extends AnyFunSuite {
 
   test("Demo mutual dependency between traits.") {
 

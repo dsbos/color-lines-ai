@@ -1,11 +1,11 @@
 package com.us.dsb.explore.movethis
 
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
 import java.time.LocalTime
 
 
-class OrderTest extends FunSuite {
+class OrderTest extends AnyFunSuite {
 
   test("decode(...) should decode basic input") {
     val input = "WM1234 N1E10 00:00:00"

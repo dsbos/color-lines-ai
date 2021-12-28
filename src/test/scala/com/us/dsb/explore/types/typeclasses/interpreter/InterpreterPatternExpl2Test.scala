@@ -1,13 +1,13 @@
 package com.us.dsb.explore.types.typeclasses.interpreter
 
-import org.scalatest.FunSpec
+import org.scalatest.funspec.AnyFunSpec
 
 
 /**
   * Interpreter-pattern exploration with `fold` taking per-case functions (to
   * help keep client code synchronized with set of subclasses).
   */
-class InterpreterPatternExpl2Test extends FunSpec {
+class InterpreterPatternExpl2Test extends AnyFunSpec {
 
 
   /** Subthings. */

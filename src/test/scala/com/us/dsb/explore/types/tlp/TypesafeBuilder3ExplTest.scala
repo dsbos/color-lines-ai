@@ -1,7 +1,8 @@
 package com.us.dsb.explore.types.tlp
 
-import org.scalatest.FunSuite
-import org.scalatest.Matchers._
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers._
+import org.scalatest.matchers.should.Matchers._  // for "shouldNot compile"
 
 import scala.language.higherKinds
 
@@ -9,7 +10,7 @@ import scala.language.higherKinds
 /**
   * Type-level example:  Type-safe range builder 3 - start and ((type-level) end or length).
   */
-class TypesafeBuilder3ExplTest extends FunSuite {
+class TypesafeBuilder3ExplTest extends AnyFunSuite {
 
 
   //////////

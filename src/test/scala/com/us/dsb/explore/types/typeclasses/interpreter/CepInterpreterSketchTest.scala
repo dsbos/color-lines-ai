@@ -1,6 +1,6 @@
 package com.us.dsb.explore.types.typeclasses.interpreter
 
-import org.scalatest.FunSpec
+import org.scalatest.funspec.AnyFunSpec
 
 
 /**
@@ -8,7 +8,7 @@ import org.scalatest.FunSpec
   * no common `fold` method to help keep client code synchronized with set of
   * subclasses.)
   */
-class CepInterpreterSketchTest extends FunSpec {
+class CepInterpreterSketchTest extends AnyFunSpec {
 
   /*
   Basic idea, iso(?)morphism with straight method calls.

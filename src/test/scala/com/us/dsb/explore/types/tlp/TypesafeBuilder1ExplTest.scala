@@ -1,14 +1,16 @@
 package com.us.dsb.explore.types.tlp
 
-import org.scalatest.FunSuite
-import org.scalatest.Matchers._
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers._
 import scala.language.higherKinds
 
+import org.scalatest.matchers._
+import org.scalatest.matchers.should.Matchers._  // for "shouldNot compile"
 
 /**
   * Type-level example:  Type-safe range builder 1 - just start and end.
   */
-class TypesafeBuilder1ExplTest extends FunSuite {
+class TypesafeBuilder1ExplTest extends AnyFunSuite {
 
 
   //////////

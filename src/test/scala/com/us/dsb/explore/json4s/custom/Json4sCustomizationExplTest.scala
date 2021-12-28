@@ -6,8 +6,7 @@ import org.json4s.jackson.Serialization
 import org.json4s.jackson.JsonMethods.compact
 import org.json4s.native.JsonMethods.{compact => Native_compact}
 import org.json4s.{CustomSerializer, DefaultFormats, Extraction, FieldSerializer, JValue, NoTypeHints}
-import org.scalatest.FunSuite
-import org.scalatest.Matchers._
+import org.scalatest.funsuite.AnyFunSuite
 
 
 /**
@@ -50,7 +49,7 @@ case class Root2(val optValueDist: Option[IntValueClassDistance],
 
 
 //noinspection CaseClassParam
-class Json4sObjectMappingExplTest extends FunSuite {
+class Json4sObjectMappingExplTest extends AnyFunSuite {
 
   case class Childxx(val wrappedTime: WrappedIntTime,
                    val wrappedDist: WrappedIntDist,
@@ -64,6 +63,8 @@ class Json4sObjectMappingExplTest extends FunSuite {
                   var child: Childxx)
 
   test("Confirm that value classes are not parameter-assignment--compatible.") {
+    import org.scalatest.matchers.should.Matchers._ // for "shouldNot compile"
+
     "val time1: WrappedIntTime = WrappedIntDist(0)" shouldNot compile
     "val time2: IntValueClassTime = IntValueClassDistance(0)" shouldNot compile
   }
@@ -140,11 +141,11 @@ class Json4sObjectMappingExplTest extends FunSuite {
                                25)*/)
   // Genericize:
   class WrappedIntTimeSerializer extends CustomSerializer[WrappedIntTime](format => (
-      { case JInt(i)       => WrappedIntTime(i.intValue()) },
+      { case JInt(i)       => WrappedIntTime(i.intValue) },
       { case x: WrappedInt => JInt(BigInt(x.value)) }
       ))
   class WrappedIntDistSerializer extends CustomSerializer[WrappedIntDist](format => (
-      { case JInt(i)       => WrappedIntDist(i.intValue()) },
+      { case JInt(i)       => WrappedIntDist(i.intValue) },
       { case x: WrappedInt => JInt(BigInt(x.value)) }
       ))
 
@@ -152,7 +153,7 @@ class Json4sObjectMappingExplTest extends FunSuite {
       {
         case JInt(i) =>
           println("xxxx111")
-          IntValueClassDistance(i.intValue())
+          IntValueClassDistance(i.intValue)
       },
       {
         case x: IntValueClassDistance =>

@@ -1,13 +1,14 @@
 package com.us.dsb.explore.types.strong
 
-import org.scalatest.FunSuite
-import org.scalatest.Matchers._
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers._
+import org.scalatest.matchers.should.Matchers._  // for "shouldNot compile"
 
 
 /**
   * Demo test of tagged types of <what?> form (old Scalaz form).
   */
-class ManualTaggedTypesExplorationTest extends FunSuite {
+class ManualTaggedTypesExplorationTest extends AnyFunSuite {
 
   test("Tagged types in old form should ...") {
 

@@ -1,6 +1,6 @@
 package com.us.dsb.explore.types.strong
 
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
 
 // FOR A VALUE CLASS:
@@ -117,7 +117,7 @@ case object Try10 extends Object {
 }
 
 
-class ValueClassDeclarationsExplTest extends FunSuite {
+class ValueClassDeclarationsExplTest extends AnyFunSuite {
 
   test("") {
     new Try1("")
