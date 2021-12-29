@@ -13,7 +13,7 @@ class CepInterpreterSketchTest extends AnyFunSpec {
   /*
   Basic idea, iso(?)morphism with straight method calls.
 
-  (currenty ignoring passing input and output data0
+  (currently ignoring passing input and output data0
 
   #1: Base form--tree of methods and called methods, executed and immediately
   def processMessage = {
@@ -134,7 +134,7 @@ class CepInterpreterSketchTest extends AnyFunSpec {
   case class SetLifecycleOp(label: String, lifecycleState: LifecycleState)
       extends ProcessingOp
 
-  case class PerLifecyleStateOp(label: String, map: (LifecycleState, ProcessingOp)*)
+  case class PerLifecycleStateOp(label: String, map: (LifecycleState, ProcessingOp)*)
       extends ProcessingOp
 
   case class PerEventKindOp(label: String, map: (Class[_ <: Event], ProcessingOp)*)
@@ -215,7 +215,7 @@ class CepInterpreterSketchTest extends AnyFunSpec {
               evaluate(proc, data)
             }
           }.getOrElse(???)
-        case PerLifecyleStateOp(_, map @ _*) =>
+        case PerLifecycleStateOp(_, map @ _*) =>
           locally {
             for (proc <- map.toMap.get(data.lifecycleState)) yield {
               evaluate(proc, data)
@@ -229,7 +229,7 @@ class CepInterpreterSketchTest extends AnyFunSpec {
   //////////
   // Interpreter 2:  Formatting/rendering specification:
 
-  //????? doesn't address non-tree nature of graph (reconvergence)
+  //????? doesn't address non-tree nature of graph (convergence)
   def format(op: ProcessingOp): String = {
 
     def formatKnownPrimitiveOp(indentation: String, op: KnownPrimitiveOp): String = {
@@ -278,7 +278,7 @@ class CepInterpreterSketchTest extends AnyFunSpec {
             }).mkString("\n"),
             indentation + s"- } /* per event kind '$label' */"
           ).mkString("\n")
-        case PerLifecyleStateOp(label, map @ _*) =>
+        case PerLifecycleStateOp(label, map @ _*) =>
           List(
             indentation + s"- '$label': per lifecycle state: {",
             map.map(pair => {
@@ -309,7 +309,7 @@ class CepInterpreterSketchTest extends AnyFunSpec {
         SequenceOp(SetStateFieldEmpty("", StateFields.miscData),
         KnownPrimitiveOp("badStartEventProcessing",
                          TempStringNamedPrimitive("Emit RejectedStartEvent replacing StartEvent")))
-      PerLifecyleStateOp(
+      PerLifecycleStateOp(
         "goodStartEventProcessing",
         (DRAFT,
             SequenceOp(

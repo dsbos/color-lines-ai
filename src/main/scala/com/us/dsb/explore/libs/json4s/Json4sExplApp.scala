@@ -30,7 +30,7 @@ import org.json4s.native.JsonMethods
  * org.json4s.JsonMethods[T] defines methods parse/parseOpt, render, compact/pretty
  * - T is output of render (not parse/parseOpt) and input of compact/pretty
  * org.json4s.native.JsonMethods extends JsonMethods[Document]
- * org.json4s.jackon.JsonMethods extends JsonMethods[JValue]
+ * org.json4s.jackson.JsonMethods extends JsonMethods[JValue]
  */
 
 

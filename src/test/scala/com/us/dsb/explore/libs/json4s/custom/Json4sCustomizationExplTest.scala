@@ -51,16 +51,16 @@ case class Root2(val optValueDist: Option[IntValueClassDistance],
 //noinspection CaseClassParam
 class Json4sObjectMappingExplTest extends AnyFunSuite {
 
-  case class Childxx(val wrappedTime: WrappedIntTime,
-                   val wrappedDist: WrappedIntDist,
-                   val valueTime: IntValueClassTime,
-                   val optValueDist: Option[IntValueClassDistance],
+  case class Child(val wrappedTime         : WrappedIntTime,
+                   val wrappedDist         : WrappedIntDist,
+                   val valueTime           : IntValueClassTime,
+                   val optValueDist        : Option[IntValueClassDistance],
                    @transient int_transient: Int)
-  case class Rootxx(val wrappedTime: WrappedIntTime,
-                  val wrappedDist: WrappedIntDist,
-                  val valueTime: IntValueClassTime,
+  case class Root(val wrappedTime : WrappedIntTime,
+                  val wrappedDist : WrappedIntDist,
+                  val valueTime   : IntValueClassTime,
                   val optValueDist: Option[IntValueClassDistance],
-                  var child: Childxx)
+                  var child       : Child)
 
   test("Confirm that value classes are not parameter-assignment--compatible.") {
     import org.scalatest.matchers.should.Matchers._ // for "shouldNot compile"
@@ -70,15 +70,15 @@ class Json4sObjectMappingExplTest extends AnyFunSuite {
   }
 
 
-  val tree4Obj1 = Rootxx(WrappedIntTime(11),
-                      WrappedIntDist(12),
-                      IntValueClassTime(13),
-                      Some(IntValueClassDistance(14)),
-                      Childxx(WrappedIntTime(21),
-                            WrappedIntDist(22),
-                            IntValueClassTime(23),
-                            Some(IntValueClassDistance(24)),
-                            25))
+  val tree4Obj1 = Root(WrappedIntTime(11),
+                       WrappedIntDist(12),
+                       IntValueClassTime(13),
+                       Some(IntValueClassDistance(14)),
+                       Child(WrappedIntTime(21),
+                               WrappedIntDist(22),
+                               IntValueClassTime(23),
+                               Some(IntValueClassDistance(24)),
+                               25))
 
   test("... FieldSerializer[Root] ...") {
     println("tree4Obj1 = " + tree4Obj1 + " (not showing non-constructor fields)")
@@ -89,7 +89,7 @@ class Json4sObjectMappingExplTest extends AnyFunSuite {
 
         value match {
           case x: WrappedInt =>   // ?? TODO: Does this ever match (re erasure)?
-            Some((propName, x.value)) 
+            Some((propName, x.value))
           case x =>
             Some((propName, x))
         }
@@ -97,7 +97,7 @@ class Json4sObjectMappingExplTest extends AnyFunSuite {
 
     implicit val formats =
       DefaultFormats +
-      FieldSerializer[Rootxx](serializer = serializer)
+      FieldSerializer[Root](serializer = serializer)
 
     val tree4Json: String = Serialization.write(tree4Obj1)
     //val tree4Json2 = compact(Extraction.decompose(tree4Obj))

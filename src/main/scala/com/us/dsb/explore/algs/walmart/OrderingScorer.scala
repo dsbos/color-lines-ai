@@ -59,7 +59,7 @@ object OrderingScorer {
         (startTime, Detractor, None)
       }
       else {
-        //?? TODO:  Try to rework to elimimate .get calls (without duplicating
+        //?? TODO:  Try to rework to eliminate .get calls (without duplicating
         //  big comment just above).
         val deliveryLatencySecs =
           order.time.until(deliveryTimeIfToday.get, ChronoUnit.SECONDS)

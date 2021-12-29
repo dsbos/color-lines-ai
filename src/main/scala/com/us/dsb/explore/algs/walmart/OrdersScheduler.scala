@@ -102,7 +102,7 @@ object OrdersScheduler {
                                 scoringStateSoFar.npsPct)
             case list =>
               // Do one level of scheduling on each child (of traversal) before
-              // proceeding with deeper traverals so that we can try processing
+              // proceeding with deeper traversals so that we can try processing
               // orders steps with higher possible NPS values before this with
               // lower values, so that maybe we can find the better values
               // sooner (after fewer other traversal stops) and then prune more

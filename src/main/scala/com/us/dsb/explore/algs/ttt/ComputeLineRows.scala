@@ -29,19 +29,19 @@ object ComputeLineRows extends App {
          ) {
       //println()
       //println( s"row1: $row1, col1: $col1; row2: $row2, col2: $col2; row3: $row3, col3: $col3:" );
-      val rowSomethingxx = row1 - row2 == row2 - row3
-      val colSomethingxx = col1 - col2 == col2 - col3
+      val rowSomething = row1 - row2 == row2 - row3
+      val colSomething = col1 - col2 == col2 - col3
       val rowSomethingMore = row1 - row2 <= 0
-      val sameRowxx = row1 == row2 && row2 == row3
-      val sameColxx = col1 == col2 && col2 == col3
-      //println( s"$row1/$col1, $row2/$col2, $row3/$col3: rowSomethingxx = $rowSomethingxx" );
-      //println( s"$row1/$col1, $row2/$col2, $row3/$col3: sameRowxx = $sameRowxx" );
-      //println( s"$row1/$col1, $row2/$col2, $row3/$col3: colSomethingxx = $colSomethingxx" );
-      //println( s"$row1/$col1, $row2/$col2, $row3/$col3: sameColxx = $sameColxx" );
-      val makeARowxx = (rowSomethingxx && colSomethingxx)  && ! (sameRowxx && sameColxx) && rowSomethingMore
-      //println( s"$row1/$col1, $row2/$col2, $row3/$col3: makeARowxx = $makeARowxx" );
-      if (makeARowxx) {
-        //println( s"$row1/$col1, $row2/$col2, $row3/$col3: $makeARowxx ************" );
+      val sameRow = row1 == row2 && row2 == row3
+      val sameCol = col1 == col2 && col2 == col3
+      //println( s"$row1/$col1, $row2/$col2, $row3/$col3: rowSomething = $rowSomething" );
+      //println( s"$row1/$col1, $row2/$col2, $row3/$col3: sameRow = $sameRow" );
+      //println( s"$row1/$col1, $row2/$col2, $row3/$col3: colSomething = $colSomething" );
+      //println( s"$row1/$col1, $row2/$col2, $row3/$col3: sameCol = $sameCol" );
+      val makeARow = (rowSomething && colSomething)  && ! (sameRow && sameCol) && rowSomethingMore
+      //println( s"$row1/$col1, $row2/$col2, $row3/$col3: makeARow = $makeARow" );
+      if (makeARow) {
+        //println( s"$row1/$col1, $row2/$col2, $row3/$col3: $makeARow ************" );
         val cell1Id = CellCoordinates(row1, col1)
         val cell2Id = CellCoordinates(row2, col2)
         val cell3Id = CellCoordinates(row3, col3)

@@ -170,12 +170,12 @@ class InterpreterPatternExpl2Test extends AnyFunSpec {
     })
   }
 
-  val plusZeroSimplifierfn: PartialFunction[Expr, Expr] = {
+  val plusZeroSimplifierFn: PartialFunction[Expr, Expr] = {
     case Plus(IntValue(0), netRight) => netRight
     case Plus(netLeft, IntValue(0)) => netLeft
   }
 
-  val timeOneSimplifierfn: PartialFunction[Expr, Expr] = {
+  val timeOneSimplifierFn: PartialFunction[Expr, Expr] = {
     case Times(IntValue(1), netRight) => netRight
     case Times(netLeft, IntValue(1)) => netLeft
   }
@@ -190,16 +190,16 @@ class InterpreterPatternExpl2Test extends AnyFunSpec {
   }
 
   def simplifyPlusZeroX1(expr: Expr): Expr = {
-    expr.foldX(plusZeroSimplifierfn)
+    expr.foldX(plusZeroSimplifierFn)
   }
 
   def simplifyTimesOneX1(expr: Expr): Expr = {
-    expr.foldX(timeOneSimplifierfn)
+    expr.foldX(timeOneSimplifierFn)
   }
 
   def simplifyMultipleX1xx(expr: Expr): Expr = {
-    expr.foldX(plusZeroSimplifierfn
-               orElse timeOneSimplifierfn
+    expr.foldX(plusZeroSimplifierFn
+               orElse timeOneSimplifierFn
                    orElse incrPlusSimplifier
     )
   }

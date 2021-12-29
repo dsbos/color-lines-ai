@@ -15,21 +15,21 @@ class InterpreterPatternExpl1Test extends AnyFunSpec {
   case class IntValue(value: Int) extends Expr
   case class IntProp(name: String) extends Expr
 
-  sealed abstract class BinaryOpxx extends Expr
+  sealed abstract class BinaryOp extends Expr
   object BinaryOp {
     def unapply(e: Expr): Option[(Expr, Expr)] = {
       e match {
         case Plus(left, right) => Some((left, right))
         case Times(left, right)  => Some((left, right))
-        case x: BinaryOpxx =>
+        case x: BinaryOp =>
           System.err.println("x  = " + x)
           ???  // something new?
         case _                   => None
       }
     }
   }
-  case class Plus(left: Expr, right: Expr) extends BinaryOpxx
-  case class Times(left: Expr, right: Expr) extends BinaryOpxx
+  case class Plus(left: Expr, right: Expr) extends BinaryOp
+  case class Times(left: Expr, right: Expr) extends BinaryOp
 
   sealed abstract class TernaryOp extends Expr
   object TernaryOp {

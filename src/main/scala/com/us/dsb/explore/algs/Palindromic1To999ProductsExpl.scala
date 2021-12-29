@@ -2,7 +2,7 @@ package com.us.dsb.explore.algs
 
 /**
  * Solutions for BAH interview question, "find largest palindromic product
- * in ~cross product of range 1L to 999 timse range 1L to 999."
+ * in ~cross product of range 1L to 999 time range 1L to 999."
  */
 object Palindromic1To999ProductsExpl {
 
