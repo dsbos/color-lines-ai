@@ -96,7 +96,7 @@ class TypeClassExpl2 extends AnyFunSuite {
 
   // validation type class
   // validator instance form 1
-  // validator instane
+  // validator instance
 
 
    test("") {

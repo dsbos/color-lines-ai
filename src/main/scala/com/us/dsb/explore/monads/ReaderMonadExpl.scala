@@ -18,7 +18,7 @@ class ReaderMonadExpl {
 
 
   type ft1 = ((Int, String)) => String
-  type ft2 = (String) => Char
+  type ft2 = String => Char
 
   val intStringPairToStringFn: ft1 = pair => pair._2
   val stringToFirstCharFn: ft2 = str => str(0)

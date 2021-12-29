@@ -1,7 +1,7 @@
 package com.us.dsb.explore.pfps
 
 //import io.estatico.newtype.macros.newtype
-//mport eu.timepit.refined.types.string.NonEmptyString
+//import eu.timepit.refined.types.string.NonEmptyString
 
 object Main extends App {
 

@@ -24,18 +24,18 @@ case class DistIntValueClass(value: Int) extends AnyVal
 case class OtherIntValueClass(value: Int) extends AnyVal
 
 
-case class Root(val time: TimeIntValueClass,
-                val optTimePresent: Option[TimeIntValueClass],
-                val optTimeAbsent: Option[TimeIntValueClass],
-                val timeList: List[TimeIntValueClass],
-                val dist: DistIntValueClass,
-                val optDistPresent: Option[DistIntValueClass],
-                val optDistAbsent: Option[DistIntValueClass],
-                val distList: List[DistIntValueClass],
-                val unhandled: OtherIntValueClass,
-                val optUnhandledPresent: Option[OtherIntValueClass],
-                val optUnhandledAbsent: Option[OtherIntValueClass],
-                val unhandledList: List[OtherIntValueClass])
+case class Root(time: TimeIntValueClass,
+                optTimePresent: Option[TimeIntValueClass],
+                optTimeAbsent: Option[TimeIntValueClass],
+                timeList: List[TimeIntValueClass],
+                dist: DistIntValueClass,
+                optDistPresent: Option[DistIntValueClass],
+                optDistAbsent: Option[DistIntValueClass],
+                distList: List[DistIntValueClass],
+                unhandled: OtherIntValueClass,
+                optUnhandledPresent: Option[OtherIntValueClass],
+                optUnhandledAbsent: Option[OtherIntValueClass],
+                unhandledList: List[OtherIntValueClass])
 
 
 //noinspection CaseClassParam

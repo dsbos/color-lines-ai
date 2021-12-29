@@ -84,7 +84,7 @@ object TicTacToeSomething extends App {
                 .fold(0d)(_ + _)
 
       val coreResult = sigmoid(rawSum)
-      return Activation(coreResult)
+      Activation(coreResult)
     }
   }
 

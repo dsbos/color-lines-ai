@@ -8,9 +8,9 @@ class CatsShowExpl {
     class B
   }
 
-  val x: A = ???;
-  //val x2: A.B = ???;
-  val x3: A#B = ???;
+  val x: A = ???
+  //val x2: A.B = ???
+  val x3: A#B = ???
 
   import cats.Show
   import cats.instances.int.catsStdShowForInt

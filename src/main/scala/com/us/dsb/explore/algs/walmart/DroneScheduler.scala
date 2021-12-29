@@ -50,7 +50,7 @@ object DroneScheduler extends App {
     println(s"outputContents = '$outputContents'")
 
     ow.write(outputContents)
-    ow.close
+    ow.close()
 
     println(outputFilePathname)
   }

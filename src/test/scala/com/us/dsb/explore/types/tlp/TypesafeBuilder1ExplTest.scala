@@ -2,7 +2,6 @@ package com.us.dsb.explore.types.tlp
 
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers._
-import scala.language.higherKinds
 
 import org.scalatest.matchers._
 import org.scalatest.matchers.should.Matchers._  // for "shouldNot compile"
@@ -146,11 +145,11 @@ class TypesafeBuilder1ExplTest extends AnyFunSuite {
 
   test("Test good: given start and end") {
     val r1 = RangeBuilder().withStart(1.0).withEnd(10.0).build()
-    assert(((1.0, 9.0, 10.0)) == ((r1.start, r1.length, r1.end)))
+    assert((1.0, 9.0, 10.0) == ((r1.start, r1.length, r1.end)))
   }
   test("Test good: given end and THEN start") {
     val r1 = RangeBuilder().withEnd(10.0).withStart(1.0).build()
-    assert(((1.0, 9.0, 10.0)) == ((r1.start, r1.length, r1.end)))
+    assert((1.0, 9.0, 10.0) == ((r1.start, r1.length, r1.end)))
   }
 
   /*test("Test good: given start and length") {

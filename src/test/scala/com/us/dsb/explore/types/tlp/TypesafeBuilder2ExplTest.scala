@@ -4,8 +4,6 @@ import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers._
 import org.scalatest.matchers.should.Matchers._  // for "shouldNot compile"
 
-import scala.language.higherKinds
-
 
 /**
   * Type-level example:  Type-safe range builder 2 - start and (value-level end or length).
@@ -141,20 +139,20 @@ class TypesafeBuilder2ExplTest extends AnyFunSuite {
 
   test("Test good: given start and end") {
     val r1 = RangeBuilder().withStart(1.0).withEnd(10.0).build()
-    assert(((1.0, 9.0, 10.0)) == ((r1.start, r1.length, r1.end)))
+    assert((1.0, 9.0, 10.0) == ((r1.start, r1.length, r1.end)))
   }
   test("Test good: given end and THEN start") {
     val r1 = RangeBuilder().withEnd(10.0).withStart(1.0).build()
-    assert(((1.0, 9.0, 10.0)) == ((r1.start, r1.length, r1.end)))
+    assert((1.0, 9.0, 10.0) == ((r1.start, r1.length, r1.end)))
   }
 
   test("Test good: given start and length") {
     val r1 = RangeBuilder().withStart(1.0).withLength(9.0).build()
-    assert(((1.0, 9.0, 10.0)) == ((r1.start, r1.length, r1.end)))
+    assert((1.0, 9.0, 10.0) == ((r1.start, r1.length, r1.end)))
   }
   test("Test good: given length and THEN start") {
     val r1 = RangeBuilder().withLength(9.0).withStart(1.0).build()
-    assert(((1.0, 9.0, 10.0)) == ((r1.start, r1.length, r1.end)))
+    assert((1.0, 9.0, 10.0) == ((r1.start, r1.length, r1.end)))
   }
 
   test("Test bad: given length and end and no start") {

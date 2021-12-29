@@ -1,4 +1,4 @@
-package namethis
+package pfps
 
 /*
 GET /brands
@@ -28,8 +28,7 @@ package unclear_refs {
 }
 import unclear_refs._
 
-//import scala.language.higherKinds
-
+//
 
 //import eu.timepit.refined.types.string.NonEmptyString
 

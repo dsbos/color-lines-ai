@@ -20,7 +20,7 @@ object CustomConstructorNewtypes extends App {
     }
     def apply(one: Int, other: Int): SuppressedConstructor = {
       import io.estatico.newtype.ops._  // for .coerce
-      (one - other).toInt.coerce
+      (one - other).coerce
     }
   }
 

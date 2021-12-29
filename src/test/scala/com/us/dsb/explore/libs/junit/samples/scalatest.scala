@@ -32,6 +32,7 @@ import org.scalatest.matchers.should.Matchers._
 import org.junit.Test
 import org.specs2.runner.JUnitRunner
 
+//noinspection ReferenceMustBePrefixed
 class StackSuite extends Assertions {
 
   @Test def stackShouldPopValuesIinLastInFirstOutOrder() = {
@@ -68,14 +69,14 @@ class ListSuite extends AnyFunSuite /*with Matchers/*ShouldMatchers*/*/ {
   }
 
   test("A non-empty list should not be empty") {
-    List(1, 2, 3) should not be (Symbol("empty"))
-    List("fee", "fie", "foe", "fum") should not be (Symbol("empty"))
+    List(1, 2, 3) should not be Symbol("empty")
+    List("fee", "fie", "foe", "fum") should not be Symbol("empty")
   }
 
   test("A list's length should equal the number of elements it contains") {
-    List() should have length (0)
-    List(1, 2) should have length (2)
-    List("fee", "fie", "foe", "fum") should have length (4)
+    List() should have length 0
+    List(1, 2) should have length 2
+    List("fee", "fie", "foe", "fum") should have length 4
   }
 }
 

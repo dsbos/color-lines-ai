@@ -201,12 +201,12 @@ object Palindromic1To999ProductsExpl {
       //println(s" - diagNum := $diagNum")
       val diagLength = diagNum
 
-      for (dummy <- 1 to 1;
+      for (_ <- 1 to 1;
            diagOffset = diagNum - 1; //if {println(s"  - diagOffset := $diagOffset"); true};
 
            if maxProduct.fold(true)(max => {
-             val temp1a = (MAX_FACTOR + MAX_FACTOR - diagOffset) / 2;
-             val temp2a = (MAX_FACTOR + MAX_FACTOR - diagOffset + 1) / 2;
+             val temp1a = (MAX_FACTOR + MAX_FACTOR - diagOffset) / 2
+             val temp2a = (MAX_FACTOR + MAX_FACTOR - diagOffset + 1) / 2
              //if {println(s"    - temp1a := $temp1a"); true};
              //if {println(s"    - temp2a := $temp2a"); true};
              //if {println(s"    - temp1a * temp2a := ${temp1a * temp2a}"); true};

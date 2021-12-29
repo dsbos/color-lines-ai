@@ -4,7 +4,7 @@ package com.us.dsb.explore.tlp.typeclasses
 object TypeClassExpl1 extends App {
 
   trait Doer[T] {
-    def getType: String;
+    def getType: String
     def getTypeView(in: T): String /*= {
       print( getType )
     }*/
@@ -28,14 +28,14 @@ object TypeClassExpl1 extends App {
 
   implicit def doerForList[A](implicit doer: Doer[A]): Doer[List[A]] = new Doer[List[A]] {
     //println("Instantiating Doer[List[A]].");
-    override def getType: String = "List[" + doer.getType + "]";
+    override def getType: String = "List[" + doer.getType + "]"
     override def getTypeView(in: List[A]): String = {
       "List[" + doer.getType + "](" + in.map(x => doer.getTypeView(x)).mkString(", ") + ")"
     }
   }
   implicit def doerForColonColon[A](implicit doer: Doer[A]): Doer[::[A]] = new Doer[::[A]] {
     //println("Instantiating Doer[::[A]].");
-    override def getType: String = "::[" + doer.getType + "]";
+    override def getType: String = "::[" + doer.getType + "]"
     override def getTypeView(in: ::[A]): String = {
       "::[" + doer.getType + "]" + "(" + in.map(x => doer.getTypeView(x)).mkString(", ") + ")"
     }
@@ -43,9 +43,9 @@ object TypeClassExpl1 extends App {
 
   implicit def doerForTuple2[A: Doer, B: Doer]: Doer[(A, B)] = new Doer[(A, B)] {
     //println("Instantiating Doer[(A, B)].");
-    def getType: String = "( " + implicitly[Doer[A]].getType + ", " + implicitly[Doer[B]].getType + " )";
+    def getType: String = "( " + implicitly[Doer[A]].getType + ", " + implicitly[Doer[B]].getType + " )"
     def getTypeView(in: (A, B)): String =
-      "(" + implicitly[Doer[A]].getTypeView(in._1) + ", " + implicitly[Doer[B]].getTypeView(in._2) + ")";
+      "(" + implicitly[Doer[A]].getTypeView(in._1) + ", " + implicitly[Doer[B]].getTypeView(in._2) + ")"
   }
 
   implicit val doerForAny: Doer[Any] = new Doer[Any] {

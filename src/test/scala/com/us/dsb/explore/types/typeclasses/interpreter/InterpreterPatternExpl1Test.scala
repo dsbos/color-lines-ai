@@ -180,18 +180,18 @@ class InterpreterPatternExpl1Test extends AnyFunSpec {
 /*
 
   //??: Interpreter?  (Interpretable?)
-  trait Dumpablexx {
+  trait Dumpable {
     // Some operation specific to type class:
     def interpret(e: Expr): String
   }
 
   // Client of type class and operation(?):
-  def interpret(t: Expr)(implicit d: Dumpablexx) = d.interpret(t)
+  def interpret(t: Expr)(implicit d: Dumpable) = d.interpret(t)
 
 
 
   // Type class instance of Dumpable for ThingThing:
-  implicit object DumpableThingOnexx extends Dumpablexx {
+  implicit object DumpableThingOnexx extends Dumpable {
     def interpret(t: Expr): String = {
       t.toString
     }

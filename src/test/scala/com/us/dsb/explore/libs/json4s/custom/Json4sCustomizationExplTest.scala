@@ -36,30 +36,30 @@ case class IntValueClassTime(value: Int) extends AnyVal
 case class IntValueClassDistance(value: Int) extends AnyVal
 
 
-case class Child2(/*val wrappedTime: WrappedIntTime,
-                   val wrappedDist: WrappedIntDist,
-                   val valueTime: IntValueClassTime,
-                   val optValueDist: Option[IntValueClassDistance],
+case class Child2(/*wrappedTime: WrappedIntTime,
+                   wrappedDist: WrappedIntDist,
+                   valueTime: IntValueClassTime,
+                   optValueDist: Option[IntValueClassDistance],
                    @transient int_transient: Int*/)
-case class Root2(val optValueDist: Option[IntValueClassDistance],
-                 val optWrappedTime: Option[WrappedIntTime]/*,
-                 val wrappedDist: WrappedIntDist,
-                 val valueTime: IntValueClassTime,
+case class Root2(optValueDist: Option[IntValueClassDistance],
+                 optWrappedTime: Option[WrappedIntTime]/*,
+                 wrappedDist: WrappedIntDist,
+                 valueTime: IntValueClassTime,
                  var child: Child2*/)
 
 
 //noinspection CaseClassParam
 class Json4sObjectMappingExplTest extends AnyFunSuite {
 
-  case class Child(val wrappedTime         : WrappedIntTime,
-                   val wrappedDist         : WrappedIntDist,
-                   val valueTime           : IntValueClassTime,
-                   val optValueDist        : Option[IntValueClassDistance],
+  case class Child(wrappedTime         : WrappedIntTime,
+                   wrappedDist         : WrappedIntDist,
+                   valueTime           : IntValueClassTime,
+                   optValueDist        : Option[IntValueClassDistance],
                    @transient int_transient: Int)
-  case class Root(val wrappedTime : WrappedIntTime,
-                  val wrappedDist : WrappedIntDist,
-                  val valueTime   : IntValueClassTime,
-                  val optValueDist: Option[IntValueClassDistance],
+  case class Root(wrappedTime : WrappedIntTime,
+                  wrappedDist : WrappedIntDist,
+                  valueTime   : IntValueClassTime,
+                  optValueDist: Option[IntValueClassDistance],
                   var child       : Child)
 
   test("Confirm that value classes are not parameter-assignment--compatible.") {

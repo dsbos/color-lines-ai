@@ -1,5 +1,8 @@
 package com.us.dsb.explore.algs.eightqueens
 
+import scala.collection.immutable.Seq
+
+//noinspection ReferenceMustBePrefixed
 object EightQueens {
 
   def solve1(): Unit = {

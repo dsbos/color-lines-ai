@@ -14,9 +14,9 @@ object ComputeLineRows extends App {
     implicit def orderingByNameThis[A <: SortedSet[CellCoordinates]]: Ordering[A] =
       Ordering.by(row => row.toString())
 
-    SortedSet[CellCoordinates]();
-    mutable.SortedSet[SortedSet[CellCoordinates]]();
-    val crudeSet = mutable.SortedSet[SortedSet[CellCoordinates]]();
+    SortedSet[CellCoordinates]()
+    mutable.SortedSet[SortedSet[CellCoordinates]]()
+    val crudeSet = mutable.SortedSet[SortedSet[CellCoordinates]]()
     for (row1 <- 1 to 3;
          col1 <- 1 to 3;
          //_ <- { println( s"row1: $row1, col1: $col1" ); Some(null) };
