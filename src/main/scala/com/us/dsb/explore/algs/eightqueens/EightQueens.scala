@@ -28,7 +28,7 @@ object EightQueens {
 
     def solve(prevXs: Seq[Int]): Unit = {
       callCount += 1
-      prevXs.length match {
+      (prevXs.length : @unchecked) match {
         case `order` =>
           solutionCount += 1
           //println("Solution (x,y): " + prevXs.zipWithIndex.map({case (x, yoff) => (x, 1 + yoff)}))
@@ -66,7 +66,7 @@ object EightQueens {
 
     def solve(prevXs: Seq[Int], prevThreatened: Seq[ThreatenedLines]): Unit = {
       callCount += 1
-      prevXs.length match {
+      (prevXs.length : @unchecked) match {
         case `order` =>
           solutionCount += 1
           //println("Solution (x,y): " + prevXs.zipWithIndex.map({case (x, yoff) => (x, 1 + yoff)}))
@@ -104,7 +104,7 @@ object EightQueens {
 
     def solve(curDepth: Int, xs: Seq[Int], threatened: Seq[ThreatenedLines]): Unit = {
       callCount += 1
-      curDepth match {
+      (curDepth : @unchecked) match {
         case `order` =>
           solutionCount += 1
           //println("Solution (x,y): " + prevXs.zipWithIndex.map({case (x, yoff) => (x, 1 + yoff)}))
@@ -157,7 +157,7 @@ object EightQueens {
 
     def solve(curDepth: Int, xs: Seq[Int], threatened: Seq[ThreatenedLines]): Unit = {
       callCount += 1
-      curDepth match {
+      (curDepth : @unchecked) match {
         case `order` =>
           solutionCount += 1
           //println("Solution (x,y): " + prevXs.zipWithIndex.map({case (x, yoff) => (x, 1 + yoff)}))
@@ -207,7 +207,7 @@ object EightQueens {
 
     def solve(curDepth: Int, xs: Seq[Int], threatened: Seq[ThreatenedLines]): Unit = {
       callCount += 1
-      curDepth match {
+      (curDepth : @unchecked) match {
         case `order` =>
           solutionCount += 1
           //println("Solution (x,y): " + prevXs.zipWithIndex.map({case (x, yoff) => (x, 1 + yoff)}))
@@ -283,7 +283,7 @@ object EightQueens {
 
     def solve(curDepth: Int, xs: Seq[Int], threatened: Seq[ThreatenedLines]): Unit = {
       callCount += 1
-      curDepth match {
+      (curDepth : @unchecked) match {
         case `order` =>
           solutionCount += 1
           //println("Solution (x,y): " + prevXs.zipWithIndex.map({case (x, yoff) => (x, 1 + yoff)}))

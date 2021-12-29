@@ -8,7 +8,7 @@ import org.json4s.JsonAST.JInt
 import org.json4s.jackson.Serialization
 import org.json4s.{CustomSerializer, DefaultFormats, FieldSerializer}
 import org.scalatest.funsuite.AnyFunSuite
-import org.scalatest.matchers._
+//import org.scalatest.matchers._
 
 
 //case class PROBINGIntValueClass(value1: Int) extends AnyVal

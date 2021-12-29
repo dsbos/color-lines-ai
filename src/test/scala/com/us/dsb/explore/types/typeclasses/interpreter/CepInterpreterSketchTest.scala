@@ -81,7 +81,7 @@ class CepInterpreterSketchTest extends AnyFunSpec {
 
   sealed trait StateField
   object StateFields {
-    // (Lower camel case because represents field in class.
+    // (Lower camel case because represents field in class.)
     case object miscData extends StateField
   }
 
@@ -177,12 +177,12 @@ class CepInterpreterSketchTest extends AnyFunSpec {
       op.kind match {
         case DummySuffixMiscData(suffix) =>
           data.copy(miscData = data.miscData + suffix)
-        case kind @ Creation_ValidateEvent => data
-        case kind @ Creation_CopyDefinition =>
+        case _ @ Creation_ValidateEvent => data
+        case _ @ Creation_CopyDefinition =>
           // ?? Scala:  Can we eliminate(/move/hide) cast(s)? (Maybe via method on Creation_xxx object(s)?
           data.copy(definition = Some(data.event.asInstanceOf[CreationEvent].definition))
-        case kind @ Creation_ModifyMiscState => data
-        case TempStringNamedPrimitive(kind) =>
+        case _ @ Creation_ModifyMiscState => data
+        case TempStringNamedPrimitive(_) =>
           data  // imagine processing according to string (e.g., match/case)
         case kind: KnownPrimitive =>
           "" + ??? + s"- '$label': UNDIFFERENTIATED known primitive op (enumerated): (${kind})"
@@ -192,8 +192,9 @@ class CepInterpreterSketchTest extends AnyFunSpec {
 
     def evaluateSetStateFieldEmpty(op: SetStateFieldEmpty, data: InAndOutData): InAndOutData = {
       val label = op.label
+      import StateFields._
       op.field match {
-        case miscData => data.copy(miscData = "<EMPTIED>")
+        case `miscData` => data.copy(miscData = "<EMPTIED>")
       }
     }
 
@@ -255,7 +256,7 @@ class CepInterpreterSketchTest extends AnyFunSpec {
       op match {
         case proc: KnownPrimitiveOp =>
           formatKnownPrimitiveOp(indentation, proc)
-        case HackAdHocPrimitiveOp(label, description, fn) =>
+        case HackAdHocPrimitiveOp(label, description, fn @ _) =>
           indentation + s"- '$label': ad-hoc operation: '$description'"
         case proc: SetStateFieldEmpty =>
           formatSetStateFieldEmpty(indentation, proc)

@@ -96,7 +96,7 @@ object PatternSyntaxExplApp extends App {
   val (x4: Int, x5: Int) = (0, 0)
   val (x6, x7): (Int, Int) = (0, 0)
   val (x6b: Int, x7b: Int): (Int, Int) = (0, 0)
-  val x8 :: x9 = 0 :: Nil
+  val x8 :: x9 = (0 :: Nil : @unchecked)
   val C(x10, x11) = C(1, 2)
   val x12 @ C(x13, x14) = C(1, 2)
   val C(x15, x16 @ _) = C(1, 2)

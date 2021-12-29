@@ -109,17 +109,16 @@ class InterpreterPatternExpl2Test extends AnyFunSpec {
       litFn   = (value: Int) => value,
       plusFn  = (left: Expr, right: Expr) => evalViaFold1(left) + evalViaFold1(right),
       timesFn = (left, right) => evalViaFold1(left) * evalViaFold1(right),
-      propFn  = (name) => {name match {case "a" => 100}}
+      propFn  = (name) => { (name : @unchecked) match { case "a" => 100 } }
     )
   }
 
   def evalViaFold2(expr: Expr): Int = {
     expr.fold2(
-      litFn   = {case IntValue(value) => value},
-      plusFn  = {case Plus(left, right) => evalViaFold2(left) + evalViaFold2(right)},
-      timesFn = {case Times(left, right) => evalViaFold2(left) * evalViaFold2(right)},
-      propFn  = {case IntProp("a") => 100 case _ => fail()
-      }
+      litFn   = { case IntValue(value) => value },
+      plusFn  = { case Plus(left, right) => evalViaFold2(left) + evalViaFold2(right) },
+      timesFn = { case Times(left, right) => evalViaFold2(left) * evalViaFold2(right )},
+      propFn  = { case IntProp("a") => 100 case x => throw new MatchError(x) } // no place for :@unchecked
     )
   }
 
@@ -157,7 +156,8 @@ class InterpreterPatternExpl2Test extends AnyFunSpec {
                                             simplifyPlusZero2(nonZero2))
     },
     {
-      case Times(factor1, factor2) => Times(simplifyPlusZero2(factor1), simplifyPlusZero2(factor2))
+      case Times(factor1, factor2) => Times(simplifyPlusZero2(factor1),
+                                            simplifyPlusZero2(factor2))
     },
     identity
     )
@@ -181,8 +181,12 @@ class InterpreterPatternExpl2Test extends AnyFunSpec {
   }
 
   val incrPlusSimplifier: PartialFunction[Expr, Expr] = {
-    case Plus(IntValue(left), IntValue(right)) if left > right => Plus(IntValue(left + 1), IntValue(right - 1))
-    case Plus(IntValue(left), IntValue(right)) if left < right => Plus(IntValue(left - 1), IntValue(right + 1))
+    case Plus(IntValue(left),
+              IntValue(right)) if left > right => Plus(IntValue(left + 1),
+                                                       IntValue(right - 1))
+    case Plus(IntValue(left),
+              IntValue(right)) if left < right => Plus(IntValue(left - 1),
+                                                       IntValue(right + 1))
   }
 
   def simplifyPlusZeroX1(expr: Expr): Expr = {

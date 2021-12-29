@@ -101,7 +101,7 @@ object Json4sExplApp extends App {
 */
     // Renaming field/property (_inside_ given class, no:
 
-    import FieldSerializer._
+    //import FieldSerializer._
     implicit val formats2 = DefaultFormats /*+
         FieldSerializer[Something](renameTo("f3", "fThree"), renameFrom("f3", "3f")) +
         FieldSerializer[SomethingElse](renameTo("e3", "eThree"), renameFrom("e3", "3e"))*/

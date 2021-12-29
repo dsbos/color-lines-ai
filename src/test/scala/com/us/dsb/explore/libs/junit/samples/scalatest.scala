@@ -27,7 +27,7 @@ clear and concise. Here's an example:
 */
 import scala.collection.mutable.Stack
 import org.scalatest._
-import org.scalatest.matchers._
+//import org.scalatest.matchers._
 import org.scalatest.matchers.should.Matchers._
 import org.junit.Test
 import org.specs2.runner.JUnitRunner

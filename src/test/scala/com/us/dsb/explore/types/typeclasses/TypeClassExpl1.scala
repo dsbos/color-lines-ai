@@ -1,6 +1,6 @@
 package com.us.dsb.explore.types.typeclasses
 
-import scala.annotation.implicitNotFound
+//import scala.annotation.implicitNotFound
 
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers._

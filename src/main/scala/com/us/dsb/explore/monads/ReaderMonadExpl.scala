@@ -1,6 +1,6 @@
 package com.us.dsb.explore.monads
 
-import scalaz.Reader
+//import scalaz.Reader
 
 class ReaderMonadExpl {
 

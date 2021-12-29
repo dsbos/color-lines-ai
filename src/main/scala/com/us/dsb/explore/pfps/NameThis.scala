@@ -33,7 +33,7 @@ import unclear_refs._
 
 //import eu.timepit.refined.types.string.NonEmptyString
 
-import io.estatico.newtype.macros.newtype
+//import io.estatico.newtype.macros.newtype
 
 
 case class User(id: UserId, name: UserName)

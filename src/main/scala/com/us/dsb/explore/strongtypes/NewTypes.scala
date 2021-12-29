@@ -24,7 +24,7 @@ object SomeContextxx  extends App {
   @newtype case class FlatGenericCollection[A](raw: List[A])
   @newtype case class FlatGenericCollection2(raw: List[_])
 
-  import SomeContextxx._
+  //import SomeContextxx._
   var x1 = Primitive(1)
   x1 = Primitive(2)
 

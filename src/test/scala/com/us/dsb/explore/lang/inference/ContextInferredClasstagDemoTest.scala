@@ -4,7 +4,7 @@ import scala.reflect.{ClassTag => StandardClassTag}
 import scala.annotation.unchecked.uncheckedVariance
 
 import org.scalatest.funsuite.AnyFunSuite
-import org.scalatest.matchers._
+//import org.scalatest.matchers._
 import org.scalatest.matchers.should.Matchers._  // for "shouldNot compile"
 
 

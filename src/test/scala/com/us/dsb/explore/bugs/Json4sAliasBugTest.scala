@@ -26,7 +26,7 @@ class Json4sAliasBugTest extends AnyFunSuite {
     val e = intercept[org.json4s.MappingException] {
       val j = decompose(new C1(List()))
     }
-    //println("e: " )
+    println("e: " )
     //e.printStackTrace()
   }
 

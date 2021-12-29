@@ -124,7 +124,7 @@ class InterpreterPatternExpl1Test extends AnyFunSpec {
       case IfPositive(cond, ifPos, ifNonPos) =>
         simplify(cond) match {
           case IntValue(pos) if pos > 0 => simplify(ifPos)
-          case IntValue(pos)            => simplify(ifNonPos)
+          case IntValue(_)              => simplify(ifNonPos)
           case nonValue                 =>
             IfPositive(nonValue, simplify(ifPos), simplify(ifNonPos) )
         }
@@ -135,7 +135,7 @@ class InterpreterPatternExpl1Test extends AnyFunSpec {
     val value: Set[String] =
       expr match {
         case IntProp(name)      => Set(name)
-        case IntValue(v)        => Set[String]()
+        case IntValue(_)        => Set[String]()
         case BinaryOp(left, right) => listProperties(left) ++ listProperties(right)
         //case Plus(left, right)  => listProperties(left) ++ listProperties(right)
         //case Times(left, right) => listProperties(left) ++ listProperties(right)

@@ -19,7 +19,7 @@ object Order {
     // TODO:  Check out using Scala regular expression matching in Scala pattern
     // matches.
 
-    val Array(orderId, locStr, timeStr) = orderLine.split(" ")
+    val Array(orderId, locStr, timeStr) = orderLine.split(" ") : @unchecked
     val matchResult = LOCATION_REGEXP.matcher(locStr)
 
     matchResult.matches()  // need to call to avoid "No match found" for .group(...)

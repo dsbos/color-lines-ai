@@ -87,9 +87,9 @@ object RefinedTypes extends App {
   }
 
   object AutoOtherTBD {
-    import eu.timepit.refined.auto.autoRefineT
-    import eu.timepit.refined.auto.autoInfer
-    import eu.timepit.refined.auto.autoUnwrap
+    //import eu.timepit.refined.auto.autoRefineT
+    //import eu.timepit.refined.auto.autoInfer
+    //import eu.timepit.refined.auto.autoUnwrap
 
 
     // see https://kwark.github.io/refined-in-practice/#35 ff
