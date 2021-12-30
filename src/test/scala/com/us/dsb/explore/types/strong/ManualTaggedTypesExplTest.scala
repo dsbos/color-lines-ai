@@ -8,7 +8,7 @@ import org.scalatest.matchers.should.Matchers._  // for "shouldNot compile"
 /**
   * Demo test of tagged types of <what?> form (old Scalaz form).
   */
-class ManualTaggedTypesExplorationTest extends AnyFunSuite {
+class ManualTaggedTypesExplTest extends AnyFunSuite {
 
   test("Tagged types in old form should ...") {
 

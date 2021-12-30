@@ -4,7 +4,7 @@ import org.scalatest.funsuite.AnyFunSuite
 //import org.scalatest.matchers._
 
 
-class PrerequisiteTraitExplorationTest extends AnyFunSuite {
+class PrerequisiteTraitExplTest extends AnyFunSuite {
 
   // Trait required by some other trait.
   trait RequiredTrait {

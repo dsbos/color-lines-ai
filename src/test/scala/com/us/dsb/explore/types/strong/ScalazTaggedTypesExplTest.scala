@@ -9,7 +9,7 @@ import scalaz.Tags
 import scalaz.@@   // Note: Definition depends on ScalaZ version.
 
 
-class ScalazTaggedTypesExplorationTest extends AnyFunSuite {
+class ScalazTaggedTypesExplTest extends AnyFunSuite {
 
   test("Tagged ...") {
 

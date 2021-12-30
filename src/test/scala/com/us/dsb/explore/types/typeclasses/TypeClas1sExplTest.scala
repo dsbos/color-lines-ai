@@ -9,7 +9,7 @@ import org.scalatest.matchers._
 /**
   * Basic demo of type class.
   */
-class TypeClassExpl1 extends AnyFunSuite {
+class TypeClas1sExplTest extends AnyFunSuite {
 
   // Type class declaration (always trait?):
   trait Dumpable[T] {

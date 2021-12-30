@@ -8,7 +8,7 @@ import org.scalatest.matchers.should.Matchers._  // for "shouldNot compile"
 /**
   * Demo test showing two mutually dependent traits.
   */
-class PrerequisiteTraitRecursionExplorationTest extends AnyFunSuite {
+class PrerequisiteTraitRecursionExplTest extends AnyFunSuite {
 
   test("Demo mutual dependency between traits.") {
 

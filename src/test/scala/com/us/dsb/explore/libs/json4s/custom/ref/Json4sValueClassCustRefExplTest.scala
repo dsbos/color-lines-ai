@@ -39,7 +39,7 @@ case class Root(time: TimeIntValueClass,
 
 
 //noinspection CaseClassParam
-class Json4sValueClassCustRefTest extends AnyFunSuite {
+class Json4sValueClassCustRefExplTest extends AnyFunSuite {
 
   val tree4Obj2 = Root(TimeIntValueClass(11),
                        Some(TimeIntValueClass(12)),

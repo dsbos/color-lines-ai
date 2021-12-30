@@ -5,7 +5,7 @@ import org.scalatest.funsuite.AnyFunSuite
 import scala.annotation.implicitNotFound
 
 
-class TypeClassExpl2 extends AnyFunSuite {
+class TypeClass2ExplTest extends AnyFunSuite {
 
   //////////
   // Type class:

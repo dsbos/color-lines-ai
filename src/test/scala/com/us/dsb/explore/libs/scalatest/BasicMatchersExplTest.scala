@@ -6,7 +6,7 @@ import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers._
 // can also mix in org.scalatest.matchers.should.Matchers
 
-class BasicMatchers extends AnyFunSpec {
+class BasicMatchersExplTest extends AnyFunSpec {
 
   describe(" ...") {
     it("equality flavors: === vs. equal vs. be, 'shouldXx' vs. 'should xx'") {

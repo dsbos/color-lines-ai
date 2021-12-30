@@ -8,7 +8,7 @@ import org.scalatest.funspec.AnyFunSpec
   * no common `fold` method to help keep client code synchronized with set of
   * subclasses.)
   */
-class CepInterpreterSketchTest extends AnyFunSpec {
+class CepInterpreterSketchExplTest extends AnyFunSpec {
 
   /*
   Basic idea, iso(?)morphism with straight method calls.

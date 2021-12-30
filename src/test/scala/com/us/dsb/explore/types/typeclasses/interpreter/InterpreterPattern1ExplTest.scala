@@ -8,7 +8,7 @@ import org.scalatest.funspec.AnyFunSpec
   * no common `fold` method to help keep client code synchronized with set of
   * subclasses.)
   */
-class InterpreterPatternExpl1Test extends AnyFunSpec {
+class InterpreterPattern1ExplTest extends AnyFunSpec {
 
   sealed trait Expr
 

@@ -70,7 +70,7 @@ class Json4sObjectMappingExplTest extends AnyFunSuite {
   }
 
 
-  val tree4Obj1 = Root(WrappedIntTime(11),
+  lazy val tree4Obj1 = Root(WrappedIntTime(11),
                        WrappedIntDist(12),
                        IntValueClassTime(13),
                        Some(IntValueClassDistance(14)),
