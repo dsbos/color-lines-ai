@@ -5,7 +5,7 @@ package com.us.dsb.explore.strongtypes
 import io.estatico.newtype.macros._
 
 
-object BasicNewtypes extends App {
+object BasicNewtypesExpl extends App {
   println("""See BasicNewtypesExplTest ('"..." shouldNot typeCheck' cases).""")
 
   object Types {
@@ -22,6 +22,10 @@ object BasicNewtypes extends App {
         this.raw
       }
     }
+
+    // Can't use on multi-argument classes.
+    //@newtype case class MultipleMembers(a: Int, b: Float)
+    //@newtype class MultipleMembers(a: Int, b: Float)
 
     @newtype case class Nested(raw: Primitive)
 

@@ -5,8 +5,8 @@ import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers._  // for "shouldNot compile"
 
 
-class BasicNewtypesExplTest extends AnyFunSpec {
-  import BasicNewtypes.Types._
+class BasicNewtypesExplExplTest extends AnyFunSpec {
+  import BasicNewtypesExpl.Types._
 
   describe("newtypes with same structure should not be compatible:") {
 
