@@ -209,8 +209,7 @@ object RefinedTypes extends App {
 
 
   object CustomPredicates {
-    //import RefinedTypesSubOld._
-    import RefinedTypesSub._
+    import CustomRefinements._
     import eu.timepit.refined.refineV
 
     val x1 = refineV[Palindrome]("madam")
