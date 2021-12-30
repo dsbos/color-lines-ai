@@ -59,6 +59,28 @@ class BasicMatchersExplTest extends AnyFunSpec {
 
     }
 
+
+    describe("compile-time checks:") {
+      import org.scalatest.matchers.should.Matchers._
+
+      it(""""shouldNot typeCheck" should pass on type error""") {
+        "1: String" shouldNot typeCheck
+      }
+
+      it(""""shouldNot compile" should pass on type error""") {
+        "1: String" shouldNot compile
+      }
+
+      it(""""shouldNot compile" should pass on syntax error""") {
+        "non-type error . . . " shouldNot compile
+      }
+
+      it(""""should compile" should pass on good code""") {
+        "1" should compile
+      }
+
+   }
+
     describe("custom equality") {
 
       case class OneInt(raw: Int)
