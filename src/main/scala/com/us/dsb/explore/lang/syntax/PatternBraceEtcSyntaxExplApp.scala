@@ -12,7 +12,7 @@ object PatternBraceEtcSyntaxExplApp extends App {
   val c2: List[Any] = List((1, 101), (2, "1 0 2"), 3, (4, 404, "FOUR"))
 
 
-  c1.foreach _ : @annotation.nowarn
+  c1.foreach _ : @annotation.nowarn("msg=pure expression.*statement position")
 
   if (false) {
     c1.foreach(null)

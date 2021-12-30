@@ -1,4 +1,4 @@
-package com.us.dsb.explore.strongtypes
+package com.us.dsb.explore.lang
 
 // https://docs.scala-lang.org/sips/42.type.html
 object LiteralTypes extends App {
@@ -51,9 +51,9 @@ object LiteralTypes extends App {
     //   IntelliJ doesn't understand right):
 
     val xInt: Int = One.compute
-    val x1: 1     = One.compute
+    val x1: 1 = One.compute
     //val x2: 2     = One.compute
-    val xInferred = One.compute            // infers :Int from :1
+    val xInferred = One.compute // infers :Int from :1
     final val xInferredFinal = One.compute // "final val" keeps :1
 
     acceptOne(1)
@@ -70,14 +70,15 @@ object LiteralTypes extends App {
     final def mInferredFinal = One.compute // but "final def" still infers :Int from :1
     //acceptOne(mInferredFinal)
 
-   /*
+    /*
      ASSIM. (from https://docs.scala-lang.org/sips/42.type.html):
 
      def foo[T](t: T): t.type = t
      final val bar = foo(23)            // result is bar: 23
 
 
-     The presence of an upper bound of Singleton on a formal type parameter indicates that singleton types should be inferred for type parameters at call sites
+     The presence of an upper bound of Singleton on a formal type parameter indicates that singleton types should be
+     inferred for type parameters at call sites
 
     ~:
     (123: Any) match {
@@ -87,13 +88,28 @@ object LiteralTypes extends App {
 
     */
 
-    import scala.Singleton
-
   }
 
   valueOf[123]
   //valueOf[123.type]
   valueOf[LiteralTypes.type]
   //valueOf[LiteralTypes]
+
+  // valueOf[Int]  no ValueOf Instance for non-singleton type
+
+  val x1: 1 = 1
+  val x2: Int = 1
+  val x3 = List[Float]()
+  valueOf[1]
+  // valueOf[Int]  // error (expected)--no ValueOf Instance for non-singleton type
+  valueOf[x1.type]
+  valueOf[x2.type] // ?? why not error?  why not doing "valueOf[Int]"?
+  valueOf[x3.type] // ?? why not error?    MAYBE singleton vs. literal?
+
+  //??def m[T <: Int with Singleton] : T = {
+  //??  valueOf[T]
+  //??}
+  //??m[1]
+  //m[""]
 
 }

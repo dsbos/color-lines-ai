@@ -3,6 +3,7 @@ name := "expl-scala"
 version := "0.1"
 
 scalaVersion := "2.13.7"
+//???? Q: how to insert below in scala-parallel-collections, etc.?
 
  // https://medium.com/@awesomeorji/sbt-for-the-absolute-beginner-2-settings-and-tasks-6f3b00be1a81
 
@@ -23,6 +24,7 @@ scalacOptions ++= Seq(
   "-Xlint:-unused,_",
   // -Xlint:unused sets -Wunused:imports,privates,locals,implicits.
 
+  "-Wunused:nowarn",
   //"-Wunused:imports",
   "-Wunused:patvars",
   //"-Wunused:privates",
@@ -31,6 +33,10 @@ scalacOptions ++= Seq(
   "-Wunused:implicits",   // explicit _parameters_
   //"-Wunused:params",    // -Wunused:explicits,implicits.
   //"-Wunused:linted",    // -Xlint:unused.
+  //??: -Wunused:synthetics?
+
+  //??: -Vimplicits?
+
 
   )
 
@@ -84,14 +90,20 @@ scalacOptions ++= Seq(
   - eta-sam - Warn on eta-expansion to meet a Java-defined functional interface that is not explicitly annotated with @FunctionalInterface.
   - deprecation - Enable linted deprecations.
 
+- e.g.: -Wconf:msg=match may not be exhaustive:i
+        -Wconf:cat=deprecation:ws,cat=feature:ws,cat=optimizer:ws
+        https://www.scala-lang.org/2021/01/12/configuring-and-suppressing-warnings.html
+
 */
 
 
-
-
-
 libraryDependencies ++= Seq(
+  "org.scala-lang.modules" %% "scala-swing" % "3.0.0",
+  //"org.scala-lang.modules" %% "scala-parser-combinators" % <version>
+  //"org.scala-lang.modules" %% "scala-parallel-collections" % "???",
+
   "org.scalatest" %% "scalatest" % "3.2.10" % Test,
+  //"org.scalatest" %% "scalatest" % "3.2.10",  // Not just in src/test
   //"org.scalactic" %% "scalactic" % "3.2.10"
 
   "junit" % "junit" % "4.13.1" % Test,
@@ -106,7 +118,6 @@ libraryDependencies ++= Seq(
   "org.json4s" % "json4s-jackson_2.13" % "3.6.11",  // 3.7.x?, 4.x?
   //"org.json4s" % "json4s-ast_2.13" % "3.6.11",  // 3.7.x?, 4.x?
 
-  "org.scala-lang.modules" %% "scala-swing" % "3.0.0",
 
 
   // Stronger types:  newtypes and refine's refinement types

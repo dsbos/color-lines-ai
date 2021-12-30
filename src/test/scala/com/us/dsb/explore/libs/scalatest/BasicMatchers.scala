@@ -53,7 +53,7 @@ class BasicMatchers extends AnyFunSpec {
 
       //??: "" should be a [String]
 
-      new java.io.File("x") should be a 'file
+      //?? new java.io.File("x") should be a 'file
 
       //https://www.scalatest.org/user_guide/using_matchers
 
