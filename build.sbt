@@ -122,19 +122,23 @@ libraryDependencies ++= Seq(
 
   // Stronger types:  newtypes and refine's refinement types
   "io.estatico" %% "newtype"             % "0.4.3",
-  // "eu.timepit"  %% "refined"                 % "0.9.28",/
+  "eu.timepit"  %% "refined"                 % "0.9.28",
+  //"eu.timepit"  %% "refined"                 % "0.9.28",/
   //"eu.timepit"  %% "refined-cats"            % "0.9.28", // optional
   //"eu.timepit"  %% "refined-eval"            % "0.9.28", // optional, JVM-only
   //"eu.timepit"  %% "refined-jsonpath"        % "0.9.28", // optional, JVM-only
   //"eu.timepit"  %% "refined-pureconfig"      % "0.9.28", // optional, JVM-only
   //"eu.timepit"  %% "refined-scalacheck"      % "0.9.28", // optional
-      "eu.timepit"  %% "refined-scalaz"          % "0.9.28", // optional
+  //"eu.timepit"  %% "refined-scalaz"          % "0.9.28", // optional
   //"eu.timepit"  %% "refined-scodec"          % "0.9.28", // optional
   //"eu.timepit"  %% "refined-scopt"           % "0.9.28", // optional
-  //"eu.timepit"  %% "refined-shapeless"       % "0.9.28",  // optional
+  //"eu.timepit"  %% "refined-shapeless"       % "0.9.28", // optional
+  // try circe ~adapter
 
   "org.typelevel"  %% "cats-core"           % "2.1.0",
   // "org.typelevel"  %% "cats-effect"         % "2.1.0",
+
+  "org.scalaz" %% "scalaz-core" % "7.3.5",
 
 
   "com.github.cb372" %% "cats-retry" % "2.1.0",

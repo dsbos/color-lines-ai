@@ -7,7 +7,7 @@ import scala.util.Try
 
 
 // https://github.com/fthomas/refined?
-object RefinedTypes extends App {
+object RefinedTypesExpl extends App {
 
   //import eu.timepit.refined._
   //import eu.timepit.refined.refineV
@@ -31,8 +31,6 @@ object RefinedTypes extends App {
   //import eu.timepit.refined.types.string.NonEmptyString
   //import eu.timepit.refined.util.string._
 
-
-
   // Note that NonEmptyString === String Refined NonEmpty
 
   object RuntimeMethods {
@@ -50,6 +48,7 @@ object RefinedTypes extends App {
     val check2ResultGood = refineV[NonEmpty](goodPlainString)
     val check2ResultBad  = refineV[NonEmpty](badPlainString)
 
+    println("RuntimeMethods:")
     println("check1ResultGood = " + check1ResultGood)
     println("check2ResultBad = " + check2ResultBad)
     println("check1ResultGood = " + check1ResultGood)
@@ -206,29 +205,5 @@ object RefinedTypes extends App {
     //xml("<x>/<y>")
     xml("<x></x>")
   }
-
-
-  object CustomPredicates {
-    import CustomRefinements._
-    import eu.timepit.refined.refineV
-
-    val x1 = refineV[Palindrome]("madam")
-    println("x1 = " + x1)
-    val x2 = refineV[Palindrome]("abc")
-    println("x2 = " + x2)
-
-    import eu.timepit.refined.auto.autoRefineV  // lets <value>: <refined type> work
-
-    // ?? make SBT sub-project:
-    // RefinedTypesSub must be compiled first to avoid "exception during macro
-    // expansion ... ClassNotFoundException "
-    // (see https://github.com/fthomas/refined/blob/master/modules/docs/macro_pitfalls.md):
-    //
-   "madam": String Refined Palindrome
-
-    //"abc": String Refined Palindrome
-
-  }
-  CustomPredicates
 
 }
