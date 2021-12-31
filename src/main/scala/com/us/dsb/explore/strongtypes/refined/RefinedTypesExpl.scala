@@ -30,38 +30,6 @@ object RefinedTypesExpl extends App {
 
   // Note that NonEmptyString === String Refined NonEmpty
 
-  object AutoWrapping {
-
-    import eu.timepit.refined.numeric.Positive
-    import eu.timepit.refined.types.numeric.{NonNegInt, PosInt}
-    import eu.timepit.refined.types.string.NonEmptyString
-
-    //"non-empty": NonEmptyString  // error (without import eu.timepit.refined.auto.autoRefineV)
-    //1: Refined[Int, Positive]
-    //1: PosInt
-
-    import eu.timepit.refined.auto.autoRefineV
-
-    "non-empty": NonEmptyString
-    1: Refined[Int, Positive]
-    1: PosInt
-    //0: PosInt
-
-    0: NonNegInt
-    //"": NonEmptyString
-  }
-
-  object AutoOtherTBD {
-    //import eu.timepit.refined.auto.autoRefineT
-    //import eu.timepit.refined.auto.autoInfer
-    //import eu.timepit.refined.auto.autoUnwrap
-
-
-    // see https://kwark.github.io/refined-in-practice/#35 ff
-
-
-  }
-
   object NestedScalarSyntax {
 
     import eu.timepit.refined.auto.autoRefineV
