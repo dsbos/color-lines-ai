@@ -14,7 +14,6 @@ object TypeTagsExplApp {
 
   val things: List[GeneralThing] = List(SpecificThingOne(), SpecificThingTwo())
 
-  import System.err.println
   def getThingViaTags[C <: GeneralThing](implicit classTag: ClassTag[C],
                                                   typeTag: TypeTag[C]): Option[C] = {
     println()

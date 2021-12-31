@@ -206,20 +206,20 @@ class InterpreterPatternExplTest2 extends AnyFunSpec {
 
 
   def printStuff(label: String, expr: Expr): Unit = {
-    System.err.println()
-    System.err.println(s"$label                           = " + expr)
-    System.err.println(s"format($label)                   = " + format(expr))
-    System.err.println(s"evaluateDirectly($label)         = " + evaluateDirectly(expr))
-    System.err.println(s"evalViaFold1($label)             = " + evalViaFold1(expr))
-    System.err.println(s"evalViaFold2($label)             = " + evalViaFold2(expr))
-    System.err.println(s"simplifyPlusZero1($label)         = " + simplifyPlusZero1(expr))
-    System.err.println(s"format(simplifyPlusZero1($label)) = " + format(simplifyPlusZero1(expr)))
-    System.err.println(s"format(simplifyPlusZero2($label)) = " + format(simplifyPlusZero2(expr)))
-    //System.err.println(s"format(simplifyPlusZeroX($label)) = " + format(simplifyPlusZeroX(expr)))
-    System.err.println(s"format(simplifyTimesOneX1($label)) = " + format(simplifyTimesOneX1(expr)))
-    System.err.println(s"format(simplifyMultipleX1($label)) = " + format(simplifyMultipleX1xx(expr)))
-    //System.err.println(s"simplify($label)               = " + simplify(expr))
-    //System.err.println(s"format(simplify($label))       = " + format(simplify(expr)))
+    println()
+    println(s"$label                           = " + expr)
+    println(s"format($label)                   = " + format(expr))
+    println(s"evaluateDirectly($label)         = " + evaluateDirectly(expr))
+    println(s"evalViaFold1($label)             = " + evalViaFold1(expr))
+    println(s"evalViaFold2($label)             = " + evalViaFold2(expr))
+    println(s"simplifyPlusZero1($label)         = " + simplifyPlusZero1(expr))
+    println(s"format(simplifyPlusZero1($label)) = " + format(simplifyPlusZero1(expr)))
+    println(s"format(simplifyPlusZero2($label)) = " + format(simplifyPlusZero2(expr)))
+    //println(s"format(simplifyPlusZeroX($label)) = " + format(simplifyPlusZeroX(expr)))
+    println(s"format(simplifyTimesOneX1($label)) = " + format(simplifyTimesOneX1(expr)))
+    println(s"format(simplifyMultipleX1($label)) = " + format(simplifyMultipleX1xx(expr)))
+    //println(s"simplify($label)               = " + simplify(expr))
+    //println(s"format(simplify($label))       = " + format(simplify(expr)))
   }
 
 

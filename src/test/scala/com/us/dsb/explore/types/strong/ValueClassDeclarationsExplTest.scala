@@ -60,7 +60,7 @@ case class Try1(value: String) extends AnyVal {
 
 // Can have instance methods:
 case class Try4(value: String) extends AnyVal {
-  def m1(): Unit = System.err.println("value = " + value)
+  def m1(): Unit = println("value = " + value)
   protected def m2() = value  // (though class can't be extended)
   private def m2(x: Int) = value + x
 }

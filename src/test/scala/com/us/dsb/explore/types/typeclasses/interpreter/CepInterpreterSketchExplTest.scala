@@ -199,7 +199,7 @@ class CepInterpreterSketchExplTest extends AnyFunSpec {
     }
 
     val label = op.label
-    System.err.println(s"(+'$label')")
+    println(s"(+'$label')")
     val value: InAndOutData =
       op match {
         case op: KnownPrimitiveOp   => evaluateKnownPrimitiveOp(op, data)
@@ -222,7 +222,7 @@ class CepInterpreterSketchExplTest extends AnyFunSpec {
             }
           }.getOrElse(???)
       }
-    System.err.println(s"(-'$label'): value = " + value)
+    println(s"(-'$label'): value = " + value)
     value
   }
 
@@ -360,20 +360,20 @@ class CepInterpreterSketchExplTest extends AnyFunSpec {
                          op: ProcessingOp,
                          data: InAndOutData
                         ): InAndOutData = {
-    System.err.println()
-    System.err.println(s"$label = " + op)
+    println()
+    println(s"$label = " + op)
 
-    System.err.println(s"format($label):")
-    System.err.println(s"----------:")
-    System.err.println(s"" + format(op))
-    System.err.println(s":----------")
+    println(s"format($label):")
+    println(s"----------:")
+    println(s"" + format(op))
+    println(s":----------")
 
-    System.err.println(s"evaluate($label, $data):")
-    System.err.println(s"==========:")
+    println(s"evaluate($label, $data):")
+    println(s"==========:")
     val result = evaluate(op, data)
-    System.err.println(s"= = = = = :")
-    System.err.println(result)
-    System.err.println(s":==========")
+    println(s"= = = = = :")
+    println(result)
+    println(s":==========")
     result
   }
 

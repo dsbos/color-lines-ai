@@ -22,7 +22,7 @@ class InterpreterPattern1ExplTest extends AnyFunSpec {
         case Plus(left, right) => Some((left, right))
         case Times(left, right)  => Some((left, right))
         case x: BinaryOp =>
-          System.err.println("x  = " + x)
+          println("x  = " + x)
           ???  // something new?
         case _                   => None
       }
@@ -148,14 +148,14 @@ class InterpreterPattern1ExplTest extends AnyFunSpec {
 
 
   def nameThis(label: String, expr: Expr): Unit = {
-    System.err.println()
-    System.err.println(s"$label                   = " + expr)
-    System.err.println(s"format($label)           = " + format(expr))
-    System.err.println(s"evaluate($label)         = " + evaluate(expr))
-    System.err.println(s"simplifyPlusZero($label) = " + simplifyPlusZero(expr))
-    System.err.println(s"simplify($label)         = " + simplify(expr))
-    System.err.println(s"format(simplify($label)) = " + format(simplify(expr)))
-    System.err.println(s"listProperties(simplify($label)) = " + listProperties(expr))
+    println()
+    println(s"$label                   = " + expr)
+    println(s"format($label)           = " + format(expr))
+    println(s"evaluate($label)         = " + evaluate(expr))
+    println(s"simplifyPlusZero($label) = " + simplifyPlusZero(expr))
+    println(s"simplify($label)         = " + simplify(expr))
+    println(s"format(simplify($label)) = " + format(simplify(expr)))
+    println(s"listProperties(simplify($label)) = " + listProperties(expr))
     assert(evaluate(expr) == evaluate(simplify(expr)))
   }
 
