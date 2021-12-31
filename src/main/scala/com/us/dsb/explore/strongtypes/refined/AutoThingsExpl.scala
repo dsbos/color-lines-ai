@@ -32,17 +32,29 @@ object AutoThingsExpl extends App {
   // see https://kwark.github.io/refined-in-practice/#35 ff
 
   object AutoRefineT {
-    //import eu.timepit.refined.auto.autoRefineT
+    import eu.timepit.refined.auto.autoRefineT
   }
   AutoRefineT
 
   object AutoInfer {
-    //import eu.timepit.refined.auto.autoInfer
+    import eu.timepit.refined.auto.autoInfer
   }
   AutoInfer
 
   object AutoUnwrap {
-    //import eu.timepit.refined.auto.autoUnwrap
+    import eu.timepit.refined.types.numeric.PosInt
+
+    import eu.timepit.refined.auto.autoRefineV
+    val x: PosInt = 1: PosInt
+
+    // Without autoUnwrap:
+    //x: Int      // ... found: PosInt; required: Int
+    x.value: Int
+
+    // Without autoUnwrap:
+    import eu.timepit.refined.auto.autoUnwrap
+
+    x: Int
   }
   AutoUnwrap
 

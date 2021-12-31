@@ -30,6 +30,34 @@ object RefinedTypesExpl extends App {
 
   // Note that NonEmptyString === String Refined NonEmpty
 
+  object Basic {
+    import eu.timepit.refined.types.numeric.PosInt
+    import eu.timepit.refined.auto.autoRefineV
+
+    type Offset = PosInt
+    //0: PosInt  // "Predicate failed: (0 > 0)."
+    var offset: Offset = 1: PosInt
+    offset = 2: PosInt
+    offset = 3
+    //offset = 0  // Predicate failed: (0 > 0).
+    val offset2 = 1: PosInt
+    offset = offset2
+
+
+    //????PosInt.unsafeFrom(1)
+
+
+    // Without autoUnwrap:
+    //offset: Int      // ... found: Offset; required: Int
+    offset.value: Int
+
+    // Without autoUnwrap:
+    import eu.timepit.refined.auto.autoUnwrap
+
+    offset: Int
+  }
+  Basic
+
   object NestedScalarSyntax {
 
     import eu.timepit.refined.auto.autoRefineV
@@ -43,6 +71,7 @@ object RefinedTypesExpl extends App {
     "ax": String Refined Or[StartsWith["a"], EndsWith["z"]]
     //"xx":String Refined Or[StartsWith["a"], EndsWith["z"]]
   }
+  NestedScalarSyntax
 
   object NestedListSyntax {
 
@@ -79,7 +108,7 @@ object RefinedTypesExpl extends App {
     //7: Int Refined OneOf[Divisible[2] :: Divisible[3] :: HNil]
 
   }
-
+  NestedListSyntax
 
   {
     import eu.timepit.refined.api.Refined
@@ -123,5 +152,6 @@ object RefinedTypesExpl extends App {
     //xml("<x>/<y>")
     xml("<x></x>")
   }
+  SpecialStringTypes
 
 }
