@@ -1,13 +1,9 @@
-// ?? do some collections, e.g., NonEmpty, Head, Forall, Index
+package com.us.dsb.explore.strongtypes.refined
 
-
-package com.us.dsb.explore.strongtypes
-
-import scala.util.Try
-
+import com.us.dsb.explore.strongtypes.CustomRefinementPredicates
 
 // https://github.com/fthomas/refined?
-object CustomPredicatesRefinedTypesExpl extends App {
+object CustomPredicatesExpl extends App {
 
   import eu.timepit.refined.api.Refined
 
@@ -19,9 +15,7 @@ object CustomPredicatesRefinedTypesExpl extends App {
   // and therefore is in subproject "buildFirst".)
   //
   import CustomRefinementPredicates._
-
-
-  import eu.timepit.refined.auto.autoRefineV  // lets <value>: <refined type> work
+  import eu.timepit.refined.auto.autoRefineV // lets <value>: <refined type> work
 
 
   "madam": String Refined Palindrome
@@ -51,7 +45,5 @@ object CustomPredicatesRefinedTypesExpl extends App {
   println("""refineV[Palindrome](List(1))       = """ + refineV[Palindrome](List(1)))
   println("""refineV[Palindrome](List(1, 2))    = """ + refineV[Palindrome](List(1, 2)))
   println("""refineV[Palindrome](List(1, 2, 1)) = """ + refineV[Palindrome](List(1, 2, 1)))
-
-  import eu.timepit.refined.refineV
   refineV[Palindrome](List(1, 2))
 }

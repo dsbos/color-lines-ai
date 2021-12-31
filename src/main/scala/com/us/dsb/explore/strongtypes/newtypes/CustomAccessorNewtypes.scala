@@ -1,11 +1,10 @@
-package com.us.dsb.explore.strongtypes
+package com.us.dsb.explore.strongtypes.newtypes
 
-// https://github.com/estatico/scala-newtype
-import io.estatico.newtype.macros._
-
+import io.estatico.newtype.macros.newtype
 
 object CustomAccessorNewtypes extends App {
   // (Quiet warning "implicit conversion method opsThis should be enabled":)
+
   import scala.language.implicitConversions
 
   // (@newtype/newtypes must be in an object, since macro defines a type.)
@@ -17,8 +16,9 @@ object CustomAccessorNewtypes extends App {
     //val saved = raw  // "val definitions not supported, use def instead"
 
     // ?? TODO Q: How to access member when default accessor is suppressed?
-    def get: Int =  {
-      ???//this.raw  // "value raw is not a member of com.us.dsb.explore.strongtypes.CustomAccessorNewtype.SuppressedAccessor.Ops$newtype"
+    def get: Int = {
+      ??? //this.raw  // "value raw is not a member of com.us.dsb.explore.strongtypes.CustomAccessorNewtype
+      // .SuppressedAccessor.Ops$newtype"
     }
 
   }

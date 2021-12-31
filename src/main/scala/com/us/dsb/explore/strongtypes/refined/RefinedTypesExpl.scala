@@ -1,10 +1,6 @@
-// ?? do some collections, e.g., NonEmpty, Head, Forall, Index
-
-
-package com.us.dsb.explore.strongtypes
+package com.us.dsb.explore.strongtypes.refined
 
 import scala.util.Try
-
 
 // https://github.com/fthomas/refined?
 object RefinedTypesExpl extends App {
@@ -12,6 +8,7 @@ object RefinedTypesExpl extends App {
   //import eu.timepit.refined._
   //import eu.timepit.refined.refineV
   //import eu.timepit.refined.api._
+
   import eu.timepit.refined.api.Refined
   //import eu.timepit.refined.api.RefType
   //import eu.timepit.refined.auto._
@@ -34,9 +31,10 @@ object RefinedTypesExpl extends App {
   // Note that NonEmptyString === String Refined NonEmpty
 
   object RuntimeMethods {
-    import eu.timepit.refined.refineV
+
     import eu.timepit.refined.api.RefType
     import eu.timepit.refined.collection.NonEmpty
+    import eu.timepit.refined.refineV
 
     val goodPlainString = "<non-empty string>"
     val badPlainString = ""
@@ -44,9 +42,9 @@ object RefinedTypesExpl extends App {
     // Note "String Refined NonEmpty" vs. just "NonEmpty":
     // (return types: Either[String, Refined[String, NonEmpty]])
     val check1ResultGood = RefType.applyRef[String Refined NonEmpty](goodPlainString)
-    val check1ResultBad  = RefType.applyRef[String Refined NonEmpty](badPlainString)
+    val check1ResultBad = RefType.applyRef[String Refined NonEmpty](badPlainString)
     val check2ResultGood = refineV[NonEmpty](goodPlainString)
-    val check2ResultBad  = refineV[NonEmpty](badPlainString)
+    val check2ResultBad = refineV[NonEmpty](badPlainString)
 
     println("RuntimeMethods:")
     println("check1ResultGood = " + check1ResultGood)
@@ -56,18 +54,21 @@ object RefinedTypesExpl extends App {
 
     val x1: Refined[String, NonEmpty] = refineV[NonEmpty].unsafeFrom(goodPlainString)
     println("x1 = " + x1)
-    val x2 = Try { refineV[NonEmpty].unsafeFrom(badPlainString) } // IllegalArgumentException
+    val x2 = Try {
+      refineV[NonEmpty].unsafeFrom(badPlainString)
+    } // IllegalArgumentException
     println("x2 = " + x2)
 
     // re which: see https://kwark.github.io/refined-in-practice/#38
     //
   }
-  RuntimeMethods  // initialize to run checks in there
 
-  object AutoWrapping{
+  RuntimeMethods // initialize to run checks in there
+
+  object AutoWrapping {
+
     import eu.timepit.refined.numeric.Positive
-    import eu.timepit.refined.types.numeric.NonNegInt
-    import eu.timepit.refined.types.numeric.PosInt
+    import eu.timepit.refined.types.numeric.{NonNegInt, PosInt}
     import eu.timepit.refined.types.string.NonEmptyString
 
     //"non-empty": NonEmptyString  // error (without import eu.timepit.refined.auto.autoRefineV)
@@ -94,28 +95,28 @@ object RefinedTypesExpl extends App {
     // see https://kwark.github.io/refined-in-practice/#35 ff
 
 
-
   }
 
   object NestedScalarSyntax {
-    import eu.timepit.refined.boolean._  // Or, Not, True, AllOf, etc.
-    import eu.timepit.refined.string._   // StartsWith, MatchesRegex, Regex, etc.
-    import eu.timepit.refined.auto.autoRefineV  // lets <value>: <refined type> work
 
-    "az":String Refined StartsWith["a"]
-    "az":String Refined EndsWith["z"]
-    "ax":String Refined (StartsWith["a"] Or EndsWith["z"])
-    "xz":String Refined Or[StartsWith["a"], EndsWith["z"]]
-    "ax":String Refined Or[StartsWith["a"], EndsWith["z"]]
+    import eu.timepit.refined.auto.autoRefineV
+    import eu.timepit.refined.boolean._
+    import eu.timepit.refined.string._ // lets <value>: <refined type> work
+
+    "az": String Refined StartsWith["a"]
+    "az": String Refined EndsWith["z"]
+    "ax": String Refined (StartsWith["a"] Or EndsWith["z"])
+    "xz": String Refined Or[StartsWith["a"], EndsWith["z"]]
+    "ax": String Refined Or[StartsWith["a"], EndsWith["z"]]
     //"xx":String Refined Or[StartsWith["a"], EndsWith["z"]]
   }
 
   object NestedListSyntax {
-    import eu.timepit.refined.auto.autoRefineV  // lets <value>: <refined type> work
-    import eu.timepit.refined.boolean._  // Or, Not, True, AllOf, etc.
+
+    import eu.timepit.refined.auto.autoRefineV
+    import eu.timepit.refined.boolean._
     import eu.timepit.refined.numeric.Divisible
-    import shapeless.HNil
-    import shapeless.::
+    import shapeless.{::, HNil}
 
     true: Boolean Refined AllOf[True :: HNil]
     //true: Boolean Refined AllOf[True :: False :: HNil]
@@ -148,27 +149,10 @@ object RefinedTypesExpl extends App {
 
 
   {
-    import eu.timepit.refined._
-    import eu.timepit.refined.refineV
-    import eu.timepit.refined.api._
     import eu.timepit.refined.api.Refined
-    import eu.timepit.refined.api.RefType
-    import eu.timepit.refined.auto.autoRefineV  // lets <value>: <refined type> work
-    import eu.timepit.refined.boolean._
-    import eu.timepit.refined.char._
-    import eu.timepit.refined.collection._
+    import eu.timepit.refined.auto.autoRefineV
     import eu.timepit.refined.collection.NonEmpty
-    import eu.timepit.refined.generic._
-    import eu.timepit.refined.numeric._
-    import eu.timepit.refined.numeric.Positive
     import eu.timepit.refined.string._
-    import eu.timepit.refined.types.char._
-    import eu.timepit.refined.types.numeric._
-    import eu.timepit.refined.types.numeric.NonNegInt
-    import eu.timepit.refined.types.numeric.PosInt
-    import eu.timepit.refined.types.string._
-    import eu.timepit.refined.types.string.NonEmptyString
-    import eu.timepit.refined.util.string._
 
     "xxx": String Refined NonEmpty
     //"xxx": String Refined MatchesRegex["abc"]
@@ -176,7 +160,8 @@ object RefinedTypesExpl extends App {
   }
 
   object SpecialStringTypes {
-    import eu.timepit.refined.auto.autoRefineV  // lets <value>: <refined type> work
+
+    import eu.timepit.refined.auto.autoRefineV
     import eu.timepit.refined.string._
     import eu.timepit.refined.util.string._
 
@@ -199,7 +184,7 @@ object RefinedTypesExpl extends App {
     //uuid("")
     //uuid("xyz")
     //uuid("00000000-0000-0000-0000-00000000000")
-    uuid(  "00000000-0000-0000-0000-000000000000")
+    uuid("00000000-0000-0000-0000-000000000000")
 
     //xml("")
     //xml("<x>/<y>")

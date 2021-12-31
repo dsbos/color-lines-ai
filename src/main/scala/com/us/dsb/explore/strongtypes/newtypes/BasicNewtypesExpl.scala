@@ -1,15 +1,13 @@
-package com.us.dsb.explore.strongtypes
+package com.us.dsb.explore.strongtypes.newtypes
 
-
-// https://github.com/estatico/scala-newtype
-import io.estatico.newtype.macros._
-
+import io.estatico.newtype.macros.newtype
 
 object BasicNewtypesExpl extends App {
   println("""See BasicNewtypesExplTest ('"..." shouldNot typeCheck' cases).""")
 
   object Types {
     // Quiet warning "implicit conversion method opsThis should be enabled":
+
     import scala.language.implicitConversions
 
     // (Must be in object, since macro defines a type.)
@@ -30,6 +28,7 @@ object BasicNewtypesExpl extends App {
     @newtype case class Nested(raw: Primitive)
 
     @newtype case class Deeper(raw: List[Nested])
+
     @newtype case class SameShapeDeeper(raw: List[Nested])
 
     @newtype case class FlatSpecificCollection(raw: List[Int])
@@ -39,6 +38,7 @@ object BasicNewtypesExpl extends App {
     @newtype case class FlatGenericCollection2(raw: List[_])
 
   }
+
   import Types._
 
   var x1xx = Primitive(1)
