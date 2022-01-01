@@ -1,11 +1,10 @@
-package com.us.dsb.explore.strongtypes
-
+package com.us.dsb.explore.strongtypes.newtypes
 
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers._  // for "shouldNot compile"
 
 
-class BasicNewtypesExplExplTest extends AnyFunSpec {
+class BasicNewtypesExplTest extends AnyFunSpec {
   import com.us.dsb.explore.strongtypes.newtypes.BasicNewtypesExpl.Types._
 
   describe("newtypes with same structure should not be compatible:") {
