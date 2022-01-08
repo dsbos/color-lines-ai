@@ -61,7 +61,7 @@ object BasicMostExplicitDemo extends App {
 
   //////////
   // ********** Unwrapping:
-  v1.value: Int  // @annotation.nowarn // ?? TODO: Why doesn't suppression work?
+  v1.value: Int  // @annotation.nowarn // ?? TODO: Why doesn't warning suppression work?
 
 
   ////////////////////////////////////////
@@ -74,7 +74,7 @@ object BasicMostExplicitDemo extends App {
   import eu.timepit.refined.api.RefType.applyRef
   import eu.timepit.refined.refineV
 
-  // ********* Wrapping dynamic expressions, returning Either:
+  // ********* Wrapping dynamic expressions, *returning Either*:
 
   // a: RefType's applyRef: takes whole refined type:
   val form1ResultGood = applyRef[Int Refined Positive](pos)
@@ -85,13 +85,14 @@ object BasicMostExplicitDemo extends App {
   val form2ResultGood = refineV[Positive](pos)
   val form2ResultBad = refineV[Positive](not)
 
-  // c: Whole refine types' companion objects' from:
+  // c: Whole refined types' companion objects' "from" method:
   PosInt.from(pos)
   PosInt.from(-not)
+  MyType.from(pos)
 
-  // ********* Wrapping dynamic expressions, throwing IllegalArgumentException if invalid:
+  // ********* Wrapping dynamic expressions, *throwing IllegalArgumentException* if invalid:
 
-  // a: Whole refine types' companion objects' unsafeFrom:
+  // a: Whole refined types' companion objects' unsafeFrom:
   Try(PosInt.unsafeFrom(pos))
   Try(PosInt.unsafeFrom(not))
 

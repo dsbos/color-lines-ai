@@ -113,7 +113,7 @@ object AutoThingsExpl extends App {
   AutoUnwrap
 
   object AutoInfer {
-    // autoInfer eenables converting from type to narrower/safisfied type:
+    // autoInfer enables converting from type to narrower/safisfied type:
 
 
     // def m1(positive: PosInt) = positive: NonNegInt  // type mismatch
