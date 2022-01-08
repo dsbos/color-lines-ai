@@ -40,6 +40,13 @@ libraryDependencies ++= Seq(
   //"eu.timepit"  %% "refined-shapeless"       % "0.9.28",  // optional
 
 
+  // Enumerations
+  "com.beachape" %% "enumeratum" % "1.7.0",
+  //"com.beachape" %% "enumeratum-circe" % enumeratumVersion,
+  //"com.beachape" %% "enumeratum-doobie" % enumeratumVersion,
+
+
+
   "org.typelevel"  %% "cats-core"           % "2.1.0",
   "org.typelevel"  %% "cats-effect"         % "2.1.0",
 
