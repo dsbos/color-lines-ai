@@ -93,8 +93,6 @@ object MultiTableColumnsEnumExpl extends App {
       lazy val getNameColumn: NameColumn = getColumns.getNameColumn // ???? Check best "lazy" place
     }
 
-
-
   }
 
   object EnumImplementation {
@@ -164,51 +162,52 @@ object MultiTableColumnsEnumExpl extends App {
     import EnumImplementation.EnumTableColumn
     import EnumImplementation.EnumTableColumnsList
 
+    /** Users table metadata. */
     object UsersTable extends BaseTable("users") {
       /** A column in the users table. */
-      sealed trait UsersTableColumn extends EnumTableColumn with EnumEntry
+      sealed trait Column extends EnumTableColumn with EnumEntry
 
-      /** Lists the columns in the users table. */
-      object UsersTableColumns extends EnumTableColumnsList[UsersTableColumn] {
+      /** Declares the columns in the users table. */
+      object Columns extends EnumTableColumnsList[Column] {
 
-        case object name extends UsersTableColumn       with NameColumn
-        case object user_email extends UsersTableColumn with TextSearchableColumn
-        case object user_other extends UsersTableColumn
+        case object name       extends Column with NameColumn
+        case object user_email extends Column with TextSearchableColumn
+        case object user_other extends Column
         // Big sequence of other columns goes here.
 
         override val values = findValues
       }
-      override val getColumns = UsersTableColumns
+      override val getColumns = Columns
     }
 
     object GroupsTable extends BaseTable("groups") {
-      sealed trait GroupsTableColumn extends EnumTableColumn with EnumEntry
+      sealed trait Column extends EnumTableColumn with EnumEntry
 
-      object GroupsTableColumns extends EnumTableColumnsList[GroupsTableColumn] {
+      object Columns extends EnumTableColumnsList[Column] {
 
-        case object name            extends GroupsTableColumn with NameColumn
-        case object group_something extends GroupsTableColumn
-        //case object abnormal        extends GroupsTableColumn with NameColumn
+        case object name            extends Column with NameColumn
+        case object group_something extends Column
+        //case object abnormal        extends GroupsColumn with NameColumn
         // Big sequence of other columns goes here.
 
         override val values = findValues
       }
-      override val getColumns = GroupsTableColumns
+      override val getColumns = Columns
     }
 
     object OtrosTabla extends BaseTable("otras_cosas") {
-      sealed trait OtrosTablaColumna extends EnumTableColumn with EnumEntry
+      sealed trait TablaColumna extends EnumTableColumn with EnumEntry
 
-      object OtrosTablaColumnas extends EnumTableColumnsList[OtrosTablaColumna] {
+      object Columnas extends EnumTableColumnsList[TablaColumna] {
 
-        case object nombre        extends OtrosTablaColumna with NameColumn
-        case object cosa_de_texto extends OtrosTablaColumna with TextSearchableColumn
-        case object otra_cosa     extends OtrosTablaColumna
+        case object nombre        extends TablaColumna with NameColumn
+        case object cosa_de_texto extends TablaColumna with TextSearchableColumn
+        case object otra_cosa     extends TablaColumna
         // Big sequence of other columns goes here.
 
         override val values = findValues
       }
-      override val getColumns = OtrosTablaColumnas
+      override val getColumns = Columnas
     }
   }
 
@@ -219,52 +218,66 @@ object MultiTableColumnsEnumExpl extends App {
     import ImplementationIndependent.BaseTable
 
     import Tables.UsersTable
-    import Tables.UsersTable._
-    import Tables.GroupsTable._
-    import Tables.OtrosTabla._
+    import Tables.UsersTable
+    import Tables.GroupsTable
+    import Tables.OtrosTabla
 
-    val usersColumnsGenerically: BaseTableColumnsList = UsersTableColumns
+    val usersColumnsGenerically: BaseTableColumnsList = UsersTable.Columns
     val usersTableGenerically: BaseTable = UsersTable
 
-    println("UsersTableColumns.name     = " + UsersTableColumns.name)
-    println("GroupsTableColumns.name    = " + GroupsTableColumns.name)
-    //println("OtrosTablaColumnas.name    = " + OtrosTablaColumnas.name)  // different
-    println("OtrosTablaColumnas.name    = " + OtrosTablaColumnas.nombre)
+    println("UsersTable.Columns.name     = " + UsersTable.Columns.name)
+    println("GroupsTable.Columns.name    = " + GroupsTable.Columns.name)
+    //println("OtrosTabla.Columnas.name    = " + OtrosTabla.Columnas.name)  // different
+    println("OtrosTabla.Columnas.name    = " + OtrosTabla.Columnas.nombre)
     //println("usersTableGenerically.name = " + usersTableGenerically.name)  // no specific cols.
 
-    println("UsersTableColumns.getNameColumn       = " + UsersTableColumns.getNameColumn)
-    println("GroupsTableColumns.getNameColumn      = " + GroupsTableColumns.getNameColumn)
-    println("OtrosTablaColumnas.getNameColumn      = " + OtrosTablaColumnas.getNameColumn)
+    println("UsersTable.Columns.getNameColumn      = " + UsersTable.Columns.getNameColumn)
+    println("GroupsTable.Columns.getNameColumn     = " + GroupsTable.Columns.getNameColumn)
+    println("OtrosTabla.Columnas.getNameColumn     = " + OtrosTabla.Columnas.getNameColumn)
     println("usersColumnsGenerically.getNameColumn = " + usersColumnsGenerically.getNameColumn)
-    println("usersTableGenerically.xxx.getNameColumn = " + usersTableGenerically.getNameColumn)
-    assert(OtrosTablaColumnas.getNameColumn.toSqlSimpleName == "nombre")
+    println("usersTableGenerically.getNameColumn   = " + usersTableGenerically.getNameColumn)
+    assert(OtrosTabla.Columnas.getNameColumn.toSqlSimpleName == "nombre")
 
-    println("UsersTableColumns.values            = " + UsersTableColumns.values)
-    assert(UsersTableColumns.values ==
+    println()
+
+    println("UsersTable.Columns.values            = " + UsersTable.Columns.values)
+    assert(UsersTable.Columns.values ==
                Vector(
-                 UsersTableColumns.name,
-                 UsersTableColumns.user_email,
-                 UsersTableColumns.user_other
+                 UsersTable.Columns.name,
+                 UsersTable.Columns.user_email,
+                 UsersTable.Columns.user_other
                  ))
 
-    println("UsersTableColumns.getSearchColumns  = " + UsersTableColumns.getSearchColumns)
-    assert(UsersTableColumns.getSearchColumns ==
+    println("UsersTable.Columns.getSearchColumns  = " + UsersTable.Columns.getSearchColumns)
+    assert(UsersTable.Columns.getSearchColumns ==
                Vector(
-                 UsersTableColumns.name,
-                 UsersTableColumns.user_email
+                 UsersTable.Columns.name,
+                 UsersTable.Columns.user_email
                  ))
-    println("OtrosTablaColumnas.getSearchColumns = " + OtrosTablaColumnas.getSearchColumns)
-    assert(OtrosTablaColumnas.getSearchColumns ==
+    println("OtrosTabla.Columnas.getSearchColumns = " + OtrosTabla.Columnas.getSearchColumns)
+    assert(OtrosTabla.Columnas.getSearchColumns ==
                Vector(
-                 OtrosTablaColumnas.nombre,
-                 OtrosTablaColumnas.cosa_de_texto
+                 OtrosTabla.Columnas.nombre,
+                 OtrosTabla.Columnas.cosa_de_texto
                  ))
 
-    // Single method replacing the multiple andSearchSatisfies methods in admin-import-service:
+    // Doobie string interpolation:
 
     import doobie.Fragment
     import doobie.Fragments
     import doobie.implicits.toSqlInterpolator
+
+    import UsersTable.Columns.name
+    val value = "whatever"
+
+    // Note non-quoting of column name and ~quoting/special handling of string
+    // value (see implicit conversion (currengly) in object BaseTableColumn):
+
+    println()
+    println("""fr"$name ILIKE '$value1'" = """ + fr"$name ILIKE '$value'" )
+    assert(fr"$name ILIKE '$value'".toString == "Fragment(\"name ILIKE '?' \")")
+
+    // Single method replacing the multiple andSearchSatisfies methods in admin-import-service:
 
     def makeSearchSql(rawSearchTerm: String, cols: BaseTableColumnsList): Fragment = {
       val searchTerm = s"%$rawSearchTerm%"
@@ -275,12 +288,8 @@ object MultiTableColumnsEnumExpl extends App {
       //  ANDing subexpressions.
     }
 
-    println(s"makeSearchSql(\"findme\", usersColumnsGenerically) = " +
-                makeSearchSql("findme", usersColumnsGenerically))
-    assert( makeSearchSql("findme", usersColumnsGenerically).toString ==
-      """Fragment("(name ILIKE '?' ) OR (user_email ILIKE '?' ) ")""")
 
-    println(s"makeSearchSql(\"findme\", usersTableGenerically.xxx) = " +
+    println(s"makeSearchSql(\"findme\", usersTableGenerically.getColumns) = " +
                 makeSearchSql("findme", usersTableGenerically.getColumns))
     assert( makeSearchSql("findme", usersTableGenerically.getColumns).toString ==
       """Fragment("(name ILIKE '?' ) OR (user_email ILIKE '?' ) ")""")
