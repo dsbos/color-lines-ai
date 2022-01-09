@@ -74,17 +74,26 @@ object MultiTableColumnsEnumExpl extends App {
     /** List of columns for a table.
      * (Not necessarily named `name`; not necessarily implemented via `Enum`/`EnumEntry`.)
      */
-    trait TableColumnsList {
+    trait BaseTableColumnsList {
 
       // Some application-specific special characteristics/properties of tables:
 
       /** Gets this column set's logical name column. */
-      def getNameColumn: NameColumn
+      val getNameColumn: NameColumn
 
       // ?? TODO:  Resolve:  Only commit to BaseTableColumn, or narrow to TextSearchableColumn
       /** Gets this column set's columns to be text-searched. */
       val getSearchColumns: IndexedSeq[BaseTableColumn]
     }
+
+    // ???? TODO: Move to generic part?
+    // TODO:  Any need to be trait?  (Class allows easier subclassing.)
+    abstract class BaseTable(val sqlSimpleName: String) {
+      val getColumns: BaseTableColumnsList
+      lazy val getNameColumn: NameColumn = getColumns.getNameColumn // ???? Check best "lazy" place
+    }
+
+
 
   }
 
@@ -105,7 +114,7 @@ object MultiTableColumnsEnumExpl extends App {
     }
 
     /** List of columns for a table, implemented with Enumeratum. */
-    trait EnumTableColumnsList[TC <: EnumEntry] extends TableColumnsList with Enum[TC] {
+    trait EnumTableColumnsList[TC <: EnumEntry] extends BaseTableColumnsList with Enum[TC] {
 
       /**
        * @inheritdoc
@@ -150,14 +159,12 @@ object MultiTableColumnsEnumExpl extends App {
   object Tables {
     import ImplementationIndependent.NameColumn
     import ImplementationIndependent.TextSearchableColumn
+    import ImplementationIndependent.BaseTableColumnsList
+    import ImplementationIndependent.BaseTable
     import EnumImplementation.EnumTableColumn
     import EnumImplementation.EnumTableColumnsList
 
-    // ?? TODO:  Revisit:  Any need to be trait?  (Classes allows easier subclassing.)
-    class Table(val sqlSimpleName: String) {
-    }
-
-    object UsersTable extends Table("users") {
+    object UsersTable extends BaseTable("users") {
       /** A column in the users table. */
       sealed trait UsersTableColumn extends EnumTableColumn with EnumEntry
 
@@ -167,12 +174,14 @@ object MultiTableColumnsEnumExpl extends App {
         case object name extends UsersTableColumn       with NameColumn
         case object user_email extends UsersTableColumn with TextSearchableColumn
         case object user_other extends UsersTableColumn
+        // Big sequence of other columns goes here.
 
         override val values = findValues
       }
+      override val getColumns = UsersTableColumns
     }
 
-    object GroupsTable extends Table("groups") {
+    object GroupsTable extends BaseTable("groups") {
       sealed trait GroupsTableColumn extends EnumTableColumn with EnumEntry
 
       object GroupsTableColumns extends EnumTableColumnsList[GroupsTableColumn] {
@@ -180,12 +189,14 @@ object MultiTableColumnsEnumExpl extends App {
         case object name            extends GroupsTableColumn with NameColumn
         case object group_something extends GroupsTableColumn
         //case object abnormal        extends GroupsTableColumn with NameColumn
+        // Big sequence of other columns goes here.
 
         override val values = findValues
       }
+      override val getColumns = GroupsTableColumns
     }
 
-    object OtrosTabla extends Table("otras_cosas") {
+    object OtrosTabla extends BaseTable("otras_cosas") {
       sealed trait OtrosTablaColumna extends EnumTableColumn with EnumEntry
 
       object OtrosTablaColumnas extends EnumTableColumnsList[OtrosTablaColumna] {
@@ -193,21 +204,27 @@ object MultiTableColumnsEnumExpl extends App {
         case object nombre        extends OtrosTablaColumna with NameColumn
         case object cosa_de_texto extends OtrosTablaColumna with TextSearchableColumn
         case object otra_cosa     extends OtrosTablaColumna
+        // Big sequence of other columns goes here.
+
         override val values = findValues
       }
+      override val getColumns = OtrosTablaColumnas
     }
   }
 
   object Clients {
     import ImplementationIndependent.BaseTableColumn
     import ImplementationIndependent.NameColumn
-    import ImplementationIndependent.TableColumnsList
+    import ImplementationIndependent.BaseTableColumnsList
+    import ImplementationIndependent.BaseTable
 
+    import Tables.UsersTable
     import Tables.UsersTable._
     import Tables.GroupsTable._
     import Tables.OtrosTabla._
 
-    val usersTableGenerically: TableColumnsList = UsersTableColumns
+    val usersColumnsGenerically: BaseTableColumnsList = UsersTableColumns
+    val usersTableGenerically: BaseTable = UsersTable
 
     println("UsersTableColumns.name     = " + UsersTableColumns.name)
     println("GroupsTableColumns.name    = " + GroupsTableColumns.name)
@@ -215,10 +232,11 @@ object MultiTableColumnsEnumExpl extends App {
     println("OtrosTablaColumnas.name    = " + OtrosTablaColumnas.nombre)
     //println("usersTableGenerically.name = " + usersTableGenerically.name)  // no specific cols.
 
-    println("UsersTableColumns.getNameColumn     = " + UsersTableColumns.getNameColumn)
-    println("GroupsTableColumns.getNameColumn    = " + GroupsTableColumns.getNameColumn)
-    println("OtrosTablaColumnas.getNameColumn    = " + OtrosTablaColumnas.getNameColumn)
-    println("usersTableGenerically.getNameColumn = " + usersTableGenerically.getNameColumn)
+    println("UsersTableColumns.getNameColumn       = " + UsersTableColumns.getNameColumn)
+    println("GroupsTableColumns.getNameColumn      = " + GroupsTableColumns.getNameColumn)
+    println("OtrosTablaColumnas.getNameColumn      = " + OtrosTablaColumnas.getNameColumn)
+    println("usersColumnsGenerically.getNameColumn = " + usersColumnsGenerically.getNameColumn)
+    println("usersTableGenerically.xxx.getNameColumn = " + usersTableGenerically.getNameColumn)
     assert(OtrosTablaColumnas.getNameColumn.toSqlSimpleName == "nombre")
 
     println("UsersTableColumns.values            = " + UsersTableColumns.values)
@@ -248,7 +266,7 @@ object MultiTableColumnsEnumExpl extends App {
     import doobie.Fragments
     import doobie.implicits.toSqlInterpolator
 
-    def makeSearchSql(rawSearchTerm: String, cols: TableColumnsList): Fragment = {
+    def makeSearchSql(rawSearchTerm: String, cols: BaseTableColumnsList): Fragment = {
       val searchTerm = s"%$rawSearchTerm%"
       val ilikeFrags = cols.getSearchColumns.map(c => fr"$c ILIKE '$searchTerm'")
       val orFrag = Fragments.or(ilikeFrags: _*)
@@ -256,9 +274,15 @@ object MultiTableColumnsEnumExpl extends App {
       // ?? TODO:  Prototype how we use "AND"--or a fixed (more logical) way of
       //  ANDing subexpressions.
     }
-    println(s"makeSearchSql(\"findme\", usersTableGenerically) = " +
-                makeSearchSql("findme", usersTableGenerically))
-    assert( makeSearchSql("findme", usersTableGenerically).toString ==
+
+    println(s"makeSearchSql(\"findme\", usersColumnsGenerically) = " +
+                makeSearchSql("findme", usersColumnsGenerically))
+    assert( makeSearchSql("findme", usersColumnsGenerically).toString ==
+      """Fragment("(name ILIKE '?' ) OR (user_email ILIKE '?' ) ")""")
+
+    println(s"makeSearchSql(\"findme\", usersTableGenerically.xxx) = " +
+                makeSearchSql("findme", usersTableGenerically.getColumns))
+    assert( makeSearchSql("findme", usersTableGenerically.getColumns).toString ==
       """Fragment("(name ILIKE '?' ) OR (user_email ILIKE '?' ) ")""")
 
   }
