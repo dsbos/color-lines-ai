@@ -19,13 +19,19 @@ object MultiTableColumnsEnumExpl extends App {
 
   object ImplementationIndependent {  // (Some of the would be packages.)
 
+    // (Note:  Was trait before addition of aux and passing aux through chain of
+    // constructors).
     /** Table column.  (Not necessarily implemented via `Enum`/`EnumEntry`.) */
-    trait BaseTableColumn {
+    abstract class BaseTableColumn(aux: String) {
+
       /**
        * Gets simple (unqualified) SQL name of this column.
        */
       def toSqlSimpleName: String
 
+      // Maybe other column characteristics, perhaps usual corresponding exposed
+      //  column name?
+      def someAuxThing: String = aux
     }
 
     object BaseTableColumn {
@@ -103,8 +109,10 @@ object MultiTableColumnsEnumExpl extends App {
   object EnumImplementation {
     import ImplementationIndependent._
 
+    // (Note:  Was trait before addition of aux and passing aux through chain of
+     // constructors).
     /** Table column implemented with Enumeratum. */
-    trait EnumTableColumn extends BaseTableColumn with EnumEntry {
+    abstract class EnumTableColumn(aux: String) extends BaseTableColumn(aux) with EnumEntry {
 
       /**
        * @inheritdoc
@@ -169,15 +177,17 @@ object MultiTableColumnsEnumExpl extends App {
 
     /** Users table metadata. */
     object UsersTable extends BaseTable("users") {
+      // (Note:  These were traits before addition of aux and passing aux through
+      // chain of constructors).
       /** A column in the users table. */
-      sealed trait Column extends EnumTableColumn with EnumEntry
+      sealed abstract class Column(aux: String) extends EnumTableColumn(aux) with EnumEntry
 
       /** Declares the columns in the users table. */
       object Columns extends EnumTableColumnsList[Column] {
 
-        case object name       extends Column with NameColumn
-        case object user_email extends Column with TextSearchableColumn
-        case object user_other extends Column
+        case object name  extends Column("Name") with NameColumn
+        case object email extends Column("E-Mail Address") with TextSearchableColumn
+        case object other extends Column("Something Else")
         // Big sequence of other columns goes here.
 
         override val values = findValues
@@ -186,12 +196,12 @@ object MultiTableColumnsEnumExpl extends App {
     }
 
     object GroupsTable extends BaseTable("groups") {
-      sealed trait Column extends EnumTableColumn with EnumEntry
+      sealed abstract class Column(aux: String) extends EnumTableColumn(aux) with EnumEntry
 
       object Columns extends EnumTableColumnsList[Column] {
 
-        case object name            extends Column with NameColumn
-        case object group_something extends Column
+        case object name      extends Column("Group Name") with NameColumn
+        case object something extends Column("Something Name")
         //case object abnormal        extends GroupsColumn with NameColumn
         // Big sequence of other columns goes here.
 
@@ -201,13 +211,13 @@ object MultiTableColumnsEnumExpl extends App {
     }
 
     object OtrosTabla extends BaseTable("otras_cosas") {
-      sealed trait TablaColumna extends EnumTableColumn with EnumEntry
+      sealed abstract class TablaColumna(aux: String) extends EnumTableColumn(aux) with EnumEntry
 
       object Columnas extends EnumTableColumnsList[TablaColumna] {
 
-        case object nombre        extends TablaColumna with NameColumn
-        case object cosa_de_texto extends TablaColumna with TextSearchableColumn
-        case object otra_cosa     extends TablaColumna
+        case object nombre        extends TablaColumna("Name/Nombre") with NameColumn
+        case object cosa_de_texto extends TablaColumna("Textual Thing") with TextSearchableColumn
+        case object otra_cosa     extends TablaColumna("Something Else")
         // Big sequence of other columns goes here.
 
         override val values = findValues
@@ -249,15 +259,15 @@ object MultiTableColumnsEnumExpl extends App {
     assert(UsersTable.Columns.values ==
                Vector(
                  UsersTable.Columns.name,
-                 UsersTable.Columns.user_email,
-                 UsersTable.Columns.user_other
+                 UsersTable.Columns.email,
+                 UsersTable.Columns.other
                  ))
 
     println("UsersTable.Columns.getSearchColumns  = " + UsersTable.Columns.getSearchColumns)
     assert(UsersTable.Columns.getSearchColumns ==
                Vector(
                  UsersTable.Columns.name,
-                 UsersTable.Columns.user_email
+                 UsersTable.Columns.email
                  ))
     println("OtrosTabla.Columnas.getSearchColumns = " + OtrosTabla.Columnas.getSearchColumns)
     assert(OtrosTabla.Columnas.getSearchColumns ==
@@ -293,15 +303,30 @@ object MultiTableColumnsEnumExpl extends App {
       //  ANDing subexpressions.
     }
 
-
     println(s"makeSearchSql(\"findme\", usersTableGenerically.getColumns) = " +
                 makeSearchSql("findme", usersTableGenerically.getColumns))
-    assert( makeSearchSql("findme", usersTableGenerically.getColumns).toString ==
-      """Fragment("(name ILIKE '?' ) OR (user_email ILIKE '?' ) ")""")
+    assert(makeSearchSql("findme",
+                         usersTableGenerically.getColumns).toString ==
+      """Fragment("(name ILIKE '?' ) OR (email ILIKE '?' ) ")""")
+
+
+    // Auxiliary per-column data, perhaps default exposed column name:
+
+    println()
+    println("UsersTable.Columns.name.someAuxThing = " + UsersTable.Columns.name.someAuxThing)
+    assert(UsersTable.Columns.name.someAuxThing == "Name")
+
+    println("UsersTable.Columns.values = " +
+                UsersTable.Columns.values)
+    println("UsersTable.Columns.values.map(_.someAuxThing) = " +
+                UsersTable.Columns.values.map(_.someAuxThing))
+    assert(UsersTable.Columns.values.map(_.someAuxThing) ==
+               Vector(UsersTable.Columns.name.someAuxThing,
+                      "E-Mail Address",
+                      UsersTable.Columns.other.someAuxThing))
 
   }
   ExpositoryClientCode
-
 
 
   ////////////////////////////////////////////////////////////////////////////////
@@ -326,16 +351,16 @@ object MultiTableColumnsEnumExpl extends App {
     object SomeUsersThing {
       import Tables.UsersTable.Columns._
 
-      val sql1 = sql"SELECT $name, $user_email, $user_other"
-      val sql2 = fr"AND $user_other = 42"
+      val sql1 = sql"SELECT $name, $email, $other"
+      val sql2 = fr"AND $other = 42"
       val sql3 = fr"$name ILIKE '${"admin"}'"
     }
 
     object AnotherUsersThing {
        import Tables.UsersTable.Columns._
 
-       val sql1 = sql"SELECT $name, $user_email"
-       val sql2 = fr"AND $user_other 0xDEADBEEF  "
+       val sql1 = sql"SELECT $name, $email"
+       val sql2 = fr"AND $other 0xDEADBEEF  "
     }
 
     // NOW think of having multiple tables that have columns with the same name,
@@ -346,7 +371,7 @@ object MultiTableColumnsEnumExpl extends App {
     object SomeGroupsThings {
       import Tables.GroupsTable.Columns._
 
-      val sql1 = sql"SELECT $name, $group_something,"
+      val sql1 = sql"SELECT $name, $something,"
       val sql2 = fr"$name ILIKE '${"admin"}'"
     }
 
