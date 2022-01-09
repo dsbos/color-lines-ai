@@ -144,6 +144,13 @@ libraryDependencies ++= Seq(
   "com.github.cb372" %% "cats-retry" % "2.1.0",
   // "org.typelevel"  %% "squants"  % "1.6.0",
 
+
+
+  "org.tpolecat" %% "doobie-core" % "0.13.4",
+  //"org.tpolecat" %% "doobie-postgres" % "0.13.4",
+  //"org.tpolecat" %% "doobie-hikari" % "0.13.4",
+
+
   // https://github.com/typelevel/kind-projector:
    /*compilerPlugin(
      "org.typelevel" %% "kind-projector" % "0.13.2" cross CrossVersion.full
