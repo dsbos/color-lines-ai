@@ -5,7 +5,12 @@ import enumeratum.{Enum, EnumEntry}
 import scala.util.chaining.scalaUtilChainingOps
 
 
-/** Exploration of common things on enumerations of table columns. */
+/**
+ * Exploration of common things on enumerations of table columns.
+ *
+ * NOTE:  See end of file for (current) main point of doing all this.
+ */
+
 object MultiTableColumnsEnumExpl extends App {
 
   // Note: Trying semantically accurate different "column" vs. "columns" on
@@ -342,7 +347,7 @@ object MultiTableColumnsEnumExpl extends App {
       import Tables.GroupsTable.Columns._
 
       val sql1 = sql"SELECT $name, $group_something,"
-      val sql3 = fr"$name ILIKE '${"admin"}'"
+      val sql2 = fr"$name ILIKE '${"admin"}'"
     }
 
   }
