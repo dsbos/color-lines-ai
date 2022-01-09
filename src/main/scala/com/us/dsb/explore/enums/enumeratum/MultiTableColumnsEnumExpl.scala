@@ -153,8 +153,11 @@ object MultiTableColumnsEnumExpl extends App {
     import EnumImplementation.EnumTableColumn
     import EnumImplementation.EnumTableColumnsList
 
+    // ?? TODO:  Revisit:  Any need to be trait?  (Classes allows easier subclassing.)
+    class Table(val sqlSimpleName: String) {
+    }
 
-    object UsersTable {
+    object UsersTable extends Table("users") {
       /** A column in the users table. */
       sealed trait UsersTableColumn extends EnumTableColumn with EnumEntry
 
@@ -169,7 +172,7 @@ object MultiTableColumnsEnumExpl extends App {
       }
     }
 
-    object GroupsTable {
+    object GroupsTable extends Table("groups") {
       sealed trait GroupsTableColumn extends EnumTableColumn with EnumEntry
 
       object GroupsTableColumns extends EnumTableColumnsList[GroupsTableColumn] {
@@ -182,7 +185,7 @@ object MultiTableColumnsEnumExpl extends App {
       }
     }
 
-    object OtrosTabla {
+    object OtrosTabla extends Table("otras_cosas") {
       sealed trait OtrosTablaColumna extends EnumTableColumn with EnumEntry
 
       object OtrosTablaColumnas extends EnumTableColumnsList[OtrosTablaColumna] {
@@ -205,7 +208,6 @@ object MultiTableColumnsEnumExpl extends App {
     import Tables.OtrosTabla._
 
     val usersTableGenerically: TableColumnsList = UsersTableColumns
-
 
     println("UsersTableColumns.name     = " + UsersTableColumns.name)
     println("GroupsTableColumns.name    = " + GroupsTableColumns.name)
