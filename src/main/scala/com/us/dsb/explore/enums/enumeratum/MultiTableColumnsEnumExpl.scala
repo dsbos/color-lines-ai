@@ -1,6 +1,5 @@
 package com.us.dsb.explore.enums.enumeratum
 
-import doobie.syntax.SqlInterpolator.SingleFragment
 import enumeratum.{Enum, EnumEntry}
 
 import scala.util.chaining.scalaUtilChainingOps
@@ -32,6 +31,7 @@ object MultiTableColumnsEnumExpl extends App {
 
       import scala.language.implicitConversions
       import doobie.Fragment
+      import doobie.syntax.SqlInterpolator.SingleFragment
       /**
        * Implicit conversion to a [[Fragment]] for simple (unqualified) column
        * name reference, for succinct use of [[BaseTableColumn]] in Doobie
@@ -211,7 +211,7 @@ object MultiTableColumnsEnumExpl extends App {
     }
   }
 
-  object Clients {
+  object ExpositoryClientCode {
     import ImplementationIndependent.BaseTableColumn
     import ImplementationIndependent.NameColumn
     import ImplementationIndependent.BaseTableColumnsList
@@ -274,7 +274,7 @@ object MultiTableColumnsEnumExpl extends App {
     // value (see implicit conversion (currengly) in object BaseTableColumn):
 
     println()
-    println("""fr"$name ILIKE '$value1'" = """ + fr"$name ILIKE '$value'" )
+    println("""fr"\$name ILIKE '$value1'" = """ + fr"$name ILIKE '$value'" )
     assert(fr"$name ILIKE '$value'".toString == "Fragment(\"name ILIKE '?' \")")
 
     // Single method replacing the multiple andSearchSatisfies methods in admin-import-service:
@@ -295,7 +295,57 @@ object MultiTableColumnsEnumExpl extends App {
       """Fragment("(name ILIKE '?' ) OR (user_email ILIKE '?' ) ")""")
 
   }
-  Clients
+  ExpositoryClientCode
+
+
+
+  ////////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////////
+  // AND NOW, the main point of all the above!:
+
+  object TableSpecificClientCode {
+    import doobie.implicits.toSqlInterpolator
+
+    // Imagine the following multiple SQL commands or fragments referring to the
+    // same columns are scattered around different classes (e.g., admin-ingest-service's
+    // multiple xxxUserRepository classes providing different views on the users
+    // table.
+    //
+    // Now, in a "typical" IDE, focus on a use of a column declaration
+    // in a SQL fragment below, jump to the declaration (command-B in Mac
+    // IntelliJ IDEA), and then jump to one of, or list all, the references in
+    // (similarly coded) SQL fragments (command-B or option-F7, respectively,
+    // in Mac IDEA). You can't usually do those traversals with text search!
+
+    object SomeUsersThing {
+      import Tables.UsersTable.Columns._
+
+      val sql1 = sql"SELECT $name, $user_email, $user_other"
+      val sql2 = fr"AND $user_other = 42"
+      val sql3 = fr"$name ILIKE '${"admin"}'"
+    }
+
+    object AnotherUsersThing {
+       import Tables.UsersTable.Columns._
+
+       val sql1 = sql"SELECT $name, $user_email"
+       val sql2 = fr"AND $user_other 0xDEADBEEF  "
+    }
+
+    // NOW think of having multiple tables that have columns with the same name,
+    // and trying to find all the SQL bits referring to that column name--but
+    // only for a specific table.  Trickier?  No!  Try traversing starting from
+    // one of the following references to GroupsTable.Columns.name:
+
+    object SomeGroupsThings {
+      import Tables.GroupsTable.Columns._
+
+      val sql1 = sql"SELECT $name, $group_something,"
+      val sql3 = fr"$name ILIKE '${"admin"}'"
+    }
+
+  }
+  TableSpecificClientCode
 
 }
-
