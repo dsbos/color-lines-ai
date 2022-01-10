@@ -17,7 +17,7 @@ object MultiTableColumnsEnumExpl extends App {
   //   things that may typically be named the same (instances of "column" vs. lists
   //   of columns.
 
-  object ImplementationIndependent {  // (Some of the would be packages.)
+  object ImplementationIndependent {  // (Some of these would be packages.)
 
     // (Note:  Was trait before addition of aux and passing aux through chain of
     // constructors).
@@ -342,7 +342,7 @@ object MultiTableColumnsEnumExpl extends App {
     // multiple xxxUserRepository classes providing different views on the users
     // table.
     //
-    // Now, in a "typical" IDE, focus on a use of a column declaration
+    // Now, in a typical IDE, focus on a use of a column declaration
     // in a SQL fragment below, jump to the declaration (command-B in Mac
     // IntelliJ IDEA), and then jump to one of, or list all, the references in
     // (similarly coded) SQL fragments (command-B or option-F7, respectively,
