@@ -294,7 +294,7 @@ object MultiTableColumnsEnumExpl extends App {
 
     // Single method replacing the multiple andSearchSatisfies methods in admin-import-service:
 
-    def makeSearchSql(rawSearchTerm: String, cols: BaseTableColumnsList): Fragment = {
+    def makeTextSearchSql(rawSearchTerm: String, cols: BaseTableColumnsList): Fragment = {
       val searchTerm = s"%$rawSearchTerm%"
       val ilikeFrags = cols.getSearchColumns.map(c => fr"$c ILIKE '$searchTerm'")
       val orFrag = Fragments.or(ilikeFrags: _*)
@@ -303,10 +303,10 @@ object MultiTableColumnsEnumExpl extends App {
       //  ANDing subexpressions.
     }
 
-    println(s"makeSearchSql(\"findme\", usersTableGenerically.getColumns) = " +
-                makeSearchSql("findme", usersTableGenerically.getColumns))
-    assert(makeSearchSql("findme",
-                         usersTableGenerically.getColumns).toString ==
+    println(s"makeTextSearchSql(\"findme\", usersTableGenerically.getColumns) = " +
+                makeTextSearchSql("findme", usersTableGenerically.getColumns))
+    assert(makeTextSearchSql("findme",
+                             usersTableGenerically.getColumns).toString ==
       """Fragment("(name ILIKE '?' ) OR (email ILIKE '?' ) ")""")
 
 
@@ -353,7 +353,8 @@ object MultiTableColumnsEnumExpl extends App {
 
       val sql1 = sql"SELECT $name, $email, $other"
       val sql2 = fr"AND $other = 42"
-      val sql3 = fr"$name ILIKE '${"admin"}'"
+      val somevalue = "admin"
+      val sql3 = fr"$name ILIKE $somevalue"
     }
 
     object AnotherUsersThing {
