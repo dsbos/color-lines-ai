@@ -14,7 +14,7 @@ object Board {
     val empty: Cell = Cell(None)
   }
 
-  def initial: Board = new Board(Vector.fill[Cell](3 * 3)(Cell.empty))
+  def initial: Board = new Board(Vector.fill[Cell](Order * Order)(Cell.empty))
 }
 
 import Board._
@@ -23,7 +23,7 @@ import Board._
 class Board(private val cellArray: Vector[Cell]) {
 
   private def vectorIndex(row: RowIndex, column: ColumnIndex): Int = {
-    (row.value.value - 1) * 3 + (column.value - 1)
+    (row.value.value - 1) * Order + (column.value.value - 1)
   }
 
   private def getCellAt(row: RowIndex, column: ColumnIndex): Cell = {
@@ -47,11 +47,7 @@ class Board(private val cellArray: Vector[Cell]) {
   }
 
   def renderMultiline: String = {
-    // ?? clean:  make more convenient; maybe provide ranges/iteration?
-    // ?? move rowIndices/etc. to Board or index types
-    val rowIndices = (1 to 3).map(x => RowIndex(Index.unsafeFrom(x)))  // ?? ~unsafe
-    val columnIndices = (1 to 3).map(ColumnIndex)
-    val cellWidth = 3
+    val cellWidth = " X ".length
     val cellSeparator = "|"
     val wholeWidth =
       columnIndices.length * cellWidth +

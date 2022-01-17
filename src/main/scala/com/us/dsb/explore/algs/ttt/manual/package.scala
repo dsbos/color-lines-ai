@@ -7,8 +7,12 @@ import io.estatico.newtype.macros.newtype
 
 package object manual {
 
+  // ?? can one of these be derived from other?
+  val Order = 3
+  type Order = 3
+
   /** TTT row/column index integer; 1-based; top row, left column row are #1. */
-  type Index = Int Refined Closed[1, 3]
+  type Index = Int Refined Closed[1, Order]
   object Index extends RefinedTypeOps.Numeric[Index, Int]
 
   // ?? revisit use--in both table and UI selection model; separate?
@@ -16,6 +20,12 @@ package object manual {
 
   import scala.language.implicitConversions
   @newtype case class RowIndex(value: Index)
-  case class ColumnIndex(value: Int) extends AnyVal
+  @newtype case class ColumnIndex(value: Index)
+
+  // ?? unsafe:
+  val rowIndices: IndexedSeq[RowIndex] =
+    (1 to Order).map(i => RowIndex(Index.unsafeFrom(i)))
+  val columnIndices: IndexedSeq[ColumnIndex] =
+    (1 to Order).map(i => ColumnIndex(Index.unsafeFrom(i)))
 
 }

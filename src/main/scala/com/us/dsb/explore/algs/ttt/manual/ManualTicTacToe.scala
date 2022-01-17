@@ -70,7 +70,7 @@ object ManualTicTacToe extends App {
 
     def withColumnAdustedBy(delta: Int): GameUIState = {
       copy(selectedColumn =
-             ColumnIndex(wrapToRange(selectedColumn.value + delta)))
+             ColumnIndex(Index.unsafeFrom(wrapToRange(selectedColumn.value.value + delta))))
     }
 
     def toDisplayString: String = {
@@ -134,7 +134,7 @@ object ManualTicTacToe extends App {
   }
 
   val initialState =
-    GameUIState(Board.initial, Player.X, RowIndex(Index(1)), ColumnIndex(1))
+    GameUIState(Board.initial, Player.X, RowIndex(Index(1)), ColumnIndex(Index(1)))
 
   val gameResult = getAndDoUiCommands(initialState)
   println("gameResult = " + gameResult)
