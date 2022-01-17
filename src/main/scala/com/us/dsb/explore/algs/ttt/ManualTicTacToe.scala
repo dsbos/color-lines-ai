@@ -3,23 +3,30 @@ package com.us.dsb.explore.algs.ttt
 
 import cats.syntax.option._
 import cats.syntax.either._
+import enumeratum.{Enum, EnumEntry}
 
 import scala.annotation.tailrec
 
 object ManualTicTacToe extends App {
 
 
-  // ?? revisit (Enumeratum enum.?)
-  object Command extends Enumeration {
-    val Up, Down, Left, Right, Mark, Quit = Value
-  }
-  type Command = Command.Value
+  sealed trait Command extends EnumEntry
+  object Command /*extends Enum[Command]*/ {
+    //val values: IndexedSeq[Command] = findValues
 
-  object Player extends Enumeration {
-    val X, O = Value
+    case object Up extends Command
+    case object Down extends Command
+    case object Left extends Command
+    case object Right extends Command
+    case object Mark extends Command
+    case object Quit extends Command
   }
 
-  type Player = Player.Value
+  sealed trait Player extends EnumEntry
+  object Player {
+    case object O extends Player
+    case object X extends Player
+  }
 
   def parseCommand(rawCmd: String): Either[String, Command] = {
     import Command._
@@ -30,7 +37,8 @@ object ManualTicTacToe extends App {
       case "r" => Right.asRight
       case "m" => Mark.asRight
       case "q" => Quit.asRight
-      case _ => s"Invalid command input line: \"$rawCmd\"".asLeft
+      case _   =>
+        s"Invalid input \"$rawCmd\"; try u(p), d(own), l(eft), r(right), m(ark), or q(uit)".asLeft
     }
   }
 
@@ -39,7 +47,8 @@ object ManualTicTacToe extends App {
     // ?? clean looking more (was while mess., now recursive; is there better Scala way?
 
     // ?? clean embedded reference to stdin/console and stdout
-    print(s"$player, enter command (u(p), d(own), l(eft), r(rigjt), m(ark), q(uit): ")
+    //print(s"Player $player command (u(p), d(own), l(eft), r(right), m(ark), q(uit): ")
+    print(s"Player $player command?: ")
     val rawCmd = scala.io.StdIn.readLine()
 
     parseCommand(rawCmd) match {
@@ -50,19 +59,38 @@ object ManualTicTacToe extends App {
     }
   }
 
-  def doCommandLoop() = {
+  // ?? somewhere expand to allow for history (maybe via Semigroup or whatever has .compose?)
+  case class GameState(currentPlayer: Player)
 
-    val command = getCommand(Player.X)
-    println("command = " + command)
+  type Result = String
+  def doCommandLoop(state: GameState): Result = {
+
+    val command = getCommand(state.currentPlayer)
+
     import Command._
 
     command match {
       case Quit => "some result"
-      // doCommandLoop()
+      case Up
+         | Down
+         | Left
+         | Right =>
+        println("TBD: move selection")
+        doCommandLoop(state)
+      case Mark =>
+        println("TBD: make and switch player")
+        import Player._
+        val newPlayer = state.currentPlayer match {
+          case X => O
+          case O => X
+        }
+        doCommandLoop(state.copy(currentPlayer =  newPlayer))
     }
   }
-  doCommandLoop()
 
+  val initialState = GameState(Player.X)
 
+  val gameResult = doCommandLoop(initialState)
+  println("gameResult = " + gameResult)
 
 }
