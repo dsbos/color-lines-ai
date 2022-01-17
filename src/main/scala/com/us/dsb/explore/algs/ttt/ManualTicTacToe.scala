@@ -11,10 +11,8 @@ object ManualTicTacToe extends App {
 
 
   sealed trait Command extends EnumEntry
-  trait MoveCommand extends Command
-  object Command /*extends Enum[Command]*/ {
-    //val values: IndexedSeq[Command] = findValues
-
+  sealed trait MoveCommand extends Command  // ?? whyy doesn't Command's "sealed" obvious this one?
+  object Command {
     case object Up extends MoveCommand
     case object Down extends MoveCommand
     case object Left extends MoveCommand
@@ -60,21 +58,51 @@ object ManualTicTacToe extends App {
     }
   }
 
+  // ?? clean (probably refined Int, maybe enum.
+  // 1: top row/leftmost column
+  type Index = Int
+  object Index {
+  }
+
   // ?? somewhere expand to allow for history (maybe via Semigroup or whatever has .compose?)
-  case class GameUIState(currentPlayer: Player)
+  case class GameUIState(currentPlayer: Player,
+                         selectedRow: Index,
+                         selectedColumn: Index) {
+    def selectionString: String = {
+      s"<row $selectedRow / column $selectedColumn>"
+    }
+
+    private def wrapToRange(rawIncremented: Index): Index = {
+      scala.math.floorMod((rawIncremented - 1), 3) + 1
+    }
+
+    def withRowAdustedBy(delta: Int): GameUIState = {
+      copy(selectedRow = wrapToRange(selectedRow + delta))
+    }
+    def withColumnAdustedBy(delta: Int): GameUIState = {
+      copy(selectedColumn = wrapToRange(selectedColumn + delta))
+    }
+
+  }
 
   case class GameResult(tbd: String)
 
   object UICommandMethods {
-    def moveSelection(state: GameUIState, moveCommand: Command) = {
-      println("TBD: move selection")
-      state
+    def moveSelection(state: GameUIState, moveCommand: MoveCommand): GameUIState = {
+      import Command._
+      moveCommand match {
+        case Up    => state.withRowAdustedBy(-1)
+        case Down  => state.withRowAdustedBy(1)
+        case Left  => state.withColumnAdustedBy(-1)
+        case Right => state.withColumnAdustedBy(1)
+      }
     }
 
-    def markAtSelection(state: GameUIState) = {
+    def markAtSelection(state: GameUIState): GameUIState = {
       import Player._
 
       // ?? soon: check valid (first, just count moves)
+      println(s"TBD: mark board at ${state.selectionString}/make player move")
 
       val newPlayer = state.currentPlayer match {
         case X => O
@@ -90,6 +118,7 @@ object ManualTicTacToe extends App {
 
   @tailrec
   def getAndDoUiCommands(state: GameUIState): GameResult = {
+    println("state = " + state)
     val command = getCommand(state.currentPlayer)
 
     import Command._
@@ -101,7 +130,7 @@ object ManualTicTacToe extends App {
     }
   }
 
-  val initialState = GameUIState(Player.X)
+  val initialState = GameUIState(Player.X, 1, 1)
 
   val gameResult = getAndDoUiCommands(initialState)
   println("gameResult = " + gameResult)
