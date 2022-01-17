@@ -1,9 +1,8 @@
-package com.us.dsb.explore.algs.ttt
-
+package com.us.dsb.explore.algs.ttt.manual
 
 import cats.syntax.option._
 import cats.syntax.either._
-import enumeratum.{Enum, EnumEntry}
+import enumeratum.EnumEntry
 
 import scala.annotation.tailrec
 
@@ -11,7 +10,9 @@ object ManualTicTacToe extends App {
 
 
   sealed trait Command extends EnumEntry
-  sealed trait MoveCommand extends Command  // ?? whyy doesn't Command's "sealed" obvious this one?
+
+  sealed trait MoveCommand extends Command // ?? why doesn't Command's "sealed" obvious this one?
+
   object Command {
     case object Up extends MoveCommand
     case object Down extends MoveCommand
@@ -22,6 +23,7 @@ object ManualTicTacToe extends App {
   }
 
   sealed trait Player extends EnumEntry
+
   object Player {
     case object O extends Player
     case object X extends Player
@@ -36,7 +38,7 @@ object ManualTicTacToe extends App {
       case "r" => Right.asRight
       case "m" => Mark.asRight
       case "q" => Quit.asRight
-      case _   =>
+      case _ =>
         s"Invalid input \"$rawCmd\"; try u(p), d(own), l(eft), r(right), m(ark), or q(uit)".asLeft
     }
   }
@@ -59,13 +61,13 @@ object ManualTicTacToe extends App {
   }
 
   object Board {
-
-    import io.estatico.newtype.macros.newtype
     /*@newtype deferred*/ private case class Cell(state: Option[Player]) { // if newType, has to be in object
     }
+
     private object Cell {
       val empty: Cell = Cell(None)
     }
+
     def initial: Board = new Board(Vector.fill[Cell](3 * 3)(Cell.empty))
   }
 
@@ -73,6 +75,7 @@ object ManualTicTacToe extends App {
 
   // probably wrap in a GameState with currentPlayer (moved from GameUiState)
   class Board(private val cellArray: Vector[Cell]) {
+
     import Board._
 
     private def vectorIndex(row: Index, column: Index): Int = {
@@ -96,17 +99,20 @@ object ManualTicTacToe extends App {
       }
       else {
         println("XXXX1:\n" + renderMultiline)
-        s"Can't move at row $row, column $column; already marked ${getCellAt(row, column)}".asLeft  // ???? clean getCellAt, etc.
+        s"Can't move at row $row, column $column; already marked ${
+          getCellAt(row, column)
+        }".asLeft // ???? clean getCellAt, etc.
       }
     }
+
     def renderMultiline: String = {
       (1 to 3).map { row =>
         (1 to 3).map { column =>
           getCellAt(row, column).state match {
-            case None         => " - "
+            case None => " - "
             case Some(player) => " " + player.toString + " "
           }
-        }.mkString("", "|", "" )
+        }.mkString("", "|", "")
       }.mkString("\n===========\n")
     }
 
@@ -117,13 +123,14 @@ object ManualTicTacToe extends App {
   // ?? clean (probably refined Int, maybe enum.
   // 1: top row/leftmost column
   type Index = Int
+
   object Index {
   }
 
   // ?? somewhere expand to allow for history (maybe via Semigroup or whatever has .compose?)
-  case class GameUIState(board: Board,  // ?? expanded to GameState (with currentPlayer)
-                         currentPlayer: Player,
-                         selectedRow: Index,
+  case class GameUIState(board         : Board, // ?? expanded to GameState (with currentPlayer)
+                         currentPlayer : Player,
+                         selectedRow   : Index,
                          selectedColumn: Index) {
     private def wrapToRange(rawIncremented: Index): Index = {
       scala.math.floorMod((rawIncremented - 1), 3) + 1
@@ -132,6 +139,7 @@ object ManualTicTacToe extends App {
     def withRowAdustedBy(delta: Int): GameUIState = {
       copy(selectedRow = wrapToRange(selectedRow + delta))
     }
+
     def withColumnAdustedBy(delta: Int): GameUIState = {
       copy(selectedColumn = wrapToRange(selectedColumn + delta))
     }
@@ -147,9 +155,9 @@ object ManualTicTacToe extends App {
     def moveSelection(state: GameUIState, moveCommand: MoveCommand): GameUIState = {
       import Command._
       moveCommand match {
-        case Up    => state.withRowAdustedBy(-1)
-        case Down  => state.withRowAdustedBy(1)
-        case Left  => state.withColumnAdustedBy(-1)
+        case Up => state.withRowAdustedBy(-1)
+        case Down => state.withRowAdustedBy(1)
+        case Left => state.withColumnAdustedBy(-1)
         case Right => state.withColumnAdustedBy(1)
       }
     }
@@ -161,7 +169,7 @@ object ManualTicTacToe extends App {
                                                 state.selectedColumn)
       moveTryResult match {
         case Right(newBoard) =>
-          val newCurrentPlayer = state.currentPlayer match {  // ?? move this game(?) logic
+          val newCurrentPlayer = state.currentPlayer match { // ?? move this game(?) logic
             case X => O
             case O => X
           }
@@ -170,7 +178,6 @@ object ManualTicTacToe extends App {
           println("TBD: " + errorMsg)
           state
       }
-
 
 
     }
@@ -187,15 +194,14 @@ object ManualTicTacToe extends App {
     println(state.toDisplayString)
 
 
-
     val command = getCommand(state.currentPlayer)
 
     import Command._
     import UICommandMethods._
     command match {
       case move: MoveCommand => getAndDoUiCommands(moveSelection(state, move))
-      case Mark              => getAndDoUiCommands(markAtSelection(state))
-      case Quit              => doQuit(state)
+      case Mark => getAndDoUiCommands(markAtSelection(state))
+      case Quit => doQuit(state)
     }
   }
 
