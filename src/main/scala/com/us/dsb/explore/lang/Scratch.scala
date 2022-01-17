@@ -1,9 +1,14 @@
 package com.us.dsb.explore.lang
 
-class Scratch {
+object Scratch extends App {
 
-  trait Eqxx[-T, -U]
-  implicit def eqString: Eqxx[String, String] = new Eqxx[String, String] {}
+  locally {
+    trait Eqxx[-T, -U]
 
-  implicitly[Eqxx[String, String]]
+    implicit def eqString: Eqxx[String, String] = new Eqxx[String, String] {}
+
+    implicitly[Eqxx[String, String]]
+  }
+
+
 }
