@@ -65,7 +65,7 @@ object ManualTicTacToe extends App {
 
     def withRowAdustedBy(delta: Int): GameUIState = {
       copy(selectedRow =
-             RowIndex.unsafeFrom(wrapToRange(selectedRow.value + delta)))
+             RowIndex(Index.unsafeFrom(wrapToRange(selectedRow.value.value + delta))))
     }
 
     def withColumnAdustedBy(delta: Int): GameUIState = {
@@ -108,8 +108,6 @@ object ManualTicTacToe extends App {
           println("TBD: " + errorMsg)
           state
       }
-
-
     }
 
     def doQuit(state: GameUIState): GameResult = {
@@ -136,7 +134,7 @@ object ManualTicTacToe extends App {
   }
 
   val initialState =
-    GameUIState(Board.initial, Player.X, RowIndex(1), ColumnIndex(1))
+    GameUIState(Board.initial, Player.X, RowIndex(Index(1)), ColumnIndex(1))
 
   val gameResult = getAndDoUiCommands(initialState)
   println("gameResult = " + gameResult)

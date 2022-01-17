@@ -23,7 +23,7 @@ import Board._
 class Board(private val cellArray: Vector[Cell]) {
 
   private def vectorIndex(row: RowIndex, column: ColumnIndex): Int = {
-    (row.value - 1) * 3 + (column.value - 1)
+    (row.value.value - 1) * 3 + (column.value - 1)
   }
 
   private def getCellAt(row: RowIndex, column: ColumnIndex): Cell = {
@@ -47,18 +47,25 @@ class Board(private val cellArray: Vector[Cell]) {
   }
 
   def renderMultiline: String = {
-    (1 to 3)
-        .map(Index.unsafeFrom)  // ?? ~unsafe
-        .map { row =>
-          (1 to 3)
-              .map(ColumnIndex)
-              .map { column =>
+    // ?? clean:  make more convenient; maybe provide ranges/iteration?
+    // ?? move rowIndices/etc. to Board or index types
+    val rowIndices = (1 to 3).map(x => RowIndex(Index.unsafeFrom(x)))  // ?? ~unsafe
+    val columnIndices = (1 to 3).map(ColumnIndex)
+    val cellWidth = 3
+    val cellSeparator = "|"
+    val wholeWidth =
+      columnIndices.length * cellWidth +
+          (columnIndices.length - 1) * cellSeparator.length
+    val rowSeparator = "\n" + ("=" * wholeWidth) + "\n"
+
+    rowIndices.map { row =>
+      columnIndices.map { column =>
         getCellAt(row, column).state match {
-          case None => " - "
+          case None         => " - "
           case Some(player) => " " + player.toString + " "
         }
-      }.mkString("", "|", "")
-    }.mkString("\n===========\n")
+      }.mkString(cellSeparator)
+    }.mkString(rowSeparator)
   }
 
 }
