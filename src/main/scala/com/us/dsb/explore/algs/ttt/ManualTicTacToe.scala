@@ -11,13 +11,14 @@ object ManualTicTacToe extends App {
 
 
   sealed trait Command extends EnumEntry
+  trait MoveCommand extends Command
   object Command /*extends Enum[Command]*/ {
     //val values: IndexedSeq[Command] = findValues
 
-    case object Up extends Command
-    case object Down extends Command
-    case object Left extends Command
-    case object Right extends Command
+    case object Up extends MoveCommand
+    case object Down extends MoveCommand
+    case object Left extends MoveCommand
+    case object Right extends MoveCommand
     case object Mark extends Command
     case object Quit extends Command
   }
@@ -60,37 +61,49 @@ object ManualTicTacToe extends App {
   }
 
   // ?? somewhere expand to allow for history (maybe via Semigroup or whatever has .compose?)
-  case class GameState(currentPlayer: Player)
+  case class GameUIState(currentPlayer: Player)
 
-  type Result = String
-  def doCommandLoop(state: GameState): Result = {
+  case class GameResult(tbd: String)
 
-    val command = getCommand(state.currentPlayer)
+  object UICommandMethods {
+    def moveSelection(state: GameUIState, moveCommand: Command) = {
+      println("TBD: move selection")
+      state
+    }
 
-    import Command._
+    def markAtSelection(state: GameUIState) = {
+      import Player._
 
-    command match {
-      case Quit => "some result"
-      case Up
-         | Down
-         | Left
-         | Right =>
-        println("TBD: move selection")
-        doCommandLoop(state)
-      case Mark =>
-        println("TBD: make and switch player")
-        import Player._
-        val newPlayer = state.currentPlayer match {
-          case X => O
-          case O => X
-        }
-        doCommandLoop(state.copy(currentPlayer =  newPlayer))
+      // ?? soon: check valid (first, just count moves)
+
+      val newPlayer = state.currentPlayer match {
+        case X => O
+        case O => X
+      }
+      state.copy(currentPlayer = newPlayer)
+    }
+
+    def doQuit(state: GameUIState): GameResult = {
+      GameResult("some result")
     }
   }
 
-  val initialState = GameState(Player.X)
+  @tailrec
+  def getAndDoUiCommands(state: GameUIState): GameResult = {
+    val command = getCommand(state.currentPlayer)
 
-  val gameResult = doCommandLoop(initialState)
+    import Command._
+    import UICommandMethods._
+    command match {
+      case move: MoveCommand => getAndDoUiCommands(moveSelection(state, move))
+      case Mark              => getAndDoUiCommands(markAtSelection(state))
+      case Quit              => doQuit(state)
+    }
+  }
+
+  val initialState = GameUIState(Player.X)
+
+  val gameResult = getAndDoUiCommands(initialState)
   println("gameResult = " + gameResult)
 
 }
