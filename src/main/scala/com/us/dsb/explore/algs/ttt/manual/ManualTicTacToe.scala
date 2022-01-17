@@ -9,28 +9,20 @@ import scala.annotation.tailrec
 object ManualTicTacToe extends App {
 
 
-  sealed trait Command extends EnumEntry
-
-  sealed trait MoveCommand extends Command // ?? why doesn't Command's "sealed" obvious this one?
-
-  object Command {
-    case object Up extends MoveCommand
-    case object Down extends MoveCommand
-    case object Left extends MoveCommand
-    case object Right extends MoveCommand
-    case object Mark extends Command
-    case object Quit extends Command
+  sealed trait UICommand extends EnumEntry
+  object UICommand {
+    // ?? why doesn't UICommand's "sealed" obviate following one (for exhaustive-match checks?)
+    sealed trait UIMoveCommand extends UICommand
+    case object Up    extends UIMoveCommand
+    case object Down  extends UIMoveCommand
+    case object Left  extends UIMoveCommand
+    case object Right extends UIMoveCommand
+    case object Mark  extends UICommand
+    case object Quit  extends UICommand
   }
 
-  sealed trait Player extends EnumEntry
-
-  object Player {
-    case object O extends Player
-    case object X extends Player
-  }
-
-  def parseCommand(rawCmd: String): Either[String, Command] = {
-    import Command._
+  def parseCommand(rawCmd: String): Either[String, UICommand] = {
+    import UICommand._
     rawCmd match {
       case "u" => Up.asRight
       case "d" => Down.asRight
@@ -44,7 +36,7 @@ object ManualTicTacToe extends App {
   }
 
   @tailrec
-  def getCommand(player: Player): Command = {
+  def getCommand(player: Player): UICommand = {
     // ?? clean looking more (was while mess., now recursive; is there better Scala way?
 
     // ?? clean embedded reference to stdin/console and stdout
@@ -60,78 +52,13 @@ object ManualTicTacToe extends App {
     }
   }
 
-  object Board {
-    /*@newtype deferred*/ private case class Cell(state: Option[Player]) { // if newType, has to be in object
-    }
 
-    private object Cell {
-      val empty: Cell = Cell(None)
-    }
-
-    def initial: Board = new Board(Vector.fill[Cell](3 * 3)(Cell.empty))
-  }
-
-  import Board._
-
-  // probably wrap in a GameState with currentPlayer (moved from GameUiState)
-  class Board(private val cellArray: Vector[Cell]) {
-
-    import Board._
-
-    private def vectorIndex(row: Index, column: Index): Int = {
-      (row - 1) * 3 + (column - 1)
-    }
-
-    private def getCellAt(row: Index, column: Index): Cell = {
-      cellArray(vectorIndex(row, column))
-    }
-
-
-    private def isEmptyAt(row: Index, column: Index): Boolean = {
-      cellArray(vectorIndex(row, column)).state.isEmpty
-    }
-
-    def tryMoveAt(player: Player, row: Index, column: Index): Either[String, Board] = {
-      if (isEmptyAt(row, column)) {
-        val newCellArray = cellArray.updated(vectorIndex(row, column), Cell(player.some))
-        val newBoard = new Board(newCellArray)
-        newBoard.asRight
-      }
-      else {
-        println("XXXX1:\n" + renderMultiline)
-        s"Can't move at row $row, column $column; already marked ${
-          getCellAt(row, column)
-        }".asLeft // ???? clean getCellAt, etc.
-      }
-    }
-
-    def renderMultiline: String = {
-      (1 to 3).map { row =>
-        (1 to 3).map { column =>
-          getCellAt(row, column).state match {
-            case None => " - "
-            case Some(player) => " " + player.toString + " "
-          }
-        }.mkString("", "|", "")
-      }.mkString("\n===========\n")
-    }
-
-
-  }
-
-
-  // ?? clean (probably refined Int, maybe enum.
-  // 1: top row/leftmost column
-  type Index = Int
-
-  object Index {
-  }
 
   // ?? somewhere expand to allow for history (maybe via Semigroup or whatever has .compose?)
-  case class GameUIState(board         : Board, // ?? expanded to GameState (with currentPlayer)
-                         currentPlayer : Player,
-                         selectedRow   : Index,
-                         selectedColumn: Index) {
+  case class GameUIState(board: Board, // ?? expand to GameState (with currentPlayer)
+                         currentPlayer: Player,
+                         selectedRow: RowIndex,
+                         selectedColumn: ColumnIndex) {
     private def wrapToRange(rawIncremented: Index): Index = {
       scala.math.floorMod((rawIncremented - 1), 3) + 1
     }
@@ -152,8 +79,9 @@ object ManualTicTacToe extends App {
   case class GameResult(tbd: String)
 
   object UICommandMethods {
-    def moveSelection(state: GameUIState, moveCommand: MoveCommand): GameUIState = {
-      import Command._
+    import UICommand.UIMoveCommand
+    def moveSelection(state: GameUIState, moveCommand: UIMoveCommand): GameUIState = {
+      import UICommand._
       moveCommand match {
         case Up => state.withRowAdustedBy(-1)
         case Down => state.withRowAdustedBy(1)
@@ -196,10 +124,10 @@ object ManualTicTacToe extends App {
 
     val command = getCommand(state.currentPlayer)
 
-    import Command._
+    import UICommand._
     import UICommandMethods._
     command match {
-      case move: MoveCommand => getAndDoUiCommands(moveSelection(state, move))
+      case move: UIMoveCommand => getAndDoUiCommands(moveSelection(state, move))
       case Mark => getAndDoUiCommands(markAtSelection(state))
       case Quit => doQuit(state)
     }
