@@ -58,6 +58,62 @@ object ManualTicTacToe extends App {
     }
   }
 
+  object Board {
+
+    import io.estatico.newtype.macros.newtype
+    /*@newtype deferred*/ private case class Cell(state: Option[Player]) { // if newType, has to be in object
+    }
+    private object Cell {
+      val empty: Cell = Cell(None)
+    }
+    def initial: Board = new Board(Vector.fill[Cell](3 * 3)(Cell.empty))
+  }
+
+  import Board._
+
+  // probably wrap in a GameState with currentPlayer (moved from GameUiState)
+  class Board(private val cellArray: Vector[Cell]) {
+    import Board._
+
+    private def vectorIndex(row: Index, column: Index): Int = {
+      (row - 1) * 3 + (column - 1)
+    }
+
+    private def getCellAt(row: Index, column: Index): Cell = {
+      cellArray(vectorIndex(row, column))
+    }
+
+
+    private def isEmptyAt(row: Index, column: Index): Boolean = {
+      cellArray(vectorIndex(row, column)).state.isEmpty
+    }
+
+    def tryMoveAt(player: Player, row: Index, column: Index): Either[String, Board] = {
+      if (isEmptyAt(row, column)) {
+        val newCellArray = cellArray.updated(vectorIndex(row, column), Cell(player.some))
+        val newBoard = new Board(newCellArray)
+        newBoard.asRight
+      }
+      else {
+        println("XXXX1:\n" + renderMultiline)
+        s"Can't move at row $row, column $column; already marked ${getCellAt(row, column)}".asLeft  // ???? clean getCellAt, etc.
+      }
+    }
+    def renderMultiline: String = {
+      (1 to 3).map { row =>
+        (1 to 3).map { column =>
+          getCellAt(row, column).state match {
+            case None         => " - "
+            case Some(player) => " " + player.toString + " "
+          }
+        }.mkString("", "|", "" )
+      }.mkString("\n===========\n")
+    }
+
+
+  }
+
+
   // ?? clean (probably refined Int, maybe enum.
   // 1: top row/leftmost column
   type Index = Int
@@ -65,13 +121,10 @@ object ManualTicTacToe extends App {
   }
 
   // ?? somewhere expand to allow for history (maybe via Semigroup or whatever has .compose?)
-  case class GameUIState(currentPlayer: Player,
+  case class GameUIState(board: Board,  // ?? expanded to GameState (with currentPlayer)
+                         currentPlayer: Player,
                          selectedRow: Index,
                          selectedColumn: Index) {
-    def selectionString: String = {
-      s"<row $selectedRow / column $selectedColumn>"
-    }
-
     private def wrapToRange(rawIncremented: Index): Index = {
       scala.math.floorMod((rawIncremented - 1), 3) + 1
     }
@@ -83,6 +136,9 @@ object ManualTicTacToe extends App {
       copy(selectedColumn = wrapToRange(selectedColumn + delta))
     }
 
+    def toDisplayString: String = {
+      s"Turn: Player $currentPlayer; marking cursor: <row $selectedRow / column $selectedColumn>"
+    }
   }
 
   case class GameResult(tbd: String)
@@ -100,15 +156,23 @@ object ManualTicTacToe extends App {
 
     def markAtSelection(state: GameUIState): GameUIState = {
       import Player._
-
-      // ?? soon: check valid (first, just count moves)
-      println(s"TBD: mark board at ${state.selectionString}/make player move")
-
-      val newPlayer = state.currentPlayer match {
-        case X => O
-        case O => X
+      val moveTryResult = state.board.tryMoveAt(state.currentPlayer,
+                                                state.selectedRow,
+                                                state.selectedColumn)
+      moveTryResult match {
+        case Right(newBoard) =>
+          val newCurrentPlayer = state.currentPlayer match {  // ?? move this game(?) logic
+            case X => O
+            case O => X
+          }
+          state.copy(board = newBoard, currentPlayer = newCurrentPlayer)
+        case Left(errorMsg) =>
+          println("TBD: " + errorMsg)
+          state
       }
-      state.copy(currentPlayer = newPlayer)
+
+
+
     }
 
     def doQuit(state: GameUIState): GameResult = {
@@ -118,7 +182,12 @@ object ManualTicTacToe extends App {
 
   @tailrec
   def getAndDoUiCommands(state: GameUIState): GameResult = {
-    println("state = " + state)
+    println()
+    println(state.board.renderMultiline)
+    println(state.toDisplayString)
+
+
+
     val command = getCommand(state.currentPlayer)
 
     import Command._
@@ -130,7 +199,7 @@ object ManualTicTacToe extends App {
     }
   }
 
-  val initialState = GameUIState(Player.X, 1, 1)
+  val initialState = GameUIState(Board.initial, Player.X, 1, 1)
 
   val gameResult = getAndDoUiCommands(initialState)
   println("gameResult = " + gameResult)
