@@ -23,7 +23,7 @@ import Board._
 class Board(private val cellArray: Vector[Cell]) {
 
   private def vectorIndex(row: RowIndex, column: ColumnIndex): Int = {
-    (row - 1) * 3 + (column - 1)
+    (row.value - 1) * 3 + (column.value - 1)
   }
 
   private def getCellAt(row: RowIndex, column: ColumnIndex): Cell = {
@@ -47,8 +47,12 @@ class Board(private val cellArray: Vector[Cell]) {
   }
 
   def renderMultiline: String = {
-    (1 to 3).map { row =>
-      (1 to 3).map { column =>
+    (1 to 3)
+        .map(Index.unsafeFrom)  // ?? ~unsafe
+        .map { row =>
+          (1 to 3)
+              .map(ColumnIndex)
+              .map { column =>
         getCellAt(row, column).state match {
           case None => " - "
           case Some(player) => " " + player.toString + " "

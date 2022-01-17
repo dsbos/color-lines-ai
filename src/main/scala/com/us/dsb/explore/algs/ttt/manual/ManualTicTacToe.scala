@@ -59,16 +59,18 @@ object ManualTicTacToe extends App {
                          currentPlayer: Player,
                          selectedRow: RowIndex,
                          selectedColumn: ColumnIndex) {
-    private def wrapToRange(rawIncremented: Index): Index = {
+    private def wrapToRange(rawIncremented: Int): Int = {
       scala.math.floorMod((rawIncremented - 1), 3) + 1
     }
 
     def withRowAdustedBy(delta: Int): GameUIState = {
-      copy(selectedRow = wrapToRange(selectedRow + delta))
+      copy(selectedRow =
+             RowIndex.unsafeFrom(wrapToRange(selectedRow.value + delta)))
     }
 
     def withColumnAdustedBy(delta: Int): GameUIState = {
-      copy(selectedColumn = wrapToRange(selectedColumn + delta))
+      copy(selectedColumn =
+             ColumnIndex(wrapToRange(selectedColumn.value + delta)))
     }
 
     def toDisplayString: String = {
@@ -133,7 +135,8 @@ object ManualTicTacToe extends App {
     }
   }
 
-  val initialState = GameUIState(Board.initial, Player.X, 1, 1)
+  val initialState =
+    GameUIState(Board.initial, Player.X, RowIndex(1), ColumnIndex(1))
 
   val gameResult = getAndDoUiCommands(initialState)
   println("gameResult = " + gameResult)
