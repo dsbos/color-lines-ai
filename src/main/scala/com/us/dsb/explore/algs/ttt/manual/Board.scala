@@ -36,6 +36,46 @@ class Board(private val cellStates: Vector[Cell]) {
     getCellAt(row, column).state
   }
 
+  private def hasThreeInARow(player: Player): Boolean = {
+    // ?? Q: How to use Tuple3 in data convert to or use as 3-element List
+    //   and call .forall?
+    // ?? auto-generate this
+    type CellRawIndices = Tuple2[Int, Int]
+    val linesData: List[Tuple3[CellRawIndices, CellRawIndices, CellRawIndices]] =
+      List(
+        ((1, 1), (1, 2), (1, 3)),
+        ((2, 1), (2, 2), (2, 3)),
+        ((3, 1), (3, 2), (3, 3)),
+        ((1, 1), (2, 1), (3, 1)),
+        ((1, 2), (2, 2), (3, 2)),
+        ((1, 3), (2, 3), (3, 3)),
+        ((1, 1), (2, 2), (3, 3)),
+        ((1, 3), (2, 2), (3, 1))
+    )
+    linesData.exists { case (cell1, cell2, cell3) =>
+      println("- checking line: " + (cell1, cell2, cell3))
+
+      val lineList = List(cell1, cell2, cell3)
+      lineList.forall { case (row, column) =>
+        print("- checking cell: - " + (row, column))
+
+        val same = {
+          val cellState =
+          getCellAt(RowIndex(Index.unsafeFrom(row)),
+                    ColumnIndex(Index.unsafeFrom(column)))
+              .state
+          print(s" - cellState = $cellState")
+          cellState
+
+
+          cellState == player.some
+        }
+        println(" - same = " + same)
+        same
+      }
+    }
+  }
+
   // ?? later refine from Either[String, ...] to "fancier" error type
   def tryMoveAt(player: Player,
                 row: RowIndex,
@@ -44,6 +84,13 @@ class Board(private val cellStates: Vector[Cell]) {
       case None =>
         val newCellArray = cellStates.updated(vectorIndex(row, column), Cell(player.some))
         val newBoard = new Board(newCellArray)
+
+
+        // ???? move hasThreeInARow into Board?
+
+        val x = newBoard.hasThreeInARow(player)   // ?? passing player to be simpler(?)
+        println(s"hasThreeInARow($player) = $x")
+
         newBoard.asRight
 
       case Some(nameThis) =>
@@ -52,7 +99,7 @@ class Board(private val cellStates: Vector[Cell]) {
     }
   }
 
-  def renderMultiline: String = {
+  def renderMultilinexx: String = {
     val cellWidth = " X ".length
     val cellSeparator = "|"
     // ?? user new Order or leave using indices declarations?
