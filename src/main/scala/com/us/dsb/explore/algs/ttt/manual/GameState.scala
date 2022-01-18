@@ -36,12 +36,12 @@ case class GameState(board: Board,
 
        val newGameResult =
          if (markedBoard.hasThreeInARow(currentPlayer)) { // ?? revisit: passing player to be simpler(?)
-           println(s"******** : Player $currentPlayer just won")
            GameState.GameResult.Win(currentPlayer).some
-           // ????expand result to flag whether to continue, or check gameResult somewhere
+         }
+         else if (markedBoard.noMovesLeft) {
+           GameState.GameResult.Draw.some
          }
          else {
-           //???? check for draw, setting gameState to Draw.some (and connect to termination)
            gameResult
          }
        GameState(markedBoard, newGameResult, nextPlayer)

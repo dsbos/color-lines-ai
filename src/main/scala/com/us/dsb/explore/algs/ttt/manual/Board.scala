@@ -20,8 +20,6 @@ object Board {
 
 import Board._
 
-// ???? create GameState--gameResult seems to need to move there
-// probably wrap in a GameState with currentPlayer (moved from GameUiState)
 class Board(private val cellStates: Vector[Cell]) {
 
   /** Maps logical row/column to row-major vector index. */
@@ -34,6 +32,10 @@ class Board(private val cellStates: Vector[Cell]) {
 
   def getMarkAt(row: RowIndex, column: ColumnIndex): Option[Player] = {
     getCellAt(row, column).state
+  }
+
+  def noMovesLeft(): Boolean = {
+    ! cellStates.exists(_.state.isEmpty)
   }
 
   /*private*/ def hasThreeInARow(player: Player): Boolean = {
