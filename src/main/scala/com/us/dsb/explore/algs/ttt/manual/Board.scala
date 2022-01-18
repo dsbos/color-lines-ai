@@ -5,7 +5,7 @@ import cats.syntax.either._
 import enumeratum.EnumEntry
 
 
-object Boardxx {
+object Board {
   /** Empty, X, or O */
   /*@newtype deferred*/
   private case class Cell(state: Option[Player]) { // if newType, has to be in object
@@ -15,15 +15,14 @@ object Boardxx {
     val empty: Cell = Cell(None)
   }
 
-
-  def initial: Boardxx = new Boardxx(Vector.fill[Cell](Order * Order)(Cell.empty))
+  def initial: Board = new Board(Vector.fill[Cell](Order * Order)(Cell.empty))
 }
 
-import Boardxx._
+import Board._
 
 // ???? create GameState--gameResult seems to need to move there
 // probably wrap in a GameState with currentPlayer (moved from GameUiState)
-class Boardxx(private val cellStates: Vector[Cell]) {
+class Board(private val cellStates: Vector[Cell]) {
 
   /** Maps logical row/column to row-major vector index. */
   private def vectorIndex(row: RowIndex, column: ColumnIndex): Int =
@@ -67,11 +66,12 @@ class Boardxx(private val cellStates: Vector[Cell]) {
 
   def markCell(player: Player,
                row: RowIndex,
-               column: ColumnIndex): Either[String, Boardxx] = {
+               column: ColumnIndex): Either[String, Board] = {
     getCellAt(row, column).state match {
       case None =>
-        val newCellArray = cellStates.updated(vectorIndex(row, column), Cell(player.some))
-        new Boardxx(newCellArray).asRight
+        val newCellArray =
+          cellStates.updated(vectorIndex(row, column), Cell(player.some))
+        new Board(newCellArray).asRight
       case Some(nameThis) =>
         (s"Can't place mark at row $row, column $column;" +
             s" is already marked (${nameThis})").asLeft    }

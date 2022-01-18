@@ -15,30 +15,36 @@ object GameState {
     case class Win(player: Player) extends GameResult
   }
 
-  def initial: GameState = GameState(Boardxx.initial, None)
+  def initial: GameState = GameState(Board.initial, None, Player.X)
 }
 
-case class GameState(board: Boardxx, gameResult: Option[GameState.GameResult]) {
+case class GameState(board: Board,
+                     gameResult: Option[GameState.GameResult],
+                     currentPlayer: Player
+                    ) {
 
-  // ???? move to GameState
    // ?? later refine from Either[String, ...] to "fancier" error type
-   def tryMoveAt(player: Player,
-                 row: RowIndex,
+   def tryMoveAt(row: RowIndex,
                  column: ColumnIndex): Either[String, GameState] = {
 
-     board.markCell(player, row, column).map { markedBoard =>
+     board.markCell(currentPlayer, row, column).map { markedBoard =>
+         import Player._
+         val nextPlayer = currentPlayer match {
+           case X => O
+           case O => X
+        }
 
        val newGameResult =
-         if (markedBoard.hasThreeInARow(player)) { // ?? revisit: passing player to be simpler(?)
-           println(s"???????????????: Player $player just won")
-           GameState.GameResult.Win(player).some
+         if (markedBoard.hasThreeInARow(currentPlayer)) { // ?? revisit: passing player to be simpler(?)
+           println(s"******** : Player $currentPlayer just won")
+           GameState.GameResult.Win(currentPlayer).some
            // ????expand result to flag whether to continue, or check gameResult somewhere
          }
          else {
            //???? check for draw, setting gameState to Draw.some (and connect to termination)
            gameResult
          }
-       GameState(markedBoard, newGameResult)
+       GameState(markedBoard, newGameResult, nextPlayer)
      }
    }
 

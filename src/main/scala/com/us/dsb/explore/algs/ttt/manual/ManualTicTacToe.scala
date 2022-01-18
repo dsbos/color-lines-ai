@@ -56,7 +56,6 @@ object ManualTicTacToe extends App {
 
   // ?? somewhere expand to allow for history (maybe via Semigroup or whatever has .compose?)
   case class GameUIState(gameState: GameState,
-                         currentPlayerxx: Player, // ?? move to new GameState
                          selectedRow: RowIndex,
                          selectedColumn: ColumnIndex) {
 
@@ -115,7 +114,7 @@ object ManualTicTacToe extends App {
 
     def toDisplayString: String = {
       renderTableMultilineWithSelection + "\n" +
-      s"Turn: Player $currentPlayerxx; marking cursor: <row $selectedRow / column $selectedColumn>"
+      s"Turn: Player ${gameState.currentPlayer}; marking cursor: <row $selectedRow / column $selectedColumn>"
     }
 
   }
@@ -138,17 +137,11 @@ object ManualTicTacToe extends App {
     // ?? "place mark"?
     def markAtSelection(uiState: GameUIState): GameUIState = {
       import Player._
-      val moveResult = uiState.gameState.tryMoveAt(uiState.currentPlayerxx,
-                                                 uiState.selectedRow,
-                                                 uiState.selectedColumn)
+      val moveResult = uiState.gameState.tryMoveAt(uiState.selectedRow,
+                                                   uiState.selectedColumn)
       moveResult match {
-        case Right(newBoard) =>
-          // ?? move this UI-independent game logic:
-          val newCurrentPlayer = uiState.currentPlayerxx match {
-            case X => O
-            case O => X
-          }
-          uiState.copy(gameState = newBoard, currentPlayerxx = newCurrentPlayer)
+        case Right(newGameState) =>
+          uiState.copy(gameState = newGameState)
         case Left(errorMsg) =>
           // ?? clean I/O?
           println(errorMsg)
@@ -169,23 +162,24 @@ object ManualTicTacToe extends App {
     println()
     println(uiState.toDisplayString)
 
-    val command = getCommand(uiState.currentPlayerxx)
+    val command = getCommand(uiState.gameState.currentPlayer)
 
     import UICommand._
     import UICommandMethods._
     command match {
-      // ?? can we factor out the getAndDoUiCommands (usefully, is this small case)?
+      // ?? can we factor out the getAndDoUiCommands (usefully, in this small case)?
       case move: UIMoveCommand => getAndDoUiCommands(moveSelection(uiState, move))
       case Mark                => getAndDoUiCommands(markAtSelection(uiState))  // ???? handle termination (see GameState)
       case Quit                => doQuit(uiState)
     }
   }
 
+  //////////////////////////////////////////////////////////////////////
+
   val initialState = {
     // ?? maybe clean getting indices; maybe get from index ranges, not
     //   constructing here (though here exercises refined type_)
-    GameUIState(GameState.initial, Player.X,
-                RowIndex(Index(1)), ColumnIndex(Index(1)))
+    GameUIState(GameState.initial, RowIndex(Index(1)), ColumnIndex(Index(1)))
   }
 
 
