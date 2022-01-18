@@ -5,8 +5,7 @@ import cats.syntax.either._
 import enumeratum.EnumEntry
 
 
-
-object Board {
+object Boardxx {
   /** Empty, X, or O */
   /*@newtype deferred*/
   private case class Cell(state: Option[Player]) { // if newType, has to be in object
@@ -16,13 +15,15 @@ object Board {
     val empty: Cell = Cell(None)
   }
 
-  def initial: Board = new Board(Vector.fill[Cell](Order * Order)(Cell.empty))
+
+  def initial: Boardxx = new Boardxx(Vector.fill[Cell](Order * Order)(Cell.empty))
 }
 
-import Board._
+import Boardxx._
 
+// ???? create GameState--gameResult seems to need to move there
 // probably wrap in a GameState with currentPlayer (moved from GameUiState)
-class Board(private val cellStates: Vector[Cell]) {
+class Boardxx(private val cellStates: Vector[Cell]) {
 
   /** Maps logical row/column to row-major vector index. */
   private def vectorIndex(row: RowIndex, column: ColumnIndex): Int =
@@ -36,7 +37,7 @@ class Board(private val cellStates: Vector[Cell]) {
     getCellAt(row, column).state
   }
 
-  private def hasThreeInARow(player: Player): Boolean = {
+  /*private*/ def hasThreeInARow(player: Player): Boolean = {
     // ?? Q: How to use Tuple3 in data convert to or use as 3-element List
     //   and call .forall?
     // ?? auto-generate this
@@ -53,53 +54,31 @@ class Board(private val cellStates: Vector[Cell]) {
         ((1, 3), (2, 2), (3, 1))
     )
     linesData.exists { case (cell1, cell2, cell3) =>
-      println("- checking line: " + (cell1, cell2, cell3))
-
       val lineList = List(cell1, cell2, cell3)
       lineList.forall { case (row, column) =>
-        print("- checking cell: - " + (row, column))
 
-        val same = {
-          val cellState =
-          getCellAt(RowIndex(Index.unsafeFrom(row)),
-                    ColumnIndex(Index.unsafeFrom(column)))
-              .state
-          print(s" - cellState = $cellState")
-          cellState
-
-
-          cellState == player.some
+        player.some ==
+            getCellAt(RowIndex(Index.unsafeFrom(row)),
+                      ColumnIndex(Index.unsafeFrom(column)))
+                .state
         }
-        println(" - same = " + same)
-        same
-      }
     }
   }
 
-  // ?? later refine from Either[String, ...] to "fancier" error type
-  def tryMoveAt(player: Player,
-                row: RowIndex,
-                column: ColumnIndex): Either[String, Board] = {
+  def markCell(player: Player,
+               row: RowIndex,
+               column: ColumnIndex): Either[String, Boardxx] = {
     getCellAt(row, column).state match {
       case None =>
         val newCellArray = cellStates.updated(vectorIndex(row, column), Cell(player.some))
-        val newBoard = new Board(newCellArray)
-
-
-        // ???? move hasThreeInARow into Board?
-
-        val x = newBoard.hasThreeInARow(player)   // ?? passing player to be simpler(?)
-        println(s"hasThreeInARow($player) = $x")
-
-        newBoard.asRight
-
+        new Boardxx(newCellArray).asRight
       case Some(nameThis) =>
         (s"Can't place mark at row $row, column $column;" +
-            s" is already marked (${nameThis})").asLeft
-    }
+            s" is already marked (${nameThis})").asLeft    }
   }
 
-  def renderMultilinexx: String = {
+
+  def renderMultiline: String = {
     val cellWidth = " X ".length
     val cellSeparator = "|"
     // ?? user new Order or leave using indices declarations?
