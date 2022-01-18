@@ -55,6 +55,7 @@ object ManualTicTacToe extends App {
   case class GameUIResult(tbd: String)
 
   object UICommandMethods {
+
     import UICommand.UIMoveCommand
     def moveSelection(uiState: GameUIState,
                       moveCommand: UIMoveCommand): GameUIState = {
@@ -69,7 +70,6 @@ object ManualTicTacToe extends App {
 
     // ?? "place mark"?
     def markAtSelection(uiState: GameUIState): GameUIState = {
-      import Player._
       val moveResult = uiState.gameState.tryMoveAt(uiState.selectedRow,
                                                    uiState.selectedColumn)
       moveResult match {
@@ -101,9 +101,20 @@ object ManualTicTacToe extends App {
     import UICommandMethods._
     command match {
       // ?? can we factor out the getAndDoUiCommands (usefully, in this small case)?
-      case move: UIMoveCommand => getAndDoUiCommands(moveSelection(uiState, move))
-      case Mark                => getAndDoUiCommands(markAtSelection(uiState))  // ???? handle termination (see GameState)
-      case Quit                => doQuit(uiState)
+      case Quit =>
+        doQuit(uiState)
+      case move: UIMoveCommand =>
+        getAndDoUiCommands(moveSelection(uiState, move))
+
+      case Mark =>
+        val newUiState = markAtSelection(uiState)
+        newUiState.gameState.gameResult match {
+          case None => getAndDoUiCommands(newUiState)
+          case Some(gameResult) =>
+            GameUIResult("Game finished ... " + gameResult)  // ??? "UI-ifiy"; do .toString higher up
+
+
+        }
     }
   }
 
@@ -116,7 +127,7 @@ object ManualTicTacToe extends App {
   }
 
 
-  val gameResult = getAndDoUiCommands(initialState)
+  val gameResult: GameUIResult = getAndDoUiCommands(initialState)
   println("gameResult = " + gameResult)
 
 }
