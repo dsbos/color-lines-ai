@@ -64,10 +64,10 @@ object ManualTicTacToe extends App {
     }
 
     // ?? should UI work directly with board's index types, or should it
-    // use its own (maybe just to simulate ....)?
+    //   use its own (maybe just to simulate ....)?
     // ?? who should do/provide this index-increment logic? (its just for
-    // our cursor-based row/column specification; what would GUI use, just
-    // 9 table-level IDs tied to GUI cells/buttons?);
+    //   our cursor-based row/column specification; what would GUI use, just
+    //   9 table-level IDs tied to GUI cells/buttons?);
 
     def withRowAdustedBy(delta: Int): GameUIState = {
       copy(selectedRow =
@@ -75,18 +75,46 @@ object ManualTicTacToe extends App {
     }
 
     // ??? factor out more commonality, yielding ~adjustByDeltaAndwrapToRange
-    // (putting unsafeFrom right next to mod code)
+    //   (putting unsafeFrom right next to mod code)
+    // ?? maybe enable auto-wrapping and -unwrapping around match
 
     def withColumnAdustedBy(delta: Int): GameUIState = {
       copy(selectedColumn =
              ColumnIndex(Index.unsafeFrom(wrapToRange(selectedColumn.value.value + delta))))
     }
 
-    // ???? rework to display selection (reworking access to board from here)
+    private def renderTableMultilineWithSelection: String = {
+      val cellWidth = " X ".length
+      val cellSeparator = "|"
+      // ?? user new Order or leave using indices declarations?
+      val wholeWidth =
+        columnIndices.length * cellWidth +
+            (columnIndices.length - 1) * cellSeparator.length
+      val rowSeparator = "\n" + ("-" * wholeWidth) + "\n"
+
+      rowIndices.map { row =>
+        columnIndices.map { column =>
+          val cellStateStr =
+            board.getMarkAt(row, column) match {
+              case None => "-"
+              case Some(player) => player.toString
+            }
+          if (row == selectedRow && column == selectedColumn ) {
+            "*" + cellStateStr + "*"
+          }
+          else {
+            " " + cellStateStr + " "
+          }
+        }.mkString(cellSeparator)
+      }.mkString(rowSeparator)
+
+    }
+
     def toDisplayString: String = {
-      board.renderMultiline + "\n" +
+      renderTableMultilineWithSelection + "\n" +
       s"Turn: Player $currentPlayer; marking cursor: <row $selectedRow / column $selectedColumn>"
     }
+
   }
 
   case class GameResult(tbd: String)
