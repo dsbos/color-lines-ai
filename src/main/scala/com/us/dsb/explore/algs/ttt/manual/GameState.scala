@@ -5,19 +5,26 @@ import cats.syntax.either._
 import enumeratum.EnumEntry
 
 
-// ?? decide "case" or not
-
 object GameState {
-  trait GameResult
 
+  /**
+   * Result of completed game.)
+   */
+  trait GameResult
   object GameResult {
     case object Draw extends GameResult
     case class Win(player: Player) extends GameResult
   }
 
-  def initial: GameState = GameState(Board.initial, None, Player.X)
+  def initial(startingPlayer: Player): GameState =
+    GameState(Board.initial, None, startingPlayer)
+  def initial: GameState = initial(Player.X)
 }
 
+/**
+ *
+ * @param gameResult  `None` means no win or draw yet
+ */
 case class GameState(board: Board,
                      gameResult: Option[GameState.GameResult],
                      currentPlayer: Player
@@ -35,7 +42,7 @@ case class GameState(board: Board,
         }
 
        val newGameResult =
-         if (markedBoard.hasThreeInARow(currentPlayer)) { // ?? revisit: passing player to be simpler(?)
+         if (markedBoard.hasThreeInARow(currentPlayer)) {
            GameState.GameResult.Win(currentPlayer).some
          }
          else if (markedBoard.noMovesLeft) {

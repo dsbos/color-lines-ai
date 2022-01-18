@@ -7,7 +7,7 @@ import io.estatico.newtype.macros.newtype
 
 package object manual {
 
-  // ?? can one of these be derived from other?
+  // ?? can one of these be derived from the other?
   val Order = 3
   type Order = 3
 
@@ -16,7 +16,6 @@ package object manual {
   object Index extends RefinedTypeOps.Numeric[Index, Int]
 
   // ?? revisit use--in both table and UI selection model; separate?
-  // ?? maybe move renderMultiline's rowIndices/etc. to around here
 
   import scala.language.implicitConversions
   @newtype case class RowIndex(value: Index)

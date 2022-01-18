@@ -2,7 +2,6 @@ package com.us.dsb.explore.algs.ttt.manual
 
 import cats.syntax.option._
 import cats.syntax.either._
-import enumeratum.EnumEntry
 
 
 object Board {
@@ -20,25 +19,25 @@ object Board {
 
 import Board._
 
+/**
+ * State of TTT board (just cells; not whose turn it is/etc.)
+ */
 class Board(private val cellStates: Vector[Cell]) {
 
-  /** Maps logical row/column to row-major vector index. */
+  /** Computes row-major cell-array index from row and column numbers. */
   private def vectorIndex(row: RowIndex, column: ColumnIndex): Int =
     (row.value.value - 1) * Order + (column.value.value - 1)
 
-  // ?? change to public for realistic UI access
-  private def getCellAt(row: RowIndex, column: ColumnIndex): Cell =
-    cellStates(vectorIndex(row, column))
-
   def getMarkAt(row: RowIndex, column: ColumnIndex): Option[Player] = {
-    getCellAt(row, column).state
+    cellStates(vectorIndex(row, column)).state
   }
 
-  def noMovesLeft(): Boolean = {
+  def noMovesLeft: Boolean = {
     ! cellStates.exists(_.state.isEmpty)
   }
 
-  /*private*/ def hasThreeInARow(player: Player): Boolean = {
+  // ?? revisit: passing player (which made check simpler
+  def hasThreeInARow(player: Player): Boolean = {
     // ?? Q: How to use Tuple3 in data convert to or use as 3-element List
     //   and call .forall?
     // ?? auto-generate this
@@ -59,17 +58,17 @@ class Board(private val cellStates: Vector[Cell]) {
       lineList.forall { case (row, column) =>
 
         player.some ==
-            getCellAt(RowIndex(Index.unsafeFrom(row)),
+            getMarkAt(RowIndex(Index.unsafeFrom(row)),
                       ColumnIndex(Index.unsafeFrom(column)))
-                .state
         }
     }
   }
 
+  /** Marks specified cell if legal. */
   def markCell(player: Player,
                row: RowIndex,
                column: ColumnIndex): Either[String, Board] = {
-    getCellAt(row, column).state match {
+    getMarkAt(row, column) match {
       case None =>
         val newCellArray =
           cellStates.updated(vectorIndex(row, column), Cell(player.some))
@@ -91,7 +90,7 @@ class Board(private val cellStates: Vector[Cell]) {
 
     rowIndices.map { row =>
       columnIndices.map { column =>
-        getCellAt(row, column).state match {
+        getMarkAt(row, column) match {
           case None         => " - "
           case Some(player) => " " + player.toString + " "
         }
