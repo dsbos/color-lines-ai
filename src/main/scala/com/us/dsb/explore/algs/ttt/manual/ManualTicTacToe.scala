@@ -59,8 +59,16 @@ object ManualTicTacToe extends App {
                          currentPlayer: Player, // ?? move to new GameState
                          selectedRow: RowIndex,
                          selectedColumn: ColumnIndex) {
-    private def wrapToRange(rawIncremented: Int): Int = {
-      scala.math.floorMod((rawIncremented - 1), 3) + 1
+
+    // ?? clean up that floorMod; I just want plain mathematical mod
+    private def adjustAndwrapToRange(unincremented: Index, delta: Int): Index = {
+      // ?? maybe enable auto-wrapping and -unwrapping around match
+      val indexOrigin = Index.MinValue.value
+      val rangeSize = Index.MaxValue.value - Index.MinValue.value + 1
+      val rawIncremented = unincremented.value + delta
+      Index.unsafeFrom(
+        scala.math.floorMod(rawIncremented - indexOrigin, rangeSize)
+            + indexOrigin)
     }
 
     // ?? should UI work directly with board's index types, or should it
@@ -70,17 +78,12 @@ object ManualTicTacToe extends App {
     //   9 table-level IDs tied to GUI cells/buttons?);
 
     def withRowAdustedBy(delta: Int): GameUIState = {
-      copy(selectedRow =
-             RowIndex(Index.unsafeFrom(wrapToRange(selectedRow.value.value + delta))))
+      copy(selectedRow = RowIndex(adjustAndwrapToRange(selectedRow.value, delta)))
     }
 
-    // ??? factor out more commonality, yielding ~adjustByDeltaAndwrapToRange
-    //   (putting unsafeFrom right next to mod code)
-    // ?? maybe enable auto-wrapping and -unwrapping around match
 
     def withColumnAdustedBy(delta: Int): GameUIState = {
-      copy(selectedColumn =
-             ColumnIndex(Index.unsafeFrom(wrapToRange(selectedColumn.value.value + delta))))
+      copy(selectedColumn = ColumnIndex(adjustAndwrapToRange(selectedColumn.value, delta)))
     }
 
     private def renderTableMultilineWithSelection: String = {
