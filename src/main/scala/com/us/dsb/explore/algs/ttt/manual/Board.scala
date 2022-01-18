@@ -32,6 +32,7 @@ class Board(private val cellStates: Vector[Cell]) {
   private def getCellAt(row: RowIndex, column: ColumnIndex): Cell =
     cellStates(vectorIndex(row, column))
 
+  // ?? later refine from Either[String, ...] to "fancier" error type
   def tryMoveAt(player: Player,
                 row: RowIndex,
                 column: ColumnIndex): Either[String, Board] = {
@@ -42,7 +43,7 @@ class Board(private val cellStates: Vector[Cell]) {
         newBoard.asRight
 
       case Some(nameThis) =>
-        (s"Can't move at row $row, column $column;" +
+        (s"Can't place mark at row $row, column $column;" +
             s" is already marked ${nameThis}").asLeft
     }
   }
