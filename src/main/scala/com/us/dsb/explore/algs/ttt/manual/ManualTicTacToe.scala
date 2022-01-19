@@ -49,7 +49,7 @@ object ManualTicTacToe extends App {
   }
 
   // ??? enhance; maybe just put clean strings in; maybe build on GameResult (plus quit case)
-  case class GameUIResult(tbd: String)
+  case class GameUIResult(text: String)
 
 
   object UICommandMethods {
@@ -81,7 +81,7 @@ object ManualTicTacToe extends App {
     }
 
     def doQuit(uiState: GameUIState): GameUIResult = {
-      GameUIResult("<some result>")
+      GameUIResult("Game was quit")
     }
   }
 
@@ -111,7 +111,14 @@ object ManualTicTacToe extends App {
           case None =>  // game not done yet
             getAndDoUiCommands(newUiState)
           case Some(gameResult) =>
-            GameUIResult("Game finished ... " + gameResult)  // ???? "UI-ifiy"; do .toString higher up
+
+            import GameState.GameResult._
+            val textResult =
+              gameResult match {
+                case Draw        => "Game ended in draw"
+                case Win(player) => s"Player $player won"
+              }
+            GameUIResult(textResult)   // ?? refine from text
         }
     }
   }
@@ -124,6 +131,6 @@ object ManualTicTacToe extends App {
     GameUIState(GameState.initial, RowIndex(Index(1)), ColumnIndex(Index(1)))
 
   val gameResult: GameUIResult = getAndDoUiCommands(initialState)
-  println("gameResult = " + gameResult)
+  println("Result: " + gameResult.text)
 
 }

@@ -10,7 +10,7 @@ object GameState {
   /**
    * Result of completed game.)
    */
-  trait GameResult
+  sealed trait GameResult
   object GameResult {
     case object Draw extends GameResult
     case class Win(player: Player) extends GameResult
@@ -30,30 +30,33 @@ case class GameState(board: Board,
                      currentPlayer: Player
                     ) {
 
-   // ?? later refine from Either[String, ...] to "fancier" error type
-   def tryMoveAt(row: RowIndex,
-                 column: ColumnIndex): Either[String, GameState] = {
+  // ?? later refine from Either[String, ...] to "fancier" error type
+  // ?? maybe add result of move (win/draw/other) with new state (so caller
+  //  doesn't have to check state's gameResult;
 
-     board.markCell(currentPlayer, row, column).map { markedBoard =>
-         import Player._
-         val nextPlayer = currentPlayer match {
-           case X => O
-           case O => X
+  def tryMoveAt(row: RowIndex,
+                column: ColumnIndex): Either[String, GameState] = {
+
+    board.markCell(currentPlayer, row, column).map { markedBoard =>
+      import Player._
+      val nextPlayer = currentPlayer match {
+        case X => O
+        case O => X
+      }
+
+      val newGameResult =
+        if (markedBoard.hasThreeInARow(currentPlayer)) {
+          GameState.GameResult.Win(currentPlayer).some
         }
-
-       val newGameResult =
-         if (markedBoard.hasThreeInARow(currentPlayer)) {
-           GameState.GameResult.Win(currentPlayer).some
-         }
-         else if (markedBoard.noMovesLeft) {
-           GameState.GameResult.Draw.some
-         }
-         else {
-           gameResult
-         }
-       GameState(markedBoard, newGameResult, nextPlayer)
-     }
-   }
+        else if (markedBoard.noMovesLeft) {
+          GameState.GameResult.Draw.some
+        }
+        else {
+          gameResult
+        }
+      GameState(markedBoard, newGameResult, nextPlayer)
+    }
+  }
 
 }
 
