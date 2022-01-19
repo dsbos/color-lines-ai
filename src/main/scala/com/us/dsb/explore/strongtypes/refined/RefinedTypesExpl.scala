@@ -2,6 +2,10 @@ package com.us.dsb.explore.strongtypes.refined
 
 import scala.util.Try
 
+// Note:  Cannot wrap refined type Index in value class
+
+
+
 // https://github.com/fthomas/refined?
 object RefinedTypesExpl extends App {
 
