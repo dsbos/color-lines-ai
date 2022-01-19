@@ -21,7 +21,7 @@ package object manual {
   @newtype case class RowIndex(value: Index)
   @newtype case class ColumnIndex(value: Index)
 
-  // ?? unsafe:
+  // (unsafeFrom that should be okay:)
   val rowIndices: IndexedSeq[RowIndex] =
     (1 to Order).map(i => RowIndex(Index.unsafeFrom(i)))
   val columnIndices: IndexedSeq[ColumnIndex] =

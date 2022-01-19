@@ -5,9 +5,9 @@ case class GameUIState(gameState: GameState,
                        selectedRow: RowIndex,
                        selectedColumn: ColumnIndex) {
 
-  // ?? clean up that floorMod; I just want plain mathematical mod
+  // ?? clean up that floorMod; I just want plain mathematical mod:
   private def adjustAndwrapToRange(unincremented: Index, delta: Int): Index = {
-    // ?? maybe enable auto-wrapping and -unwrapping around match
+    // ?? maybe enable auto-wrapping and -unwrapping around math
     val indexOrigin = Index.MinValue.value
     val rangeSize = Index.MaxValue.value - Index.MinValue.value + 1
     val rawIncremented = unincremented.value + delta
@@ -17,24 +17,21 @@ case class GameUIState(gameState: GameState,
   }
 
   // ?? should UI work directly with board's index types, or should it
-  //   use its own (maybe just to simulate ....)?
-  // ?? who should do/provide this index-increment logic? (its just for
+  //   use its own (maybe just to simulate ...)?
+  // ?? who should do/provide this index-increment logic? (it's just for
   //   our cursor-based row/column specification; what would GUI use, just
   //   9 table-level IDs tied to GUI cells/buttons?);
 
-  def withRowAdustedBy(delta: Int): GameUIState = {
+  def withRowAdustedBy(delta: Int): GameUIState =
     copy(selectedRow = RowIndex(adjustAndwrapToRange(selectedRow.value, delta)))
-  }
 
-
-  def withColumnAdustedBy(delta: Int): GameUIState = {
+  def withColumnAdustedBy(delta: Int): GameUIState =
     copy(selectedColumn = ColumnIndex(adjustAndwrapToRange(selectedColumn.value, delta)))
-  }
 
   private def renderTableMultilineWithSelection: String = {
     val cellWidth = " X ".length
     val cellSeparator = "|"
-    // ?? user new Order or leave using indices declarations?
+    // ?? use new Order or leave using indices declarations?
     val wholeWidth =
       columnIndices.length * cellWidth +
           (columnIndices.length - 1) * cellSeparator.length
@@ -53,8 +50,8 @@ case class GameUIState(gameState: GameState,
         else {
           " " + cellStateStr + " "
         }
-      }.mkString(cellSeparator)
-    }.mkString(rowSeparator)
+      }.mkString(cellSeparator)  // make each row line
+    }.mkString(rowSeparator)     // make whole-board multi-line string
 
   }
 

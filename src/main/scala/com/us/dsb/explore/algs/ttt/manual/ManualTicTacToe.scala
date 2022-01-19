@@ -8,7 +8,6 @@ import scala.annotation.tailrec
 
 object ManualTicTacToe extends App {
 
-
   sealed trait UICommand extends EnumEntry
   object UICommand {
     // ?? why doesn't UICommand's "sealed" obviate the following one (for exhaustive-match checks?)
@@ -37,10 +36,7 @@ object ManualTicTacToe extends App {
 
   @tailrec
   def getCommand(player: Player): UICommand = {
-    // ?? clean looking more (was while mess., now recursive; is there better Scala way?
-
     // ?? clean embedded reference to stdin/console and stdout
-    //print(s"Player $player command (u(p), d(own), l(eft), r(right), m(ark), q(uit): ")
     print(s"Player $player command?: ")
     val rawCmd = scala.io.StdIn.readLine()
 
@@ -48,11 +44,13 @@ object ManualTicTacToe extends App {
       case Right(cmd) => cmd
       case Left(msg) =>
         println(msg)
-        getCommand(player)
+        getCommand(player)  // loop
     }
   }
 
+  // ??? enhance; maybe just put clean strings in; maybe build on GameResult (plus quit case)
   case class GameUIResult(tbd: String)
+
 
   object UICommandMethods {
 
@@ -76,7 +74,7 @@ object ManualTicTacToe extends App {
         case Right(newGameState) =>
           uiState.copy(gameState = newGameState)
         case Left(errorMsg) =>
-          // ?? clean I/O?
+          // ?? clean I/O?  add to result and hjave cmd loop show? call ~injected error reporter?
           println(errorMsg)
           uiState  // no change
       }
@@ -87,8 +85,10 @@ object ManualTicTacToe extends App {
     }
   }
 
+  // ?? clean looping more (was while mess, now recursive; is there better Scala way?)
   /**
-   * Logically, loops on prompting for and executing user UI ~commands.
+   * Logically, loops on prompting for and executing user UI ~commands until
+   * game over or quit.
    */
   @tailrec
   def getAndDoUiCommands(uiState: GameUIState): GameUIResult = {
@@ -100,32 +100,28 @@ object ManualTicTacToe extends App {
     import UICommand._
     import UICommandMethods._
     command match {
-      // ?? can we factor out the getAndDoUiCommands (usefully, in this small case)?
+      // ?? can we factor down the multiple getAndDoUiCommands calls (usefully, in this small case)?
       case Quit =>
         doQuit(uiState)
-      case move: UIMoveCommand =>
+      case move: UIMoveCommand =>  // any move-selection command
         getAndDoUiCommands(moveSelection(uiState, move))
-
       case Mark =>
         val newUiState = markAtSelection(uiState)
         newUiState.gameState.gameResult match {
-          case None => getAndDoUiCommands(newUiState)
+          case None =>  // game not done yet
+            getAndDoUiCommands(newUiState)
           case Some(gameResult) =>
-            GameUIResult("Game finished ... " + gameResult)  // ??? "UI-ifiy"; do .toString higher up
-
-
+            GameUIResult("Game finished ... " + gameResult)  // ???? "UI-ifiy"; do .toString higher up
         }
     }
   }
 
   //////////////////////////////////////////////////////////////////////
 
-  val initialState = {
+  val initialState =
     // ?? maybe clean getting indices; maybe get from index ranges, not
     //   constructing here (though here exercises refined type_)
     GameUIState(GameState.initial, RowIndex(Index(1)), ColumnIndex(Index(1)))
-  }
-
 
   val gameResult: GameUIResult = getAndDoUiCommands(initialState)
   println("gameResult = " + gameResult)

@@ -7,8 +7,7 @@ import cats.syntax.either._
 object Board {
   /** Empty, X, or O */
   /*@newtype deferred*/
-  private case class Cell(state: Option[Player]) { // if newType, has to be in object
-  }
+  private case class Cell(state: Option[Player])  // if newType, has to be in object
 
   private object Cell {
     val empty: Cell = Cell(None)
@@ -36,11 +35,12 @@ class Board(private val cellStates: Vector[Cell]) {
     ! cellStates.exists(_.state.isEmpty)
   }
 
-  // ?? revisit: passing player (which made check simpler
+  // (note almost completely unoptimized; do we care?)
+  // ?? revisit passing player (which made check simpler)
   def hasThreeInARow(player: Player): Boolean = {
-    // ?? Q: How to use Tuple3 in data convert to or use as 3-element List
-    //   and call .forall?
-    // ?? auto-generate this
+    // ?? Q: How to use Tuple3 in data and then convert to or use as 3-element
+    //   List and call .forall?
+    // ?? any way auto-generate this simply?  or factor out repeated cell pairs?
     type CellRawIndices = Tuple2[Int, Int]
     val linesData: List[Tuple3[CellRawIndices, CellRawIndices, CellRawIndices]] =
       List(
@@ -53,10 +53,10 @@ class Board(private val cellStates: Vector[Cell]) {
         ((1, 1), (2, 2), (3, 3)),
         ((1, 3), (2, 2), (3, 1))
     )
+    // See if there _exists_ line where _all_ cells are marked by user:
     linesData.exists { case (cell1, cell2, cell3) =>
       val lineList = List(cell1, cell2, cell3)
       lineList.forall { case (row, column) =>
-
         player.some ==
             getMarkAt(RowIndex(Index.unsafeFrom(row)),
                       ColumnIndex(Index.unsafeFrom(column)))
@@ -64,7 +64,7 @@ class Board(private val cellStates: Vector[Cell]) {
     }
   }
 
-  /** Marks specified cell if legal. */
+  /** Marks specified cell, if not already marked. */
   def markCell(player: Player,
                row: RowIndex,
                column: ColumnIndex): Either[String, Board] = {
@@ -78,11 +78,10 @@ class Board(private val cellStates: Vector[Cell]) {
             s" is already marked (${nameThis})").asLeft    }
   }
 
-
   def renderMultiline: String = {
     val cellWidth = " X ".length
     val cellSeparator = "|"
-    // ?? user new Order or leave using indices declarations?
+    // ?? use new Order or leave using indices declarations?
     val wholeWidth =
       columnIndices.length * cellWidth +
           (columnIndices.length - 1) * cellSeparator.length
@@ -94,8 +93,8 @@ class Board(private val cellStates: Vector[Cell]) {
           case None         => " - "
           case Some(player) => " " + player.toString + " "
         }
-      }.mkString(cellSeparator)
-    }.mkString(rowSeparator)
+      }.mkString(cellSeparator)  // make each row line
+    }.mkString(rowSeparator)     // make whole-board multi-line string
   }
 
 }
