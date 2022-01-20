@@ -30,19 +30,23 @@ class Board(private val cellStates: Vector[Cell]) {
     cellStates(vectorIndex(row, column)).state
   }
 
-  // ?? "withCellMarkedBy" ("with" re immutable state
-  /** Marks specified cell, if not already marked. */
-  def markCell(player: Player,
-               row: RowIndex,
-               column: ColumnIndex): Either[String, Board] = {
-    getMarkAt(row, column) match {
-      case None =>
-        val newCellArray =
-          cellStates.updated(vectorIndex(row, column), Cell(player.some))
-        new Board(newCellArray).asRight
-      case Some(nameThis) =>
-        (s"Can't place mark at row $row, column $column;" +
-            s" is already marked (${nameThis})").asLeft    }
+  // (Maybe less private in future.)
+  private def withCellUpdated(row: RowIndex,
+                              column: ColumnIndex,
+                              cellState: Option[Player]): Board = {
+    new Board(cellStates.updated(vectorIndex(row, column), Cell(cellState)))
+  }
+
+  def withCellMarkedForPlayerxx(row: RowIndex,
+                              column: ColumnIndex,
+                              player: Player): Board = {
+    withCellUpdated(row, column, player.some)
+  }
+
+  // Not for basic TTT game; for backtracking/undo.
+  def withCellUnmarked(row: RowIndex,
+                       column: ColumnIndex): Board = {
+    withCellUpdated(row, column, None)
   }
 
   def hasNoMovesLeft: Boolean = {

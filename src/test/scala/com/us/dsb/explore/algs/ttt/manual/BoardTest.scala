@@ -1,5 +1,7 @@
 package com.us.dsb.explore.algs.ttt.manual
 
+import cats.syntax.option._
+
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers._
 
@@ -18,7 +20,7 @@ class BoardTest extends AnyFunSpec {
               case 0 => Player.O
               case 1 => Player.X
             }
-        board.markCell(variedPlayer, row, column).toOption.get
+        board.withCellMarkedForPlayerxx(row, column, variedPlayer)
       }
     }
   }
@@ -30,11 +32,11 @@ class BoardTest extends AnyFunSpec {
               case 0 => Player.O
               case 1 => Player.X
             }
-        if (row.value.value == 2 && column.value.value == 2) {
+        if (row.value.value == 2 && column.value.value == 2) { // skip one  //??? clear one from variedFilledBoard?
           board
         }
         else {
-          board.markCell(variedPlayer, row, column).toOption.get
+          board.withCellMarkedForPlayerxx(row, column, variedPlayer)
         }
       }
     }
@@ -65,7 +67,7 @@ class BoardTest extends AnyFunSpec {
     }
   }
 
-  describe("Board.markCell") {
+  describe("Board.withCellMarkedForPlayer") {
 
     describe("for unmarked cells:") {
 
@@ -75,26 +77,18 @@ class BoardTest extends AnyFunSpec {
           val board0 = Board.initial
           val someRow = rowIndices.head
           val someCol = columnIndices.head
-          val markResult = board0.markCell(Player.X, someRow, someCol)
+          val markedBoard = board0.withCellMarkedForPlayerxx(someRow, someCol, Player.X)
         }
         import LazySharedBreakpointable._
 
-        it("should accept operation") {
-          assertResult(true, s" (markResult.isRight; markResult = $markResult)") {
-             markResult.isRight
-           }
-
-        }
-        lazy val markedBoard = markResult.toOption.get
         it("should mark cell for player") {
-
-          assertResult(Some(Player.X)) {
+          assertResult(Some(Player.X), s" (markedBoard = $markedBoard)") {
             markedBoard.getMarkAt(someRow, someCol)
           }
         }
         it("(should cause change in string renderings)") {
-          assert("xxx"+markedBoard.toString != board0.toString)
-          assert("xxx"+markedBoard.renderMultiline != board0.renderMultiline)
+          assert(markedBoard.toString != board0.toString)
+          assert(markedBoard.renderMultiline != board0.renderMultiline)
         }
       }
 
@@ -103,21 +97,47 @@ class BoardTest extends AnyFunSpec {
 
     }
     describe("for already-marked cells:") {
-      it("should reject operation") {
+      it("should blindy mark again (same-player case)") {
+        val someRow = rowIndices.head
+        val someCol = columnIndices.head
+        val board0 = Board.initial
+        val board1 = board0.withCellMarkedForPlayerxx(someRow, someCol, Player.X)
+        val result = board1.withCellMarkedForPlayerxx(someRow, someCol, Player.X)
+
+        assertResult(Player.X.some) {
+          result.getMarkAt(someRow, someCol)
+        }
+      }
+      it("should blindy mark again (other-player case)") {
         val someRow = rowIndices.last
         val someCol = columnIndices.last
         val board0 = Board.initial
-        val board1 = board0.markCell(Player.X, someRow, someCol).toOption.get
-        val result = board1.markCell(Player.X, someRow, someCol)
-        assertResult(true) {
-          result.isLeft
+        val board1 = board0.withCellMarkedForPlayerxx(someRow, someCol, Player.X)
+        val result = board1.withCellMarkedForPlayerxx(someRow, someCol, Player.O)
+
+        assertResult(Player.O.some) {
+          result.getMarkAt(someRow, someCol)
         }
       }
     }
 
   }
 
-  it("Board.getMarkAt covered somewhat with markCell") {
+  describe("Board.withCellUnmarked") {
+
+      it("should unmark marked cell") {
+        val someRow = rowIndices.head
+        val someCol = columnIndices.head
+        val board0 = Board.initial
+        val markedBoard = board0.withCellMarkedForPlayerxx(someRow, someCol, Player.X)
+        val unmarkedBoard = markedBoard.withCellUnmarked(someRow, someCol)
+        assertResult(None) {
+          unmarkedBoard.getMarkAt(someRow, someCol)
+        }
+      }
+  }
+
+  it("Board.getMarkAt covered somewhat with ?????markCell") {
     cancel()
   }
 
@@ -132,8 +152,7 @@ class BoardTest extends AnyFunSpec {
       (Player.X :: Player.O :: Nil).foreach { player =>
         it(s"board with an $player") {
           board0
-              .markCell(player, rowIndices(0), ColumnIndex(Index(1)))
-              .toOption.get
+              .withCellMarkedForPlayerxx(rowIndices(0), ColumnIndex(Index(1)), player)
               .toString shouldBe s"<$player--/---/--->"
         }
       }
@@ -156,7 +175,7 @@ class BoardTest extends AnyFunSpec {
       val board0 = Board.initial
       val someRow = rowIndices.head
       val someCol = columnIndices.head
-      val oneXboard = board0.markCell(Player.X, someRow, someCol).toOption.get
+      val oneXboard = board0.withCellMarkedForPlayerxx(someRow, someCol, Player.X)
       oneXboard.hasNoMovesLeft shouldBe false
     }
     it ("should not detect 8-moves board as  full") {
@@ -185,11 +204,11 @@ class BoardTest extends AnyFunSpec {
 
     val `<XXX/---/OO->` = {
         Board.initial
-            .markCell(X, 1, 1).toOption.get
-            .markCell(O, 3, 1).toOption.get
-            .markCell(X, 1, 2).toOption.get
-            .markCell(O, 3, 2).toOption.get
-            .markCell(X, 1, 3).toOption.get
+            .withCellMarkedForPlayerxx(1, 1, X)
+            .withCellMarkedForPlayerxx(3, 1, O)
+            .withCellMarkedForPlayerxx(1, 2, X)
+            .withCellMarkedForPlayerxx(3, 2, O)
+            .withCellMarkedForPlayerxx(1, 3, X)
     }
 
     it("should detect for some three-in-a-row case, w/right player") {
