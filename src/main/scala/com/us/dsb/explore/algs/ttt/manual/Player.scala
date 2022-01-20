@@ -2,6 +2,7 @@ package com.us.dsb.explore.algs.ttt.manual
 
 import enumeratum.EnumEntry
 
+/** Player identity. */
 sealed trait Player extends EnumEntry
 object Player {
   case object O extends Player

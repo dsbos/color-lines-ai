@@ -5,9 +5,8 @@ import cats.syntax.either._
 
 
 object Board {
-  /** Empty, X, or O */
-  /*@newtype deferred*/
-  private case class Cell(state: Option[Player])  // if newType, has to be in object
+  /** Empty, player-X mark, or player-O mark. */
+  private case class Cell(state: Option[Player])
 
   private object Cell {
     val empty: Cell = Cell(None)
@@ -29,6 +28,21 @@ class Board(private val cellStates: Vector[Cell]) {
 
   def getMarkAt(row: RowIndex, column: ColumnIndex): Option[Player] = {
     cellStates(vectorIndex(row, column)).state
+  }
+
+  // ?? "withCellMarkedBy" ("with" re immutable state
+  /** Marks specified cell, if not already marked. */
+  def markCell(player: Player,
+               row: RowIndex,
+               column: ColumnIndex): Either[String, Board] = {
+    getMarkAt(row, column) match {
+      case None =>
+        val newCellArray =
+          cellStates.updated(vectorIndex(row, column), Cell(player.some))
+        new Board(newCellArray).asRight
+      case Some(nameThis) =>
+        (s"Can't place mark at row $row, column $column;" +
+            s" is already marked (${nameThis})").asLeft    }
   }
 
   def hasNoMovesLeft: Boolean = {
@@ -62,21 +76,6 @@ class Board(private val cellStates: Vector[Cell]) {
                       ColumnIndex(Index.unsafeFrom(column)))
         }
     }
-  }
-
-  // ?? "withCellMarkedBy" ("with" re immutable state
-  /** Marks specified cell, if not already marked. */
-  def markCell(player: Player,
-               row: RowIndex,
-               column: ColumnIndex): Either[String, Board] = {
-    getMarkAt(row, column) match {
-      case None =>
-        val newCellArray =
-          cellStates.updated(vectorIndex(row, column), Cell(player.some))
-        new Board(newCellArray).asRight
-      case Some(nameThis) =>
-        (s"Can't place mark at row $row, column $column;" +
-            s" is already marked (${nameThis})").asLeft    }
   }
 
   /** Makes compact single-line string like "<X-O/-X-/O-X>". */
