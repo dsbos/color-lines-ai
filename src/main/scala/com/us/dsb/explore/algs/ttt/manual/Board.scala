@@ -64,6 +64,7 @@ class Board(private val cellStates: Vector[Cell]) {
     }
   }
 
+  // ?? "withCellMarkedBy" ("with" re immutable state
   /** Marks specified cell, if not already marked. */
   def markCell(player: Player,
                row: RowIndex,
@@ -76,6 +77,18 @@ class Board(private val cellStates: Vector[Cell]) {
       case Some(nameThis) =>
         (s"Can't place mark at row $row, column $column;" +
             s" is already marked (${nameThis})").asLeft    }
+  }
+
+  /** Makes compact single-line string like "<X-O/-X-/O-X>". */
+  override def toString: String = {
+    rowIndices.map { row =>
+      columnIndices.map { column =>
+        getMarkAt(row, column) match {
+          case None         => "-"
+          case Some(player) => player.toString
+        }
+      }.mkString("")
+    }.mkString("<", "/", ">")
   }
 
   def renderMultiline: String = {

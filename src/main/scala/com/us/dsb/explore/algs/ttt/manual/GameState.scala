@@ -37,6 +37,15 @@ case class GameState(board: Board,
   def tryMoveAt(row: RowIndex,
                 column: ColumnIndex): Either[String, GameState] = {
 
+
+
+    // ?? revisit location/division of move/game logic (currently, Board
+    //   checks empty cell; board detects wins/draw; GameState uses win/draw
+    //   information;
+    //   consider allow undo--either Board.markCell would have to allow changing
+    //   already-marked cell, or we'd need a separate method for that ~meta-level
+    //   operation
+
     board.markCell(currentPlayer, row, column).map { markedBoard =>
       import Player._
       val nextPlayer = currentPlayer match {
