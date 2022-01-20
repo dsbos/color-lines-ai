@@ -10,7 +10,35 @@ import org.scalatest.matchers.should.Matchers._
 class BoardTest extends AnyFunSpec {
 
 
-
+  private lazy val variedFilledBoard = {
+    rowIndices.foldLeft(Board.initial) { (board, row) =>
+      columnIndices.foldLeft(board){ (board, column) =>
+          val variedPlayer: Player =
+            (row.value.value + column.value.value) % 2 match {
+              case 0 => Player.O
+              case 1 => Player.X
+            }
+        board.markCell(variedPlayer, row, column).toOption.get
+      }
+    }
+  }
+  private lazy val variedAllButFilledBoard = {
+    rowIndices.foldLeft(Board.initial) { (board, row) =>
+      columnIndices.foldLeft(board){ (board, column) =>
+          val variedPlayer: Player =
+            (row.value.value + column.value.value) % 2 match {
+              case 0 => Player.O
+              case 1 => Player.X
+            }
+        if (row.value.value == 2 && column.value.value == 2) {
+          board
+        }
+        else {
+          board.markCell(variedPlayer, row, column).toOption.get
+        }
+      }
+    }
+  }
 
   describe("Board$.initial") {
     //import org.scalatest.matchers.should.Matchers._
@@ -42,7 +70,6 @@ class BoardTest extends AnyFunSpec {
     describe("for unmarked cells:") {
 
       describe("for some specified cell for specified player:") {
-
         // ??? move lazy-object example to ScalaTest expl.
         object LazySharedBreakpointable {
           val board0 = Board.initial
@@ -52,26 +79,23 @@ class BoardTest extends AnyFunSpec {
         }
         import LazySharedBreakpointable._
 
-        it("should accept command") {
+        it("should accept operation") {
           assertResult(true, s" (markResult.isRight; markResult = $markResult)") {
              markResult.isRight
            }
 
         }
+        lazy val markedBoard = markResult.toOption.get
         it("should mark cell for player") {
-          val markedBoard = markResult.toOption.get
 
           assertResult(Some(Player.X)) {
             markedBoard.getMarkAt(someRow, someCol)
           }
         }
         it("(should cause change in string renderings)") {
-          val markedBoard = markResult.toOption.get
-          assert(markedBoard.toString != board0.toString)
-          assert(markedBoard.renderMultiline != board0.renderMultiline)
+          assert("xxx"+markedBoard.toString != board0.toString)
+          assert("xxx"+markedBoard.renderMultiline != board0.renderMultiline)
         }
-
-
       }
 
       // ?? theoretically/possibly, exercise more/all cells
@@ -79,7 +103,7 @@ class BoardTest extends AnyFunSpec {
 
     }
     describe("for already-marked cells:") {
-      it("should reject marking some already-marked cell:") {
+      it("should reject operation") {
         val someRow = rowIndices.last
         val someCol = columnIndices.last
         val board0 = Board.initial
@@ -93,34 +117,8 @@ class BoardTest extends AnyFunSpec {
 
   }
 
-  lazy val variedFilledBoard = {
-    rowIndices.foldLeft(Board.initial) { (board, row) =>
-      columnIndices.foldLeft(board){ (board, column) =>
-          val variedPlayer: Player =
-            (row.value.value + column.value.value) % 2 match {
-              case 0 => Player.O
-              case 1 => Player.X
-            }
-        board.markCell(variedPlayer, row, column).toOption.get
-      }
-    }
-  }
-  lazy val variedAllButFilledBoard = {
-    rowIndices.foldLeft(Board.initial) { (board, row) =>
-      columnIndices.foldLeft(board){ (board, column) =>
-          val variedPlayer: Player =
-            (row.value.value + column.value.value) % 2 match {
-              case 0 => Player.O
-              case 1 => Player.X
-            }
-        if (row.value.value == 2 && column.value.value == 2) {
-          board
-        }
-        else {
-          board.markCell(variedPlayer, row, column).toOption.get
-        }
-      }
-    }
+  it("Board.getMarkAt covered somewhat with markCell") {
+    cancel()
   }
 
   describe("Board.toString") {
@@ -145,48 +143,76 @@ class BoardTest extends AnyFunSpec {
     }
   }
 
-  describe("Board.noMovesLeft") {
-    it("should detect empty board as not full") {
-      Board.initial.noMovesLeft shouldBe false
+  // ("it" and "cancel" to note without "!!! IGNORED !!!"
+  it("Board.renderMultiline") {
+    cancel()
+  }
+
+  describe("Board.hasNoMovesLeft") {
+    it("should not detect empty board as full") {
+      Board.initial.hasNoMovesLeft shouldBe false
     }
-    it ("should detect one-move board as not full") {
+    it ("should not detect 1-move board as  full") {
       val board0 = Board.initial
       val someRow = rowIndices.head
       val someCol = columnIndices.head
       val oneXboard = board0.markCell(Player.X, someRow, someCol).toOption.get
-      oneXboard.noMovesLeft shouldBe false
+      oneXboard.hasNoMovesLeft shouldBe false
     }
-    it ("should detect 8-moves board as not full") {
-      variedAllButFilledBoard.noMovesLeft shouldBe(false)
+    it ("should not detect 8-moves board as  full") {
+      variedAllButFilledBoard.hasNoMovesLeft shouldBe(false)
     }
+    // ?? theoretically, check other cardinalities
+    // ?? theoretically, check other ~permutations
 
     it("should detect full board as full") {
-      variedFilledBoard.noMovesLeft shouldBe true
+      variedFilledBoard.hasNoMovesLeft shouldBe true
     }
   }
-
-  describe("Board.getMarkAt") {
-    ignore("TBD") {
-    }
-  }
-
-
-
 
   describe("Board.hasThreeInARow") {
-    ignore("TBD") {
+    import Player._
+    import scala.language.implicitConversions
+    implicit def intToRow(int: Int) = RowIndex(Index.unsafeFrom(int))
+    implicit def intToCol(int: Int) = ColumnIndex(Index.unsafeFrom(int))
+
+    it("should not detect for empty board") {
+      val testBoard = Board.initial
+      assertResult(false, s" (from .hasThreeInARow(X) for $testBoard)") {
+        testBoard.hasThreeInARow(X)
+      }
     }
+
+    val `<XXX/---/OO->` = {
+        Board.initial
+            .markCell(X, 1, 1).toOption.get
+            .markCell(O, 3, 1).toOption.get
+            .markCell(X, 1, 2).toOption.get
+            .markCell(O, 3, 2).toOption.get
+            .markCell(X, 1, 3).toOption.get
+    }
+
+    it("should detect for some three-in-a-row case, w/right player") {
+      assertResult(true, s" (from .hasThreeInARow(X) for ${`<XXX/---/OO->`})") {
+        `<XXX/---/OO->`.hasThreeInARow(X)
+      }
+    }
+
+    it("should not detect for wrong player") {
+      assertResult(false, s" (from .hasThreeInARow(O) for ${`<XXX/---/OO->`})") {
+        `<XXX/---/OO->`.hasThreeInARow(O)
+      }
+    }
+
+    ignore("possibly check all lines (algorithmically)") {
+
+    }
+
   }
 
-  describe("Board.renderMultiline") {
-    ignore("TBD") {
-    }
-  }
-
-
-
-  describe("Board.vectorIndex??") {
-    ignore("TBD") {
+  describe("Board.vectorIndex:") {
+    it("how and how hard/disruptive to test private method?") {
+      cancel()
     }
   }
 

@@ -31,7 +31,7 @@ class Board(private val cellStates: Vector[Cell]) {
     cellStates(vectorIndex(row, column)).state
   }
 
-  def noMovesLeft: Boolean = {
+  def hasNoMovesLeft: Boolean = {
     ! cellStates.exists(_.state.isEmpty)
   }
 

@@ -57,7 +57,7 @@ case class GameState(board: Board,
         if (markedBoard.hasThreeInARow(currentPlayer)) {
           GameState.GameResult.Win(currentPlayer).some
         }
-        else if (markedBoard.noMovesLeft) {
+        else if (markedBoard.hasNoMovesLeft) {
           GameState.GameResult.Draw.some
         }
         else {
