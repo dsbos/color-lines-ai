@@ -18,10 +18,11 @@ object GameState {
 
   def initial(startingPlayer: Player): GameState =
     GameState(Board.initial, None, startingPlayer)
-  def initial: GameState = initial(Player.X)
+  def initial: GameState = initial(Player.O)
 }
 
 /**
+ * TTT game state _and_ controller--should functions be separated or together?
  *
  * @param gameResult  `None` means no win or draw yet
  */

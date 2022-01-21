@@ -167,6 +167,11 @@ class BoardTest extends AnyFunSpec {
     cancel()
   }
 
+  // ("it" and "cancel" to note without "!!! IGNORED !!!"
+  it("Board.renderCompactMultiline") {
+    cancel()
+  }
+
   describe("Board.hasNoMovesLeft") {
     it("should not detect empty board as full") {
       Board.initial.hasNoMovesLeft shouldBe false

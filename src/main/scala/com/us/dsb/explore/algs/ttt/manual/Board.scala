@@ -113,5 +113,17 @@ class Board(private val cellStates: Vector[Cell]) {
     }.mkString(rowSeparator)     // make whole-board multi-line string
   }
 
+  def renderCompactMultiline: String = {
+    // ?? use new Order or leave using indices declarations?
+    rowIndices.map { row =>
+      columnIndices.map { column =>
+        getMarkAt(row, column) match {
+          case None         => "-"
+          case Some(player) => player.toString
+        }
+      }.mkString("|")  // make each row line
+    }.mkString("\n")
+  }
+
 }
 
