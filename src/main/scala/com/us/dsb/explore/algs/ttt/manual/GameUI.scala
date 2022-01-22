@@ -53,18 +53,19 @@ object GameUI {
   }
 
   @tailrec
-  private def getCommand(player: Player): UICommand = {
+  private def getCommand(io: UserTextIO, player: Player): UICommand = {
 
     // ?? clean embedded references to stdin/console and stdout
-    print(s"Player $player command?: ")
-    val rawCmd = scala.io.StdIn.readLine()
+    io.print(s"Player $player command?: ")
+
+    val rawCmd = io.readLine()
 
     import scala.Left
     parseCommand(rawCmd) match {
       case Right(cmd) => cmd
       case Left(msg) =>
-        println(msg)
-        getCommand(player)  // loop
+        io.println(msg)
+        getCommand(io, player)  // loop
     }
   }
 
@@ -81,15 +82,15 @@ object GameUI {
   }
 
   // ?? "place mark"?
-  private def markAtSelection(uiState: GameUIState): GameUIState = {
+  private def markAtSelection(io: UserTextIO, uiState: GameUIState): GameUIState = {
     val moveResult = uiState.gameState.tryMoveAt(uiState.selectedRow,
                                                  uiState.selectedColumn)
     moveResult match {
       case Right(newGameState) =>
         uiState.copy(gameState = newGameState)
       case Left(errorMsg) =>
-        // ?? clean I/O?  add to result and have cmd loop show? call ~injected error reporter?
-        println(errorMsg)
+        // ?? add to result and have command ~loop show?:
+        io.println(errorMsg)
         uiState  // no change
     }
   }
@@ -104,11 +105,11 @@ object GameUI {
    * game over or quit.
    */
   @tailrec
-  private def getAndDoUiCommands(uiState: GameUIState): GameUIResult = {
-    println()
-    println(uiState.toDisplayString)
+  private def getAndDoUiCommands(io: UserTextIO, uiState: GameUIState): GameUIResult = {
+    io.println()
+    io.println(uiState.toDisplayString)
 
-    val command = getCommand(uiState.gameState.currentPlayer)
+    val command = getCommand(io, uiState.gameState.currentPlayer)
 
     import UICommand._
     command match {
@@ -117,12 +118,12 @@ object GameUI {
         doQuit(uiState)
       case move: UIMoveCommand =>  // any move-selection command
         val nextState = moveSelection(uiState, move)
-        getAndDoUiCommands(nextState)
+        getAndDoUiCommands(io, nextState)  // loop
       case Mark =>
-        val nextState = markAtSelection(uiState)
+        val nextState = markAtSelection(io, uiState)
         nextState.gameState.gameResult match {
           case None =>  // game not done yet
-            getAndDoUiCommands(nextState)
+            getAndDoUiCommands(io, nextState)  // loop
           case Some(gameResult) =>
             import GameState.GameResult._  // ???
             val textResult =
@@ -135,11 +136,36 @@ object GameUI {
     }
   }
 
-  def runGame(): GameUIResult = {
+  // ?? revisit name
+  trait UserTextIO {
+    def print(lineOrPart: String): Unit
+    def println(): Unit = println("")
+    def println(fullLine: String): Unit
+    def readLine(): String
+
+    // ??? soon, try with separate methods for prompt vs. error (etc.) lines
+    //  (imagine highlighting errors, using bold for actual prompt line
+    //  after plain lines for board rendering)
+  }
+
+  object ConsoleUserTextIO extends UserTextIO {
+    def print(lineOrPart: String): Unit = Predef.print(lineOrPart)
+    def println(fullLine: String): Unit = Predef.println(fullLine)
+    def readLine(): String              = scala.io.StdIn.readLine()
+  }
+
+
+  // ???? next, probably create class GameUI to hold NameThisIO (to avoid passing all around)
+  // ???? add GameUI tests:
+  // - 1:  driving from outside to normal insides--mocking/etc. UserTextIO?
+  // - 2:  driving from outside to special GameState (test double; spy/reporter/?)
+
+
+  def runGame(io: UserTextIO): GameUIResult = {
     val initialState =
       GameUIState(GameState.initial, RowIndex(Index(1)), ColumnIndex(Index(1)))
 
-    getAndDoUiCommands(initialState)
+    getAndDoUiCommands(io, initialState)
 
   }
 
