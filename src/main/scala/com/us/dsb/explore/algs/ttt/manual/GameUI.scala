@@ -2,22 +2,26 @@ package com.us.dsb.explore.algs.ttt.manual
 
 import cats.syntax.option._
 import cats.syntax.either._
-import enumeratum.EnumEntry
+import enumeratum.{Enum, EnumEntry}
 
 import scala.annotation.tailrec
 
+// ?? any substantial benefit to moving internal methods to class? we could
+//  avoid some state passing, but only by mutating top-level state member
 
-//???? object -> class?
 /** TTT UI controller. */
 object GameUI {
 
   // ??? enhance; maybe just put clean strings in; maybe build on GameResult (plus quit case)
   case class GameUIResult(text: String)
 
+  // ("extends EnumEntry" gets .entryName, enables Enum; "extends Enum[...]"
+  // enables (and requires) .values.
 
-  sealed trait UICommand extends EnumEntry
-  object UICommand {
-    // ?? why doesn't UICommand's "sealed" obviate the following one (for exhaustive-match checks?)
+  private sealed trait UICommand
+  private object UICommand {
+    // (Q: Why doesn't UICommand's "sealed" obviate the following one (for
+    //   exhaustive-match checks)?
     sealed trait UIMoveCommand extends UICommand
     case object Up    extends UIMoveCommand
     case object Down  extends UIMoveCommand
@@ -26,8 +30,15 @@ object GameUI {
     case object Mark  extends UICommand
     case object Quit  extends UICommand
   }
+  // ?? Decide "UICommand._" re little scala.Right ~clashes.
 
-  def parseCommand(rawCmd: String): Either[String, UICommand] = {
+  // (Could put strings in enumerators and use Enum.withName to factor down
+  // parse function, but then layers wouldn't be separated.)
+
+  // ?? revisit String (but may be fine since dealing with input _strings_
+  //   from _user_
+  // ?? revisit Either--use something fancier (MonadError)?
+  private def parseCommand(rawCmd: String): Either[String, UICommand] = {
     import UICommand._
     rawCmd match {
       case "u" => Up.asRight
@@ -42,11 +53,13 @@ object GameUI {
   }
 
   @tailrec
-  def getCommand(player: Player): UICommand = {
-    // ?? clean embedded reference to stdin/console and stdout
+  private def getCommand(player: Player): UICommand = {
+
+    // ?? clean embedded references to stdin/console and stdout
     print(s"Player $player command?: ")
     val rawCmd = scala.io.StdIn.readLine()
 
+    import scala.Left
     parseCommand(rawCmd) match {
       case Right(cmd) => cmd
       case Left(msg) =>
@@ -55,9 +68,9 @@ object GameUI {
     }
   }
 
-  //import UICommand.UIMoveCommand
-  def moveSelection(uiState: GameUIState,
-                    moveCommand: UICommand.UIMoveCommand): GameUIState = {
+  private def moveSelection(uiState: GameUIState,
+                            moveCommand: UICommand.UIMoveCommand
+                           ): GameUIState = {
     import UICommand._
     moveCommand match {
       case Up    => uiState.withRowAdustedBy(-1)
@@ -68,26 +81,22 @@ object GameUI {
   }
 
   // ?? "place mark"?
-  def markAtSelection(uiState: GameUIState): GameUIState = {
+  private def markAtSelection(uiState: GameUIState): GameUIState = {
     val moveResult = uiState.gameState.tryMoveAt(uiState.selectedRow,
                                                  uiState.selectedColumn)
     moveResult match {
       case Right(newGameState) =>
         uiState.copy(gameState = newGameState)
       case Left(errorMsg) =>
-        // ?? clean I/O?  add to result and hjave cmd loop show? call ~injected error reporter?
+        // ?? clean I/O?  add to result and have cmd loop show? call ~injected error reporter?
         println(errorMsg)
         uiState  // no change
     }
   }
 
-  def doQuit(uiState: GameUIState): GameUIResult = {
+  private def doQuit(uiState: GameUIState): GameUIResult = {
     GameUIResult("Game was quit")
   }
-
-
-
-
 
   // ?? clean looping more (was while mess, now recursive; is there better Scala way?)
   /**
@@ -95,7 +104,7 @@ object GameUI {
    * game over or quit.
    */
   @tailrec
-  def getAndDoUiCommands(uiState: GameUIState): GameUIResult = {
+  private def getAndDoUiCommands(uiState: GameUIState): GameUIResult = {
     println()
     println(uiState.toDisplayString)
 
@@ -107,34 +116,30 @@ object GameUI {
       case Quit =>
         doQuit(uiState)
       case move: UIMoveCommand =>  // any move-selection command
-        getAndDoUiCommands(moveSelection(uiState, move))
+        val nextState = moveSelection(uiState, move)
+        getAndDoUiCommands(nextState)
       case Mark =>
-        val newUiState = markAtSelection(uiState)
-        newUiState.gameState.gameResult match {
+        val nextState = markAtSelection(uiState)
+        nextState.gameState.gameResult match {
           case None =>  // game not done yet
-            getAndDoUiCommands(newUiState)
+            getAndDoUiCommands(nextState)
           case Some(gameResult) =>
-
-            import GameState.GameResult._
+            import GameState.GameResult._  // ???
             val textResult =
               gameResult match {
                 case Draw        => "Game ended in draw"
                 case Win(player) => s"Player $player won"
               }
-            GameUIResult(textResult)   // ?? refine from text
+            GameUIResult(textResult)   // ?? refine from text?
         }
     }
   }
 
   def runGame(): GameUIResult = {
-    // ???? construct GameUIState
-    // ???? _maybe_ move GamUIeState into GameUI and not pass around methods
     val initialState =
-      // ?? maybe clean getting indices; maybe get from index ranges, not
-      //   constructing here (though here exercises refined type_)
       GameUIState(GameState.initial, RowIndex(Index(1)), ColumnIndex(Index(1)))
 
-    GameUI.getAndDoUiCommands(initialState)
+    getAndDoUiCommands(initialState)
 
   }
 
