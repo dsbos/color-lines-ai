@@ -1,7 +1,7 @@
 package com.us.dsb.explore.algs.ttt.manual
 
 import cats.syntax.option._
-
+import org.scalatest.{PrivateMethodTester, color}
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers._
 
@@ -229,16 +229,32 @@ class BoardTest extends AnyFunSpec {
     }
 
     ignore("possibly check all lines (algorithmically)") {
-
     }
 
   }
 
-  describe("Board.vectorIndex:") {
-    it("how and how hard/disruptive to test private method?") {
-      cancel()
+  describe("Board.vectorIndex (private method we want to test directly):") {
+    import PrivateMethodTester._
+    val vectorIndex = PrivateMethod[Int](Symbol("vectorIndex"))
+
+    it("should compute 0 for first row, first column") {
+      val index = Board.initial invokePrivate vectorIndex(Index(1), columnIndices.head)
+      index shouldEqual 0
+    }
+
+    it("should compute array length - 1 for last row, last column") {
+      val index = Board.initial invokePrivate vectorIndex(rowIndices.last, Index(3))
+      index shouldEqual Order * Order - 1
+    }
+
+    describe("should compute indices in row-major order (chosen but ~isolated)") {
+      it("1, 2 => 1") {
+        Board.initial invokePrivate vectorIndex(Index(1), Index(2)) shouldEqual 1
+      }
+      it("2, 1 => 3 (Order/row length/# columns)") {
+        Board.initial invokePrivate vectorIndex(Index(2), Index(1)) shouldEqual Order
+      }
     }
   }
-
 
 }
