@@ -126,4 +126,16 @@ object GameUI {
     }
   }
 
+  def runGame(): GameUIResult = {
+    // ???? construct GameUIState
+    // ???? _maybe_ move GamUIeState into GameUI and not pass around methods
+    val initialState =
+      // ?? maybe clean getting indices; maybe get from index ranges, not
+      //   constructing here (though here exercises refined type_)
+      GameUIState(GameState.initial, RowIndex(Index(1)), ColumnIndex(Index(1)))
+
+    GameUI.getAndDoUiCommands(initialState)
+
+  }
+
 }
