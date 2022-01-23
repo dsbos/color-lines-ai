@@ -139,8 +139,7 @@ object GameUI {
     def printError(fullLine: String): Unit
   }
 
-  // ???? add colored version w/import scala.io.AnsiColor._
-  object PlainConsoleTextIO extends SegregatedTextIO {
+  class BaseConsoleTextIO extends SegregatedTextIO {
     import scala.io.StdIn.readLine
 
     override def printError(fullLine: String): Unit = println(fullLine)
@@ -148,12 +147,23 @@ object GameUI {
     override def printStateText(lineOrLines: String): Unit = println(lineOrLines)
   }
 
+  object PlainConsoleTextIO extends BaseConsoleTextIO
+
+  object ColoredConsoleTextIO extends BaseConsoleTextIO {
+    import scala.io.AnsiColor._
+
+    override def printError(fullLine: String): Unit =
+      super.printError(RED + fullLine + RESET)
+    override def readPromptedLine(prompt: String): String =
+      super.readPromptedLine(BLUE + prompt + RESET)
+    //override def printStateText(lineOrLines: String): Unit = xx(lineOrLines)
+  }
+
 
   // ???? next, probably create class GameUI to hold NameThisIO (to avoid passing all around)
   // ???? add GameUI tests:
   // - 1:  driving from outside to normal insides--do more: checking SegregatedTextIO output
   // - 2:  driving from outside to special GameState (test double; spy/reporter/?)
-
 
   def runGame(io: SegregatedTextIO): GameUIResult = {
     val initialState =
