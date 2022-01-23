@@ -16,6 +16,37 @@ object GameUI {
   // ??? enhance; maybe just put clean strings in; maybe build on GameResult (plus quit case)
   case class GameUIResult(text: String)
 
+  // ?? revisit name
+  trait SegregatedTextIO {
+    def printStateText(lineOrLines: String): Unit
+    def readPromptedLine(prompt: String): String
+    def printError(fullLine: String): Unit
+    // ?? first, second, or both?:
+    def printResult(lineOrLines: String): Unit
+    def printResult(result: GameUIResult): Unit = printResult(result.text)
+  }
+
+  class BaseConsoleTextIO extends SegregatedTextIO {
+    import scala.io.StdIn.readLine
+
+    override def printStateText(lineOrLines: String): Unit = println(lineOrLines)
+    override def readPromptedLine(prompt: String): String  = readLine(prompt)
+    override def printError(fullLine: String): Unit = println(fullLine)
+    override def printResult(lineOrLines: String): Unit = println(lineOrLines)
+  }
+
+  object PlainConsoleTextIO extends BaseConsoleTextIO
+
+  object ColoredConsoleTextIO extends BaseConsoleTextIO {
+    import scala.io.AnsiColor._
+    override def readPromptedLine(prompt: String): String =
+      super.readPromptedLine(BLUE + prompt + RESET)
+    override def printError(fullLine: String): Unit =
+      super.printError(RED + fullLine + RESET)
+    override def printResult(lineOrLines: String): Unit =
+      super.printResult(BOLD + lineOrLines + RESET)
+  }
+
   // ("extends EnumEntry" gets .entryName, enables Enum; "extends Enum[...]"
   // enables (and requires) .values.
 
@@ -138,40 +169,10 @@ object GameUI {
     }
   }
 
-  // ?? revisit name
-  trait SegregatedTextIO {
-    def printStateText(lineOrLines: String): Unit
-    def readPromptedLine(prompt: String): String
-    def printError(fullLine: String): Unit
-    // ?? first, second, or both?:
-    def printResult(lineOrLines: String): Unit
-    def printResult(result: GameUIResult): Unit = printResult(result.text)
-  }
+  // ???? soon, probably create class GameUI to hold NameThisIO (to avoid passing
+  //   all around); but think about currently pure methods vs. using IO member)
 
-  class BaseConsoleTextIO extends SegregatedTextIO {
-    import scala.io.StdIn.readLine
-
-    override def printStateText(lineOrLines: String): Unit = println(lineOrLines)
-    override def readPromptedLine(prompt: String): String  = readLine(prompt)
-    override def printError(fullLine: String): Unit = println(fullLine)
-    override def printResult(lineOrLines: String): Unit = println(lineOrLines)
-  }
-
-  object PlainConsoleTextIO extends BaseConsoleTextIO
-
-  object ColoredConsoleTextIO extends BaseConsoleTextIO {
-    import scala.io.AnsiColor._
-    override def readPromptedLine(prompt: String): String =
-      super.readPromptedLine(BLUE + prompt + RESET)
-    override def printError(fullLine: String): Unit =
-      super.printError(RED + fullLine + RESET)
-    override def printResult(lineOrLines: String): Unit =
-      super.printResult(BOLD + lineOrLines + RESET)
-  }
-
-
-  // ???? next, probably create class GameUI to hold NameThisIO (to avoid passing all around)
-  // ???? add GameUI tests:
+  // ??? add more GameUI tests:
   // - 1:  driving from outside to normal insides--do more: checking SegregatedTextIO output
   // - 2:  driving from outside to special GameState (test double; spy/reporter/?)
 
