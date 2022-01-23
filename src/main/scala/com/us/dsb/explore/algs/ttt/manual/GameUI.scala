@@ -53,18 +53,14 @@ object GameUI {
   }
 
   @tailrec
-  private def getCommand(io: UserTextIO, player: Player): UICommand = {
-
-    // ?? clean embedded references to stdin/console and stdout
-    io.print(s"Player $player command?: ")
-
-    val rawCmd = io.readLine()
+  private def getCommand(io: SegregatedTextIO, player: Player): UICommand = {
+    val rawCmd = io.readPromptedLine(s"Player $player command?: ")
 
     import scala.Left
     parseCommand(rawCmd) match {
       case Right(cmd) => cmd
       case Left(msg) =>
-        io.println(msg)
+        io.printError(msg)
         getCommand(io, player)  // loop
     }
   }
@@ -82,7 +78,7 @@ object GameUI {
   }
 
   // ?? "place mark"?
-  private def markAtSelection(io: UserTextIO, uiState: GameUIState): GameUIState = {
+  private def markAtSelection(io: SegregatedTextIO, uiState: GameUIState): GameUIState = {
     val moveResult = uiState.gameState.tryMoveAt(uiState.selectedRow,
                                                  uiState.selectedColumn)
     moveResult match {
@@ -90,7 +86,7 @@ object GameUI {
         uiState.copy(gameState = newGameState)
       case Left(errorMsg) =>
         // ?? add to result and have command ~loop show?:
-        io.println(errorMsg)
+        io.printError(errorMsg)
         uiState  // no change
     }
   }
@@ -105,9 +101,9 @@ object GameUI {
    * game over or quit.
    */
   @tailrec
-  private def getAndDoUiCommands(io: UserTextIO, uiState: GameUIState): GameUIResult = {
-    io.println()
-    io.println(uiState.toDisplayString)
+  private def getAndDoUiCommands(io: SegregatedTextIO, uiState: GameUIState): GameUIResult = {
+    io.printStateText("")
+    io.printStateText(uiState.toDisplayString)
 
     val command = getCommand(io, uiState.gameState.currentPlayer)
 
@@ -137,31 +133,29 @@ object GameUI {
   }
 
   // ?? revisit name
-  trait UserTextIO {
-    def print(lineOrPart: String): Unit
-    def println(): Unit = println("")
-    def println(fullLine: String): Unit
-    def readLine(): String
-
-    // ??? soon, try with separate methods for prompt vs. error (etc.) lines
-    //  (imagine highlighting errors, using bold for actual prompt line
-    //  after plain lines for board rendering)
+  trait SegregatedTextIO {
+    def printStateText(lineOrLines: String): Unit
+    def readPromptedLine(prompt: String): String
+    def printError(fullLine: String): Unit
   }
 
-  object ConsoleUserTextIO extends UserTextIO {
-    def print(lineOrPart: String): Unit = Predef.print(lineOrPart)
-    def println(fullLine: String): Unit = Predef.println(fullLine)
-    def readLine(): String              = scala.io.StdIn.readLine()
+  // ???? add colored version w/import scala.io.AnsiColor._
+  object PlainConsoleTextIO extends SegregatedTextIO {
+    import scala.io.StdIn.readLine
+
+    override def printError(fullLine: String): Unit = println(fullLine)
+    override def readPromptedLine(prompt: String): String  = readLine(prompt)
+    override def printStateText(lineOrLines: String): Unit = println(lineOrLines)
   }
 
 
   // ???? next, probably create class GameUI to hold NameThisIO (to avoid passing all around)
   // ???? add GameUI tests:
-  // - 1:  driving from outside to normal insides--mocking/etc. UserTextIO?
+  // - 1:  driving from outside to normal insides--do more: checking SegregatedTextIO output
   // - 2:  driving from outside to special GameState (test double; spy/reporter/?)
 
 
-  def runGame(io: UserTextIO): GameUIResult = {
+  def runGame(io: SegregatedTextIO): GameUIResult = {
     val initialState =
       GameUIState(GameState.initial, RowIndex(Index(1)), ColumnIndex(Index(1)))
 

@@ -1,34 +1,34 @@
 package com.us.dsb.explore.algs.ttt.manual
 
-import com.us.dsb.explore.algs.ttt.manual.GameUI.{GameUIResult, UserTextIO}
+import com.us.dsb.explore.algs.ttt.manual.GameUI.{GameUIResult, SegregatedTextIO}
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers._
 
 
 class GameUITest extends AnyFunSpec {
 
-  class CrudeManualStubIO(inputs: String*) extends UserTextIO {
+  class CrudeManualStubIO(inputs: String*) extends SegregatedTextIO {
 
     private var remainingInputs = inputs.toList
 
-    override def readLine(): String = {
+    override def readPromptedLine(prompt: String): String = {
+      Predef.println(s"readLine(prompt): not checking prompt '''${prompt}'''")
       remainingInputs match {
         case head :: tail =>
           remainingInputs = tail
           val thisInput = head
-          Predef.println(s"readLine(): returning; '''${thisInput}'''")
+          Predef.println(s"readLine(prompt): returning '''${thisInput}'''")
           thisInput
         case Nil =>
           ???
       }
     }
 
-    override def print(lineOrPart: String): Unit = {
-      Predef.println(s"print(String):   not checking; '''${lineOrPart}'''")
+    override def printError(fullLine: String): Unit = {
+      Predef.println(s"printError(String):   not checking: '''${fullLine}'''")
     }
-
-    override def println(fullLine: String): Unit = {
-      Predef.println(s"println(String): not checking; '''${fullLine}'''")
+    override def printStateText(lineOrLines: String): Unit = {
+      Predef.println(s"printStateText(String):   not checking: '''${lineOrLines}'''")
     }
 
   }
