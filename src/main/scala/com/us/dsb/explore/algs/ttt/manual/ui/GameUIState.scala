@@ -3,9 +3,9 @@ package com.us.dsb.explore.algs.ttt.manual.ui
 import com.us.dsb.explore.algs.ttt.manual.game._
 
 // ?? somewhere expand to allow for history (maybe via Semigroup or whatever has .compose?)
-case class GameUIState(gameState: GameState,
-                       selectedRow: RowIndex,
-                       selectedColumn: ColumnIndex) {
+private case class GameUIState(gameState: GameState,
+                               selectedRow: RowIndex,
+                               selectedColumn: ColumnIndex) {
 
   // ?? clean up that floorMod; I just want plain mathematical mod:
   private def adjustAndwrapToRange(unincremented: Index, delta: Int): Index = {
@@ -24,10 +24,10 @@ case class GameUIState(gameState: GameState,
   //   our cursor-based row/column specification; what would GUI use, just
   //   9 table-level IDs tied to GUI cells/buttons?);
 
-  def withRowAdustedBy(delta: Int): GameUIState =
+  private[ui] def withRowAdustedBy(delta: Int): GameUIState =
     copy(selectedRow = RowIndex(adjustAndwrapToRange(selectedRow.value, delta)))
 
-  def withColumnAdustedBy(delta: Int): GameUIState =
+  private[ui] def withColumnAdustedBy(delta: Int): GameUIState =
     copy(selectedColumn = ColumnIndex(adjustAndwrapToRange(selectedColumn.value, delta)))
 
   private def renderTableMultilineWithSelection: String = {
@@ -57,7 +57,7 @@ case class GameUIState(gameState: GameState,
 
   }
 
-  def toDisplayString: String = {
+  private[ui] def toDisplayString: String = {
     renderTableMultilineWithSelection + "\n" +
     s"Turn: Player ${gameState.currentPlayer}; marking cursor: <row $selectedRow / column $selectedColumn>"
   }

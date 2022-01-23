@@ -19,32 +19,32 @@ object GameUI {
 
   // ?? revisit name
   trait SegregatedTextIO {
-    def printStateText(lineOrLines: String): Unit
-    def readPromptedLine(prompt: String): String
-    def printError(fullLine: String): Unit
+    private[ui] def printStateText(lineOrLines: String): Unit
+    private[ui] def readPromptedLine(prompt: String): String
+    private[ui] def printError(fullLine: String): Unit
     // ?? first, second, or both?:
-    def printResult(lineOrLines: String): Unit
-    def printResult(result: GameUIResult): Unit = printResult(result.text)
+    private[ui] def printResult(lineOrLines: String): Unit
+    private[ui] def printResult(result: GameUIResult): Unit = printResult(result.text)
   }
 
   class BaseConsoleTextIO extends SegregatedTextIO {
     import scala.io.StdIn.readLine
 
-    override def printStateText(lineOrLines: String): Unit = println(lineOrLines)
-    override def readPromptedLine(prompt: String): String  = readLine(prompt)
-    override def printError(fullLine: String): Unit = println(fullLine)
-    override def printResult(lineOrLines: String): Unit = println(lineOrLines)
+    private[ui] override def printStateText(lineOrLines: String): Unit = println(lineOrLines)
+    private[ui] override def readPromptedLine(prompt: String): String  = readLine(prompt)
+    private[ui] override def printError(fullLine: String): Unit = println(fullLine)
+    private[ui] override def printResult(lineOrLines: String): Unit = println(lineOrLines)
   }
 
   object PlainConsoleTextIO extends BaseConsoleTextIO
 
   object ColoredConsoleTextIO extends BaseConsoleTextIO {
     import scala.io.AnsiColor._
-    override def readPromptedLine(prompt: String): String =
+    private[ui] override def readPromptedLine(prompt: String): String =
       super.readPromptedLine(BLUE + prompt + RESET)
-    override def printError(fullLine: String): Unit =
+    private[ui] override def printError(fullLine: String): Unit =
       super.printError(RED + fullLine + RESET)
-    override def printResult(lineOrLines: String): Unit =
+    private[ui] override def printResult(lineOrLines: String): Unit =
       super.printResult(BOLD + lineOrLines + RESET)
   }
 
