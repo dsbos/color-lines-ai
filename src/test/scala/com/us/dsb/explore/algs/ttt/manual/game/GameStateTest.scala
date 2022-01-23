@@ -8,8 +8,8 @@ class GameStateTest extends AnyFunSpec {
   describe("GameState$?. tryMoveAt") {
     import Player._
     import scala.language.implicitConversions
-    implicit def intToRow(int: Int): RowIndex = RowIndex(Index.unsafeFrom(int))
-    implicit def intToCol(int: Int) = ColumnIndex(Index.unsafeFrom(int))
+    implicit def intToRow(int: Int): RowIndex    = RowIndex(Index.unsafeFrom(int))
+    implicit def intToCol(int: Int): ColumnIndex = ColumnIndex(Index.unsafeFrom(int))
 
 
     ignore("marks cells") {
@@ -18,8 +18,23 @@ class GameStateTest extends AnyFunSpec {
     ignore("accepts marking an unmarked cell") {
 
     }
-    ignore("rejects marking an already marked cell") {
+    describe("rejects marking an already marked cell:") {
+      it("other player") {
+        val reMarkResult =
+          GameState.initial(Player.X)
+              .tryMoveAt(1, 1).toOption.get
+              .tryMoveAt(1, 1)
+        assert(reMarkResult.isLeft, s" (reMarkResult = $reMarkResult)")
+      }
+      it("same player") {
 
+        val reMarkResult =
+          GameState.initial(Player.X)
+              .tryMoveAt(1, 1).toOption.get
+              .tryMoveAt(3, 1).toOption.get
+              .tryMoveAt(1, 1)
+        assert(reMarkResult.isLeft, s" (reMarkResult = $reMarkResult)")
+      }
     }
     describe("detects wins:") {
       it("one case") {

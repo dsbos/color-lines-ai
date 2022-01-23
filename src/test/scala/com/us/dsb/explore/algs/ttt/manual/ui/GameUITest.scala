@@ -1,6 +1,5 @@
 package com.us.dsb.explore.algs.ttt.manual.ui
 
-import com.us.dsb.explore.algs.ttt.manual.ui.GameUI.{GameUIResult, SegregatedTextIO}
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers._
 
@@ -99,5 +98,7 @@ class GameUITest extends AnyFunSpec {
         actual should be ("Game ended in draw")
       }
     }
+  }
+  ignore("no coverage: markAtSelection's error case") {
   }
 }
