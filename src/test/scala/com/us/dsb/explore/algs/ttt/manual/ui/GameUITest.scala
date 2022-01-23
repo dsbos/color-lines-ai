@@ -1,6 +1,6 @@
-package com.us.dsb.explore.algs.ttt.manual
+package com.us.dsb.explore.algs.ttt.manual.ui
 
-import com.us.dsb.explore.algs.ttt.manual.GameUI.{GameUIResult, SegregatedTextIO}
+import com.us.dsb.explore.algs.ttt.manual.ui.GameUI.{GameUIResult, SegregatedTextIO}
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers._
 

@@ -27,7 +27,7 @@ object Quasiquotes extends App {
 
       val x13: Any = {
         println("- execution val x13 = x12.apply:")
-        x12.apply
+        x12.apply()
       }
       println("- returned value x13:\n" + x13)
 

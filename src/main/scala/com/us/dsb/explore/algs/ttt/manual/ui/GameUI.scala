@@ -1,4 +1,4 @@
-package com.us.dsb.explore.algs.ttt.manual
+package com.us.dsb.explore.algs.ttt.manual.ui
 
 import cats.syntax.option._
 import cats.syntax.either._
