@@ -80,10 +80,8 @@ class GameStateTest extends AnyFunSpec {
       val state0 = GameState.initial
       val result1 = state0.tryMoveAt(rowIndices.head, columnIndices.head)
       val state1 = result1.toOption.get
-
     }
 
   }
-
 
 }

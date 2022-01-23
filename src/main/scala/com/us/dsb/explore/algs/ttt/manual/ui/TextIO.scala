@@ -2,7 +2,7 @@ package com.us.dsb.explore.algs.ttt.manual.ui
 
 import com.us.dsb.explore.algs.ttt.manual.ui.GameUI.GameUIResult
 
-// ?? revisit namea
+// ?? revisit names
 
 private[ui] trait SegregatedTextIO {
   private[ui] def printStateText(lineOrLines: String): Unit

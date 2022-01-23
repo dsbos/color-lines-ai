@@ -1,0 +1,7 @@
+Selected to-do items:
+- add representative mocking-base _non_--end-to-end testing of GameUI (probably
+  first adjust to inject GameState, then inject test double for GameState)
+- maybe split getAndDoUiCommands's looping from command evaluation (re easier
+  testing)
+- research and try FP-style restructuring of GameUI, especially re reducing
+  mocking

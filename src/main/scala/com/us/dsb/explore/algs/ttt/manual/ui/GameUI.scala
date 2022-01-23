@@ -88,7 +88,6 @@ object GameUI {
       case Right(newGameState) =>
         uiState.copy(gameState = newGameState)
       case Left(errorMsg) =>
-        // ?? add to result and have command ~loop show?:
         io.printError(errorMsg)
         uiState  // no change
     }
@@ -101,6 +100,9 @@ object GameUI {
   }
 
   // ?? clean looping more (was while mess, now recursive; is there better Scala way?)
+  // ??? what about ~separatability and testability?  command execution should
+  //   probably be separated from looping recursion (e.g., commands return
+  //   something indicating whether to continue looping)
   /**
    * Logically, loops on prompting for and executing user UI ~commands until
    * game over or quit.
@@ -132,8 +134,8 @@ object GameUI {
                 case Draw        => "Game ended in draw"
                 case Win(player) => s"Player $player won"
               }
-            // ?? refine from text?
             GameUIResult(textResult).tap {
+              //noinspection ConvertibleToMethodValue
               io.printResult(_)
             }
         }
