@@ -55,7 +55,7 @@ class GameStateTest extends AnyFunSpec {
               .tryMoveAt(1, 3).toOption.get
               .tryMoveAt(2, 3).toOption.get
               .tryMoveAt(3, 3).toOption.get
-              .tryMoveAt(3, 2).toOption.get
+              .tryMoveAt(3, 2).toOption.get  // XXO/OOX/XXO
         assertResult(GameState.GameResult.Draw.some, s" (drawState = $drawState)") {
           drawState.gameResult
         }

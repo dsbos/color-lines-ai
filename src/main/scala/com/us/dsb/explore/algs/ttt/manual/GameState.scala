@@ -18,7 +18,7 @@ object GameState {
 
   def initial(startingPlayer: Player): GameState =
     GameState(Board.initial, None, startingPlayer)
-  def initial: GameState = initial(Player.O)
+  def initial: GameState = initial(Player.X)
 }
 
 /**
