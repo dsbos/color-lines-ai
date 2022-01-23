@@ -24,11 +24,14 @@ class GameUITest extends AnyFunSpec {
       }
     }
 
+    override def printStateText(lineOrLines: String): Unit = {
+      Predef.println(s"printStateText(String):   not checking: '''${lineOrLines}'''")
+    }
     override def printError(fullLine: String): Unit = {
       Predef.println(s"printError(String):   not checking: '''${fullLine}'''")
     }
-    override def printStateText(lineOrLines: String): Unit = {
-      Predef.println(s"printStateText(String):   not checking: '''${lineOrLines}'''")
+    override def printResult(lineOrLines: String): Unit = {
+      Predef.println(s"printResult(String):   not checking: '''${lineOrLines}'''")
     }
 
   }

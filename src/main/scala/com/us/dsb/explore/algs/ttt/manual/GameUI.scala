@@ -5,6 +5,7 @@ import cats.syntax.either._
 import enumeratum.{Enum, EnumEntry}
 
 import scala.annotation.tailrec
+import scala.util.chaining.scalaUtilChainingOps
 
 // ?? any substantial benefit to moving internal methods to class? we could
 //  avoid some state passing, but only by mutating top-level state member
@@ -91,8 +92,10 @@ object GameUI {
     }
   }
 
-  private def doQuit(uiState: GameUIState): GameUIResult = {
-    GameUIResult("Game was quit")
+  private def doQuit(io: SegregatedTextIO, uiState: GameUIState): GameUIResult = {
+    GameUIResult("Game was quit").tap {
+      io.printResult(_)
+    }
   }
 
   // ?? clean looping more (was while mess, now recursive; is there better Scala way?)
@@ -111,7 +114,7 @@ object GameUI {
     command match {
       // ?? can we factor down the multiple getAndDoUiCommands calls (usefully, in this small case)?
       case Quit =>
-        doQuit(uiState)
+        doQuit(io, uiState)
       case move: UIMoveCommand =>  // any move-selection command
         val nextState = moveSelection(uiState, move)
         getAndDoUiCommands(io, nextState)  // loop
@@ -127,7 +130,10 @@ object GameUI {
                 case Draw        => "Game ended in draw"
                 case Win(player) => s"Player $player won"
               }
-            GameUIResult(textResult)   // ?? refine from text?
+            // ?? refine from text?
+            GameUIResult(textResult).tap {
+              io.printResult(_)
+            }
         }
     }
   }
@@ -137,26 +143,30 @@ object GameUI {
     def printStateText(lineOrLines: String): Unit
     def readPromptedLine(prompt: String): String
     def printError(fullLine: String): Unit
+    // ?? first, second, or both?:
+    def printResult(lineOrLines: String): Unit
+    def printResult(result: GameUIResult): Unit = printResult(result.text)
   }
 
   class BaseConsoleTextIO extends SegregatedTextIO {
     import scala.io.StdIn.readLine
 
-    override def printError(fullLine: String): Unit = println(fullLine)
-    override def readPromptedLine(prompt: String): String  = readLine(prompt)
     override def printStateText(lineOrLines: String): Unit = println(lineOrLines)
+    override def readPromptedLine(prompt: String): String  = readLine(prompt)
+    override def printError(fullLine: String): Unit = println(fullLine)
+    override def printResult(lineOrLines: String): Unit = println(lineOrLines)
   }
 
   object PlainConsoleTextIO extends BaseConsoleTextIO
 
   object ColoredConsoleTextIO extends BaseConsoleTextIO {
     import scala.io.AnsiColor._
-
-    override def printError(fullLine: String): Unit =
-      super.printError(RED + fullLine + RESET)
     override def readPromptedLine(prompt: String): String =
       super.readPromptedLine(BLUE + prompt + RESET)
-    //override def printStateText(lineOrLines: String): Unit = xx(lineOrLines)
+    override def printError(fullLine: String): Unit =
+      super.printError(RED + fullLine + RESET)
+    override def printResult(lineOrLines: String): Unit =
+      super.printResult(BOLD + lineOrLines + RESET)
   }
 
 
