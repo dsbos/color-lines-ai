@@ -1,5 +1,7 @@
 package com.us.dsb.explore.algs.ttt.manual
 
+import com.us.dsb.explore.algs.ttt.manual.game._
+
 // ?? somewhere expand to allow for history (maybe via Semigroup or whatever has .compose?)
 case class GameUIState(gameState: GameState,
                        selectedRow: RowIndex,

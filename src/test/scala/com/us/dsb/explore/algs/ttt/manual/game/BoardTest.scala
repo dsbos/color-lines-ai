@@ -1,7 +1,7 @@
-package com.us.dsb.explore.algs.ttt.manual
+package com.us.dsb.explore.algs.ttt.manual.game
 
 import cats.syntax.option._
-import org.scalatest.{PrivateMethodTester, color}
+import org.scalatest.PrivateMethodTester
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers._
 

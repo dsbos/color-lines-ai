@@ -1,8 +1,7 @@
-package com.us.dsb.explore.algs.ttt.manual
+package com.us.dsb.explore.algs.ttt.manual.game
 
 import cats.syntax.option._
 import cats.syntax.either._
-import enumeratum.EnumEntry
 
 
 object GameState {
@@ -64,5 +63,3 @@ case class GameState(board: Board,
   }
 
 }
-
-

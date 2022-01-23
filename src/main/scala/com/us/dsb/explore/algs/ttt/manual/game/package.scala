@@ -1,13 +1,11 @@
-package com.us.dsb.explore.algs.ttt
+package com.us.dsb.explore.algs.ttt.manual
 
 import eu.timepit.refined.api.{Refined, RefinedTypeOps}
 import eu.timepit.refined.numeric.Interval.Closed
 import eu.timepit.refined.predicates.all.Positive
 import io.estatico.newtype.macros.newtype
 
-package object manual {
-
-  // ?? should these be in Board?  should these be with Board in subpackage "board"?
+package object game {
 
   // ?? can one of these be derived from the other?
   val Order = 3

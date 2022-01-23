@@ -2,6 +2,7 @@ package com.us.dsb.explore.algs.ttt.manual
 
 import org.scalatest.funspec.AnyFunSpec
 import cats.syntax.option._
+import com.us.dsb.explore.algs.ttt.manual.game._
 
 import scala.util.chaining.scalaUtilChainingOps
 

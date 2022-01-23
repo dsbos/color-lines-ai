@@ -2,6 +2,7 @@ package com.us.dsb.explore.algs.ttt.manual
 
 import cats.syntax.option._
 import cats.syntax.either._
+import com.us.dsb.explore.algs.ttt.manual.game.{ColumnIndex, GameState, Index, Player, RowIndex}
 import enumeratum.{Enum, EnumEntry}
 
 import scala.annotation.tailrec

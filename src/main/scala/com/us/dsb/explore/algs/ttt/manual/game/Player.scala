@@ -1,4 +1,4 @@
-package com.us.dsb.explore.algs.ttt.manual
+package com.us.dsb.explore.algs.ttt.manual.game
 
 import enumeratum.EnumEntry
 
