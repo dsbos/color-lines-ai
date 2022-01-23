@@ -7,12 +7,12 @@ import cats.syntax.either._
 object GameState {
 
   /**
-   * Result of completed game.)
+   * Result of completed game.
    */
   sealed trait GameResult
   object GameResult {
     case object Draw extends GameResult
-    case class Win(player: Player) extends GameResult
+    case class  Win(player: Player) extends GameResult
   }
 
   def initial(startingPlayer: Player): GameState =
@@ -39,7 +39,7 @@ case class GameState(board: Board,
                ): Either[String, GameState] = {
     board.getMarkAt(row, column) match {
       case None =>
-        val markedBoard = board.withCellMarkedForPlayerxx(row, column, currentPlayer)
+        val markedBoard = board.withCellMarkedForPlayer(row, column, currentPlayer)
         val newGameResult =
           if (markedBoard.hasThreeInARow(currentPlayer)) {
             GameState.GameResult.Win(currentPlayer).some

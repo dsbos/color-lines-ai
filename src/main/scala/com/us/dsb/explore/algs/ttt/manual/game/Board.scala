@@ -4,15 +4,16 @@ import cats.syntax.option._
 import cats.syntax.either._
 
 
-object Board {
+private[game] object Board {
+
   /** Empty, player-X mark, or player-O mark. */
   private case class Cell(state: Option[Player])
-
   private object Cell {
     val empty: Cell = Cell(None)
   }
 
-  def initial: Board = new Board(Vector.fill[Cell](Order * Order)(Cell.empty))
+  private[game] def initial: Board =
+    new Board(Vector.fill[Cell](Order * Order)(Cell.empty))
 }
 
 import Board._
@@ -20,7 +21,7 @@ import Board._
 /**
  * State of TTT board (just cells; not whose turn it is/etc.)
  */
-class Board(private val cellStates: Vector[Cell]) {
+private[game] class Board(private val cellStates: Vector[Cell]) {
 
   /** Computes row-major cell-array index from row and column numbers. */
   private def vectorIndex(row: RowIndex, column: ColumnIndex): Int =
@@ -37,7 +38,7 @@ class Board(private val cellStates: Vector[Cell]) {
     new Board(cellStates.updated(vectorIndex(row, column), Cell(cellState)))
   }
 
-  def withCellMarkedForPlayerxx(row: RowIndex,
+  def withCellMarkedForPlayer(row: RowIndex,
                               column: ColumnIndex,
                               player: Player): Board = {
     withCellUpdated(row, column, player.some)
@@ -49,9 +50,8 @@ class Board(private val cellStates: Vector[Cell]) {
     withCellUpdated(row, column, None)
   }
 
-  def hasNoMovesLeft: Boolean = {
-    ! cellStates.exists(_.state.isEmpty)
-  }
+  def hasNoMovesLeft: Boolean = ! cellStates.exists(_.state.isEmpty)
+
 
   // (note almost completely unoptimized; do we care?)
   // ?? revisit passing player (which made check simpler)

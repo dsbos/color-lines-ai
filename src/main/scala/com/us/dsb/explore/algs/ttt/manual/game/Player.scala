@@ -4,8 +4,8 @@ import enumeratum.EnumEntry
 
 /** Player identity. */
 sealed trait Player extends EnumEntry
-object Player {
-  case object O extends Player
-  case object X extends Player
+private/*??*/ object Player {
+  private[game]/*??*/ case object O extends Player
+  private[game]/*??*/ case object X extends Player
 }
 // ?? possibly put get-other-player logic here

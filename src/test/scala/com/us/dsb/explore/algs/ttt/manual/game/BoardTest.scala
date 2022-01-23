@@ -20,7 +20,7 @@ class BoardTest extends AnyFunSpec {
               case 0 => Player.O
               case 1 => Player.X
             }
-        board.withCellMarkedForPlayerxx(row, column, variedPlayer)
+        board.withCellMarkedForPlayer(row, column, variedPlayer)
       }
     }
   }
@@ -36,7 +36,7 @@ class BoardTest extends AnyFunSpec {
           board
         }
         else {
-          board.withCellMarkedForPlayerxx(row, column, variedPlayer)
+          board.withCellMarkedForPlayer(row, column, variedPlayer)
         }
       }
     }
@@ -77,7 +77,7 @@ class BoardTest extends AnyFunSpec {
           val board0 = Board.initial
           val someRow = rowIndices.head
           val someCol = columnIndices.head
-          val markedBoard = board0.withCellMarkedForPlayerxx(someRow, someCol, Player.X)
+          val markedBoard = board0.withCellMarkedForPlayer(someRow, someCol, Player.X)
         }
         import LazySharedBreakpointable._
 
@@ -101,8 +101,8 @@ class BoardTest extends AnyFunSpec {
         val someRow = rowIndices.head
         val someCol = columnIndices.head
         val board0 = Board.initial
-        val board1 = board0.withCellMarkedForPlayerxx(someRow, someCol, Player.X)
-        val result = board1.withCellMarkedForPlayerxx(someRow, someCol, Player.X)
+        val board1 = board0.withCellMarkedForPlayer(someRow, someCol, Player.X)
+        val result = board1.withCellMarkedForPlayer(someRow, someCol, Player.X)
 
         assertResult(Player.X.some) {
           result.getMarkAt(someRow, someCol)
@@ -112,8 +112,8 @@ class BoardTest extends AnyFunSpec {
         val someRow = rowIndices.last
         val someCol = columnIndices.last
         val board0 = Board.initial
-        val board1 = board0.withCellMarkedForPlayerxx(someRow, someCol, Player.X)
-        val result = board1.withCellMarkedForPlayerxx(someRow, someCol, Player.O)
+        val board1 = board0.withCellMarkedForPlayer(someRow, someCol, Player.X)
+        val result = board1.withCellMarkedForPlayer(someRow, someCol, Player.O)
 
         assertResult(Player.O.some) {
           result.getMarkAt(someRow, someCol)
@@ -129,7 +129,7 @@ class BoardTest extends AnyFunSpec {
         val someRow = rowIndices.head
         val someCol = columnIndices.head
         val board0 = Board.initial
-        val markedBoard = board0.withCellMarkedForPlayerxx(someRow, someCol, Player.X)
+        val markedBoard = board0.withCellMarkedForPlayer(someRow, someCol, Player.X)
         val unmarkedBoard = markedBoard.withCellUnmarked(someRow, someCol)
         assertResult(None) {
           unmarkedBoard.getMarkAt(someRow, someCol)
@@ -152,7 +152,7 @@ class BoardTest extends AnyFunSpec {
       (Player.X :: Player.O :: Nil).foreach { player =>
         it(s"board with an $player") {
           board0
-              .withCellMarkedForPlayerxx(rowIndices(0), ColumnIndex(Index(1)), player)
+              .withCellMarkedForPlayer(rowIndices(0), ColumnIndex(Index(1)), player)
               .toString shouldBe s"<$player--/---/--->"
         }
       }
@@ -180,7 +180,7 @@ class BoardTest extends AnyFunSpec {
       val board0 = Board.initial
       val someRow = rowIndices.head
       val someCol = columnIndices.head
-      val oneXboard = board0.withCellMarkedForPlayerxx(someRow, someCol, Player.X)
+      val oneXboard = board0.withCellMarkedForPlayer(someRow, someCol, Player.X)
       oneXboard.hasNoMovesLeft shouldBe false
     }
     it ("should not detect 8-moves board as  full") {
@@ -209,11 +209,11 @@ class BoardTest extends AnyFunSpec {
 
     val `<XXX/---/OO->` = {
         Board.initial
-            .withCellMarkedForPlayerxx(1, 1, X)
-            .withCellMarkedForPlayerxx(3, 1, O)
-            .withCellMarkedForPlayerxx(1, 2, X)
-            .withCellMarkedForPlayerxx(3, 2, O)
-            .withCellMarkedForPlayerxx(1, 3, X)
+            .withCellMarkedForPlayer(1, 1, X)
+            .withCellMarkedForPlayer(3, 1, O)
+            .withCellMarkedForPlayer(1, 2, X)
+            .withCellMarkedForPlayer(3, 2, O)
+            .withCellMarkedForPlayer(1, 3, X)
     }
 
     it("should detect for some three-in-a-row case, w/right player") {

@@ -18,6 +18,7 @@ package object game {
   // ?? revisit use--in both table and UI selection model; separate?
 
   import scala.language.implicitConversions  // suppress warning from  @newtype
+  // ???? what exactly does "private" on a newtype affect?
   @newtype case class RowIndex(value: Index)
   @newtype case class ColumnIndex(value: Index)
 

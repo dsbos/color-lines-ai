@@ -175,7 +175,7 @@ object GameUI {
 
   // ??? add more GameUI tests:
   // - 1:  driving from outside to normal insides--do more: checking SegregatedTextIO output
-  // - 2:  driving from outside to special GameState (test double; spy/reporter/?)
+  // - 2:  driving from outside to special GameState (inject; test double; spy/reporter/?)
 
   def runGame(io: SegregatedTextIO): GameUIResult = {
     val initialState =

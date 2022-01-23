@@ -1,18 +1,14 @@
-package com.us.dsb.explore.algs.ttt.manual
+package com.us.dsb.explore.algs.ttt.manual.game
 
 import org.scalatest.funspec.AnyFunSpec
 import cats.syntax.option._
-import com.us.dsb.explore.algs.ttt.manual.game._
-
-import scala.util.chaining.scalaUtilChainingOps
 
 class GameStateTest extends AnyFunSpec {
-
 
   describe("GameState$?. tryMoveAt") {
     import Player._
     import scala.language.implicitConversions
-    implicit def intToRow(int: Int) = RowIndex(Index.unsafeFrom(int))
+    implicit def intToRow(int: Int): RowIndex = RowIndex(Index.unsafeFrom(int))
     implicit def intToCol(int: Int) = ColumnIndex(Index.unsafeFrom(int))
 
 
