@@ -81,64 +81,84 @@ object GameUI {
   }
 
   // ?? "place mark"?
-  private def markAtSelection(io: SegregatedTextIO, uiState: GameUIState): GameUIState = {
+  private def markAtSelection(io: SegregatedTextIO,
+                              uiState: GameUIState
+                             ): GameUIState = {
     val moveResult = uiState.gameState.tryMoveAt(uiState.selectedRow,
                                                  uiState.selectedColumn)
     moveResult match {
       case Right(newGameState) =>
         uiState.copy(gameState = newGameState)
       case Left(errorMsg) =>
+        // ??? probably change return value to carry state plus any message
+        // (or possibly Either, with caller displaying)
         io.printError(errorMsg)
         uiState  // no change
     }
   }
 
-  private def doQuit(io: SegregatedTextIO, uiState: GameUIState): GameUIResult = {
-    GameUIResult("Game was quit").tap {
-      io.printResult(_)
+  private def doQuit: GameUIResult = {
+    GameUIResult("Game was quit")
+  }
+
+  /**
+   *
+   * @return next state (`Right`) or disposition of game (`Left`)
+   */
+  private def doCommand(io: SegregatedTextIO,
+                        uiState: GameUIState,
+                        command: UICommand
+                       ): Either[GameUIResult, GameUIState] = {
+    import UICommand._
+    command match {
+      case Quit =>
+        doQuit.asLeft
+      case move: UIMoveCommand => // any move-selection command
+        moveSelection(uiState, move).asRight
+      case Mark =>
+        // ?? should following win/draw logic be 1) in markAtSelection (with
+        //   other Mark impl. logic), 2) in here, or 3) out in separate method
+        //   first calling markAtSelection? (what level is markAtSelection for:
+        //   lower-level marking or higher-level moving (marking and maybe
+        //   winning/drawing)?) (hmm--similar question re GameState's tryMoveAt) )
+        val newState = markAtSelection(io, uiState)
+        // Check whether move finished game:
+        newState.gameState.gameResult match {
+          case None => // game not done yet (after valid _or_ invalid mark try)
+            newState.asRight
+          case Some(gameResult) =>
+            import GameState.GameResult._ // ??? unnest? leave?
+            val resultText =
+              gameResult match {
+                case Draw => "Game ended in draw"
+                case Win(player) => s"Player $player won"
+              }
+            GameUIResult(resultText).asLeft
+        }
     }
   }
 
-  // ?? clean looping more (was while mess, now recursive; is there better Scala way?)
-  // ??? what about ~separatability and testability?  command execution should
-  //   probably be separated from looping recursion (e.g., commands return
-  //   something indicating whether to continue looping)
+  // ?? clean looping more (originally was while mess, now recursive; is there
+  // better Scala way?)
+
   /**
    * Logically, loops on prompting for and executing user UI ~commands until
    * game over or quit.
    */
   @tailrec
-  private def getAndDoUiCommands(io: SegregatedTextIO, uiState: GameUIState): GameUIResult = {
+  private def getAndDoUiCommands(io: SegregatedTextIO,
+                                 uiState: GameUIState
+                                ): GameUIResult = {
     io.printStateText("")
     io.printStateText(uiState.toDisplayString)
-
     val command = getCommand(io, uiState.gameState.currentPlayer)
 
-    import UICommand._
-    command match {
-      // ?? can we factor down the multiple getAndDoUiCommands calls (usefully, in this small case)?
-      case Quit =>
-        doQuit(io, uiState)
-      case move: UIMoveCommand =>  // any move-selection command
-        val nextState = moveSelection(uiState, move)
-        getAndDoUiCommands(io, nextState)  // loop
-      case Mark =>
-        val nextState = markAtSelection(io, uiState)
-        nextState.gameState.gameResult match {
-          case None =>  // game not done yet
-            getAndDoUiCommands(io, nextState)  // loop
-          case Some(gameResult) =>
-            import GameState.GameResult._  // ???
-            val textResult =
-              gameResult match {
-                case Draw        => "Game ended in draw"
-                case Win(player) => s"Player $player won"
-              }
-            GameUIResult(textResult).tap {
-              //noinspection ConvertibleToMethodValue
-              io.printResult(_)
-            }
-        }
+    doCommand(io, uiState, command) match {
+      case Right(nextState) =>
+        getAndDoUiCommands(io, nextState) // "recurse" to loop
+      case Left(uiResult)  =>
+        io.printResult(uiResult)
+        uiResult
     }
   }
 
