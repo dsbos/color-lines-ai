@@ -40,7 +40,7 @@ case class GameState(board: Board,
     board.getMarkAt(row, column) match {
       case None =>
         val markedBoard = board.withCellMarkedForPlayer(row, column, currentPlayer)
-        val newGameResult = {
+        val newGameResult =
           if (markedBoard.hasThreeInARow(currentPlayer)) {
             GameState.GameResult.Win(currentPlayer).some
           }
@@ -50,8 +50,8 @@ case class GameState(board: Board,
           else {
             gameResult
           }
-        }
-        GameState(markedBoard, newGameResult, currentPlayer.otherPlayer).asRight
+        val nextPlayer = Player.getOtherPlayer(currentPlayer)
+        GameState(markedBoard, newGameResult, nextPlayer).asRight
       case Some(nameThis) =>
         (s"Can't place mark at row $row, column $column;" +
             s" is already marked (${nameThis})").asLeft
