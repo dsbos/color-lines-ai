@@ -32,7 +32,8 @@ case class GameState(board: Board,
 
   // ?? later refine from Either[String, ...] to "fancier" error type
   // ?? maybe add result of move (win/draw/other) with new state (so caller
-  //  doesn't have to check state's gameResult;
+  //  doesn't have to check state's gameResult; also, think about where I'd add
+  //  game history
 
   def tryMoveAt(row: RowIndex,
                 column: ColumnIndex
@@ -53,7 +54,7 @@ case class GameState(board: Board,
         GameState(markedBoard, newGameResult, currentPlayer.opponent).asRight
       case Some(nameThis) =>
         (s"Can't place mark at row $row, column $column;" +
-            s" is already marked (${nameThis})").asLeft
+            s" is already marked ($nameThis)").asLeft
     }
   }
 

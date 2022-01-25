@@ -8,16 +8,14 @@ import io.estatico.newtype.macros.newtype
 package object game {
 
   type Order = 3
-  val Order = valueOf[Order]
+  val Order: Order = valueOf[Order]
 
   /** TTT row or column index integer; 1-based; top row, left column row are #1. */
   type Index = Int Refined Closed[1, Order]
   object Index extends RefinedTypeOps.Numeric[Index, Int]
 
-  // ?? revisit use--in both table and UI selection model; separate?
-
-  import scala.language.implicitConversions  // suppress warning from  @newtype
-  // ???? what exactly does "private" on a newtype affect?
+  import scala.language.implicitConversions  // suppress warning from @newtype
+  // ?? what exactly does "private" on a newtype affect?
   @newtype case class RowIndex(value: Index)
   @newtype case class ColumnIndex(value: Index)
 

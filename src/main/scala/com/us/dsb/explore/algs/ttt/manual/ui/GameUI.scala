@@ -8,9 +8,6 @@ import enumeratum.{Enum, EnumEntry}
 import scala.annotation.tailrec
 import scala.util.chaining.scalaUtilChainingOps
 
-// ?? any substantial benefit to moving internal methods to class? we could
-//  avoid some state passing, but only by mutating top-level state member
-
 /** TTT UI controller. */
 object GameUI {
 
@@ -73,10 +70,10 @@ object GameUI {
                            ): GameUIState = {
     import UICommand._
     moveCommand match {
-      case Up    => uiState.withRowAdustedBy(-1)
-      case Down  => uiState.withRowAdustedBy(1)
-      case Left  => uiState.withColumnAdustedBy(-1)
-      case Right => uiState.withColumnAdustedBy(1)
+      case Up    => uiState.withRowAdjustedBy(-1)
+      case Down  => uiState.withRowAdjustedBy(1)
+      case Left  => uiState.withColumnAdjustedBy(-1)
+      case Right => uiState.withColumnAdjustedBy(1)
     }
   }
 

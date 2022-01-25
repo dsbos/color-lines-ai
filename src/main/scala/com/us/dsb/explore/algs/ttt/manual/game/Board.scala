@@ -56,8 +56,8 @@ private[game] class Board(private val cellStates: Vector[Cell]) {
   // ?? Q: How to use Tuple3 in data and then convert to or use as 3-element
   //   List and call .forall?
   // ?? any way auto-generate this simply?  or factor out repeated cell pairs?
-  private type CellRawIndices = Tuple2[Int, Int]
-  private val linesData: List[Tuple3[CellRawIndices, CellRawIndices, CellRawIndices]] =
+  private type CellRawIndices = (Int, Int)
+  private val linesData: List[(CellRawIndices, CellRawIndices, CellRawIndices)] =
         List(
           ((1, 1), (1, 2), (1, 3)),
           ((2, 1), (2, 2), (2, 3)),
@@ -98,7 +98,6 @@ private[game] class Board(private val cellStates: Vector[Cell]) {
   def renderMultiline: String = {
     val cellWidth = " X ".length
     val cellSeparator = "|"
-    // ?? use new Order or leave using indices declarations?
     val wholeWidth =
       columnIndices.length * cellWidth +
           (columnIndices.length - 1) * cellSeparator.length
@@ -115,7 +114,6 @@ private[game] class Board(private val cellStates: Vector[Cell]) {
   }
 
   def renderCompactMultiline: String = {
-    // ?? use new Order or leave using indices declarations?
     rowIndices.map { row =>
       columnIndices.map { column =>
         getMarkAt(row, column) match {
