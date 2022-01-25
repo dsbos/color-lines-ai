@@ -50,8 +50,7 @@ case class GameState(board: Board,
           else {
             gameResult
           }
-        val nextPlayer = Player.getOtherPlayer(currentPlayer)
-        GameState(markedBoard, newGameResult, nextPlayer).asRight
+        GameState(markedBoard, newGameResult, currentPlayer.opponent).asRight
       case Some(nameThis) =>
         (s"Can't place mark at row $row, column $column;" +
             s" is already marked (${nameThis})").asLeft
