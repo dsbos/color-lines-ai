@@ -200,35 +200,46 @@ class BoardTest extends AnyFunSpec {
     implicit def intToRow(int: Int) = RowIndex(Index.unsafeFrom(int))
     implicit def intToCol(int: Int) = ColumnIndex(Index.unsafeFrom(int))
 
+    lazy val `<XX-/---/OO->` = {
+      Board.initial
+          .withCellMarkedForPlayer(1, 1, X)
+          .withCellMarkedForPlayer(3, 1, O)
+          .withCellMarkedForPlayer(1, 2, X)
+          .withCellMarkedForPlayer(3, 2, O)
+    }
+    lazy val `<XXX/---/OO->` = {
+      `<XX-/---/OO->`
+          .withCellMarkedForPlayer(1, 3, X)
+    }
+    lazy val `<XX-/X--/OOO>` = {
+      `<XX-/---/OO->`
+          .withCellMarkedForPlayer(2, 1, X)
+          .withCellMarkedForPlayer(3, 3, O)
+    }
+
     it("should not detect for empty board") {
       val testBoard = Board.initial
-      assertResult(false, s" (from .hasThreeInARow(X) for $testBoard)") {
-        testBoard.hasThreeInARow(X)
+      assertResult(false, s" (from .hasThreeInARow for $testBoard)") {
+        testBoard.hasThreeInARow
       }
     }
 
-    lazy val `<XXX/---/OO->` = {
-        Board.initial
-            .withCellMarkedForPlayer(1, 1, X)
-            .withCellMarkedForPlayer(3, 1, O)
-            .withCellMarkedForPlayer(1, 2, X)
-            .withCellMarkedForPlayer(3, 2, O)
-            .withCellMarkedForPlayer(1, 3, X)
-    }
-
-    it("should detect for some three-in-a-row case, w/right player") {
-      assertResult(true, s" (from .hasThreeInARow(X) for ${`<XXX/---/OO->`})") {
-        `<XXX/---/OO->`.hasThreeInARow(X)
+    it("should detect for some three-in-a-row case for X ") {
+      assertResult(true, s" (from .hasThreeInARow for ${`<XXX/---/OO->`})") {
+        `<XXX/---/OO->`.hasThreeInARow
       }
     }
 
-    it("should not detect for wrong player") {
-      assertResult(false, s" (from .hasThreeInARow(O) for ${`<XXX/---/OO->`})") {
-        `<XXX/---/OO->`.hasThreeInARow(O)
+    it("should for detect some three-in-a-row case for O") {
+      assertResult(true, s" (from .hasThreeInARow for ${`<XX-/X--/OOO>`})") {
+        `<XX-/X--/OOO>`.hasThreeInARow
       }
     }
 
     ignore("possibly check all lines (algorithmically)") {
+    }
+
+    ignore("possibly check more/all non-wins (algorithmically)") {
     }
 
   }

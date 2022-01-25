@@ -41,7 +41,7 @@ case class GameState(board: Board,
       case None =>
         val markedBoard = board.withCellMarkedForPlayer(row, column, currentPlayer)
         val newGameResult =
-          if (markedBoard.hasThreeInARow(currentPlayer)) {
+          if (markedBoard.hasThreeInARow) {
             GameState.GameResult.Win(currentPlayer).some
           }
           else if (markedBoard.hasNoMovesLeft) {

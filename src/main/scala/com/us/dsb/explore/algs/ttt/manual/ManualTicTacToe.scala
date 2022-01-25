@@ -4,7 +4,7 @@ import com.us.dsb.explore.algs.ttt.manual.ui.{ColoredConsoleTextIO, GameUI}
 
 object ManualTicTacToe extends App {
 
-  val gameResult = GameUI.runGame(ColoredConsoleTextIO)  // ?? specify starting user?
+  val gameResult = GameUI.runGame(ColoredConsoleTextIO)
   println("Game result: " + gameResult.text)
 
 }
