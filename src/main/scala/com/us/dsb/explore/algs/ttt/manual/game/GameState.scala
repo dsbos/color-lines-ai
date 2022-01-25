@@ -50,11 +50,7 @@ case class GameState(board: Board,
           else {
             gameResult
           }
-        import Player._
-        val nextPlayer = currentPlayer match {
-          case X => O
-          case O => X
-        }
+        val nextPlayer = Player.getOtherPlayer(currentPlayer)
         GameState(markedBoard, newGameResult, nextPlayer).asRight
       case Some(nameThis) =>
         (s"Can't place mark at row $row, column $column;" +
