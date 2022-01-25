@@ -7,9 +7,8 @@ import io.estatico.newtype.macros.newtype
 
 package object game {
 
-  // ?? can one of these be derived from the other?
-  val Order = 3
   type Order = 3
+  val Order = valueOf[Order]
 
   /** TTT row or column index integer; 1-based; top row, left column row are #1. */
   type Index = Int Refined Closed[1, Order]
