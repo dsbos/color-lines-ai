@@ -207,7 +207,7 @@ class BoardTest extends AnyFunSpec {
       }
     }
 
-    val `<XXX/---/OO->` = {
+    lazy val `<XXX/---/OO->` = {
         Board.initial
             .withCellMarkedForPlayer(1, 1, X)
             .withCellMarkedForPlayer(3, 1, O)

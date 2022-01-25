@@ -55,7 +55,6 @@ class GameStateTest extends AnyFunSpec {
     }
     describe("detects draws") {
       it("one case") {
-
         val drawState =
           GameState.initial(Player.X)
               // .tap(s => println(s.board.renderCompactMultiline + "\n"))
