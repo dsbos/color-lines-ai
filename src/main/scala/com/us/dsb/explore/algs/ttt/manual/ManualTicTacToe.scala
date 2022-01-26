@@ -1,10 +1,10 @@
 package com.us.dsb.explore.algs.ttt.manual
 
-import com.us.dsb.explore.algs.ttt.manual.ui.{ColoredConsoleTextIO, GameUI}
+import com.us.dsb.explore.algs.ttt.manual.ui.{LiveColoredConsoleTextIO, GameUI}
 
 object ManualTicTacToe extends App {
 
-  val gameResult = GameUI.runGame(ColoredConsoleTextIO)
+  val gameResult = GameUI.runGame(LiveColoredConsoleTextIO)
   println("Game result: " + gameResult.text)
 
 }
