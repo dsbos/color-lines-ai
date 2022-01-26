@@ -19,6 +19,7 @@ object GameState {
     GameState(Board.initial, None, startingPlayer)
   def initial: GameState = initial(Player.X)
 }
+import GameState._
 
 /**
  * TTT game state _and_ controller--should functions be separated or together?
@@ -26,7 +27,7 @@ object GameState {
  * @param gameResult  `None` means no win or draw yet
  */
 case class GameState(board: Board,
-                     gameResult: Option[GameState.GameResult],
+                     gameResult: Option[GameResult],
                      currentPlayer: Player
                     ) {
 
@@ -43,10 +44,10 @@ case class GameState(board: Board,
         val markedBoard = board.withCellMarkedForPlayer(row, column, currentPlayer)
         val newGameResult =
           if (markedBoard.hasThreeInARow) {
-            GameState.GameResult.Win(currentPlayer).some
+            GameResult.Win(currentPlayer).some
           }
           else if (markedBoard.hasNoMovesLeft) {
-            GameState.GameResult.Draw.some
+            GameResult.Draw.some
           }
           else {
             gameResult

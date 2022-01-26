@@ -11,7 +11,7 @@ import scala.util.chaining.scalaUtilChainingOps
 /** TTT UI controller. */
 object GameUI {
 
-  // ??? enhance; maybe just put clean strings in; maybe build on GameResult (plus quit case)
+  // ?? enhance; maybe just put clean strings in; maybe build on GameResult (plus quit case)
   case class GameUIResult(text: String)
 
 
@@ -35,8 +35,6 @@ object GameUI {
   // (Could put strings in enumerators and use Enum.withName to factor down
   // parse function, but then layers wouldn't be separated.)
 
-  // ?? revisit String (but may be fine since dealing with input _strings_
-  //   from _user_
   // ?? revisit Either--use something fancier (MonadError)?
   private def parseCommand(rawCmd: String): Either[String, UICommand] = {
     import UICommand._
@@ -88,7 +86,7 @@ object GameUI {
         uiState.copy(gameState = newGameState)
       case Left(errorMsg) =>
         // ??? probably change return value to carry state plus any message
-        // (or possibly Either, with caller displaying)
+        //   (or possibly Either, with caller displaying)
         io.printError(errorMsg)
         uiState  // no change
     }
@@ -124,7 +122,7 @@ object GameUI {
           case None => // game not done yet (after valid _or_ invalid mark try)
             newState.asRight
           case Some(gameResult) =>
-            import GameState.GameResult._ // ??? unnest? leave?
+            import GameState.GameResult._
             val resultText =
               gameResult match {
                 case Draw => "Game ended in draw"
@@ -159,7 +157,7 @@ object GameUI {
     }
   }
 
-  // ???? soon, probably create class GameUI to hold NameThisIO (to avoid passing
+  // ??? soon, probably create class GameUI to hold NameThisIO (to avoid passing
   //   all around); but think about currently pure methods vs. using IO member)
 
   // ??? add more GameUI tests:
