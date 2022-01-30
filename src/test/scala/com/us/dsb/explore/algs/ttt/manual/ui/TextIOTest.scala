@@ -15,7 +15,7 @@ class TextIOTest extends AnyFunSpec {
   }
 
   // Crude, manual stub and spy ConsoleIO.
-  class TextConsoleIO(inputLines: String*) extends ConsoleIO {
+  class ConsoleIODouble(inputLines: String*) extends ConsoleIO {
     private var stringsToRead = inputLines
     private var printedStrings: List[String] = Nil;
     def getPrintedStrings: List[String] = printedStrings
@@ -27,9 +27,13 @@ class TextIOTest extends AnyFunSpec {
     override def readLine(prompt: String): String = {
       printedStrings ::= prompt
 
-      val lineRead = stringsToRead.head  // .get - unsafe - but crude anyway
-      stringsToRead = stringsToRead.drop(1)
-      lineRead
+      stringsToRead match {
+        case head +: tail =>
+          stringsToRead = tail
+          head
+        case _ =>
+          ???
+      }
     }
   }
 
@@ -44,7 +48,7 @@ class TextIOTest extends AnyFunSpec {
 
     describe("printStateText should print given text plainly; output should:") {
       lazy val printedStrings = {
-        val consoleIODouble = new TextConsoleIO
+        val consoleIODouble = new ConsoleIODouble
         val uut = getUUT(consoleIODouble)
 
         uut.printStateText("text")
@@ -66,7 +70,7 @@ class TextIOTest extends AnyFunSpec {
     describe("printError should print given text in red; output should:") {
       // Note:  "lazy" avoids executing during ScalaTest's registration phase.
       lazy val printedStrings = {
-        val consoleIODouble = new TextConsoleIO
+        val consoleIODouble = new ConsoleIODouble
         val uut = getUUT(consoleIODouble)
 
         uut.printError("given text")
@@ -89,7 +93,7 @@ class TextIOTest extends AnyFunSpec {
 
     // Demo:  checking subconditions with "should ... and ..." (in one test):
     it("printResult should print given text in bold (should ... and ...)") {
-      val consoleIODouble = new TextConsoleIO
+      val consoleIODouble = new ConsoleIODouble
       val uut = getUUT(consoleIODouble)
 
       uut.printResult("given text")
@@ -106,7 +110,7 @@ class TextIOTest extends AnyFunSpec {
 
     describe("readPromptedLine should print given prompt value and get input") {
       lazy val (printedStrings, lineRead) = {
-        val consoleIODouble = new TextConsoleIO("given input")
+        val consoleIODouble = new ConsoleIODouble("given input")
         val uut = getUUT(consoleIODouble)
 
         val lineRead = uut.readPromptedLine("given text")

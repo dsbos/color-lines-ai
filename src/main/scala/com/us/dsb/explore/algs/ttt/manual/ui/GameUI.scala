@@ -18,8 +18,8 @@ object GameUI {
   // ("extends EnumEntry" gets .entryName, enables Enum; "extends Enum[...]"
   // enables (and requires) .values.
 
-  private sealed trait UICommand
-  private object UICommand {
+  private[ui] sealed trait UICommand
+  private[ui] object UICommand {
     // (Q: Why doesn't UICommand's "sealed" obviate the following one (for
     //   exhaustive-match checks)?
     sealed trait UIMoveCommand extends UICommand
@@ -33,7 +33,7 @@ object GameUI {
   // ?? Decide "UICommand._" re little scala.Right ~clashes.
 
   // (Could put strings in enumerators and use Enum.withName to factor down
-  // parse function, but then layers wouldn't be separated.)
+  // parse function, but then (sub)layers wouldn't be separated.)
 
   // ?? revisit Either--use something fancier (MonadError)?
   private def parseCommand(rawCmd: String): Either[String, UICommand] = {
@@ -53,8 +53,6 @@ object GameUI {
   @tailrec
   private def getCommand(io: SegregatedTextIO, player: Player): UICommand = {
     val rawCmd = io.readPromptedLine(s"Player $player command?: ")
-
-    import scala.Left
     parseCommand(rawCmd) match {
       case Right(cmd) => cmd
       case Left(msg) =>

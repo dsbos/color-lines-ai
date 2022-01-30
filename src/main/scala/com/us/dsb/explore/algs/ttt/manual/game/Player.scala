@@ -6,14 +6,15 @@ import enumeratum.EnumEntry
 sealed trait Player extends EnumEntry {
   def opponent: Player
 }
-private[game] object Player {
+// (Object Player, X, and Y visible by test in [ui].)
+object Player {
 
   /** Player who goes first (per traditional rules/naming). */
-  private[game] case object X extends Player {
+  case object X extends Player {
     override def opponent: O.type = O
   }
 
-  private[game] case object O extends Player {
+  case object O extends Player {
     def opponent: X.type = X
   }
 
