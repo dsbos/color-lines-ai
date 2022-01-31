@@ -1,6 +1,6 @@
-package com.us.dsb.explore.fp.namethis.orig
+package com.us.dsb.explore.fp.namethis.tf
 
-import com.us.dsb.explore.fp.namethis.orig.TextIOClient.UICommand
+import com.us.dsb.explore.fp.namethis.tf.TextIOClient.UICommand
 import org.scalatest.AppendedClues._
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers._
