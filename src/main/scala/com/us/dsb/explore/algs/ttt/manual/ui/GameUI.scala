@@ -9,7 +9,7 @@ import scala.annotation.tailrec
 import scala.util.chaining.scalaUtilChainingOps
 
 /** TTT UI controller. */
-object GameUI {
+private[manual] object GameUI {
 
   // ?? enhance; maybe just put clean strings in; maybe build on GameResult (plus quit case)
   case class GameUIResult(text: String)

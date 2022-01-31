@@ -8,7 +8,7 @@ private[ui] trait ConsoleIO {
   def println(lineOrLines: String): Unit
   def readLine(prompt: String): String
 }
-object LiveConsoleIO extends ConsoleIO {
+private[manual] object LiveConsoleIO extends ConsoleIO {
   override def println(lineOrLines: String): Unit = Predef.println(lineOrLines)
   override def readLine(prompt: String): String = scala.io.StdIn.readLine(prompt)
 }
@@ -32,7 +32,7 @@ private[ui] class BaseConsoleTextIO(cio: ConsoleIO) extends SegregatedTextIO {
   private[ui] override def printResult(lineOrLines: String): Unit = cio.println(lineOrLines)
 }
 
-class PlainConsoleTextIO(x: ConsoleIO) extends BaseConsoleTextIO(x)
+private[manual] class PlainConsoleTextIO(x: ConsoleIO) extends BaseConsoleTextIO(x)
 object LivePlainConsoleTextIO extends PlainConsoleTextIO(LiveConsoleIO)
 // (Expect to have test version in tests.)
 
@@ -45,5 +45,5 @@ class ColoredConsoleTextIO(x: ConsoleIO) extends BaseConsoleTextIO(x) {
   private[ui] override def printResult(lineOrLines: String): Unit =
     super.printResult(BOLD + lineOrLines + RESET)
 }
-object LiveColoredConsoleTextIO extends ColoredConsoleTextIO(LiveConsoleIO)
+private[manual] object LiveColoredConsoleTextIO extends ColoredConsoleTextIO(LiveConsoleIO)
 // (Expect to have test-double version in tests.)

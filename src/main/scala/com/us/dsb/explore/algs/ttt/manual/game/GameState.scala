@@ -4,7 +4,7 @@ import cats.syntax.option._
 import cats.syntax.either._
 
 
-object GameState {
+private[manual] object GameState {
 
   /**
    * Result of completed game.

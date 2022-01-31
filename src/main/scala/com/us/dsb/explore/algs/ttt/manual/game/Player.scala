@@ -3,11 +3,11 @@ package com.us.dsb.explore.algs.ttt.manual.game
 import enumeratum.EnumEntry
 
 /** Player identity. */
-sealed trait Player extends EnumEntry {
+private[manual] sealed trait Player extends EnumEntry {
   def opponent: Player
 }
 // (Object Player, X, and Y visible by test in [ui].)
-object Player {
+private[manual] object Player {
 
   /** Player who goes first (per traditional rules/naming). */
   case object X extends Player {

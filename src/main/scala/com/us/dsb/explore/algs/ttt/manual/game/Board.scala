@@ -4,7 +4,7 @@ import cats.syntax.option._
 import cats.syntax.either._
 
 
-private[game] object Board {
+private[manual] object Board {
 
   /** Empty, player-X mark, or player-O mark. */
   private case class Cell(state: Option[Player])
