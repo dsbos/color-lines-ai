@@ -1,4 +1,4 @@
-package com.us.dsb.explore.fp.namethis.ui
+package com.us.dsb.explore.fp.namethis.orig
 
 import cats.syntax.option._
 import cats.syntax.either._

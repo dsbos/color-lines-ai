@@ -1,4 +1,4 @@
-package com.us.dsb.explore.fp.namethis.ui
+package com.us.dsb.explore.fp.namethis.orig
 
 import org.scalatest.LoneElement
 import org.scalatest.funspec.AnyFunSpec

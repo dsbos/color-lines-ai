@@ -1,4 +1,4 @@
-package com.us.dsb.explore.fp.namethis.ui
+package com.us.dsb.explore.fp.namethis.orig
 
 trait SegregatedTextIO {
   def printStateText(lineOrLines: String): Unit
