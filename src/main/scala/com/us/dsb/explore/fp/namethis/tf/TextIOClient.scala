@@ -1,5 +1,6 @@
 package com.us.dsb.explore.fp.namethis.tf
 
+import cats.effect.IO
 import cats.syntax.option._
 import cats.syntax.either._
 //import com.us.dsb.explore.fp.namethis.game.{ColumnIndex, GameState, Index, Player, RowIndex}
@@ -46,16 +47,32 @@ object TextIOClient {
     }
   }
 
-  @tailrec
-  private def getCommand(io: SegregatedTextIO, dummy: String): UICommand = {
-    val rawCmd = io.readPromptedLine(s"Player $dummy command?: ")
-    parseCommand(rawCmd) match {
-      case Right(cmd) => cmd
-      case Left(msg) =>
-        io.printError(msg)
-        getCommand(io, dummy)  // loop
-    }
+  private def callSimply(io: SegregatedTextIO, dummy: String): IO[Either[String, UICommand]] = {
+    for {
+      rawCmd <- io.readPromptedLine(s"Player $dummy command?: ")
+    } yield (parseCommand(rawCmd))
   }
 
+
+  //@tailrec
+  private def getCommand(io: SegregatedTextIO, dummy: String): IO[UICommand] = {
+    val parseResultIO =
+      for {
+        rawCmd <- io.readPromptedLine(s"Player $dummy command?: ")
+        cmdGood <- IO(parseCommand(rawCmd))
+      } yield {
+        cmdGood
+      }
+    for {
+      parseResult <- parseResultIO
+      goodCmd <- parseResult match {
+        case Right(cmd) => IO(cmd)
+        case Left(msg) =>
+          io.printError(msg)
+          getCommand(io, dummy) // loop
+      }
+    } yield goodCmd
+
+  }
 
 }
