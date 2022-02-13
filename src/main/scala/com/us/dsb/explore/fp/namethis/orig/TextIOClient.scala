@@ -46,24 +46,26 @@ object TextIOClient extends App {
     }
   }
 
-  private def callSimply(io: SegregatedTextIO, dummy: String): Either[String, UICommand] = {
-    val rawCmd = io.readPromptedLine(s"Player $dummy command?: ")
+  private def callSimply(tio: SegregatedTextIO, dummy: String): Either[String, UICommand] = {
+    val rawCmd = tio.readPromptedLine(s"Player $dummy command?: ")
     parseCommand(rawCmd)
   }
 
   @tailrec
-  private def getCommand(io: SegregatedTextIO, dummy: String): UICommand = {
-    val rawCmd = io.readPromptedLine(s"Player $dummy command?: ")
+  private def getCommand(tio: SegregatedTextIO, dummy: String): UICommand = {
+    val rawCmd = tio.readPromptedLine(s"Player $dummy command?: ")
     parseCommand(rawCmd) match {
       case Right(cmd) => cmd
       case Left(msg) =>
-        io.printError(msg)
-        getCommand(io, dummy)  // loop
+        tio.printError(msg)
+        getCommand(tio, dummy)  // loop
     }
   }
 
   val result1 = callSimply(LiveColoredConsoleTextIO, "<whichever player>")
   println("result1 = " + result1)
+
+  println()
 
   val result2 = getCommand(LiveColoredConsoleTextIO, "<whichever player>")
   println("result2 = " + result2)

@@ -43,18 +43,18 @@ object TextIOClient extends App {
     }
   }
 
-  private def callSimply(io: SegregatedTextIO, dummy: String): IO[Either[String, UICommand]] = {
+  private def callSimply(tio: SegregatedTextIO, dummy: String): IO[Either[String, UICommand]] = {
     for {
-      rawCmd <- io.readPromptedLine(s"Player $dummy command?: ")
+      rawCmd <- tio.readPromptedLine(s"Player $dummy command?: ")
     } yield (parseCommand(rawCmd))
   }
 
 
   //@tailrec
-  private def getCommand(io: SegregatedTextIO, dummy: String): IO[UICommand] = {
+  private def getCommand(tio: SegregatedTextIO, dummy: String): IO[UICommand] = {
     val parseResultIO =
       for {
-        rawCmd <- io.readPromptedLine(s"Player $dummy command?: ")
+        rawCmd <- tio.readPromptedLine(s"Player $dummy command?: ")
         cmdGood <- IO(parseCommand(rawCmd))
       } yield {
         cmdGood
@@ -64,9 +64,9 @@ object TextIOClient extends App {
       goodCmd <- parseResult match {
         case Right(cmd) => IO(cmd)
         case Left(msg) =>
-          io.printError(msg)  // ???? doesn't print, since printError used IO; how do I execute it?  for/flatMap?
+          tio.printError(msg)  // ???? doesn't print, since printError used IO; how do I execute it?  for/flatMap?
           println("*** Q:  How to execute printerror(...): IO[Unit]?")
-          getCommand(io, dummy) // loop
+          getCommand(tio, dummy) // loop
       }
     } yield goodCmd
 
@@ -76,6 +76,8 @@ object TextIOClient extends App {
     callSimply(LiveColoredConsoleTextIO, "<whichever player>")
         .unsafeRunSync()
   println("result1 = " + result1)
+
+  println()
 
   val result2 =
     getCommand(LiveColoredConsoleTextIO, "<whichever player>")
