@@ -52,23 +52,23 @@ object TextIOClient extends App {
 
   //@tailrec
   private def getCommand(tio: SegregatedTextIO, dummy: String): IO[UICommand] = {
-    val parseResultIO =
+    val cmdOrErrorIO =
       for {
         rawCmd <- tio.readPromptedLine(s"Player $dummy command?: ")
-        cmdGood <- IO(parseCommand(rawCmd))
+        cmdOrError <- IO(parseCommand(rawCmd))
       } yield {
-        cmdGood
+        cmdOrError
       }
     for {
-      parseResult <- parseResultIO
-      goodCmd <- parseResult match {
+      cmdOrError <- cmdOrErrorIO
+      eventualCmd <- cmdOrError match {
         case Right(cmd) => IO(cmd)
         case Left(msg) =>
           tio.printError(msg)  // ???? doesn't print, since printError used IO; how do I execute it?  for/flatMap?
           println("*** Q:  How to execute printerror(...): IO[Unit]?")
           getCommand(tio, dummy) // loop
       }
-    } yield goodCmd
+    } yield eventualCmd
 
   }
 
