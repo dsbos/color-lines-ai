@@ -9,7 +9,7 @@ import scala.annotation.tailrec
 import scala.util.chaining.scalaUtilChainingOps
 
 /** TTT UI controller. */
-object TextIOClient {
+object TextIOClient extends App {
 
   // ("extends EnumEntry" gets .entryName, enables Enum; "extends Enum[...]"
   // enables (and requires) .values.
@@ -62,5 +62,10 @@ object TextIOClient {
     }
   }
 
+  val result1 = callSimply(LiveColoredConsoleTextIO, "<whichever player>")
+  println("result1 = " + result1)
+
+  val result2 = getCommand(LiveColoredConsoleTextIO, "<whichever player>")
+  println("result2 = " + result2)
 
 }

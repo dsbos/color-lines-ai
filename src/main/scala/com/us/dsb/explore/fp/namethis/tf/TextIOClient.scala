@@ -1,16 +1,12 @@
 package com.us.dsb.explore.fp.namethis.tf
 
 import cats.effect.IO
-import cats.syntax.option._
+import com.us.dsb.explore.fp.namethis.tf.LiveColoredConsoleTextIO
 import cats.syntax.either._
-//import com.us.dsb.explore.fp.namethis.game.{ColumnIndex, GameState, Index, Player, RowIndex}
-import enumeratum.{Enum, EnumEntry}
 
-import scala.annotation.tailrec
-import scala.util.chaining.scalaUtilChainingOps
 
 /** TTT UI controller. */
-object TextIOClient {
+object TextIOClient extends App {
 
   // ("extends EnumEntry" gets .entryName, enables Enum; "extends Enum[...]"
   // enables (and requires) .values.
@@ -68,11 +64,22 @@ object TextIOClient {
       goodCmd <- parseResult match {
         case Right(cmd) => IO(cmd)
         case Left(msg) =>
-          io.printError(msg)
+          io.printError(msg)  // ???? doesn't print, since printError used IO; how do I execute it?  for/flatMap?
+          println("*** Q:  How to execute printerror(...): IO[Unit]?")
           getCommand(io, dummy) // loop
       }
     } yield goodCmd
 
   }
+
+  val result1 =
+    callSimply(LiveColoredConsoleTextIO, "<whichever player>")
+        .unsafeRunSync()
+  println("result1 = " + result1)
+
+  val result2 =
+    getCommand(LiveColoredConsoleTextIO, "<whichever player>")
+        .unsafeRunSync()
+  println("result2 = " + result2)
 
 }
