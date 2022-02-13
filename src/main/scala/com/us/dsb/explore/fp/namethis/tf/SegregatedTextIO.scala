@@ -16,11 +16,11 @@ class BaseConsoleTextIO(cio: ConsoleIO) extends SegregatedTextIO {
   override def printResult(lineOrLines: String): IO[Unit] = cio.println(lineOrLines)
 }
 
-class PlainConsoleTextIO(x: ConsoleIO) extends BaseConsoleTextIO(x)
+class PlainConsoleTextIO(cio: ConsoleIO) extends BaseConsoleTextIO(cio)
 object LivePlainConsoleTextIO extends PlainConsoleTextIO(LiveConsoleIO)
 // (Expect to have test version in tests.)
 
-class ColoredConsoleTextIO(x: ConsoleIO) extends BaseConsoleTextIO(x) {
+class ColoredConsoleTextIO(cio: ConsoleIO) extends BaseConsoleTextIO(cio) {
   import scala.io.AnsiColor._
   override def readPromptedLine(prompt: String): IO[String] =
     super.readPromptedLine(BLUE + prompt + RESET)
