@@ -64,8 +64,7 @@ object TextIOClient extends App {
       eventualCmd <- cmdOrError match {
         case Right(cmd) => IO(cmd)
         case Left(msg) =>
-          tio.printError(msg)  // ???? doesn't print, since printError used IO; how do I execute it?  for/flatMap?
-          println("*** Q:  How to execute printerror(...): IO[Unit]?")
+          tio.printError(msg) *>  // ???? STUDY
           getCommand(tio, dummy) // loop
       }
     } yield eventualCmd
