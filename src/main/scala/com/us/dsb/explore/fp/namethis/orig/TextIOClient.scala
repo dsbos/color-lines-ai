@@ -48,7 +48,9 @@ object TextIOClient extends App {
 
   def callSimply(tio: SegregatedTextIO, dummy: String): Either[String, UICommand] = {
     val rawCmd = tio.readPromptedLine(s"Player $dummy command?: ")
-    parseCommand(rawCmd)
+    val cmd = parseCommand(rawCmd)
+    tio.printResult("Parsing result = " + cmd)
+    cmd
   }
 
   @tailrec
