@@ -51,18 +51,19 @@ class TextIOClientTest extends AnyFunSpec {
     describe("NT.for some valid command:") {
       object LazyShared {
         val ioDouble = new SegregatedTextIODouble("u")
-        val callResult = TextIOClient.getCommand(ioDouble, "<dummy X>")
+        val call = TextIOClient.getCommand(ioDouble, "<dummy X>")
+        val callResult = call.unsafeRunSync()
       }
       import LazyShared._
 
-      ignore("NT.should return decoded command") {
+      it("NT.should return decoded command") {
         // Note: Can't break line line before withClue; "... . withClue(...)" and
         //   '... \n .withClue(...)" don't attach clue; other options unclear.
         //
         callResult shouldBe UICommand.Up withClue
             s"(printed strings: ${ioDouble.getPrintedStrings}"
       }
-      ignore("NT.should emit only prompt line (once)") {
+      it("NT.should emit only prompt line (once)") {
         ioDouble.getPrintedStrings should have length 1
       }
     }
@@ -70,15 +71,19 @@ class TextIOClientTest extends AnyFunSpec {
     describe("NT.for invalid command(s) and then valid command:") {
       object LazyShared {
         val ioDouble = new SegregatedTextIODouble("?", "u")
-        val callResult = TextIOClient.getCommand(ioDouble, "<dummy X>")
+        val call = TextIOClient.getCommand(ioDouble, "<dummy X>")
+        val callResult = call.unsafeRunSync()
       }
       import LazyShared._
 
-      ignore("NT.should emit error line and extra prompt line") {
-        ioDouble.getPrintedStrings should have length 3
+      it("NT.should emit prompt, error, and second prompt line") {
+        ioDouble.getPrintedStrings shouldBe
+            List("Player <dummy X> command?: ",
+                 "Invalid input \"?\"; try u(p), d(own), l(eft), r(right), m(ark), or q(uit)",
+                 "Player <dummy X> command?: ")
         // Theoretically, check specifics.
       }
-      ignore("NT.should return decoded eventual valid command") {
+      it("NT.should return decoded eventual valid command") {
         // Note: Can't break line line before withClue; "... . withClue(...)" and
         //   '... \n .withClue(...)" don't attach clue; other options unclear.
         //
