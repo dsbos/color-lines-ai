@@ -62,7 +62,13 @@ object TextIOClient extends App {
     for {
       cmdOrError <- cmdOrErrorIO
       eventualCmd <- cmdOrError match {
-        case Right(cmd) => IO(cmd)
+        case Right(cmd) =>
+          // ?? Q:  This IO (along with the composed one for Left(...)) gets
+          //   created only after things start running (since the parsed command
+          //   can't be available before then).  Is it normal to create
+          //   additional IO objects after things start running, or is something
+          //   around here an abnormal way of doing things?
+          IO.pure(cmd)
         case Left(msg) =>
           tio.printError(msg) *>  // ???? STUDY
           getCommand(tio, dummy) // loop
@@ -71,9 +77,10 @@ object TextIOClient extends App {
 
   }
 
-  val result1 =
-    callSimply(LiveColoredConsoleTextIO, "<whichever player>")
-        .unsafeRunSync()
+  //java.lang.System.setProperty("cats.effect.stackTracingMode", "full")
+  val callIo1 = callSimply(LiveColoredConsoleTextIO, "<whichever player>")
+  println("callIo1 = " + callIo1)
+  val result1 = callIo1.unsafeRunSync()
   println("result1 = " + result1)
 
   println()
