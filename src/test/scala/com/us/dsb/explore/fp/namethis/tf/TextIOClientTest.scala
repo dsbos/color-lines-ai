@@ -12,7 +12,7 @@ class TextIOClientTest extends AnyFunSpec {
   class SegregatedTextIODouble(inputLines: String*) extends SegregatedTextIO {
     private var remainingInputs = inputLines
     private var printedStrings: List[String] = Nil
-    // (no tracking of via which method)
+    // (no tracking of via which method wrote string)
     def getPrintedStrings: List[String] = printedStrings
 
     override def printStateText(lineOrLines: String): IO[Unit] = {

@@ -14,7 +14,7 @@ class GameUITest extends AnyFunSpec {
   class SegregatedTextIODouble(inputLines: String*) extends SegregatedTextIO {
     private var remainingInputs = inputLines
     private var printedStrings: List[String] = Nil
-    // (no tracking of via which method)
+    // (no tracking of via which method wrote string)
     def getPrintedStrings: List[String] = printedStrings
 
     override def printStateText(lineOrLines: String): Unit = {
@@ -73,8 +73,11 @@ class GameUITest extends AnyFunSpec {
       }
       import LazyShared._
 
-      it("should emit error line and extra prompt line") {
-        ioDouble.getPrintedStrings should have length 3
+      it("should emit prompt, error, and second prompt line") {
+        ioDouble.getPrintedStrings shouldBe
+            List("Player X command?: ",
+                 "Invalid input \"?\"; try u(p), d(own), l(eft), r(right), m(ark), or q(uit)",
+                 "Player X command?: ")
         // Theoretically, check specifics.
       }
       it("should return decoded eventual valid command") {
