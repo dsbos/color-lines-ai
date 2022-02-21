@@ -7,7 +7,7 @@ import org.scalatest.matchers.should.Matchers._
 
 class ConsoleIOTest extends AnyFunSpec {
 
-  it/*describe*/("TextIO?:") {
+  it/*describe*/("TextIO? (disabled in original):") {
     cancel()
     it("NT.println ...") {
     }

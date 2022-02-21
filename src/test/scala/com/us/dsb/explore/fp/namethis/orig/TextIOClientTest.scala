@@ -47,7 +47,7 @@ class TextIOClientTest extends AnyFunSpec {
     describe("NT.for some valid command:") {
       object LazyShared {
         val ioDouble = new SegregatedTextIODouble("u")
-        val callResult = TextIOClient invokePrivate getCommand(ioDouble, "<dummuy X>")
+        val callResult = TextIOClient.getCommand(ioDouble, "<dummy X>")
       }
       import LazyShared._
 
@@ -66,7 +66,7 @@ class TextIOClientTest extends AnyFunSpec {
     describe("NT.for invalid command(s) and then valid command:") {
       object LazyShared {
         val ioDouble = new SegregatedTextIODouble("?", "u")
-        val callResult = TextIOClient invokePrivate getCommand(ioDouble, "<dummuy X>")
+        val callResult = TextIOClient.getCommand(ioDouble, "<dummy X>")
       }
       import LazyShared._
 

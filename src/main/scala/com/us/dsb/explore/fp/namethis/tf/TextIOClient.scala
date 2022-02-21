@@ -43,7 +43,7 @@ object TextIOClient extends App {
     }
   }
 
-  private def callSimply(tio: SegregatedTextIO, dummy: String): IO[Either[String, UICommand]] = {
+  def callSimply(tio: SegregatedTextIO, dummy: String): IO[Either[String, UICommand]] = {
     for {
       rawCmd <- tio.readPromptedLine(s"Player $dummy command?: ")
     } yield (parseCommand(rawCmd))
@@ -51,7 +51,7 @@ object TextIOClient extends App {
 
 
   //@tailrec
-  private def getCommand(tio: SegregatedTextIO, dummy: String): IO[UICommand] = {
+  def getCommand(tio: SegregatedTextIO, dummy: String): IO[UICommand] = {
     val cmdOrErrorIO =
       for {
         rawCmd <- tio.readPromptedLine(s"Player $dummy command?: ")
