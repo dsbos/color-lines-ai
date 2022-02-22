@@ -4,7 +4,6 @@ import cats.effect.IO
 import com.us.dsb.explore.fp.namethis.tf.LiveColoredConsoleTextIO
 import cats.syntax.either._
 
-
 /** TTT UI controller. */
 object TextIOClient extends App {
 
@@ -54,15 +53,9 @@ object TextIOClient extends App {
 
   //@tailrec
   def getCommand(tio: SegregatedTextIO, dummy: String): IO[UICommand] = {
-    val cmdOrErrorIO =
-      for {
-        rawCmd <- tio.readPromptedLine(s"Player $dummy command?: ")
-        cmdOrError <- IO(parseCommand(rawCmd))
-      } yield {
-        cmdOrError
-      }
     for {
-      cmdOrError <- cmdOrErrorIO
+      rawCmd <- tio.readPromptedLine(s"Player $dummy command?: ")
+      cmdOrError <- IO(parseCommand(rawCmd))
       eventualCmd <- cmdOrError match {
         case Right(cmd) =>
           // ?? Q:  This IO (along with the composed one for Left(...)) gets
