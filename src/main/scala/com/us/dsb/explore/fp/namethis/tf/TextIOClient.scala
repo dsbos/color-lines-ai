@@ -55,7 +55,10 @@ object TextIOClient extends App {
   def getCommand(tio: SegregatedTextIO, dummy: String): IO[UICommand] = {
     for {
       rawCmd <- tio.readPromptedLine(s"Player $dummy command?: ")
-      cmdOrError <- IO(parseCommand(rawCmd))
+      // ?? Q: Which form is more normal? (Note that error is re bad user input,
+      //   no, say, IOException.):
+      //cmdOrError <- IO(parseCommand(rawCmd))
+      cmdOrError = parseCommand(rawCmd)
       eventualCmd <- cmdOrError match {
         case Right(cmd) =>
           // ?? Q:  This IO (along with the composed one for Left(...)) gets
