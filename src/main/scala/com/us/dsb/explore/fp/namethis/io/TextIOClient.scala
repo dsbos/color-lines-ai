@@ -1,7 +1,7 @@
-package com.us.dsb.explore.fp.namethis.tf
+package com.us.dsb.explore.fp.namethis.io
 
 import cats.effect.IO
-import com.us.dsb.explore.fp.namethis.tf.LiveColoredConsoleTextIO
+import com.us.dsb.explore.fp.namethis.io.LiveColoredConsoleTextIO
 import cats.syntax.either._
 
 /** TTT UI controller. */

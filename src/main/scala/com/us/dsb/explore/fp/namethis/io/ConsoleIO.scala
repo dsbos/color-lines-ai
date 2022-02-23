@@ -1,4 +1,4 @@
-package com.us.dsb.explore.fp.namethis.tf
+package com.us.dsb.explore.fp.namethis.io
 
 import cats.effect.IO
 
