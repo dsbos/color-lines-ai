@@ -1,7 +1,7 @@
 //??? TO BE reworked into tagless-final form:
 package com.us.dsb.explore.fp.namethis.tf
 
-import cats.effect.IO
+import cats.effect.IO/**/
 import com.us.dsb.explore.fp.namethis.io.TextIOClient.UICommand
 import org.scalatest.AppendedClues._
 import org.scalatest.funspec.AnyFunSpec
@@ -16,30 +16,30 @@ class TextIOClientTest extends AnyFunSpec {
     // (no tracking of via which method wrote string)
     def getPrintedStrings: List[String] = printedStrings
 
-    override def printStateText(lineOrLines: String): IO[Unit] = {
+    override def printStateText(lineOrLines: String): IO/**/[Unit] = {
       printedStrings ::= lineOrLines
-      IO(())
+      IO/**/(())
     }
 
-    override def readPromptedLine(prompt: String): IO[String] = {
+    override def readPromptedLine(prompt: String): IO/**/[String] = {
       printedStrings ::= prompt
       remainingInputs match {
         case head +: tail =>
           remainingInputs = tail
-          IO(head)
+          IO/**/(head)
         case Nil =>
           ???
       }
     }
 
-    override def printError(fullLine: String): IO[Unit] = {
+    override def printError(fullLine: String): IO/**/[Unit] = {
       printedStrings ::= fullLine
-      IO(())
+      IO/**/(())
     }
 
-    override def printResult(lineOrLines: String): IO[Unit] = {
+    override def printResult(lineOrLines: String): IO/**/[Unit] = {
       printedStrings ::= lineOrLines
-      IO(())
+      IO/**/(())
     }
 
   }

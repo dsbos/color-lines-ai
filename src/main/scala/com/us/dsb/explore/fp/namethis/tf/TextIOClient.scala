@@ -1,7 +1,8 @@
 //??? TO BE reworked into tagless-final form:
 package com.us.dsb.explore.fp.namethis.tf
 
-import cats.effect.IO
+import cats.Functor
+import cats.effect.IO/**/
 import com.us.dsb.explore.fp.namethis.tf.LiveColoredConsoleTextIO
 import cats.syntax.either._
 
@@ -43,8 +44,14 @@ object TextIOClient extends App {
     }
   }
 
-  def callSimply(tio: SegregatedTextIO, dummy: String): IO[Either[String, UICommand]] = {
+  //???? Q: How to use Functor around here to make a .map be findable for
+  // "rawCmd <- tio.readPromptedLine(...)"?  ": Functor"?  "<: Functor"?
+  def callSimply[F[_]: Functor](tio: SegregatedTextIO[F], dummy: String): F[Either[String, UICommand]] = {
+    val temp_functor_of_f = implicitly[Functor[F]]
+    val temp_functor_of_f_map = temp_functor_of_f.map[Int, Float] _
+
     for {
+      // currently get: "value map is not a member of type parameter F[String]":
       rawCmd <- tio.readPromptedLine(s"Player $dummy command?: ")
       cmd = parseCommand(rawCmd)
       _ <- tio.printResult("Parsing result = " + cmd)
@@ -53,21 +60,21 @@ object TextIOClient extends App {
 
 
   //@tailrec
-  def getCommand(tio: SegregatedTextIO, dummy: String): IO[UICommand] = {
+  def getCommand(tio: SegregatedTextIO, dummy: String): IO/**/[UICommand] = {
     for {
       rawCmd <- tio.readPromptedLine(s"Player $dummy command?: ")
       // ?? Q: Which form is more normal? (Note that error is re bad user input,
       //   no, say, IOException.):
-      //cmdOrError <- IO(parseCommand(rawCmd))
+      //cmdOrError <- IO/**/(parseCommand(rawCmd))
       cmdOrError = parseCommand(rawCmd)
       eventualCmd <- cmdOrError match {
         case Right(cmd) =>
-          // ?? Q:  This IO (along with the composed one for Left(...)) gets
+          // ?? Q:  This IO/**/ (along with the composed one for Left(...)) gets
           //   created only after things start running (since the parsed command
           //   can't be available before then).  Is it normal to create
-          //   additional IO objects after things start running, or is something
+          //   additional IO/**/ objects after things start running, or is something
           //   around here an abnormal way of doing things?
-          IO.pure(cmd)
+          IO/**/.pure(cmd)
         case Left(msg) =>
           tio.printError(msg) *>  // ???? STUDY
           getCommand(tio, dummy) // loop

@@ -1,7 +1,7 @@
 //??? TO BE reworked into tagless-final form:
 package com.us.dsb.explore.fp.namethis.tf
 
-import cats.effect.IO
+import cats.effect.IO/**/
 import org.scalatest.LoneElement
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers._
@@ -22,18 +22,18 @@ class ConsoleIOTest extends AnyFunSpec {
     private var printedStrings: List[String] = Nil;
     def getPrintedStrings: List[String] = printedStrings
 
-    override def println(lineOrLines: String): IO[Unit] = {
+    override def println(lineOrLines: String): IO/**/[Unit] = {
       printedStrings ::= lineOrLines
-      IO(())
+      IO/**/(())
     }
 
-    override def readLine(prompt: String): IO[String] = {
+    override def readLine(prompt: String): IO/**/[String] = {
       printedStrings ::= prompt
 
       stringsToRead match {
         case head +: tail =>
           stringsToRead = tail
-          IO(head)
+          IO/**/(head)
         case _ =>
           ???
       }
