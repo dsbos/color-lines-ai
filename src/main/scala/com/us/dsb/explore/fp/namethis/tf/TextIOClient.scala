@@ -1,7 +1,6 @@
 //??? TO BE reworked into tagless-final form:
 package com.us.dsb.explore.fp.namethis.tf
 
-import cats.effect.IO/**/
 import com.us.dsb.explore.fp.namethis.tf.LiveColoredConsoleTextIO
 import cats.syntax.either._
 
@@ -43,10 +42,10 @@ object TextIOClient extends App {
     }
   }
 
-  import cats.{FlatMap, Functor}
+  import cats.{Applicative, Apply, FlatMap, Functor, Monad}
 
   // (FlatMap includes Functor:)
-  def callSimply[F[_]/*: Functor*/: FlatMap](tio: SegregatedTextIO[F], dummy: String): F[Either[String, UICommand]] = {
+  def callSimply[F[_]: FlatMap](tio: SegregatedTextIO[F], dummy: String): F[Either[String, UICommand]] = {
     import cats.syntax.functor._  // to wrap "x <- ...: F" to get .map
     import cats.syntax.flatMap._  // to wrap "x <- ...: F" to get .flatMap
     for {
@@ -56,28 +55,28 @@ object TextIOClient extends App {
     } yield (cmd)
   }
 
-
   //@tailrec
-  def getCommand(tio: SegregatedTextIO, dummy: String): IO/**/[UICommand] = {
+  // (Monad includes FlatMap, Applicative, etc.:
+  def getCommand[F[_]: Monad](tio: SegregatedTextIO[F], dummy: String): F[Either[String, UICommand]] = {
+    import cats.syntax.functor._
+    import cats.syntax.flatMap._
+    import cats.syntax.applicative._
+    import cats.syntax.apply._
+    //import cats.syntax.all._
     for {
+      // getting "value map is not a member of type parameter F[String]" here:
+      //rawCmd <- tio.readPromptedLine(s"Player $dummy command?: ")
       rawCmd <- tio.readPromptedLine(s"Player $dummy command?: ")
-      // ?? Q: Which form is more normal? (Note that error is re bad user input,
-      //   no, say, IOException.):
-      //cmdOrError <- IO/**/(parseCommand(rawCmd))
       cmdOrError = parseCommand(rawCmd)
+      _ <- tio.printResult("Parsing result = " + cmdOrError)  //???
       eventualCmd <- cmdOrError match {
         case Right(cmd) =>
-          // ?? Q:  This IO/**/ (along with the composed one for Left(...)) gets
-          //   created only after things start running (since the parsed command
-          //   can't be available before then).  Is it normal to create
-          //   additional IO/**/ objects after things start running, or is something
-          //   around here an abnormal way of doing things?
-          IO/**/.pure(cmd)
+          cmd.pure[F]
         case Left(msg) =>
-          tio.printError(msg) *>  // ???? STUDY
-          getCommand(tio, dummy) // loop
+          tio.printError(msg) *>
+              getCommand(tio, dummy)  // loop
       }
-    } yield eventualCmd
+    } yield cmdOrError /*eventualCmd*/
 
   }
 
