@@ -1,7 +1,6 @@
 //??? TO BE reworked into tagless-final form:
 package com.us.dsb.explore.fp.namethis.tf
 
-import cats.Functor
 import cats.effect.IO/**/
 import com.us.dsb.explore.fp.namethis.tf.LiveColoredConsoleTextIO
 import cats.syntax.either._
@@ -44,14 +43,13 @@ object TextIOClient extends App {
     }
   }
 
-  //???? Q: How to use Functor around here to make a .map be findable for
-  // "rawCmd <- tio.readPromptedLine(...)"?  ": Functor"?  "<: Functor"?
-  def callSimply[F[_]: Functor](tio: SegregatedTextIO[F], dummy: String): F[Either[String, UICommand]] = {
-    val temp_functor_of_f = implicitly[Functor[F]]
-    val temp_functor_of_f_map = temp_functor_of_f.map[Int, Float] _
+  import cats.{FlatMap, Functor}
 
+  // (FlatMap includes Functor:)
+  def callSimply[F[_]/*: Functor*/: FlatMap](tio: SegregatedTextIO[F], dummy: String): F[Either[String, UICommand]] = {
+    import cats.syntax.functor._  // to wrap "x <- ...: F" to get .map
+    import cats.syntax.flatMap._  // to wrap "x <- ...: F" to get .flatMap
     for {
-      // currently get: "value map is not a member of type parameter F[String]":
       rawCmd <- tio.readPromptedLine(s"Player $dummy command?: ")
       cmd = parseCommand(rawCmd)
       _ <- tio.printResult("Parsing result = " + cmd)
