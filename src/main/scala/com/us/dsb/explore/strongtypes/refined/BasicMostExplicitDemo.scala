@@ -1,6 +1,5 @@
 package com.us.dsb.explore.strongtypes.refined
 
-import com.sun.xml.internal.ws.api.server.InstanceResolverAnnotation
 import eu.timepit.refined.api.{Refined, RefinedTypeOps}
 import eu.timepit.refined.numeric.Positive
 import eu.timepit.refined.types.numeric.PosInt

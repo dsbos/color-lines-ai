@@ -1,4 +1,4 @@
-//??? TO BE reworked into tagless-final form:
+//??? BEING REWORKED tagless-final(?) form:
 package com.us.dsb.explore.fp.namethis.tf
 
 import cats.effect.IO/**/

@@ -1,8 +1,10 @@
-//??? TO BE reworked into tagless-final form:
+//??? BEING REWORKED tagless-final(?) form:
 package com.us.dsb.explore.fp.namethis.tf
 
-import cats.effect.IO/**/
+import cats.Applicative
 import com.us.dsb.explore.fp.namethis.io.TextIOClient.UICommand
+import cats.effect.IO
+import cats.syntax.applicative._
 import org.scalatest.AppendedClues._
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers._
@@ -10,36 +12,36 @@ import org.scalatest.matchers.should.Matchers._
 class TextIOClientTest extends AnyFunSpec {
 
   // Crude, manual stub and spy SegregatedTextIO.
-  class SegregatedTextIODouble(inputLines: String*) extends SegregatedTextIO {
+  class SegregatedTextIODouble[F[_]: Applicative](inputLines: String*) extends SegregatedTextIO[F] {
     private var remainingInputs = inputLines
     private var printedStrings: List[String] = Nil
     // (no tracking of via which method wrote string)
     def getPrintedStrings: List[String] = printedStrings
 
-    override def printStateText(lineOrLines: String): IO/**/[Unit] = {
+    override def printStateText(lineOrLines: String): F[Unit] = {
       printedStrings ::= lineOrLines
-      IO/**/(())
+      ().pure[F]
     }
 
-    override def readPromptedLine(prompt: String): IO/**/[String] = {
+    override def readPromptedLine(prompt: String): F[String] = {
       printedStrings ::= prompt
       remainingInputs match {
         case head +: tail =>
           remainingInputs = tail
-          IO/**/(head)
+          head.pure[F]
         case Nil =>
           ???
       }
     }
 
-    override def printError(fullLine: String): IO/**/[Unit] = {
+    override def printError(fullLine: String): F[Unit] = {
       printedStrings ::= fullLine
-      IO/**/(())
+      ().pure[F]
     }
 
-    override def printResult(lineOrLines: String): IO/**/[Unit] = {
+    override def printResult(lineOrLines: String): F[Unit] = {
       printedStrings ::= lineOrLines
-      IO/**/(())
+      ().pure[F]
     }
 
   }
@@ -51,7 +53,7 @@ class TextIOClientTest extends AnyFunSpec {
 
     describe("NT.for some valid command:") {
       object LazyShared {
-        val ioDouble = new SegregatedTextIODouble("u")
+        val ioDouble = new SegregatedTextIODouble[IO]("u")
         val call = TextIOClient.getCommand(ioDouble, "<dummy X>")
         val callResult = call.unsafeRunSync()
       }
@@ -71,7 +73,7 @@ class TextIOClientTest extends AnyFunSpec {
 
     describe("NT.for invalid command(s) and then valid command:") {
       object LazyShared {
-        val ioDouble = new SegregatedTextIODouble("?", "u")
+        val ioDouble = new SegregatedTextIODouble[IO]("?", "u")
         val call = TextIOClient.getCommand(ioDouble, "<dummy X>")
         val callResult = call.unsafeRunSync()
       }

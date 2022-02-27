@@ -1,10 +1,13 @@
-//??? TO BE reworked into tagless-final form:
+//??? BEING REWORKED tagless-final(?) form:
 package com.us.dsb.explore.fp.namethis.tf
 
+import cats.Applicative
 import cats.effect.IO/**/
 import org.scalatest.LoneElement
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers._
+import cats.syntax.applicative._  // for .pure[...]
+
 
 class ConsoleIOTest extends AnyFunSpec {
 
@@ -17,23 +20,23 @@ class ConsoleIOTest extends AnyFunSpec {
   }
 
   // Crude, manual stub and spy ConsoleIO.
-  class ConsoleIODouble(inputLines: String*) extends ConsoleIO {
+  class ConsoleIODouble[F[_]: Applicative](inputLines: String* /* ???? F[_]? */) extends ConsoleIO[F] {
     private var stringsToRead = inputLines
     private var printedStrings: List[String] = Nil;
-    def getPrintedStrings: List[String] = printedStrings
+    def getPrintedStrings: List[String] = printedStrings  // ???? F[_]?
 
-    override def println(lineOrLines: String): IO/**/[Unit] = {
+    override def println(lineOrLines: String): F[Unit] = {
       printedStrings ::= lineOrLines
-      IO/**/(())
+      ().pure[F]
     }
 
-    override def readLine(prompt: String): IO/**/[String] = {
+    override def readLine(prompt: String): F[String] = {
       printedStrings ::= prompt
 
       stringsToRead match {
         case head +: tail =>
           stringsToRead = tail
-          IO/**/(head)
+          head.pure[F]
         case _ =>
           ???
       }
@@ -43,21 +46,21 @@ class ConsoleIOTest extends AnyFunSpec {
   describe("NT.ColoredConsoleTextIO") {
     import org.scalatest.LoneElement._
 
-    def getUUT(consoleIODouble: ConsoleIO): SegregatedTextIO = {
+    def getUUT[F[_]](consoleIODouble: ConsoleIO[F]): SegregatedTextIO[F] = {  //???? still F or now IO/etc.?
       // Demo:  Try injecting "bad" UUT and see how failing conditions show up:
       new ColoredConsoleTextIO(consoleIODouble)
       //new PlainConsoleTextIO(consoleIODouble)
     }
 
     describe("NT.printStateText should print given text plainly; output should:") {
-      lazy val printedStrings = {
-        val consoleIODouble = new ConsoleIODouble
-        val uut = getUUT(consoleIODouble)
-
+      object BreakpointableLazy {
+        private val consoleIODouble = new ConsoleIODouble[IO]
+        private val uut = getUUT(consoleIODouble)
         uut.printStateText("text")
-
-        consoleIODouble.getPrintedStrings
+        val printedStrings = consoleIODouble.getPrintedStrings
       }
+      //???? where  unsafeRun...?
+      import BreakpointableLazy._
       it("NT.include given text") {
         printedStrings.loneElement should include ("text")
       }
@@ -73,7 +76,7 @@ class ConsoleIOTest extends AnyFunSpec {
     describe("NT.printError should print given text in red; output should:") {
       // Note:  "lazy" avoids executing during ScalaTest's registration phase.
       lazy val printedStrings = {
-        val consoleIODouble = new ConsoleIODouble
+        val consoleIODouble = new ConsoleIODouble[IO]
         val uut = getUUT(consoleIODouble)
 
         uut.printError("given text")
@@ -96,7 +99,7 @@ class ConsoleIOTest extends AnyFunSpec {
 
     // Demo:  checking subconditions with "should ... and ..." (in one test):
     it("NT.printResult should print given text in bold (should ... and ...)") {
-      val consoleIODouble = new ConsoleIODouble
+      val consoleIODouble = new ConsoleIODouble[IO]
       val uut = getUUT(consoleIODouble)
 
       uut.printResult("given text")
@@ -113,7 +116,7 @@ class ConsoleIOTest extends AnyFunSpec {
 
     describe("NT.readPromptedLine should print given prompt value and get input") {
       lazy val (printedStrings, lineRead) = {
-        val consoleIODouble = new ConsoleIODouble("given input")
+        val consoleIODouble = new ConsoleIODouble[IO]("given input")
         val uut = getUUT(consoleIODouble)
 
         val lineRead = uut.readPromptedLine("given text")
