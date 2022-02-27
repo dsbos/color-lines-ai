@@ -4,7 +4,7 @@ import org.scalatest.LoneElement
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers._
 
-class TextIOTest extends AnyFunSpec {
+private[manual] class TextIOTest extends AnyFunSpec {
 
   it/*describe*/("TextIO?:") {
     cancel()
@@ -17,15 +17,15 @@ class TextIOTest extends AnyFunSpec {
   // Crude, manual stub and spy ConsoleIO.
   class ConsoleIODouble(inputLines: String*) extends ConsoleIO {
     private var stringsToRead = inputLines
-    private var printedStrings: List[String] = Nil;
-    def getPrintedStrings: List[String] = printedStrings
+    private var printedStringsReversed: List[String] = Nil;
+    def getPrintedStrings: List[String] = printedStringsReversed.reverse
 
     override def println(lineOrLines: String): Unit = {
-      printedStrings ::= lineOrLines
+      printedStringsReversed ::= lineOrLines
     }
 
     override def readLine(prompt: String): String = {
-      printedStrings ::= prompt
+      printedStringsReversed ::= prompt
 
       stringsToRead match {
         case head +: tail =>

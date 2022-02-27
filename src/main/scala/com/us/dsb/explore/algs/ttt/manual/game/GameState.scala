@@ -26,10 +26,10 @@ import GameState._
  *
  * @param gameResult  `None` means no win or draw yet
  */
-case class GameState(board: Board,
-                     gameResult: Option[GameResult],
-                     currentPlayer: Player
-                    ) {
+private[manual] case class GameState(board: Board,
+                                     gameResult: Option[GameResult],
+                                     currentPlayer: Player
+                                    ) {
 
   // ?? later refine from Either[String, ...] to "fancier" error type
   // ?? maybe add result of move (win/draw/other) with new state (so caller

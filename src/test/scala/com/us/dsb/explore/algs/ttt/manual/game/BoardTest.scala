@@ -9,7 +9,7 @@ import org.scalatest.matchers.should.Matchers._
 //import org.scalatest.funspec._
 //import org.scalatest.matchers._
 
-class BoardTest extends AnyFunSpec {
+private[manual] class BoardTest extends AnyFunSpec {
 
 
   private lazy val variedFilledBoard = {

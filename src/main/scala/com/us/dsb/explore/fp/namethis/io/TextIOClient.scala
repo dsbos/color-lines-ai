@@ -5,7 +5,7 @@ import com.us.dsb.explore.fp.namethis.io.LiveColoredConsoleTextIO
 import cats.syntax.either._
 
 /** TTT UI controller. */
-object TextIOClient extends App {
+private[io] object TextIOClient extends App {
 
   // ("extends EnumEntry" gets .entryName, enables Enum; "extends Enum[...]"
   // enables (and requires) .values.

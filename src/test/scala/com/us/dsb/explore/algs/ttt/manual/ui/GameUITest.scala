@@ -7,7 +7,7 @@ import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers._
 
 
-class GameUITest extends AnyFunSpec {
+private[manual] class GameUITest extends AnyFunSpec {
 
 
   // Crude, manual stub and spy SegregatedTextIO.

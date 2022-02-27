@@ -9,7 +9,7 @@ import scala.annotation.tailrec
 import scala.util.chaining.scalaUtilChainingOps
 
 /** TTT UI controller. */
-object TextIOClient extends App {
+private[orig] object TextIOClient extends App {
 
   // ("extends EnumEntry" gets .entryName, enables Enum; "extends Enum[...]"
   // enables (and requires) .values.
