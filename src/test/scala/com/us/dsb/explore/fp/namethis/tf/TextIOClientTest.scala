@@ -1,9 +1,9 @@
 //??? BEING REWORKED tagless-final(?) form:
 package com.us.dsb.explore.fp.namethis.tf
 
-import cats.Applicative
-import com.us.dsb.explore.fp.namethis.io.TextIOClient.UICommand
-import cats.effect.IO
+import cats.{Applicative, Id}
+import com.us.dsb.explore.fp.namethis.tf.TextIOClient.UICommand
+//?????import cats.effect.IO
 import cats.syntax.applicative._
 import org.scalatest.AppendedClues._
 import org.scalatest.funspec.AnyFunSpec
@@ -12,7 +12,7 @@ import org.scalatest.matchers.should.Matchers._
 class TextIOClientTest extends AnyFunSpec {
 
   // Crude, manual stub and spy SegregatedTextIO.
-  class SegregatedTextIODouble[F[_]: Applicative](inputLines: String*) extends SegregatedTextIO[F] {
+  class SegregatedTextIODouble[F[_]: Applicative](inputLines: String* /* ???? F[_]? */) extends SegregatedTextIO[F] {
     private var remainingInputs = inputLines
     private var printedStringsReversed: List[String] = Nil  // ???? State?
     // (no tracking of via which method wrote string)
@@ -53,9 +53,9 @@ class TextIOClientTest extends AnyFunSpec {
 
     describe("NT.for some valid command:") {
       object LazyShared {
-        val ioDouble = new SegregatedTextIODouble[IO]("u")
+        val ioDouble = new SegregatedTextIODouble[Id]("u")
         val call = TextIOClient.getCommand(ioDouble, "<dummy X>")
-        val callResult = call.unsafeRunSync()
+        val callResult = call/*.unsafeRunSync()*/
       }
       import LazyShared._
 
@@ -66,25 +66,27 @@ class TextIOClientTest extends AnyFunSpec {
         callResult shouldBe UICommand.Up withClue
             s"(printed strings: ${ioDouble.getPrintedStrings}"
       }
-      it("NT.should emit only prompt line (once)") {
-        ioDouble.getPrintedStrings should have length 1
+      it("NT.should emit prompt line and 'result = ' line ") {
+        ioDouble.getPrintedStrings should have length 2 withClue
+            s"(printed strings: ${ioDouble.getPrintedStrings}"
       }
     }
 
     describe("NT.for invalid command(s) and then valid command:") {
       object LazyShared {
-        val ioDouble = new SegregatedTextIODouble[IO]("?", "u")
+        val ioDouble = new SegregatedTextIODouble[Id]("?", "u")
         val call = TextIOClient.getCommand(ioDouble, "<dummy X>")
-        val callResult = call.unsafeRunSync()
+        val callResult = call/*.unsafeRunSync()*/
       }
       import LazyShared._
 
-      it("NT.should emit prompt, error, and second prompt line") {
+      it("NT.should emit prompt, error, and second prompt line, plus `result =` lines ") {
         ioDouble.getPrintedStrings shouldBe
             List("Player <dummy X> command?: ",
+                 "(Parsing result = Left(Invalid input \"?\"; try u(p), d(own), l(eft), r(right), m(ark), or q(uit)))",
                  "Invalid input \"?\"; try u(p), d(own), l(eft), r(right), m(ark), or q(uit)",
-                 "Player <dummy X> command?: ")
-        // Theoretically, check specifics.
+                 "Player <dummy X> command?: ",
+                 "(Parsing result = Right(Up))")
       }
       it("NT.should return decoded eventual valid command") {
         // Note: Can't break line line before withClue; "... . withClue(...)" and

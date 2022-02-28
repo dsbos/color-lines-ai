@@ -51,13 +51,13 @@ private[fp] object TextIOClient extends App {
     for {
       rawCmd <- tio.readPromptedLine(s"Player $dummy command?: ")
       cmd = parseCommand(rawCmd)
-      _ <- tio.printResult("Parsing result = " + cmd)
+      _ <- tio.printResult(s"(Parsing result = cmd)")
     } yield (cmd)
   }
 
   //@tailrec
   // (Monad includes FlatMap, Applicative, etc.:
-  def getCommand[F[_]: Monad](tio: SegregatedTextIO[F], dummy: String): F[Either[String, UICommand]] = {
+  def getCommand[F[_]: Monad](tio: SegregatedTextIO[F], dummy: String): F[UICommand] = {
     import cats.syntax.functor._
     import cats.syntax.flatMap._
     import cats.syntax.applicative._
@@ -68,7 +68,7 @@ private[fp] object TextIOClient extends App {
       //rawCmd <- tio.readPromptedLine(s"Player $dummy command?: ")
       rawCmd <- tio.readPromptedLine(s"Player $dummy command?: ")
       cmdOrError = parseCommand(rawCmd)
-      _ <- tio.printResult("Parsing result = " + cmdOrError)  //???
+      _ <- tio.printResult(s"(Parsing result = $cmdOrError)")  //???
       eventualCmd <- cmdOrError match {
         case Right(cmd) =>
           cmd.pure[F]
@@ -76,7 +76,7 @@ private[fp] object TextIOClient extends App {
           tio.printError(msg) *>
               getCommand(tio, dummy)  // loop
       }
-    } yield cmdOrError /*eventualCmd*/
+    } yield eventualCmd /*eventualCmd*/
 
   }
 
