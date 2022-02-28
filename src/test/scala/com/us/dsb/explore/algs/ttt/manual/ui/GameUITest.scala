@@ -6,23 +6,21 @@ import org.scalatest.AppendedClues._
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers._
 
-
 private[manual] class GameUITest extends AnyFunSpec {
-
 
   // Crude, manual stub and spy SegregatedTextIO.
   class SegregatedTextIODouble(inputLines: String*) extends SegregatedTextIO {
     private var remainingInputs = inputLines
-    private var printedStrings: List[String] = Nil
+    private var printedStringsReversed: List[String] = Nil
     // (no tracking of via which method wrote string)
-    def getPrintedStrings: List[String] = printedStrings
+    def getPrintedStrings: List[String] = printedStringsReversed.reverse
 
     override def printStateText(lineOrLines: String): Unit = {
-      printedStrings ::= lineOrLines
+      printedStringsReversed ::= lineOrLines
     }
 
     override def readPromptedLine(prompt: String): String = {
-      printedStrings ::= prompt
+      printedStringsReversed ::= prompt
       remainingInputs match {
         case head +: tail =>
           remainingInputs = tail
@@ -33,11 +31,11 @@ private[manual] class GameUITest extends AnyFunSpec {
     }
 
     override def printError(fullLine: String): Unit = {
-      printedStrings ::= fullLine
+      printedStringsReversed ::= fullLine
     }
 
     override def printResult(lineOrLines: String): Unit = {
-      printedStrings ::= lineOrLines
+      printedStringsReversed ::= lineOrLines
     }
 
   }

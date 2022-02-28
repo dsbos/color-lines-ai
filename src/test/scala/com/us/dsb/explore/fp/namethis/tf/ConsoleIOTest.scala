@@ -22,16 +22,16 @@ class ConsoleIOTest extends AnyFunSpec {
   // Crude, manual stub and spy ConsoleIO.
   class ConsoleIODouble[F[_]: Applicative](inputLines: String* /* ???? F[_]? */) extends ConsoleIO[F] {
     private var stringsToRead = inputLines
-    private var printedStrings: List[String] = Nil;
-    def getPrintedStrings: List[String] = printedStrings  // ???? F[_]?
+    private var printedStringsReversed: List[String] = Nil;
+    def getPrintedStrings: List[String] = printedStringsReversed.reverse  // ???? F[_]?
 
     override def println(lineOrLines: String): F[Unit] = {
-      printedStrings ::= lineOrLines
+      printedStringsReversed ::= lineOrLines
       ().pure[F]
     }
 
     override def readLine(prompt: String): F[String] = {
-      printedStrings ::= prompt
+      printedStringsReversed ::= prompt
 
       stringsToRead match {
         case head +: tail =>

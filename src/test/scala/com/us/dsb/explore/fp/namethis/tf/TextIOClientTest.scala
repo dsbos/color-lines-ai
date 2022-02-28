@@ -14,17 +14,17 @@ class TextIOClientTest extends AnyFunSpec {
   // Crude, manual stub and spy SegregatedTextIO.
   class SegregatedTextIODouble[F[_]: Applicative](inputLines: String*) extends SegregatedTextIO[F] {
     private var remainingInputs = inputLines
-    private var printedStrings: List[String] = Nil
+    private var printedStringsReversed: List[String] = Nil  // ???? State?
     // (no tracking of via which method wrote string)
-    def getPrintedStrings: List[String] = printedStrings
+    def getPrintedStrings: List[String] = printedStringsReversed.reverse  // ???? F[_]?
 
     override def printStateText(lineOrLines: String): F[Unit] = {
-      printedStrings ::= lineOrLines
+      printedStringsReversed ::= lineOrLines
       ().pure[F]
     }
 
     override def readPromptedLine(prompt: String): F[String] = {
-      printedStrings ::= prompt
+      printedStringsReversed ::= prompt
       remainingInputs match {
         case head +: tail =>
           remainingInputs = tail
@@ -35,12 +35,12 @@ class TextIOClientTest extends AnyFunSpec {
     }
 
     override def printError(fullLine: String): F[Unit] = {
-      printedStrings ::= fullLine
+      printedStringsReversed ::= fullLine
       ().pure[F]
     }
 
     override def printResult(lineOrLines: String): F[Unit] = {
-      printedStrings ::= lineOrLines
+      printedStringsReversed ::= lineOrLines
       ().pure[F]
     }
 

@@ -18,16 +18,16 @@ class ConsoleIOTest extends AnyFunSpec {
   // Crude, manual stub and spy ConsoleIO.
   class ConsoleIODouble(inputLines: String*) extends ConsoleIO {
     private var stringsToRead = inputLines
-    private var printedStrings: List[String] = Nil;
-    def getPrintedStrings: List[String] = printedStrings
+    private var printedStringsReversed: List[String] = Nil;
+    def getPrintedStrings: List[String] = printedStringsReversed.reverse
 
     override def println(lineOrLines: String): IO[Unit] = {
-      printedStrings ::= lineOrLines
+      printedStringsReversed ::= lineOrLines
       IO(())
     }
 
     override def readLine(prompt: String): IO[String] = {
-      printedStrings ::= prompt
+      printedStringsReversed ::= prompt
 
       stringsToRead match {
         case head +: tail =>
