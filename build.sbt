@@ -118,6 +118,24 @@ libraryDependencies ++= Seq(
   "org.json4s" % "json4s-jackson_2.13" % "3.6.11",  // 3.7.x?, 4.x?
   //"org.json4s" % "json4s-ast_2.13" % "3.6.11",  // 3.7.x?, 4.x?
 
+  //"io.circe" %% "circe-core" % "0.14.1",
+  //"io.circe" %% "circe-generic" % "0.14.1",
+  //"io.circe" %% "circe-generic-extras" % "0.14.1",
+  "io.circe" %% "circe-literal" % "0.14.1",
+  "io.circe" %% "circe-jawn" % "0.14.1",
+  //"io.circe" %% "circe-optics" % "0.14.1",
+  //"io.circe" %% "circe-parser" % "0.14.1",
+
+  "com.stephenn" %% "scalatest-circe" % "0.2.0" % Test,
+
+  "com.stephenn" %% "scalatest-json-jsonassert" % "0.2.0" % Test,
+  "com.stephenn" %% "scalatest-json4s" % "0.2.0" % Test,
+  "com.stephenn" %% "scalatest-play-json" % "0.2.0" % Test,
+  "com.stephenn" %% "scalatest-circe" % "0.2.0" % Test,
+  "com.stephenn" %% "scalatest-argonaut" % "0.2.0" % Test,
+  "com.stephenn" %% "scalatest-jsoniter-scala" % "0.2.0" % Test,
+
+  "com.softwaremill.diffx" %% "diffx-scalatest-should" % "0.7.0" % Test,
 
 
   // Stronger types:  newtypes and refine's refinement types
