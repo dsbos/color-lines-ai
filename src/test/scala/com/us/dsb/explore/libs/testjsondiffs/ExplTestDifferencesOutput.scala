@@ -16,19 +16,22 @@ class ExplTestDifferencesOutput extends AnyFunSpec {
 
   if (enable) {
     describe("object differencing") {
-      it("??") {
+      import com.softwaremill.diffx.scalatest.DiffShouldMatcher._
 
-        import com.softwaremill.diffx.scalatest.DiffShouldMatcher._
-        import com.softwaremill.diffx.generic.auto._ //???? try semi-auto derivation
+      it("simple case class") {
+        case class C(a: String, b: List[Int], x: Int = 1)
 
-        case class C(a: String, b: List[Int], x: Unit)
-        val a = C("one", List(1, 2, 3, 4), ())
-        val b = C("two", List(1, 2, 4, 5), ())
+        // (Use semi-automatic derivation; avoid slow compilation (multiple macros).)
+        import com.softwaremill.diffx.Diff
+        implicit val diffForC = Diff.derived[C]
+
+        val a = C("one", List(1, 2, 3, 4), 0)
+        val b = C("two", List(1, 2, 4, 5), 0)
+
         a shouldMatchTo b
       }
 
     }
-
 
     describe("??1") {
       object NameThis {
