@@ -126,17 +126,23 @@ libraryDependencies ++= Seq(
   //"io.circe" %% "circe-optics" % "0.14.1",
   //"io.circe" %% "circe-parser" % "0.14.1",
 
-  "com.stephenn" %% "scalatest-circe" % "0.2.0" % Test,
 
-  "com.stephenn" %% "scalatest-json-jsonassert" % "0.2.0" % Test,
+  // NOTE:  Can't use both latest scalatest-argonaut (0.2.5) and
+  // diffx-scalatest-should, because 1) the former uses old and incompatible
+  // version 0.3.29 of diffx-core_2.13 and 2) diffx-scalatest-should doesn't
+  // have a version that uses diffx-core_2.13 < 0.6.0.
+  //
+  // SO, we can't (currently) get differences in the "<old value> -> <new value>"
+  // form for both JSON and regular objects.
+
+  "com.stephenn" %% "scalatest-circe" % "0.2.5" % Test,
+  "com.stephenn" %% "scalatest-json-jsonassert" % "0.2.5" % Test,
   "com.stephenn" %% "scalatest-json4s" % "0.2.0" % Test,
-  "com.stephenn" %% "scalatest-play-json" % "0.2.0" % Test,
-  "com.stephenn" %% "scalatest-circe" % "0.2.0" % Test,
-  "com.stephenn" %% "scalatest-argonaut" % "0.2.0" % Test,
-  "com.stephenn" %% "scalatest-jsoniter-scala" % "0.2.0" % Test,
+  "com.stephenn" %% "scalatest-play-json" % "0.2.5" % Test,
+  "com.stephenn" %% "scalatest-argonaut" % "0.2.5" % Test,
+  "com.stephenn" %% "scalatest-jsoniter-scala" % "0.2.5" % Test,
 
   "com.softwaremill.diffx" %% "diffx-scalatest-should" % "0.7.0" % Test,
-
 
   // Stronger types:  newtypes and refine's refinement types
   "io.estatico" %% "newtype"             % "0.4.3",

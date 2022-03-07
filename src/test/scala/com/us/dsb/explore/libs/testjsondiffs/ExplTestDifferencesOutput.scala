@@ -46,12 +46,21 @@ class ExplTestDifferencesOutput extends AnyFunSpec {
 
       //??? What about straight from Circe Json?
 
-      //??? Check out diffx -- see Patience algorithm   (with ...remembering._)
+      //??? Check out diffx -- see Patience algorithm (with ...remembering._)
       // ????? see "diffx-scalatest-should"
 
+      // Note:  scalatest-argonaut uses diffx, also displaying changes as
+      // "<old> -> <new>", BUT it can't co-exist with diffx-scalatest-should,
+      // since the former depends on an old, incompatable version of diffx-core.
+      it("1. scalatest-argonaut (unified-diffs ~JSON; with removed values; no whole values") {
+        pending
+        import com.stephenn.scalatest.argonaut.JsonMatchers._
+        newJson.toString should matchJson(refJson.toString())
+      }
+
       it("?? plain ScalaTest on Circe (no diffs; with whole values; get IDE 'see difference') (????)") {
-        eqvJson shouldEqual (refJson)
-        newJson shouldEqual (refJson)
+        eqvJson shouldEqual refJson
+        newJson shouldEqual refJson
       }
 
       it("?? Json4s diff (just printing)") {
@@ -98,11 +107,6 @@ class ExplTestDifferencesOutput extends AnyFunSpec {
         println("(+: doesn't automatically do ScalaTest failure)")
       }
 
-      it("1. scalatest-argonaut (unified-diffs ~JSON; with removed values; no whole values") {
-        import com.stephenn.scalatest.argonaut.JsonMatchers._
-        newJson.toString should matchJson(refJson.toString())
-      }
-
       it("?? scalatest-json4s (no removed values; as JSON; with whole values)") {
         import com.stephenn.scalatest.json4s.JsonMatchers._
         newJson.toString should matchJson(refJson.toString())
@@ -122,7 +126,6 @@ class ExplTestDifferencesOutput extends AnyFunSpec {
         import com.stephenn.scalatest.playjson.JsonMatchers._
         newJson.toString should matchJson(refJson.toString())
       }
-
 
     }
   }
