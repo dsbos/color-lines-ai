@@ -40,37 +40,28 @@ object AttributeType {
 
 /** Attribute information shared between multiple (entity-specific) instances. */
 // ?? RENAME:
-class SharableAttributeInfo(
-                               val name: String,   // FieldName? (re JSON:API "attributes" and "relationships")
-                               val `type`: AttributeType  // ?? narrowable on owned attribute instances?
-                               // what about database mapping (column)--here? separate layer?
-                           ) {
-
-}
+class SharableAttributeInfo(val name: String,   // FieldName? (re JSON:API "attributes" and "relationships")
+                            val `type`: AttributeType  // ?? narrowable on owned attribute instances?
+                            // what about database mapping (column)--here? separate layer?
+                           )
 object SharableAttributeInfo {
-  // ??? What about String -> EntityName -> UserName?
   case object EntityName extends SharableAttributeInfo("name", AttributeType.EntityName)
   // ?? entity GUID, etc.
 }
 
-//trait xxAttribute_Owned {
-//  val parentEntity: xxEntity
-//  val name: String  // FieldName?
-//  val `type`: AttributeType
-//}
-//object xxAttribute_Owned {
-//  class /*??*/NameThis3b(val parentEntity: xxEntity,
-//                   val name: String,
-//                   val `type`: xxAttributeTypeCHOOSE) extends xxAttribute_Owned
-//  def apply(parentEntity: xxEntity, name: String, `type`: xxAttributeTypeCHOOSE): xxAttribute_Owned =
-//    new /*??*/NameThis3b(parentEntity, name, `type`)
-//
-//  //// ??? What about String -> EntityName -> UserName?
-//  //case object xxEntityName extends NameThis3b("name", AttributeTypeCHOOSE.UserName)
-//}
-//
-//
-//
+
+class AttributeInstance(
+  val baseInfo: SharableAttributeInfo,   // ??? compose or inherit?
+  val parentEntity: xxEntity  //?? "containing"?
+  // ???? narrowed type?
+  // ?? any other narrowing information?
+  // ?? any other instance-specific informatino (e.g., DB column name, if around here
+  )
+
+
+trait xxEntity  //??? TEMPORARY VERSION, for AttributeInstance.parentEntity
+
+
 //trait xxRelationship {
 //  val name: String
 //  val otherEntityType: xxEntity
