@@ -12,7 +12,7 @@ trait AttributeType {
   // maybe Scala representation type
 }
 
-class PrimitiveType(val name: String)  extends AttributeType {
+class PrimitiveType(val name: String) extends AttributeType {
   // anything specific to primitive type?
 }
 
@@ -31,9 +31,10 @@ class DerivedType(val name: String,
 
 object AttributeType {
   case object BooleanType extends PrimitiveType("boolean")
-  case object StringType extends PrimitiveType("string")
-  case object EntityName extends DerivedType("entityName", StringType)
-  case object UserName   extends DerivedType("userName", EntityName)
+  case object StringType  extends PrimitiveType("string")
+
+  case object EntityNameString extends DerivedType("entityName", StringType)
+  case object UserNameString   extends DerivedType("userName", EntityNameString)
   // (even "case object AdminUserName extends DerivedType("adminUserName", UserName)" )
   // ?? UUID/GUID, object GUID, user GUID?
 }
@@ -45,7 +46,11 @@ class SharableAttributeInfo(val name: String,   // FieldName? (re JSON:API "attr
                             // what about database mapping (column)--here? separate layer?
                            )
 object SharableAttributeInfo {
-  case object EntityName extends SharableAttributeInfo("name", AttributeType.EntityName)
+  case class GenericAttrInfo(override val name: String,
+                             override val `type`: AttributeType
+                            ) extends SharableAttributeInfo(name, `type`)
+  // ?? try with val and GenericAttrInfo--current toStrig doesn't show values
+  case object EntityNameAttr extends SharableAttributeInfo("name", AttributeType.EntityNameString)
   // ?? entity GUID, etc.
 }
 
@@ -58,18 +63,18 @@ trait AttributeInstance {
   // ?? any other instance-specific informatino (e.g., DB column name, if around here
   }
 object AttributeInstance {
-  case class NameThis(parentEntity: Entity,
+  case class AttrInst(parentEntity: Entity,
                       baseInfo: SharableAttributeInfo
                      ) extends AttributeInstance
   def apply(parentEntity: Entity,
             baseInfo: SharableAttributeInfo
            ): AttributeInstance =
-    NameThis(parentEntity, baseInfo)
+    AttrInst(parentEntity, baseInfo)
   def apply(parentEntity: Entity,
             name: String,
             `type`: AttributeType
            ): AttributeInstance =
-  NameThis(parentEntity, new SharableAttributeInfo(name, `type`))
+    AttrInst(parentEntity, SharableAttributeInfo.GenericAttrInfo(name, `type`))
 }
 
 trait Entity {
@@ -79,22 +84,28 @@ trait Entity {
 }
 
 
-//object xxUserEntity extends Entity {
-//  self =>
-////  val `type`: xxEntityTypeNameInfo =
-////    xxEntityTypeNameInfo("adUser", "AD User", "AD user", "...")
-//  object xxAttributes {
-//    case object name extends AttributeInstance(self,
-//                                               SharableAttributeInfo.EntityName
-//                                               )
-//  }
-//  val attributes: Set[AttributeInstance] =
-//    Set(xxAttributes.name
-//        )
-//
-////  val relationships: Set[xxRelationship] = Set()
-//
-//}
+object UserEntity extends Entity {
+  self =>  // (rename for clarity below)
+
+  //val `type`: xxEntityTypeNameInfo =
+  //  xxEntityTypeNameInfo("adUser", "AD User", "AD user", "...")
+
+  /** For directly accessible references: */
+  object Attributes {
+    // 1. Instance of common attribute:
+    // ?? re-check using objects:
+    val name = AttributeInstance(self, SharableAttributeInfo.EntityNameAttr)
+    // 2. Instance of regular ("non-common") attribute:
+    val special = AttributeInstance(self, "special", AttributeType.BooleanType)
+  }
+  /** For ~generic references/lookups/listing. */
+  val attributes: Set[AttributeInstance] =
+    Set(Attributes.name,
+        Attributes.special
+        )
+
+  //val relationships: Set[xxRelationship] = Set()
+}
 
 ///**
 // * ...
@@ -147,4 +158,10 @@ trait Entity {
 //  val otherEntityType: xxEntity
 //
 //}
-//
+
+
+object Temp extends App {
+  println("UserEntity = " + UserEntity)
+  println("UserEntity.attributes:" + UserEntity.attributes.mkString("\n- ", "\n- ", "\n"))
+
+}
