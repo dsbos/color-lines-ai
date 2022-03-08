@@ -50,24 +50,52 @@ object SharableAttributeInfo {
 }
 
 
-class AttributeInstance(
-  val baseInfo: SharableAttributeInfo,   // ??? compose or inherit?
-  val parentEntity: xxEntity  //?? "containing"?
+trait AttributeInstance {
+  val parentEntity: Entity  //?? "containing"?
+  val baseInfo: SharableAttributeInfo   // ??? compose or inherit?
   // ???? narrowed type?
   // ?? any other narrowing information?
   // ?? any other instance-specific informatino (e.g., DB column name, if around here
-  )
+  }
+object AttributeInstance {
+  case class NameThis(parentEntity: Entity,
+                      baseInfo: SharableAttributeInfo
+                     ) extends AttributeInstance
+  def apply(parentEntity: Entity,
+            baseInfo: SharableAttributeInfo
+           ): AttributeInstance =
+    NameThis(parentEntity, baseInfo)
+  def apply(parentEntity: Entity,
+            name: String,
+            `type`: AttributeType
+           ): AttributeInstance =
+  NameThis(parentEntity, new SharableAttributeInfo(name, `type`))
+}
+
+trait Entity {
+  //??val `type`: xxEntityTypeNameInfo
+  val attributes: Set[AttributeInstance]
+  //??val relationships: Set[xxRelationship]
+}
 
 
-trait xxEntity  //??? TEMPORARY VERSION, for AttributeInstance.parentEntity
-
-
-//trait xxRelationship {
-//  val name: String
-//  val otherEntityType: xxEntity
+//object xxUserEntity extends Entity {
+//  self =>
+////  val `type`: xxEntityTypeNameInfo =
+////    xxEntityTypeNameInfo("adUser", "AD User", "AD user", "...")
+//  object xxAttributes {
+//    case object name extends AttributeInstance(self,
+//                                               SharableAttributeInfo.EntityName
+//                                               )
+//  }
+//  val attributes: Set[AttributeInstance] =
+//    Set(xxAttributes.name
+//        )
+//
+////  val relationships: Set[xxRelationship] = Set()
 //
 //}
-//
+
 ///**
 // * ...
 // * @param singularIdentifer ...; e.g., adminUser    (JSON:API type)
@@ -104,35 +132,19 @@ trait xxEntity  //??? TEMPORARY VERSION, for AttributeInstance.parentEntity
 //
 //}
 //
-//trait xxEntity {
-//  val `type`: xxEntityTypeNameInfo
-//  val attributes_1: Set[xxAttribute_Sharable]
-//  val attributes_2: Set[xxAttribute_Owned]
-//  val relationships: Set[xxRelationship]
-//}
 //
 //trait xxEntityTableColumn
 //trait xxEntityTable
 //
 //
 //
-//object xxUserEntity extends xxEntity {
-//  val `type`: xxEntityTypeNameInfo =
-//    xxEntityTypeNameInfo("adUser", "AD User", "AD user", "...")
-//  object xxAttributes {
-//    val name_1 = xxAttribute_Sharable.xxEntityName
-//    case object xxname_2 extends xxAttribute_Owned.NameThis3b(xxUserEntity, "name", xxAttributeTypeCHOOSE.xxUserName)
-//  }
-//  val attributes_1: Set[xxAttribute_Sharable] =
-//    Set(xxAttributes.name_1
-//    )
-//  val attributes_2: Set[xxAttribute_Owned] =
-//    Set(xxAttributes.xxname_2
-//    )
-//  val relationships: Set[xxRelationship] = Set()
-//
-//}
 //
 ////object xxDomainEntity extends xxEntity
 //
+//
+//trait xxRelationship {
+//  val name: String
+//  val otherEntityType: xxEntity
+//
+//}
 //
