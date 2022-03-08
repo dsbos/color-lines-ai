@@ -35,22 +35,24 @@ object AttributeType {
   case object EntityName extends DerivedType("entityName", StringType)
   case object UserName   extends DerivedType("userName", EntityName)
   // (even "case object AdminUserName extends DerivedType("adminUserName", UserName)" )
+  // ?? UUID/GUID, object GUID, user GUID?
 }
 
+/** Attribute information shared between multiple (entity-specific) instances. */
+// ?? RENAME:
+class SharableAttributeInfo(
+                               val name: String,   // FieldName? (re JSON:API "attributes" and "relationships")
+                               val `type`: AttributeType  // ?? narrowable on owned attribute instances?
+                               // what about database mapping (column)--here? separate layer?
+                           ) {
 
-//trait xxAttribute_Sharable {
-//  val name: String  // FieldName?
-//  val `type`: AttributeType
-//}
-//object xxAttribute_Sharable {
-//  class /*??*/NameThis3(val name: String, val `type`: AttributeType) extends xxAttribute_Sharable
-//  def apply(name: String, `type`: AttributeType): xxAttribute_Sharable =
-//    new /*??*/NameThis3(name, `type`)
-//
-//  // ??? What about String -> EntityName -> UserName?
-//  case object xxEntityName extends NameThis3("name", xxAttributeTypeCHOOSE.xxUserName)
-//}
-//
+}
+object SharableAttributeInfo {
+  // ??? What about String -> EntityName -> UserName?
+  case object EntityName extends SharableAttributeInfo("name", AttributeType.EntityName)
+  // ?? entity GUID, etc.
+}
+
 //trait xxAttribute_Owned {
 //  val parentEntity: xxEntity
 //  val name: String  // FieldName?
