@@ -41,16 +41,21 @@ object AttributeType {
 
 /** Attribute information shared between multiple (entity-specific) instances. */
 // ?? RENAME:
-class SharableAttributeInfo(val name: String,   // FieldName? (re JSON:API "attributes" and "relationships")
+class SharableAttributeInfo(val fieldName: String,   // FieldName? (re JSON:API "attributes" and "relationships")
+                            val uiLabel: String,
                             val `type`: AttributeType  // ?? narrowable on owned attribute instances?
                             // what about database mapping (column)--here? separate layer?
                            )
 object SharableAttributeInfo {
-  case class GenericAttrInfo(override val name: String,
+  case class GenericAttrInfo(override val fieldName: String,
+                             override val uiLabel: String,
                              override val `type`: AttributeType
-                            ) extends SharableAttributeInfo(name, `type`)
-  // ?? try with val and GenericAttrInfo--current toStrig doesn't show values
-  case object EntityNameAttr extends SharableAttributeInfo("name", AttributeType.EntityNameString)
+                            ) extends SharableAttributeInfo(fieldName, uiLabel, `type`)
+  // ?? Would we want to try with val and GenericAttrInfo?  Current toString
+  // doesn't show values.  But then toString is minor factor.  CHECK JSON codecs.
+  case object EntityNameAttr extends SharableAttributeInfo("name",
+                                                           "Name",
+                                                           AttributeType.EntityNameString)
   // ?? entity GUID, etc.
 }
 
@@ -71,87 +76,107 @@ object AttributeInstance {
            ): AttributeInstance =
     AttrInst(parentEntity, baseInfo)
   def apply(parentEntity: Entity,
-            name: String,
+            fieldName: String,
+            uiLabel: String,
             `type`: AttributeType
            ): AttributeInstance =
-    AttrInst(parentEntity, SharableAttributeInfo.GenericAttrInfo(name, `type`))
+    AttrInst(parentEntity, SharableAttributeInfo.GenericAttrInfo(fieldName, uiLabel, `type`))
+}
+
+/**
+ * ...
+ * @param singularIdentifer ...; e.g., adminUser    (JSON:API type)
+ * @param pluralIdentifer   ...; e.g., adminUsers   (JSON:API URL segment)
+ * @param singularLabel     ...; e.g., Admin. User  (single-thing UI label)
+ * @param pluralLabel       ...; e.g., Admin. Users (things-list UI label)
+ * @param singularPhrase    ...; e.g., admin. user  (single-thing phrase)
+ * @param pluralPhrase      ...; e.g., admin. users (multiple-things phrase)
+ * @param other             e.g., description of entity kind, tool-tips, etc.
+ */
+case class EntityTypeNameInfo(
+  singularIdentifer: String,
+  pluralIdentifer: String,
+  singularLabel: String,
+  pluralLabel: String,
+  singularPhrase: String,
+  pluralPhrase: String,
+  other: String
+  )
+object EntityTypeNameInfo {
+  /** Constructs with plurals made by by appending "s". */
+  def apply(singularIdentifer: String,
+            singularLabel: String,
+            singularPhrase: String,
+            other: String): EntityTypeNameInfo =
+    EntityTypeNameInfo(singularIdentifer,
+                       singularIdentifer + "s",
+                       singularLabel,
+                       singularLabel + "s",
+                       singularPhrase,
+                       singularPhrase + "s",
+                       other)
 }
 
 trait Entity {
-  //??val `type`: xxEntityTypeNameInfo
+  val typeNameInfo: EntityTypeNameInfo
   val attributes: Set[AttributeInstance]
   //??val relationships: Set[xxRelationship]
 }
 
 
-object UserEntity extends Entity {
-  self =>  // (rename for clarity below)
+object Entities {
+  object UserEntity extends Entity {
+    self => // (rename for clarity below)
 
-  //val `type`: xxEntityTypeNameInfo =
-  //  xxEntityTypeNameInfo("adUser", "AD User", "AD user", "...")
+    val typeNameInfo: EntityTypeNameInfo =
+      EntityTypeNameInfo("adUser", "AD User", "AD user", "...")
 
-  /** For directly accessible references: */
-  object Attributes {
-    // 1. Instance of common attribute:
-    // ?? re-check using objects:
-    val name = AttributeInstance(self, SharableAttributeInfo.EntityNameAttr)
-    // 2. Instance of regular ("non-common") attribute:
-    val special = AttributeInstance(self, "special", AttributeType.BooleanType)
+    /** For directly accessible references: */
+    object Attributes {
+      // 1. Instance of common attribute:
+      // ?? re-check using objects:
+      val name = AttributeInstance(self, SharableAttributeInfo.EntityNameAttr)  // ????  narrow type?
+      // 2. Instance of regular ("non-common") attribute:
+      val special = AttributeInstance(self, "special", "Is Special", AttributeType.BooleanType)
+    }
+
+    /** For ~generic references/lookups/listing. */
+    val attributes: Set[AttributeInstance] =
+      Set(Attributes.name,
+          Attributes.special
+          )
+
+    //val relationships: Set[Relationship] = Set()
   }
-  /** For ~generic references/lookups/listing. */
-  val attributes: Set[AttributeInstance] =
-    Set(Attributes.name,
-        Attributes.special
-        )
 
-  //val relationships: Set[xxRelationship] = Set()
+  object DomainEntity extends Entity {
+    self => // (rename for clarity below)
+
+    val typeNameInfo: EntityTypeNameInfo =
+      EntityTypeNameInfo("adDomain", "AD Domain", "AD domain", "...")
+
+    object Attributes {
+      val name = AttributeInstance(self, SharableAttributeInfo.EntityNameAttr) // ????  narrow type?
+      val whatever = AttributeInstance(self, "whatever", "Whatever", AttributeType.BooleanType)
+    }
+
+    /** For ~generic references/lookups/listing. */
+    val attributes: Set[AttributeInstance] =
+      Set(Attributes.name,
+          Attributes.whatever
+          )
+
+    //val relationships: Set[xxRelationship] = Set()
+  }
+
+  val entities: Seq[Entity] =
+    List(UserEntity, DomainEntity)
+
 }
 
-///**
-// * ...
-// * @param singularIdentifer ...; e.g., adminUser    (JSON:API type)
-// * @param pluralIdentifer   ...; e.g., adminUsers   (JSON:API URL segment)
-// * @param singularLabel     ...; e.g., Admin. User  (single-thing UI label)
-// * @param pluralLabel       ...; e.g., Admin. Users (things-list UI label)
-// * @param singularPhrase    ...; e.g., admin. user  (single-thing message)
-// * @param pluralPhrase      ...; e.g., admin. users (multiple-things messages)
-// * @param other             e.g., description of entity kind, tool-tips, etc.
-// */
-//case class xxEntityTypeNameInfo(
-//  singularIdentifer: String,
-//  pluralIdentifer: String,
-//  singularLabel: String,
-//  pluralLabel: String,
-//  singularPhrase: String,
-//  pluralPhrase: String,
-//  other: String
-//  )
-//object xxEntityTypeNameInfo {
-//  /** Constructs with plurals made by by appending "s". */
-//  def apply(singularIdentifer: String,
-//            singularLabel: String,
-//            singularPhrase: String,
-//            other: String): xxEntityTypeNameInfo =
-//    xxEntityTypeNameInfo(singularIdentifer,
-//                       singularIdentifer + "s",
-//                       singularLabel,
-//                       singularLabel + "s",
-//                       singularPhrase,
-//                       singularPhrase + "s",
-//                       other)
-//  "".toLowerCase
-//
-//}
-//
-//
+
 //trait xxEntityTableColumn
 //trait xxEntityTable
-//
-//
-//
-//
-////object xxDomainEntity extends xxEntity
-//
 //
 //trait xxRelationship {
 //  val name: String
@@ -161,7 +186,17 @@ object UserEntity extends Entity {
 
 
 object Temp extends App {
-  println("UserEntity = " + UserEntity)
-  println("UserEntity.attributes:" + UserEntity.attributes.mkString("\n- ", "\n- ", "\n"))
+//  import Entities._
+//  println("UserEntity = " + UserEntity)
+//  println("UserEntity.typeNameInfo = " + UserEntity.typeNameInfo)
+//  println("UserEntity.attributes:" + UserEntity.attributes.mkString("\n- ", "\n- ", "\n"))
+
+  println("Entity types:")
+  Entities.entities.foreach { entityType =>
+    println("entityType = " + entityType)
+    println("entityType.typeNameInfo = " + entityType.typeNameInfo)
+    println("entityType.attributes:" + entityType.attributes.mkString("\n- ", "\n- ", "\n"))
+
+  }
 
 }
