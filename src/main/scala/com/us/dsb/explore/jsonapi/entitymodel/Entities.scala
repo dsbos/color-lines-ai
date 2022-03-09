@@ -6,7 +6,7 @@ import com.us.dsb.explore.jsonapi.entitymodel
 // ?? Maybe -> "DataType" if not just for entity attribute types.  (But in filter
 //   expressions, still closely related to attribute types.)
 
-trait AttributeType {
+trait DataType {
   val name: String  // AttributeTypeName?
   // maybe JSON representation type, or codecs
   // maybe Scala representation type
@@ -16,24 +16,26 @@ trait AttributeType {
   //  to format for whichever ones UI understands)
 }
 
-class PrimitiveType(val name: String) extends AttributeType {
-  // anything specific to primitive type? (JSON value type?)
-}
 
-// ?? Where will enumeration types fit in?
+object DataType {
 
-class DerivedType(val name: String,
-                  val baseType: AttributeType
-                 ) extends AttributeType {
-  val rootType: AttributeType = {
-    baseType match {
-      case p: PrimitiveType => p
-      case d: DerivedType => d.baseType
+  class PrimitiveType(val name: String) extends DataType {
+    // anything specific to primitive type? (JSON value type?)
+  }
+
+  // ?? Where will enumeration types fit in?
+
+  class DerivedType(val name: String,
+                    val baseType: DataType
+                   ) extends DataType {
+    val rootType: DataType = {  //?????? move to DataType(?)
+      baseType match {
+        case p: PrimitiveType => p
+        case d: DerivedType   => d.baseType
+      }
     }
   }
-}
 
-object AttributeType {
   // Primitive types:
   case object BooleanType extends PrimitiveType("boolean")
   case object StringType  extends PrimitiveType("string")
@@ -42,33 +44,34 @@ object AttributeType {
   // Derived/semantic types (including chained types):
   case object EntityNameString extends DerivedType("entityName", StringType)
   case object UserNameString   extends DerivedType("userName", EntityNameString)
+
 }
 
 /** Attribute information shared between multiple (entity-specific) instances. */
 // ?? RENAME:
 class SharableAttributeInfo(val fieldName: String,   // FieldName? (re JSON:API "attributes" and "relationships")
                             val uiLabel: String,
-                            val `type`: AttributeType  // ?? narrowable on owned attribute instances?
+                            val `type`: DataType  // ?? narrowable on owned attribute instances?
                             // what about database mapping (column)--here? separate layer?
                            )
 object SharableAttributeInfo {
   case class GenericAttrInfo(override val fieldName: String,
                              override val uiLabel: String,
-                             override val `type`: AttributeType
+                             override val `type`: DataType
                             ) extends SharableAttributeInfo(fieldName, uiLabel, `type`)
   // ?? Would we want to try with val and GenericAttrInfo?  Current toString
   // doesn't show values.  But then toString is minor factor.  CHECK JSON codecs.
-  case class BaseEntityNameAttr(override val `type`: AttributeType = AttributeType.EntityNameString)
+  case class BaseEntityNameAttr(override val `type`: DataType = DataType.EntityNameString)
       extends SharableAttributeInfo("name",
                                     "Name",
                                     `type`)
   case object PlainEntityNameAttr extends SharableAttributeInfo("name",
-                                                           "Name",
-                                                           AttributeType.EntityNameString)
+                                                                "Name",
+                                                                 DataType.EntityNameString)
 
   case object CreationDateAttr extends SharableAttributeInfo("creationDate",  // **
                                                            "Created",
-                                                           AttributeType.TimestampType)
+                                                             DataType.TimestampType)
   // ?? entity GUID, etc.
 }
 
@@ -91,7 +94,7 @@ object AttributeInstance {
   def apply(parentEntity: Entity,
             fieldName: String,
             uiLabel: String,
-            `type`: AttributeType
+            `type`: DataType
            ): AttributeInstance =
     AttrInst(parentEntity, SharableAttributeInfo.GenericAttrInfo(fieldName, uiLabel, `type`))
 }
@@ -191,10 +194,10 @@ object Entities {
       val creationDate = AttributeInstance(self, SharableAttributeInfo.CreationDateAttr)
 
       // 1a. Instance of narrowable common attribute, no refinement/narrowing:
-      val name = AttributeInstance(self, SharableAttributeInfo.BaseEntityNameAttr(AttributeType.UserNameString))
+      val name = AttributeInstance(self, SharableAttributeInfo.BaseEntityNameAttr(DataType.UserNameString))
 
       // 2. Instance of regular ("non-common") attribute:
-      val special = AttributeInstance(self, "special", "Is Special", AttributeType.BooleanType)
+      val special = AttributeInstance(self, "special", "Is Special", DataType.BooleanType)
     }
 
     /** For ~generic references/lookups/listing. */
