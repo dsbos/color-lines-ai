@@ -6,7 +6,7 @@ import com.us.dsb.explore.jsonapi.entitymodel
 // ?? Maybe -> "DataType" if not just for entity attribute types.  (But in filter
 //   expressions, still closely related to attribute types.)
 
-trait DataType {
+sealed trait DataType {
   import DataType._
   val name: String  // AttributeTypeName?
   // maybe JSON representation type, or codecs
@@ -15,15 +15,10 @@ trait DataType {
   //  entityName, string) so UI can handle most-specific one it currently
   //  knows about (perhaps even adding all as element class values, with CSS
   //  to format for whichever ones UI understands)
-  val rootType: DataType =
+  val (rootType: DataType, typeChain: Seq[DataType]) =
     this match {
-      case p: PrimitiveType => p
-      case d: DerivedType   => d.baseType
-    }
-  val typeChain: Seq[DataType] =
-    this match {
-      case p: PrimitiveType => this +: Nil
-      case d: DerivedType   => this +: d.baseType.typeChain
+      case p: PrimitiveType => (p,          this +: Nil)
+      case d: DerivedType   => (d.baseType, this +: d.baseType.typeChain)
     }
 
 }
@@ -54,7 +49,6 @@ object DataType {
 }
 
 /** Attribute information shared between multiple (entity-specific) instances. */
-// ?? RENAME:
 class SharableAttributeInfo(val fieldName: String,   // FieldName? (re JSON:API "attributes" and "relationships")
                             val uiLabel: String,
                             val `type`: DataType  // ?? narrowable on owned attribute instances?
