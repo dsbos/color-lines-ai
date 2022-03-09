@@ -7,6 +7,7 @@ import com.us.dsb.explore.jsonapi.entitymodel
 //   expressions, still closely related to attribute types.)
 
 trait DataType {
+  import DataType._
   val name: String  // AttributeTypeName?
   // maybe JSON representation type, or codecs
   // maybe Scala representation type
@@ -14,6 +15,17 @@ trait DataType {
   //  entityName, string) so UI can handle most-specific one it currently
   //  knows about (perhaps even adding all as element class values, with CSS
   //  to format for whichever ones UI understands)
+  val rootType: DataType =
+    this match {
+      case p: PrimitiveType => p
+      case d: DerivedType   => d.baseType
+    }
+  val typeChain: Seq[DataType] =
+    this match {
+      case p: PrimitiveType => this +: Nil
+      case d: DerivedType   => this +: d.baseType.typeChain
+    }
+
 }
 
 
@@ -28,12 +40,6 @@ object DataType {
   class DerivedType(val name: String,
                     val baseType: DataType
                    ) extends DataType {
-    val rootType: DataType = {  //?????? move to DataType(?)
-      baseType match {
-        case p: PrimitiveType => p
-        case d: DerivedType   => d.baseType
-      }
-    }
   }
 
   // Primitive types:
@@ -282,6 +288,8 @@ object Temp extends App {
       println(s"      - fieldName: '${attr.baseInfo.fieldName}'")
       println(s"      - uiLabel:   '${attr.baseInfo.uiLabel}")
       println(s"      - type name: '${attr.baseInfo.`type`}'")
+      println(s"      - type .rootType}: '${attr.baseInfo.`type`.rootType}'")
+      println(s"      - type .typeChain}: '${attr.baseInfo.`type`.typeChain}'")
     }
 
   }
