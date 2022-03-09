@@ -3,17 +3,21 @@ package com.us.dsb.explore.jsonapi.entitymodel
 import com.us.dsb.explore.jsonapi.entitymodel
 
 
-// ?? Maybe -> DataType if not just for entity attribute types.  (But in filter
+// ?? Maybe -> "DataType" if not just for entity attribute types.  (But in filter
 //   expressions, still closely related to attribute types.)
 
 trait AttributeType {
   val name: String  // AttributeTypeName?
   // maybe JSON representation type, or codecs
   // maybe Scala representation type
+  // somewhere: maybe ordered list of all types in chain (e.g., userName,
+  //  entityName, string) so UI can handle most-specific one it currently
+  //  knows about (perhaps even adding all as element class values, with CSS
+  //  to format for whichever ones UI understands)
 }
 
 class PrimitiveType(val name: String) extends AttributeType {
-  // anything specific to primitive type?
+  // anything specific to primitive type? (JSON value type?)
 }
 
 // ?? Where will enumeration types fit in?
@@ -30,13 +34,14 @@ class DerivedType(val name: String,
 }
 
 object AttributeType {
+  // Primitive types:
   case object BooleanType extends PrimitiveType("boolean")
   case object StringType  extends PrimitiveType("string")
+  case object TimestampType extends PrimitiveType("timestamp")
 
+  // Derived/semantic types (including chained types):
   case object EntityNameString extends DerivedType("entityName", StringType)
   case object UserNameString   extends DerivedType("userName", EntityNameString)
-  // (even "case object AdminUserName extends DerivedType("adminUserName", UserName)" )
-  // ?? UUID/GUID, object GUID, user GUID?
 }
 
 /** Attribute information shared between multiple (entity-specific) instances. */
@@ -53,9 +58,17 @@ object SharableAttributeInfo {
                             ) extends SharableAttributeInfo(fieldName, uiLabel, `type`)
   // ?? Would we want to try with val and GenericAttrInfo?  Current toString
   // doesn't show values.  But then toString is minor factor.  CHECK JSON codecs.
-  case object EntityNameAttr extends SharableAttributeInfo("name",
+  case class BaseEntityNameAttr(override val `type`: AttributeType = AttributeType.EntityNameString)
+      extends SharableAttributeInfo("name",
+                                    "Name",
+                                    `type`)
+  case object PlainEntityNameAttr extends SharableAttributeInfo("name",
                                                            "Name",
                                                            AttributeType.EntityNameString)
+
+  case object CreationDateAttr extends SharableAttributeInfo("creationDate",  // **
+                                                           "created",
+                                                           AttributeType.TimestampType)
   // ?? entity GUID, etc.
 }
 
@@ -117,14 +130,53 @@ object EntityTypeNameInfo {
                        other)
 }
 
+
+// ???? Q: How to model overall relationship vs. how it shows up in two entity
+//   types (or twice in same entity type (maybe like parent/child things, or
+//   group members of groups))
+
+trait OneWayCardinality
+object OneWayCardinality {
+  case object to1    extends OneWayCardinality
+  case object to0or1 extends OneWayCardinality
+  case object to1ToN extends OneWayCardinality
+  case object to0ToN extends OneWayCardinality
+}
+
+//????? combine RelationshipHalf and RelationshipEnd? or make RelationshipHalf
+// add just what's needed for JSON:API "relationships" list
+
+trait RelationshipHalf {
+  // ??? any owning-entity-type member?
+  val fieldName: String  // (name for JSON:API; outgoing-arrow relationship name)
+  val otherEntityType: Entity
+  val cardinality: OneWayCardinality
+  val relationship: Relationship  // ???: link to xxx view of relationship?
+}
+
+trait Relationship {
+  trait RelationshipEnd {
+    val directedName: String  // ?? fieldName and iuLabel?
+    val entityType: Entity
+    val cardinality: OneWayCardinality
+    // ?? any (internal) indication of "one" vs. "other"?
+  }
+  val undirectedName: String
+  val oneEnd: RelationshipEnd
+  val otherEnd: RelationshipEnd
+  // any need for combined (xxx-to-yyyy) cardinality?
+  // ?? where would mapping to DB implementation of relationship go?
+}
+
+
 trait Entity {
   val typeNameInfo: EntityTypeNameInfo
   val attributes: Set[AttributeInstance]
   //??val relationships: Set[xxRelationship]
 }
 
-
 object Entities {
+
   object UserEntity extends Entity {
     self => // (rename for clarity below)
 
@@ -133,9 +185,14 @@ object Entities {
 
     /** For directly accessible references: */
     object Attributes {
-      // 1. Instance of common attribute:
       // ?? re-check using objects:
-      val name = AttributeInstance(self, SharableAttributeInfo.EntityNameAttr)  // ????  narrow type?
+
+      // 1a. Instance of common attribute, no refinement/narrowing:
+      val creationDate = AttributeInstance(self, SharableAttributeInfo.CreationDateAttr)
+
+      // 1a. Instance of narrowable common attribute, no refinement/narrowing:
+      val name = AttributeInstance(self, SharableAttributeInfo.BaseEntityNameAttr(AttributeType.UserNameString))
+
       // 2. Instance of regular ("non-common") attribute:
       val special = AttributeInstance(self, "special", "Is Special", AttributeType.BooleanType)
     }
@@ -143,8 +200,11 @@ object Entities {
     /** For ~generic references/lookups/listing. */
     val attributes: Set[AttributeInstance] =
       Set(Attributes.name,
-          Attributes.special
+          Attributes.special,
+          Attributes.creationDate
           )
+
+    object RelationShips  //???
 
     //val relationships: Set[Relationship] = Set()
   }
@@ -156,11 +216,10 @@ object Entities {
       EntityTypeNameInfo("adDomain", "AD Domain", "AD domain", "...")
 
     object Attributes {
-      val name = AttributeInstance(self, SharableAttributeInfo.EntityNameAttr) // ????  narrow type?
+      val name = AttributeInstance(self, SharableAttributeInfo.PlainEntityNameAttr) // ????  narrow type?
       val whatever = AttributeInstance(self, "whatever", "Whatever", AttributeType.BooleanType)
     }
 
-    /** For ~generic references/lookups/listing. */
     val attributes: Set[AttributeInstance] =
       Set(Attributes.name,
           Attributes.whatever
@@ -170,32 +229,57 @@ object Entities {
   }
 
   val entities: Seq[Entity] =
-    List(UserEntity, DomainEntity)
+    List(UserEntity,
+         DomainEntity)
+
+  // ?? any desire/need to model entity subclassing to that single relationship
+  //   of domain can represent domain's containment of multiple entity kinds
+  //   (e.g., users, computers, groups, whatever)?  (probably would make
+  //   relationship modeling harder) ...
+
+  object UserInDomains extends Relationship {
+    val undirectedName: String = "userInDomain"
+
+    val oneEnd: RelationshipEnd = new RelationshipEnd {
+      val directedName: String = "??user's containing domain"
+      val cardinality: OneWayCardinality = OneWayCardinality.to1
+      val entityType: Entity = DomainEntity
+    }
+
+    val otherEnd: RelationshipEnd = new RelationshipEnd {
+      val directedName: String = "??domain's contained users"
+      val cardinality: OneWayCardinality = OneWayCardinality.to0ToN
+      val entityType: Entity = UserEntity
+    }
+
+  }
 
 }
 
-
 //trait xxEntityTableColumn
 //trait xxEntityTable
+// - not necessarily table; also table-like SELECT subset of columns; also
+//   table-like results of JOIN
 //
-//trait xxRelationship {
-//  val name: String
-//  val otherEntityType: xxEntity
-//
-//}
+//something mapping entity attributes and relationships to columns of tables+
+//  (e.g., for transforming filter expressions referring to attributes into
+//  SQL expressions referring columns)
 
 
 object Temp extends App {
-//  import Entities._
-//  println("UserEntity = " + UserEntity)
-//  println("UserEntity.typeNameInfo = " + UserEntity.typeNameInfo)
-//  println("UserEntity.attributes:" + UserEntity.attributes.mkString("\n- ", "\n- ", "\n"))
 
   println("Entity types:")
   Entities.entities.foreach { entityType =>
-    println("entityType = " + entityType)
-    println("entityType.typeNameInfo = " + entityType.typeNameInfo)
-    println("entityType.attributes:" + entityType.attributes.mkString("\n- ", "\n- ", "\n"))
+    println("* entityType = " + entityType)
+    println("  .typeNameInfo = " + entityType.typeNameInfo)
+    println("  .attributes:")
+    entityType.attributes.foreach { attr =>
+      println(s"    * (attr = $attr)")
+      println(s"      - parentEntity identifier: '${attr.parentEntity.typeNameInfo.singularIdentifer}'")
+      println(s"      - fieldName: '${attr.baseInfo.fieldName}'")
+      println(s"      - uiLabel:   '${attr.baseInfo.uiLabel}")
+      println(s"      - type name: '${attr.baseInfo.`type`}'")
+    }
 
   }
 
