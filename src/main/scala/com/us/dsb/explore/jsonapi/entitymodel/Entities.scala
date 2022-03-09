@@ -67,7 +67,7 @@ object SharableAttributeInfo {
                                                            AttributeType.EntityNameString)
 
   case object CreationDateAttr extends SharableAttributeInfo("creationDate",  // **
-                                                           "created",
+                                                           "Created",
                                                            AttributeType.TimestampType)
   // ?? entity GUID, etc.
 }
@@ -217,12 +217,12 @@ object Entities {
 
     object Attributes {
       val name = AttributeInstance(self, SharableAttributeInfo.PlainEntityNameAttr) // ????  narrow type?
-      val whatever = AttributeInstance(self, "whatever", "Whatever", AttributeType.BooleanType)
+      val creationDate = AttributeInstance(self, SharableAttributeInfo.CreationDateAttr)
     }
 
     val attributes: Set[AttributeInstance] =
       Set(Attributes.name,
-          Attributes.whatever
+          Attributes.creationDate
           )
 
     //val relationships: Set[xxRelationship] = Set()
