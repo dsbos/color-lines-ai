@@ -17,10 +17,9 @@ sealed trait DataType {
   //  to format for whichever ones UI understands)
   val (rootType: DataType, typeChain: Seq[DataType]) =
     this match {
-      case p: PrimitiveType => (p,          this +: Nil)
-      case d: DerivedType   => (d.baseType, this +: d.baseType.typeChain)
+      case p: PrimitiveType => (p,                   this +: Nil)
+      case d: DerivedType   => (d.baseType.rootType, this +: d.baseType.typeChain)
     }
-
 }
 
 
@@ -282,8 +281,8 @@ object Temp extends App {
       println(s"      - fieldName: '${attr.baseInfo.fieldName}'")
       println(s"      - uiLabel:   '${attr.baseInfo.uiLabel}")
       println(s"      - type name: '${attr.baseInfo.`type`}'")
-      println(s"      - type .rootType}: '${attr.baseInfo.`type`.rootType}'")
-      println(s"      - type .typeChain}: '${attr.baseInfo.`type`.typeChain}'")
+      println(s"      - type .rootType: ${attr.baseInfo.`type`.rootType}")
+      println(s"      - type .typeChain: ${attr.baseInfo.`type`.typeChain}")
     }
 
   }
