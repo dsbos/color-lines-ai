@@ -23,7 +23,7 @@ object ValueClassTypeSafetyExplTest {
 /**
   * ... shows that value classes are good for strong typing with simple parameter
   * passing and assignment, but not good for strong typing with operations in
-  * expressions ...
+  * filtering ...
   */
 class ValueClassTypeSafetyExplTest extends AnyFunSuite {
   // (Review:  I thought object's members were automatically visible in companion

@@ -1,4 +1,4 @@
-package com.us.dsb.explore.jsonapi.expressions
+package com.us.dsb.explore.jsonapisketch.filtering
 
 object Expressions {
 
@@ -36,8 +36,8 @@ object Expressions {
     CompoundName1(Ident1("relationship"), Ident1("name"))
   }
 
-  import com.us.dsb.explore.jsonapi.entitymodel.AttributeInstance
-  import com.us.dsb.explore.jsonapi.entitymodel.Entities.UserEntity
+  import com.us.dsb.explore.jsonapisketch.entitymodel.AttributeInstance
+  import com.us.dsb.explore.jsonapisketch.entitymodel.Entities.UserEntity
 
   trait FunctionId
   object FunctionId {
