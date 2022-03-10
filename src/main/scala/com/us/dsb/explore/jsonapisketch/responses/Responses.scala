@@ -10,7 +10,8 @@ object Responses {
 
   type RelatedResourceLink = Deferred
 
-  type Error = Deferred
+
+  type Error = Deferred // https://jsonapi.org/format/#error-objects
 
   type MemberNameSyntax = String  // constrained ...
 
@@ -20,11 +21,17 @@ object Responses {
   type AttributeName = FieldName
   type RelationshipName = FieldName
 
+  //???? move some lower-level types to shared area (e.g., names that appear in
+  // filter, sort, include, etc. parameters
+
 
   class MetaObject(val others: Arbitrary*)
   class DocMetadata extends MetaObject
   class LinkMetadata extends MetaObject
   class ResourceObjectMetadata extends MetaObject
+  class ResourceIdentifierObjectMetadata extends MetaObject
+  class RelationshipObjectMetadata extends MetaObject
+
 
 
 
@@ -43,21 +50,43 @@ object Responses {
   case class AttributesObject(members: Map[AttributeName, Arbitrary])
 
 
-  case class RelationshipsObject(tbd: TBD)  //????
+  //???? CONTINUE with relationships, resource linkage, etc.
+  // ... at least of one links, data, and meta;
+  // ???? research:  data _and_ links? semantics?
+  case class RelationshipObject(links: Option[LinksObject],  // with at least "self" or "related" //??? CONTINUE
+                                 data: TBD,  //?????? "resource linkage"
+                                 meta: RelationshipObjectMetadata
+                                )  //????
 
+  case class RelationshipsObject(members: Map[RelationshipName, RelationshipObject])
 
   trait PrimaryData
 
   trait ResourceObjectOrId extends PrimaryData //?? maybe not just primary soon
-  trait NonNullResourceObjectOrId extends  ResourceObjectOrId
-  case class ResourceObject(id: Some[ResourceId],  // option for case we won't use
+  trait NonNullResourceObjectOrId extends ResourceObjectOrId
+  case class ResourceObject(id: Some[ResourceId],  // optional for case we won't use
                             `type`: TBD,
                             attributes: Option[AttributesObject],
                             relationships: Option[RelationshipsObject],
                             links: Option[Link],
                             meta: Option[ResourceObjectMetadata],
                             `others?`: TBD) extends NonNullResourceObjectOrId
-  case class ResourceIdentifierObject(tbd: TBD) extends NonNullResourceObjectOrId
+
+  //???: Q:  Does this always identify a resource object in member included _and_
+  //   having a "self" URL?  Or does client sometimes need to assemble URL string
+  //   from entity type (re "user" for type and "GET /users/123")?
+  //   - If primary data is resource _identifier_ object(s), is there alwways
+  //     resource object(s) in response document?
+  //???: Q: What determines whether primary data is resource objects or resource
+  // identifier objects?  Undefined by JSON:API spec.?  Typically fixed per
+  // service?  Typically controllable by some (specific) parameter?  (Or is
+  // resource identifier object just degenerage case for "fields[xxx]=" (no
+  // fields selected).)
+  case class ResourceIdentifierObject(id: Some[ResourceId],  // optional for case we won't use
+                                     `type`: TBD,
+                                      meta: ResourceIdentifierObjectMetadata,
+                                      `others?`: Arbitrary
+                                     ) extends NonNullResourceObjectOrId
   case class NoResourceObject() extends ResourceObjectOrId
 
   trait ResourceObjectListOrIdList extends PrimaryData //?? maybe not just primary soon
