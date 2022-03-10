@@ -47,7 +47,7 @@ object Expressions {
   import FunctionId._
 
   trait Expression2 {
-    //?? type?
+    //?? data type?
   }
 
   trait Literal2 extends Expression2
@@ -65,5 +65,19 @@ object Expressions {
               FuncCall2(Equals, StringLit2("user3"), SimpleAttrRef2(UserEntity.Attributes.name)))
   }
 
+
+  /*
+    1. parse URL--data path, filter parameter(s), included-data parameter(s?)
+    2. parse filter expressions
+       - text to CST (unresolved names)
+       - CST to AST (names resolved to functions, attributes (simple and pathed)))
+       - (check types somewhere around here)
+       - "evaluate" AST to SQL (conditional expressions to use in overall query)
+    3.
+    ...
+    n. generate JSON ("data", "relationships", "included", ...)
+
+
+   */
 
 }
