@@ -51,7 +51,15 @@ object Responses {
 
 
   //???? CONTINUE with relationships, resource linkage, etc.
-  // ... at least of one links, data, and meta;
+  // - has at least of one links, data, and meta (part of spec that requires
+  //   data member is only for creation)
+  // - re having data _and_ links:  if not using include/included, data's
+  //   entity references via resource identifier objects can't be resolved to
+  //   anything (data or URLs) without accessing server; providing links.related
+  //   make it easy for client to get full data for any referenced entities--it
+  //   doesn't have to construct a URL to get the entity; (but what about appending
+  //   ID (from resource identifier object) to "related" URL--knows only to
+  //   append, doesn't have to know starting segment (and relationship to type))
   // ???? research:  data _and_ links? semantics?
   case class RelationshipObject(links: Option[LinksObject],  // with at least "self" or "related" //??? CONTINUE
                                  data: TBD,  //?????? "resource linkage"
@@ -82,6 +90,7 @@ object Responses {
   // service?  Typically controllable by some (specific) parameter?  (Or is
   // resource identifier object just degenerage case for "fields[xxx]=" (no
   // fields selected).)
+
   case class ResourceIdentifierObject(id: Some[ResourceId],  // optional for case we won't use
                                      `type`: TBD,
                                       meta: ResourceIdentifierObjectMetadata,
