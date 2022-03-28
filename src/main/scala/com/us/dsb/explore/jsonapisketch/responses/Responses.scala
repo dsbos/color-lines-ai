@@ -103,14 +103,14 @@ object Responses extends App {
   //???? CONTINUE with relationships, resource linkage, etc.
   // - has at least of one links, data, and meta (part of spec that requires
   //   data member is only for creation)
-  // - re having data _and_ links: xx if not using include/included, data's
+  // - re having data _and_ links:  if not using include/included, data's
   //   entity references via resource identifier objects can't be resolved to
   //   anything (data or URLs) without accessing server; providing links.related
   //   make it easy for client to get full data for any referenced entities--it
   //   doesn't have to construct a URL to get the entity; (but what about appending
   //   ID (from resource identifier object) to "related" URL--knows only to
   //   append, doesn't have to know starting segment (and relationship to type))
-  // ???? research: xx data _and_ links? semantics?
+  // ???? research:  data _and_ links? semantics?
   case class RelationshipObject(links: Some[LinksObject],  // with at least "self" or "related"
                                 data: ResourceLinkage,
                                 meta: RelationshipObjectMetadata
@@ -133,15 +133,15 @@ object Responses extends App {
                             meta: Option[ResourceObjectMetadata] // anything for specific entity instance?
                             ) extends xxNonNullResourceObjectOrId
 
-  //???: xxQ: xx Does this always identify a resource object in member included _and_
+  //???: Q:  Does this always identify a resource object in member included _and_
   //   having a "self" URL?  Or does client sometimes need to assemble URL string
-  //   from entity type xx(re "user" for type xxand "GET /users/123")?
+  //   from entity type(re "user" for typeand "GET /users/123")?
   //   - If primary data is resource _identifier_ object(s), is there alwways
   //     resource object(s) in response document?
-  //???: xxQ: xxWhat determines whether primary data is resource objects or resource
+  //???: Q: What determines whether primary data is resource objects or resource
   // identifier objects?  Undefined by JSON:API spec.?  Typically fixed per
   // service?  Typically controllable by some (specific) parameter?  (Or is
-  // resource identifier object just degenerage case for "fields[xxxxx]=" (no
+  // resource identifier object just degenerage case for "fields[xxx]=" (no
   // fields selected).)
 
   // https://jsonapi.org/format/1.1/#error-objects:
@@ -185,14 +185,12 @@ object Responses extends App {
   case class ErrorResponseDoc(jsonapi: JsonApiObject,
                               meta: ErrorDocMetadata,
                               errors: Seq[ErrorObject],
-                              `xxlinks?`: Option[LinksObject], // allowed without "data"?  meaning what?
-                              `xxothers?`: xxTBD*
-                             )
+                              // spec.: allows "links', but "related to the primary data"
+                              )
   // what would this be before
-  case class xxMetaOnlyResponseDoc(jsonapi: JsonApiObject,
-                                   xxmeta: MetaOnlyDocMetadata,
-                                `xxlinks?`: Option[LinksObject], // allowed without "data"?  meaning what?
-                                 `xxothers?`: xxTBD*
-                                )
+  case class MetaOnlyResponseDoc(jsonapi: JsonApiObject,
+                                 meta: MetaOnlyDocMetadata,
+                                 // spec.: allows "links', but "related to the primary data"
+                                 )
 
 }
