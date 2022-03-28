@@ -47,88 +47,131 @@ object Requests extends App {
             get-relationship-object step
             - or maybe wrap in partial step to be completed in next loop iteraton
       - (checking for to-1 relationships in prefix of chain isn't addressed yet)
-
-
-
-
    */
 
-  val entityTypeNames    = List[TBD]("user",  "domain",  "group")
-  val entityTypeSegments = List[TBD]("users", "domains", "groups")
+  case class EntityId(raw: String) extends AnyVal
+
+  trait EntityType
+  case object User extends EntityType
+  // Group, Domain, etc.
+
+  trait Relationship
+  case object `User.groups` extends Relationship
+  case object `User.primaryGroup` extends Relationship
+  // *.domain, etc.
 
 
-  type TBD = String
-
-  trait RequestPath
-  trait SingleEntityPath extends RequestPath
-  trait EntityCollectionPath extends RequestPath
-  // ??? relationship object as SingleEntityPath or separate (dedicated) case?
 
 
-  case object VirtualRootObjectPath extends SingleEntityPath
+  def getEntityTypeForSegment(entitiesSegment: String): Either[String, EntityType] = {
+    // initial hack implementation only
+    val result =
+      entitiesSegment match {
+        case "users" => Right(User)
+        case unknown => Left(s"Unknown entity-type-related segment '$entitiesSegment'")
+      }
+    result
+  }
 
-  case class BaseEntityCollectionPath(entityTypeSegment: TBD) extends EntityCollectionPath
+  def getEntityTypeRelationshipForSegment(entityType: EntityType,
+                                          relationshipSegment: String
+                                         ): Either[String, Relationship] = {
+    // initial hack implementation only
+    val result: Either[String, Relationship] = {
+      (entityType, relationshipSegment) match {
+        case (User, "groups") => Right(`User.groups`)
+        case (User, "primaryGroup") => Right(`User.primaryGroup`)
+        case (entityType, relationship) =>
+          Left(s"Entity type $entityType has no `$relationship` relationship.")
+        //case _ => ???
+      }
+    }
+    result
+  }
 
+  trait RequestPath2
+  case object VirtualRootObjectPath2 extends RequestPath2
+  case class EntitiesByTypePath2(entityType: EntityType) extends RequestPath2  // ?? single/multiple?
+  case class EntityByIdPath2(entityType: EntityType, entityId: EntityId) extends RequestPath2  // ?? single/multiple?
 
-  case class EntityByIdPath(entityTypeSegment: TBD, entityid: TBD) extends SingleEntityPath
-  // or in terms of nested EntityCollectionPath?
+  case class SimpleRelationshipObjectPath2(singleEntityPath: EntityByIdPath2,
+                                           relationship: Relationship
+                                          ) extends RequestPath2
+  case class SimpleRelatedDataPath2(singleEntityPath: EntityByIdPath2,
+                                    relationship: Relationship
+                                   ) extends RequestPath2
 
-  // at earlier point, don't know yet that prefix relationship is to-1 (to
-  //   be valid prefix) and (for non-/relationships/ case) whether final
-  //   relationship is to-1 (to extend SingleEntityPath or not)
-  //
-  case class RawRelationshipObjectPath(sourceEntityPath: RequestPath,
-                                       notYetResolvedRelationshipName: TBD) extends RequestPath
-  case class RawRelatedDataPath(sourceEntityPath: RequestPath,
-                                notYetResolvedRelationshipName: TBD) extends RequestPath
+  def interpretPath(rawAbsPath: String): Either[String, RequestPath2] = {
+    require(rawAbsPath.startsWith("/"))
 
+    val segments = rawAbsPath.split("/").drop(1).toList
+    def NIY = Left(s"Not implemented yet: '$rawAbsPath'")
+    val result: Either[String, RequestPath2] =
+      segments match {
+        case Nil =>
+          Right(VirtualRootObjectPath2)
 
-  // at later point, have limited to valid (single-entity) prefix, and identifid
-  //   whether final relationship is to-1 (to extend SingleEntityPath or not)
+        case entitiesSegment :: Nil =>
+          getEntityTypeForSegment(entitiesSegment)
+              .map(entityType => EntitiesByTypePath2(entityType))
 
-  case class RelationshipObjectPath(sourceEntityPath: SingleEntityPath,
-                                    relationshipName: TBD
-                                   ) extends RequestPath  //???? single object, but not _entity_
+        case entitiesSegment :: entityIdSegment :: Nil =>  // ???? fold together (re nested EntityByIdPath2)
+          getEntityTypeForSegment(entitiesSegment)
+                        .map(entityType => EntityByIdPath2(entityType, EntityId(entityIdSegment)))
 
+        case entitiesSegment :: entityIdSegment :: tail =>  // ???? fold together (re nested EntityByIdPath2)
+          tail match {
+            case "relationships" :: relationshipSegment :: Nil =>
+              val refactorThis =
+                        getEntityTypeForSegment(entitiesSegment)
+                                      .map(entityType => EntityByIdPath2(entityType, EntityId(entityIdSegment)))
+              refactorThis.flatMap { entityPath =>
+                getEntityTypeRelationshipForSegment(entityPath.entityType,
+                                                    relationshipSegment)
+                    .map(relationship => SimpleRelationshipObjectPath2(entityPath,
+                                                                       relationship))
+              }
+            case relationshipSegment :: Nil =>
+               val refactorThis =
+                         getEntityTypeForSegment(entitiesSegment)
+                                       .map(entityType => EntityByIdPath2(entityType, EntityId(entityIdSegment)))
+              refactorThis.flatMap { entityPath =>
+                 getEntityTypeRelationshipForSegment(entityPath.entityType,
+                                                     relationshipSegment)
+                     .map(relationship => SimpleRelatedDataPath2(entityPath,
+                                                                        relationship))
+               }
+            case chainTail =>
+              NIY
+          }
+      }
+    println(s"'$rawAbsPath' -> $result")
+    result
+  }
 
-  case class ToOneRelatedDataPath(sourceEntityPath: SingleEntityPath,
-                                  toNRrelationshipName: TBD) extends SingleEntityPath
-  case class ToNRelatedDataPath(sourceEntityPath: SingleEntityPath,
-                                toOneRelationshipName: TBD) extends EntityCollectionPath
-
-
-  val samples = List[RequestPath](
-      VirtualRootObjectPath,
-      BaseEntityCollectionPath("users"),  // (not necessarily same as type string, e.g. "user")
-      EntityByIdPath("domains", "QOMPLX.COM"),
-
-      RawRelationshipObjectPath(
-        sourceEntityPath = EntityByIdPath("domains", "QOMPLX.COM"),
-        "notYetResolvedRelationship"),
-      RawRelatedDataPath(
-        sourceEntityPath = EntityByIdPath("domains", "QOMPLX.COM"),
-        "notYetResolvedRelationship"),
-
-
-      RelationshipObjectPath(
-        sourceEntityPath = EntityByIdPath("users", "1"): SingleEntityPath,
-        "anyCardinalityRelationship": TBD),
-
-      ToOneRelatedDataPath(
-        sourceEntityPath = EntityByIdPath("users", "1"): SingleEntityPath,
-        "userToOneDomainRelationship"),
-      ToNRelatedDataPath(EntityByIdPath("users", "1"),
-                         "userToGroupsRelationship")
-
+  val testStringPaths = List[String](
+    //"badAbsolutePath",
+    "/",
+    "/users",
+    "/unknown",
+    "/users/user1",
+    "/users/user1/relationships/unknown",
+    "/users/user1/relationships/groups",
+    "/users/user1/relationships/primaryGroup",
+    "/users/user1/groups",
+    "/users/user1/primaryGroup",
+    "/users/user1/primaryGroup/domain"
   )
-  println(samples.mkString("Samples:\n- ", "\n- ", ""))
+  val testInterpretedPaths = testStringPaths.map(interpretPath(_))
+
+
 
 
 
 
 
   case class RequestURL(
-                       path: RequestPath,
+                       path: RequestPath2,
                        tbd: Unit
                        )
 
