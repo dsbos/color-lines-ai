@@ -118,13 +118,14 @@ libraryDependencies ++= Seq(
   "org.json4s" % "json4s-jackson_2.13" % "3.6.11",  // 3.7.x?, 4.x?
   //"org.json4s" % "json4s-ast_2.13" % "3.6.11",  // 3.7.x?, 4.x?
 
-  //"io.circe" %% "circe-core" % "0.14.1",
-  //"io.circe" %% "circe-generic" % "0.14.1",
+  "io.circe" %% "circe-core" % "0.14.1",
+  //("io.circe" %% "circe-derivation" % "0.14.1",)
+  "io.circe" %% "circe-generic" % "0.14.1",
   //"io.circe" %% "circe-generic-extras" % "0.14.1",
   "io.circe" %% "circe-literal" % "0.14.1",
   "io.circe" %% "circe-jawn" % "0.14.1",
-  //"io.circe" %% "circe-optics" % "0.14.1",
-  //"io.circe" %% "circe-parser" % "0.14.1",
+  "io.circe" %% "circe-optics" % "0.14.1",
+  "io.circe" %% "circe-parser" % "0.14.1",
 
 
   // NOTE:  Can't use both latest scalatest-argonaut (0.2.5) and

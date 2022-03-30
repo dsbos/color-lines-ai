@@ -61,8 +61,6 @@ object Requests extends App {
   // *.domain, etc.
 
 
-
-
   def getEntityTypeForSegment(entitiesSegment: String): Either[String, EntityType] = {
     // initial hack implementation only
     val result =
