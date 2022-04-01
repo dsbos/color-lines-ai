@@ -2,6 +2,8 @@ package com.us.dsb.explore.jsonapisketch
 
 import io.circe.Json
 
+import java.net.URI
+
 object ResponsePoc extends App {
   /*
    - scalar data: "data" will be for one entity, not list
@@ -34,13 +36,13 @@ object ResponsePoc extends App {
     private val usersTable = {
       import UserColumnNames._
       Map(
-        "fakeguid-user-0123" -> Map(
-          object_guid -> "fakeguid-user-0123",
+        "user0123-fake-guid" -> Map(
+          object_guid -> "user0123-fake-guid\"",
           user_name -> "User 123",
           some_int -> 1
         ),
-        "fakeguid-user-0456" -> Map(
-          object_guid -> "fakeguid-user-0456",
+        "user0456-fake-guid" -> Map(
+          object_guid -> "user0456-fake-guid",
           user_name -> "User 456",
           some_int -> 2
         )
@@ -76,7 +78,8 @@ object ResponsePoc extends App {
   trait EntityMetadata {
     import EntityMetadata._
 
-    def getEntityTypeName(`type`: EntityType): String
+    def getEntityTypeName(`type`: EntityType): String     // more value classes?
+    def getEntityTypeSegment(`type`: EntityType): String
     def getEntityTypeAttributes(`type`: EntityType): Seq[Attribute]
     def getEntityTableName(`type`: EntityType): TableName
     def getEntityTableKeyColumn(`type`: EntityType): ColumnName
@@ -100,6 +103,11 @@ object ResponsePoc extends App {
     override def getEntityTypeName(`type`: EntityType): String = {
       `type` match {
         case UserType => "user"
+      }
+    }
+    override def getEntityTypeSegment(`type`: EntityType): String = {
+      `type` match {
+        case UserType => "users"
       }
     }
     override def getEntityTableName(`type`: EntityType): TableName = {
@@ -150,7 +158,8 @@ object ResponsePoc extends App {
 
 
 
-  def makeEntityCollectionResponse(`type`: EntityType,
+  def makeEntityCollectionResponse(apiUrlPathPrefix: URI,  // (concat., don't resolve)
+                                   `type`: EntityType,
                                    id: EntityId,
                                    other: TBD): Json = {
     val typeNameString = getEntityTypeName(`type`)
@@ -236,10 +245,13 @@ object ResponsePoc extends App {
         val rowResourceObject =
           Json.obj(
             "type" -> Json.fromString(typeNameString),
-            "id" -> dbAnyToJson(entityId),  //??????CONTINUE
+            "id" -> dbAnyToJson(entityId),
             "attributes" -> attributesObject,
             // (no "relationships" yet or in this case)
-            //???? "links" and self link
+            "links" -> Json.obj(
+              "self"-> Json.fromString(s"$apiUrlPathPrefix/${getEntityTypeSegment(`type`)}/$entityId")
+
+            )
           )
         rowResourceObject
       }
@@ -248,9 +260,12 @@ object ResponsePoc extends App {
 
     Json.obj(
       "meta" -> makeMetadata,
-      "data" -> makeData
-      //???? links: "self"; then some URL path/query parsing
-      //?? links: pagination
+      "data" -> makeData,
+      "links" -> Json.obj(
+        //?? later, include relevant query parameters
+        "self" -> Json.fromString(s"$apiUrlPathPrefix/${getEntityTypeSegment(`type`)}")
+        //?? links: pagination
+         )
       )
 
 
@@ -258,7 +273,8 @@ object ResponsePoc extends App {
 
 
   val responseDoc =
-    makeEntityCollectionResponse(UserType,
+    makeEntityCollectionResponse(URI.create("/someApi"),
+                                 UserType,
                                  EntityId("123"),
                                  ())
   println(s"ResponsePoc.x: responseDoc = $responseDoc")
