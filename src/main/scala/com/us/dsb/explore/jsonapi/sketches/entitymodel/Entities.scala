@@ -1,6 +1,4 @@
-package com.us.dsb.explore.jsonapisketch.entitymodel
-
-import com.us.dsb.explore.jsonapisketch.entitymodel
+package com.us.dsb.explore.jsonapi.sketches.entitymodel
 
 
 // ?? Maybe -> "DataType" if not just for entity attribute types.  (But in filter

@@ -1,4 +1,4 @@
-package com.us.dsb.explore.jsonapisketch
+package com.us.dsb.explore.jsonapi.sketches
 
 import io.circe._
 import io.circe.Json.JString

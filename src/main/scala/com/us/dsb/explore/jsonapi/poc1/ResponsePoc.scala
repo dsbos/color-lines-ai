@@ -1,4 +1,4 @@
-package com.us.dsb.explore.jsonapisketch
+package com.us.dsb.explore.jsonapi.poc1
 
 import io.circe.Json
 
@@ -19,18 +19,23 @@ object ResponsePoc extends App {
 
   object Database {
     case class TableName(raw: String) extends AnyVal
+
     case class ColumnName(raw: String) extends AnyVal
   }
+
   import Database._
+
   trait Database {
     def xxselectAllRows(tableName: TableName, columnNames: ColumnName*): Seq[Map[ColumnName, Any]]
   }
+
   object DatabaseImpl extends Database {
     val usersTableName = TableName("users_table")
+
     object UserColumnNames {
       val object_guid = ColumnName("object_guid")
       val user_name = ColumnName("user_name")
-      val some_int  = ColumnName("some_int")
+      val some_int = ColumnName("some_int")
     }
 
     private val usersTable = {
@@ -40,24 +45,25 @@ object ResponsePoc extends App {
           object_guid -> "user0123-fake-guid",
           user_name -> "User 123",
           some_int -> 1
-        ),
+          ),
         "user0456-fake-guid" -> Map(
           object_guid -> "user0456-fake-guid",
           user_name -> "User 456",
           some_int -> 2
+          )
         )
-      )
     }
 
     val tables = Map(usersTableName -> usersTable)
 
     import Database._
-    override def xxselectAllRows(tableName: TableName,
+
+    override def xxselectAllRows(tableName  : TableName,
                                  columnNames: ColumnName*
-                                 ): Seq[Map[ColumnName, Any]] = {
+                                ): Seq[Map[ColumnName, Any]] = {
       println(s"selectAllRows.1: tableName = $tableName, columnNames = ${columnNames}")
       val tableFullRows = tables(tableName)
-      val rows  = {
+      val rows = {
         tableFullRows.map { case (key, allColumns) =>
           println(s"selectAllRows.2: key = $key, allColumns = ${allColumns}")
           val selectedColumns: Map[ColumnName, Any] =
@@ -74,37 +80,57 @@ object ResponsePoc extends App {
   }
 
 
-
   object EntityMetadata {
     trait DataType
+
     case object DT_String extends DataType
+
     case object DT_Int extends DataType
+
     case object DT_Timestamp extends DataType
-    case class DT_Enumeration(enumerators: TBD) extends DataType  //?? where do specific enumeration types go?
-    case class DT_JsonObject1() extends DataType  // (maybe)
-    case class DT_JsonObjec2t(Schema: TBD) extends DataType  // (possibly)
+
+    case class DT_Enumeration(enumerators: TBD) extends DataType //?? where do specific enumeration types go?
+
+    case class DT_JsonObject1() extends DataType // (maybe)
+
+    case class DT_JsonObjec2t(Schema: TBD) extends DataType // (possibly)
+
     case class DataTypeString(raw: String) extends AnyVal
 
     sealed trait EntityType
+
     sealed trait Attribute
+
     case class EntityTypeName(raw: String) extends AnyVal
+
     case class EntityTypeSegment(raw: String) extends AnyVal
+
     case class EntityId(raw: String) extends AnyVal
+
     case class AttributeName(raw: String) extends AnyVal
 
   }
+
   import EntityMetadata._
+
   trait EntityMetadata {
     /** (Currently,) not necessarily simple name--e.g., with enumerators */
     def getDataTypeString(`type`: DataType): DataTypeString
 
     def getEntityTypeName(`type`: EntityType): EntityTypeName
+
     def getEntityTypeSegment(`type`: EntityType): EntityTypeSegment
+
     def getEntityTypeAttributes(`type`: EntityType): Seq[Attribute]
+
     def getEntityTableName(`type`: EntityType): TableName
+
     def getEntityTableKeyColumn(`type`: EntityType): ColumnName
+
     def getAttributeName(attribute: Attribute): AttributeName
+
     def getAttributeType(attribute: Attribute): DataType
+
     def getAttributeColumnName(attribute: Attribute): ColumnName
   }
 
@@ -120,12 +146,12 @@ object ResponsePoc extends App {
     }
 
 
-
-
-
     case object UserType extends EntityType
+
     case object User_ObjectGuid extends Attribute
+
     case object User_UserName extends Attribute
+
     case object User_SomeInt extends Attribute
 
     override def getEntityTypeName(`type`: EntityType): EntityTypeName = {
@@ -133,16 +159,19 @@ object ResponsePoc extends App {
         case UserType => EntityTypeName("user")
       }
     }
+
     override def getEntityTypeSegment(`type`: EntityType): EntityTypeSegment = {
       `type` match {
         case UserType => EntityTypeSegment("users")
       }
     }
+
     override def getEntityTableName(`type`: EntityType): TableName = {
       `type` match {
         case UserType => DatabaseImpl.usersTableName
       }
     }
+
     override def getEntityTableKeyColumn(`type`: EntityType): ColumnName = {
       `type` match {
         case UserType => DatabaseImpl.UserColumnNames.object_guid
@@ -189,15 +218,14 @@ object ResponsePoc extends App {
     }
 
   }
-  import EntityMetadata._
+
   import EntityMetadataImpl._
 
 
-
-  def makeEntityCollectionResponse(apiUrlPathPrefix: URI,  // (concat., don't resolve)
-                                   `type`: EntityType,
-                                   id: EntityId,
-                                   other: TBD): Json = {
+  def makeEntityCollectionResponse(apiUrlPathPrefix: URI, // (concat., don't resolve)
+                                   `type`          : EntityType,
+                                   id              : EntityId,
+                                   other           : TBD): Json = {
     val typeName = getEntityTypeName(`type`)
     val allAttributes = getEntityTypeAttributes(`type`)
     val requestedAttributes = getEntityTypeAttributes(`type`)
@@ -206,14 +234,14 @@ object ResponsePoc extends App {
       val attributesValue: Json = {
         Json.fromValues(
           allAttributes.map { attribute =>
-              val typeStr = getDataTypeString(getAttributeType(attribute))
+            val typeStr = getDataTypeString(getAttributeType(attribute))
             Json.obj(
               "name" -> Json.fromString(getAttributeName(attribute).raw),
               "type" -> Json.fromString(typeStr.raw)
               //?? more (logical types; what else?)
-            )
+              )
           }
-        )
+          )
       }
       val entityTypeValue =
         Json.obj(
@@ -222,7 +250,7 @@ object ResponsePoc extends App {
           "attributes" -> attributesValue
           //"relationships"
 
-        )
+          )
 
       Json.obj(
         "entityTypes" -> Json.obj(typeName.raw -> entityTypeValue)
@@ -230,7 +258,7 @@ object ResponsePoc extends App {
         //  enumerators list separate from references to enumeration type)
         //?? non-type metadata, e.g., entity counts
 
-      )
+        )
     }
 
     def makeData: Json = {
@@ -241,9 +269,9 @@ object ResponsePoc extends App {
       // - get column ~query for each entity attribute
       //?? add entity ID column (primary key) if not explicitly requested
       val requestedDbColumns =
-        requestedAttributes.map { attribute =>
-          getAttributeColumnName(attribute)
-        }
+      requestedAttributes.map { attribute =>
+        getAttributeColumnName(attribute)
+      }
 
       // - execute query (into some intermediate data)
       val dbRows = DatabaseImpl.xxselectAllRows(table, requestedDbColumns: _*)
@@ -256,7 +284,7 @@ object ResponsePoc extends App {
         def dbAnyToJson(any: Any): Json = {
           any match {
             case s: String => Json.fromString(s)
-            case i: Int    => Json.fromInt(i)
+            case i: Int => Json.fromInt(i)
           }
         }
 
@@ -287,10 +315,10 @@ object ResponsePoc extends App {
             "attributes" -> attributesObject,
             // (no "relationships" yet or in this case)
             "links" -> Json.obj(
-              "self"-> Json.fromString(s"$apiUrlPathPrefix/${getEntityTypeSegment(`type`).raw}/$entityId")
+              "self" -> Json.fromString(s"$apiUrlPathPrefix/${getEntityTypeSegment(`type`).raw}/$entityId")
 
+              )
             )
-          )
         rowResourceObject
       }
       Json.fromValues(resourceObjects)
@@ -301,7 +329,7 @@ object ResponsePoc extends App {
         //?? later, include relevant query parameters
         "self" -> Json.fromString(s"$apiUrlPathPrefix/${getEntityTypeSegment(`type`).raw}")
         //?? links: pagination
-         ),
+        ),
       "meta" -> makeMetadata,
       "data" -> makeData
       )

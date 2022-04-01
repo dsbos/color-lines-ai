@@ -1,4 +1,4 @@
-package com.us.dsb.explore.jsonapisketch.responses
+package com.us.dsb.explore.jsonapi.sketches.responses
 
 object Requests extends App {
   /*

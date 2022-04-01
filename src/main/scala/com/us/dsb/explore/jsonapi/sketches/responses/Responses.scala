@@ -1,4 +1,4 @@
-package com.us.dsb.explore.jsonapisketch.responses
+package com.us.dsb.explore.jsonapi.sketches.responses
 
 import java.net.URI
 import scala.collection.immutable.LinearSeq
