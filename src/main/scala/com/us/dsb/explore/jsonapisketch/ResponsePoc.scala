@@ -75,24 +75,29 @@ object ResponsePoc extends App {
 
 
 
-  trait EntityMetadata {
-    import EntityMetadata._
-
-    def getEntityTypeName(`type`: EntityType): String     // more value classes?
-    def getEntityTypeSegment(`type`: EntityType): String
-    def getEntityTypeAttributes(`type`: EntityType): Seq[Attribute]
-    def getEntityTableName(`type`: EntityType): TableName
-    def getEntityTableKeyColumn(`type`: EntityType): ColumnName
-    def getAttributeName(attribute: Attribute): String
-    def getAttributeType(attribute: Attribute): String
-    def getAttributeColumnName(attribute: Attribute): ColumnName
-  }
   object EntityMetadata {
     sealed trait EntityType
     sealed trait Attribute
+    case class EntityTypeName(raw: String) extends AnyVal
+    case class EntityTypeSegment(raw: String) extends AnyVal
     case class EntityId(raw: String) extends AnyVal
+    case class AttributeName(raw: String) extends AnyVal
+
+    //????CONTINUE: do DataType; apply to getAttributeType
   }
   import EntityMetadata._
+  trait EntityMetadata {
+
+
+    def getEntityTypeName(`type`: EntityType): EntityTypeName
+    def getEntityTypeSegment(`type`: EntityType): EntityTypeSegment
+    def getEntityTypeAttributes(`type`: EntityType): Seq[Attribute]
+    def getEntityTableName(`type`: EntityType): TableName
+    def getEntityTableKeyColumn(`type`: EntityType): ColumnName
+    def getAttributeName(attribute: Attribute): AttributeName
+    def getAttributeType(attribute: Attribute): String     //???? more than just string/value class
+    def getAttributeColumnName(attribute: Attribute): ColumnName
+  }
 
   object EntityMetadataImpl extends EntityMetadata {
     case object UserType extends EntityType
@@ -100,14 +105,14 @@ object ResponsePoc extends App {
     case object User_UserName extends Attribute
     case object User_SomeInt extends Attribute
 
-    override def getEntityTypeName(`type`: EntityType): String = {
+    override def getEntityTypeName(`type`: EntityType): EntityTypeName = {
       `type` match {
-        case UserType => "user"
+        case UserType => EntityTypeName("user")
       }
     }
-    override def getEntityTypeSegment(`type`: EntityType): String = {
+    override def getEntityTypeSegment(`type`: EntityType): EntityTypeSegment = {
       `type` match {
-        case UserType => "users"
+        case UserType => EntityTypeSegment("users")
       }
     }
     override def getEntityTableName(`type`: EntityType): TableName = {
@@ -128,12 +133,14 @@ object ResponsePoc extends App {
       }
     }
 
-    override def getAttributeName(attribute: Attribute): String = {  //???? value class
-      attribute match {
-        case User_ObjectGuid => "objectGuid"
-        case User_UserName => "userName"
-        case User_SomeInt => "someInt"
-      }
+    override def getAttributeName(attribute: Attribute): AttributeName = {
+      val nameThis =
+        attribute match {
+          case User_ObjectGuid => "objectGuid"
+          case User_UserName => "userName"
+          case User_SomeInt => "someInt"
+        }
+      AttributeName(nameThis)
     }
 
     override def getAttributeType(attribute: Attribute): String = {  //???? value class
@@ -162,7 +169,7 @@ object ResponsePoc extends App {
                                    `type`: EntityType,
                                    id: EntityId,
                                    other: TBD): Json = {
-    val typeNameString = getEntityTypeName(`type`)
+    val typeName = getEntityTypeName(`type`)
     val allAttributes = getEntityTypeAttributes(`type`)
     val requestedAttributes = getEntityTypeAttributes(`type`)
 
@@ -171,7 +178,7 @@ object ResponsePoc extends App {
         Json.fromValues(
           allAttributes.map { attribute =>
             Json.obj(
-              "name" -> Json.fromString(getAttributeName(attribute)),
+              "name" -> Json.fromString(getAttributeName(attribute).raw),
               "type" -> Json.fromString(getAttributeType(attribute))
               //?? more (logical types; what else?)
             )
@@ -180,7 +187,7 @@ object ResponsePoc extends App {
       }
       val entityTypeValue =
         Json.obj(
-          "typeName" -> Json.fromString(typeNameString),
+          "typeName" -> Json.fromString(typeName.raw),
           // typeUrlPathSegment
           "attributes" -> attributesValue
           //"relationships"
@@ -228,7 +235,7 @@ object ResponsePoc extends App {
               val dbColumn = getAttributeColumnName(attr)
               val value = dbColumnNameToValueMap(dbColumn)
               val attrName = EntityMetadataImpl.getAttributeName(attr)
-              attrName -> dbAnyToJson(value)
+              attrName.raw -> dbAnyToJson(value)
             }
           println("makeData.x4: fields2 = " + fields)
 
@@ -244,12 +251,12 @@ object ResponsePoc extends App {
 
         val rowResourceObject =
           Json.obj(
-            "type" -> Json.fromString(typeNameString),
+            "type" -> Json.fromString(typeName.raw),
             "id" -> dbAnyToJson(entityId),
             "attributes" -> attributesObject,
             // (no "relationships" yet or in this case)
             "links" -> Json.obj(
-              "self"-> Json.fromString(s"$apiUrlPathPrefix/${getEntityTypeSegment(`type`)}/$entityId")
+              "self"-> Json.fromString(s"$apiUrlPathPrefix/${getEntityTypeSegment(`type`).raw}/$entityId")
 
             )
           )
@@ -263,7 +270,7 @@ object ResponsePoc extends App {
       "data" -> makeData,
       "links" -> Json.obj(
         //?? later, include relevant query parameters
-        "self" -> Json.fromString(s"$apiUrlPathPrefix/${getEntityTypeSegment(`type`)}")
+        "self" -> Json.fromString(s"$apiUrlPathPrefix/${getEntityTypeSegment(`type`).raw}")
         //?? links: pagination
          )
       )
