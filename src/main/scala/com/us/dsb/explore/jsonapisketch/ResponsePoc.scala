@@ -76,6 +76,15 @@ object ResponsePoc extends App {
 
 
   object EntityMetadata {
+    trait DataType
+    case object DT_String extends DataType
+    case object DT_Int extends DataType
+    case object DT_Timestamp extends DataType
+    case class DT_Enumeration(enumerators: TBD) extends DataType  //?? where do specific enumeration types go?
+    case class DT_JsonObject1() extends DataType  // (maybe)
+    case class DT_JsonObjec2t(Schema: TBD) extends DataType  // (possibly)
+    case class DataTypeString(raw: String) extends AnyVal
+
     sealed trait EntityType
     sealed trait Attribute
     case class EntityTypeName(raw: String) extends AnyVal
@@ -83,11 +92,11 @@ object ResponsePoc extends App {
     case class EntityId(raw: String) extends AnyVal
     case class AttributeName(raw: String) extends AnyVal
 
-    //????CONTINUE: do DataType; apply to getAttributeType
   }
   import EntityMetadata._
   trait EntityMetadata {
-
+    /** (Currently,) not necessarily simple name--e.g., with enumerators */
+    def getDataTypeString(`type`: DataType): DataTypeString
 
     def getEntityTypeName(`type`: EntityType): EntityTypeName
     def getEntityTypeSegment(`type`: EntityType): EntityTypeSegment
@@ -95,11 +104,25 @@ object ResponsePoc extends App {
     def getEntityTableName(`type`: EntityType): TableName
     def getEntityTableKeyColumn(`type`: EntityType): ColumnName
     def getAttributeName(attribute: Attribute): AttributeName
-    def getAttributeType(attribute: Attribute): String     //???? more than just string/value class
+    def getAttributeType(attribute: Attribute): DataType
     def getAttributeColumnName(attribute: Attribute): ColumnName
   }
 
   object EntityMetadataImpl extends EntityMetadata {
+    override def getDataTypeString(`type`: DataType): DataTypeString = {
+      val nameThis =
+        `type` match {
+          case DT_String => "string"
+          case DT_Int => "int"
+          case null => ???
+        }
+      DataTypeString(nameThis)
+    }
+
+
+
+
+
     case object UserType extends EntityType
     case object User_ObjectGuid extends Attribute
     case object User_UserName extends Attribute
@@ -143,11 +166,17 @@ object ResponsePoc extends App {
       AttributeName(nameThis)
     }
 
-    override def getAttributeType(attribute: Attribute): String = {  //???? value class
+    override def getAttributeType(attribute: Attribute): DataType = {
       attribute match {
-        case User_ObjectGuid => "string"
-        case User_UserName => "string"
-        case User_SomeInt => "int"
+        case User_ObjectGuid => DT_String
+        case User_UserName => DT_String
+        case User_SomeInt => DT_Int
+        //?? do something with enumeration
+        //?? maybe do some times with same enumeration; how to share?
+        // (should "meta" have a "datatypes" member for ~parameterized data-type
+        //    classes (e.g., enumeration classes)? should all types be whether,
+        //    with simple ones such as "string" being declared as primitive or
+        //    build it?)
       }
     }
 
@@ -177,9 +206,10 @@ object ResponsePoc extends App {
       val attributesValue: Json = {
         Json.fromValues(
           allAttributes.map { attribute =>
+              val typeStr = getDataTypeString(getAttributeType(attribute))
             Json.obj(
               "name" -> Json.fromString(getAttributeName(attribute).raw),
-              "type" -> Json.fromString(getAttributeType(attribute))
+              "type" -> Json.fromString(typeStr.raw)
               //?? more (logical types; what else?)
             )
           }
