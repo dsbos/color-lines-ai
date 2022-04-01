@@ -37,7 +37,7 @@ object ResponsePoc extends App {
       import UserColumnNames._
       Map(
         "user0123-fake-guid" -> Map(
-          object_guid -> "user0123-fake-guid\"",
+          object_guid -> "user0123-fake-guid",
           user_name -> "User 123",
           some_int -> 1
         ),
@@ -225,8 +225,9 @@ object ResponsePoc extends App {
         )
 
       Json.obj(
-        //?? allow for multiple entity types? (here or elsewhere?)
-        "entityType" -> entityTypeValue
+        "entityTypes" -> Json.obj(typeName.raw -> entityTypeValue)
+        //?? dataTypes if we need to declare names for enumeration types (having
+        //  enumerators list separate from references to enumeration type)
         //?? non-type metadata, e.g., entity counts
 
       )
@@ -296,13 +297,13 @@ object ResponsePoc extends App {
     }
 
     Json.obj(
-      "meta" -> makeMetadata,
-      "data" -> makeData,
       "links" -> Json.obj(
         //?? later, include relevant query parameters
         "self" -> Json.fromString(s"$apiUrlPathPrefix/${getEntityTypeSegment(`type`).raw}")
         //?? links: pagination
-         )
+         ),
+      "meta" -> makeMetadata,
+      "data" -> makeData
       )
 
 
