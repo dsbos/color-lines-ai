@@ -3,6 +3,7 @@ package com.us.dsb.explore.jsonapi.poc1
 
 /** Generic database types. */
 object Database {
+  case class RowKey(raw: String) extends AnyVal
   case class TableName(raw: String) extends AnyVal
   case class ColumnName(raw: String) extends AnyVal
 }
@@ -10,6 +11,7 @@ import Database._
 
 /** Generic database actions. */
 trait Database {
+  def selectSpecificRow(tableName: TableName, rowKey: RowKey, columnNames: ColumnName*): Option[Map[ColumnName, Any]]
   def selectAllRows(tableName: TableName, columnNames: ColumnName*): Seq[Map[ColumnName, Any]]
 }
 
@@ -41,9 +43,38 @@ object DatabaseImpl extends Database {
       )
   }
 
-  private val tables = Map(TableNames.users -> usersTable)
+  private val tables =
+    Map(TableNames.users -> usersTable
+        )
 
   import Database._
+
+  def selectSpecificRow(tableName: TableName,
+                        rowKey: RowKey,
+                        columnNames: ColumnName*
+                       ): Option[Map[ColumnName, Any]] = {
+    println(s"selectSpecificRow.1: tableName = $tableName, rowKey = $rowKey, columnNames = ${columnNames}")
+    val tableFullRows = tables(tableName)
+    val fullSelectedRowOpt = tableFullRows.get(rowKey.raw)  //?? .get
+
+    val row = {
+      fullSelectedRowOpt.map { allColumns =>
+        println(s"selectSpecificRow.2: allColumns = ${allColumns}")
+        val selectedColumns: Map[ColumnName, Any] =
+          columnNames.map { columnName =>
+            println("selectSpecificRow.3:   columnName = " + columnName)
+            columnName -> allColumns(columnName)
+          }.toMap
+        println("selectSpecificRow.4:   selectedColumns = " + selectedColumns)
+        selectedColumns
+      }
+    }
+    row
+
+
+  }
+
+
 
   override def selectAllRows(tableName  : TableName,
                              columnNames: ColumnName*
