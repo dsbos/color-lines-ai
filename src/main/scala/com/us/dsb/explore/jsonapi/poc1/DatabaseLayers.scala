@@ -53,19 +53,19 @@ object DatabaseImpl extends Database {
                         rowKey: RowKey,
                         columnNames: ColumnName*
                        ): Option[Map[ColumnName, Any]] = {
-    println(s"selectSpecificRow.1: tableName = $tableName, rowKey = $rowKey, columnNames = ${columnNames}")
+    //println(s"selectSpecificRow.1: tableName = $tableName, rowKey = $rowKey, columnNames = ${columnNames}")
     val tableFullRows = tables(tableName)
     val fullSelectedRowOpt = tableFullRows.get(rowKey.raw)  //?? .get
 
     val row = {
       fullSelectedRowOpt.map { allColumns =>
-        println(s"selectSpecificRow.2: allColumns = ${allColumns}")
+        //println(s"selectSpecificRow.2: allColumns = ${allColumns}")
         val selectedColumns: Map[ColumnName, Any] =
           columnNames.map { columnName =>
-            println("selectSpecificRow.3:   columnName = " + columnName)
+            //println("selectSpecificRow.3:   columnName = " + columnName)
             columnName -> allColumns(columnName)
           }.toMap
-        println("selectSpecificRow.4:   selectedColumns = " + selectedColumns)
+        //println("selectSpecificRow.4:   selectedColumns = " + selectedColumns)
         selectedColumns
       }
     }
@@ -79,17 +79,17 @@ object DatabaseImpl extends Database {
   override def selectAllRows(tableName  : TableName,
                              columnNames: ColumnName*
                             ): Seq[Map[ColumnName, Any]] = {
-    println(s"selectAllRows.1: tableName = $tableName, columnNames = ${columnNames}")
+    //println(s"selectAllRows.1: tableName = $tableName, columnNames = ${columnNames}")
     val tableFullRows = tables(tableName)
     val rows = {
       tableFullRows.map { case (key, allColumns) =>
-        println(s"selectAllRows.2: key = $key, allColumns = ${allColumns}")
+        //println(s"selectAllRows.2: key = $key, allColumns = ${allColumns}")
         val selectedColumns: Map[ColumnName, Any] =
           columnNames.map { columnName =>
-            println("selectAllRows.3:   columnName = " + columnName)
+            //println("selectAllRows.3:   columnName = " + columnName)
             columnName -> allColumns(columnName)
           }.toMap
-        println("selectAllRows.4:   selectedColumns = " + selectedColumns)
+        //println("selectAllRows.4:   selectedColumns = " + selectedColumns)
         selectedColumns
       }
     }
