@@ -1,5 +1,6 @@
 package com.us.dsb.explore.jsonapi.poc1
 
+import com.us.dsb.explore.jsonapi.poc1.Database._
 import io.circe.Json
 
 import java.net.URI
@@ -16,68 +17,6 @@ object ResponsePoc extends App {
 
   type TBD = Unit
 
-
-  object Database {
-    case class TableName(raw: String) extends AnyVal
-
-    case class ColumnName(raw: String) extends AnyVal
-  }
-
-  import Database._
-
-  trait Database {
-    def xxselectAllRows(tableName: TableName, columnNames: ColumnName*): Seq[Map[ColumnName, Any]]
-  }
-
-  object DatabaseImpl extends Database {
-    val usersTableName = TableName("users_table")
-
-    object UserColumnNames {
-      val object_guid = ColumnName("object_guid")
-      val user_name = ColumnName("user_name")
-      val some_int = ColumnName("some_int")
-    }
-
-    private val usersTable = {
-      import UserColumnNames._
-      Map(
-        "user0123-fake-guid" -> Map(
-          object_guid -> "user0123-fake-guid",
-          user_name -> "User 123",
-          some_int -> 1
-          ),
-        "user0456-fake-guid" -> Map(
-          object_guid -> "user0456-fake-guid",
-          user_name -> "User 456",
-          some_int -> 2
-          )
-        )
-    }
-
-    val tables = Map(usersTableName -> usersTable)
-
-    import Database._
-
-    override def xxselectAllRows(tableName  : TableName,
-                                 columnNames: ColumnName*
-                                ): Seq[Map[ColumnName, Any]] = {
-      println(s"selectAllRows.1: tableName = $tableName, columnNames = ${columnNames}")
-      val tableFullRows = tables(tableName)
-      val rows = {
-        tableFullRows.map { case (key, allColumns) =>
-          println(s"selectAllRows.2: key = $key, allColumns = ${allColumns}")
-          val selectedColumns: Map[ColumnName, Any] =
-            columnNames.map { columnName =>
-              println("selectAllRows.3:   columnName = " + columnName)
-              columnName -> allColumns(columnName)
-            }.toMap
-          println("selectAllRows.4:   selectedColumns = " + selectedColumns)
-          selectedColumns
-        }
-      }
-      rows.toSeq
-    }
-  }
 
 
   object EntityMetadata {
@@ -140,7 +79,6 @@ object ResponsePoc extends App {
         `type` match {
           case DT_String => "string"
           case DT_Int => "int"
-          case null => ???
         }
       DataTypeString(nameThis)
     }
@@ -168,7 +106,7 @@ object ResponsePoc extends App {
 
     override def getEntityTableName(`type`: EntityType): TableName = {
       `type` match {
-        case UserType => DatabaseImpl.usersTableName
+        case UserType => DatabaseImpl.TableNames.users
       }
     }
 
@@ -274,7 +212,7 @@ object ResponsePoc extends App {
       }
 
       // - execute query (into some intermediate data)
-      val dbRows = DatabaseImpl.xxselectAllRows(table, requestedDbColumns: _*)
+      val dbRows = DatabaseImpl.selectAllRows(table, requestedDbColumns: _*)
       println(s"makeData.x1: dbRows = " + dbRows)
 
       // - construct JSON response data
