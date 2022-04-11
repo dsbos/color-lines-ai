@@ -15,10 +15,12 @@ object EntityMetadata {
   case object DT_Int extends DataType
   case object DT_Timestamp extends DataType
   case class DT_Enumeration(enumerators: TBD) extends DataType //?? where do specific enumeration types go?
-  case class DT_JsonObject1() extends DataType // (maybe)
-  case class DT_JsonObjec2t(Schema: TBD) extends DataType // (possibly)
+  case class DT_JsonObject1()            extends DataType // (maybe)
+  case class DT_JsonObject2(Schema: TBD) extends DataType // (possibly)
 
   case class DataTypeString(raw: String) extends AnyVal
+
+  //?? address physical type vs. logical type(s)
 
   sealed trait EntityType
   sealed trait Attribute
@@ -35,12 +37,15 @@ import EntityMetadata._
 trait EntityMetadata {
   /** (Currently,) not necessarily simple name--e.g., with enumerators */
   def getDataTypeString(`type`: DataType): DataTypeString
+
   def getEntityTypeName(`type`: EntityType): EntityTypeName
   def getEntityTypeSegment(`type`: EntityType): EntityTypeSegment
-  def getEntityTypeForSegment(segment: EntityTypeSegment): EntityType
   def getEntityTypeAttributes(`type`: EntityType): Seq[Attribute]
   def getEntityTableName(`type`: EntityType): TableName
   def getEntityTableKeyColumn(`type`: EntityType): ColumnName
+
+  def getEntityTypeForSegment(segment: EntityTypeSegment): EntityType
+
   def getAttributeName(attribute: Attribute): AttributeName
   def getAttributeType(attribute: Attribute): DataType
   def getAttributeColumnName(attribute: Attribute): ColumnName
@@ -52,6 +57,8 @@ object EntityMetadataImpl extends EntityMetadata {
       `type` match {
         case DT_String => "string"
         case DT_Int => "int"
+        //?? what about enumeration types? hacky string?  richer representation?
+        // named (and sharable) or anonymous?
       }
     DataTypeString(nameThis)
   }
@@ -99,21 +106,20 @@ object EntityMetadataImpl extends EntityMetadata {
     }
   }
 
-  override def getAttributeName(attribute: Attribute): AttributeName = {
-    val nameThis =
-      attribute match {
-        case User_ObjectGuid => "objectGuid"
-        case User_UserName => "userName"
-        case User_SomeInt => "someInt"
-      }
-    AttributeName(nameThis)
-  }
 
-  override def getAttributeType(attribute: Attribute): DataType = {
+  private case class AttrData(name: AttributeName,
+                              `type`: DataType,
+                              dbColumn: ColumnName)
+  //?? rework into map/etc.
+  private def getAttributeData(attribute: Attribute): AttrData = {
+    import DatabaseImpl._
     attribute match {
-      case User_ObjectGuid => DT_String
-      case User_UserName => DT_String
-      case User_SomeInt => DT_Int
+      case User_ObjectGuid =>
+        AttrData(AttributeName("objectGuid"), DT_String, UserColumnNames.object_guid)
+      case User_UserName =>
+        AttrData(AttributeName("userName"), DT_String, UserColumnNames.user_name)
+      case User_SomeInt =>
+        AttrData(AttributeName("someInt"), DT_Int, UserColumnNames.some_int)
       //?? do something with enumeration
       //?? maybe do some times with same enumeration; how to share?
       // (should "meta" have a "datatypes" member for ~parameterized data-type
@@ -123,12 +129,16 @@ object EntityMetadataImpl extends EntityMetadata {
     }
   }
 
+  override def getAttributeName(attribute: Attribute): AttributeName = {
+    getAttributeData(attribute).name
+  }
+
+  override def getAttributeType(attribute: Attribute): DataType = {
+    getAttributeData(attribute).`type`
+  }
+
   override def getAttributeColumnName(attribute: Attribute): ColumnName = {
-    attribute match {
-      case User_ObjectGuid => DatabaseImpl.UserColumnNames.object_guid
-      case User_UserName => DatabaseImpl.UserColumnNames.user_name
-      case User_SomeInt => DatabaseImpl.UserColumnNames.some_int
-    }
+    getAttributeData(attribute).dbColumn
   }
 
 }
