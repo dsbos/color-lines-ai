@@ -24,6 +24,7 @@ object EntityMetadata {
 
   sealed trait EntityType
   sealed trait Attribute
+  //?? relationships (outgoing half?)
 
   case class EntityTypeName(raw: String) extends AnyVal
   case class EntityTypeSegment(raw: String) extends AnyVal
@@ -38,10 +39,10 @@ trait EntityMetadata {
   /** (Currently,) not necessarily simple name--e.g., with enumerators */
   def getDataTypeString(`type`: DataType): DataTypeString
 
-  def getEntityTypeName(`type`: EntityType): EntityTypeName
-  def getEntityTypeSegment(`type`: EntityType): EntityTypeSegment
+  def getEntityTypeName(      `type`: EntityType): EntityTypeName
+  def getEntityTypeSegment(   `type`: EntityType): EntityTypeSegment
   def getEntityTypeAttributes(`type`: EntityType): Seq[Attribute]
-  def getEntityTableName(`type`: EntityType): TableName
+  def getEntityTableName(     `type`: EntityType): TableName
   def getEntityTableKeyColumn(`type`: EntityType): ColumnName
 
   def getEntityTypeForSegment(segment: EntityTypeSegment): EntityType
@@ -63,23 +64,52 @@ object EntityMetadataImpl extends EntityMetadata {
     DataTypeString(nameThis)
   }
 
+  // Entity-type identifiers:
   case object UserType extends EntityType
 
+  // Entity-type-attribute identifiers:
   case object User_ObjectGuid extends Attribute
-  case object User_UserName extends Attribute
-  case object User_SomeInt extends Attribute
+  case object User_UserName   extends Attribute
+  case object User_SomeInt    extends Attribute
+
+  // Entity-type--level data:
+
+  private case class EntityTypeData(name: EntityTypeName,
+                            segment: EntityTypeSegment,
+                            tableName: TableName,
+                            tableKeyColumn: ColumnName,
+                            attributes: Seq[Attribute])
+
+  private def getEntityTypeData(`type`: EntityType): EntityTypeData = {
+    import DatabaseImpl._
+    `type` match {
+      case UserType =>
+        EntityTypeData(EntityTypeName("user"),
+                       EntityTypeSegment("users"),
+                       TableNames.users,
+                       UserColumnNames.object_guid,
+                       List(User_ObjectGuid,
+                            User_UserName,
+                            User_SomeInt))
+    }
+  }
 
   override def getEntityTypeName(`type`: EntityType): EntityTypeName = {
-    `type` match {
-      case UserType => EntityTypeName("user")
-    }
+    getEntityTypeData(`type`).name
   }
 
-  override def getEntityTypeSegment(`type`: EntityType): EntityTypeSegment = {
-    `type` match {
-      case UserType => EntityTypeSegment("users")
-    }
-  }
+  override def getEntityTypeSegment(`type`: EntityType): EntityTypeSegment =
+    getEntityTypeData(`type`).segment
+
+  override def getEntityTableName(`type`: EntityType): TableName =
+    getEntityTypeData(`type`).tableName
+
+  override def getEntityTableKeyColumn(`type`: EntityType): ColumnName =
+    getEntityTypeData(`type`).tableKeyColumn
+
+  override def getEntityTypeAttributes(`type`: EntityType): Seq[Attribute] =
+    getEntityTypeData(`type`).attributes
+
 
   def getEntityTypeForSegment(segment: EntityTypeSegment): EntityType = {
     segment match {
@@ -87,25 +117,7 @@ object EntityMetadataImpl extends EntityMetadata {
     }
   }
 
-  override def getEntityTableName(`type`: EntityType): TableName = {
-    `type` match {
-      case UserType => DatabaseImpl.TableNames.users
-    }
-  }
-
-  override def getEntityTableKeyColumn(`type`: EntityType): ColumnName = {
-    `type` match {
-      case UserType => DatabaseImpl.UserColumnNames.object_guid
-    }
-  }
-
-  override def getEntityTypeAttributes(`type`: EntityType): Seq[Attribute] = {
-    `type` match {
-      case UserType => List(User_ObjectGuid, User_UserName, User_SomeInt)
-      case _ => ???
-    }
-  }
-
+  // Attribute--level data:
 
   private case class AttrData(name: AttributeName,
                               `type`: DataType,
@@ -117,9 +129,9 @@ object EntityMetadataImpl extends EntityMetadata {
       case User_ObjectGuid =>
         AttrData(AttributeName("objectGuid"), DT_String, UserColumnNames.object_guid)
       case User_UserName =>
-        AttrData(AttributeName("userName"), DT_String, UserColumnNames.user_name)
+        AttrData(AttributeName("userName"),   DT_String, UserColumnNames.user_name)
       case User_SomeInt =>
-        AttrData(AttributeName("someInt"), DT_Int, UserColumnNames.some_int)
+        AttrData(AttributeName("someInt"),    DT_Int,    UserColumnNames.some_int)
       //?? do something with enumeration
       //?? maybe do some times with same enumeration; how to share?
       // (should "meta" have a "datatypes" member for ~parameterized data-type
@@ -129,16 +141,13 @@ object EntityMetadataImpl extends EntityMetadata {
     }
   }
 
-  override def getAttributeName(attribute: Attribute): AttributeName = {
+  override def getAttributeName(attribute: Attribute): AttributeName =
     getAttributeData(attribute).name
-  }
 
-  override def getAttributeType(attribute: Attribute): DataType = {
+  override def getAttributeType(attribute: Attribute): DataType =
     getAttributeData(attribute).`type`
-  }
 
-  override def getAttributeColumnName(attribute: Attribute): ColumnName = {
+  override def getAttributeColumnName(attribute: Attribute): ColumnName =
     getAttributeData(attribute).dbColumn
-  }
 
 }
