@@ -71,6 +71,7 @@ object EntityMetadataImpl extends EntityMetadata {
   // Entity-type-attribute identifiers:
   case object User_ObjectGuid   extends Attribute
   case object User_UserName     extends Attribute
+  case object User_DomainName   extends Attribute
   case object User_SomeInt      extends Attribute
   case object Domain_ObjectGuid extends Attribute
   case object Domain_DomainName extends Attribute
@@ -94,6 +95,7 @@ object EntityMetadataImpl extends EntityMetadata {
                        UserColumnNames.object_guid,
                        List(User_ObjectGuid,
                             User_UserName,
+                            User_DomainName,
                             User_SomeInt))
       case DomainType =>
         EntityTypeData(EntityTypeName("domain"),
@@ -141,7 +143,9 @@ object EntityMetadataImpl extends EntityMetadata {
         AttrData(AttributeName("objectGuid"), DT_String, UserColumnNames.object_guid)
       case User_UserName =>
         AttrData(AttributeName("userName"),   DT_String, UserColumnNames.user_name)
-      case User_SomeInt =>
+      case User_DomainName =>
+        AttrData(AttributeName("domainName"), DT_String, UserColumnNames.domain_name)
+      case `User_SomeInt` =>
         AttrData(AttributeName("someInt"),    DT_Int,    UserColumnNames.some_int)
 
       case Domain_ObjectGuid =>
