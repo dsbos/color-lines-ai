@@ -18,13 +18,19 @@ trait Database {
 /** Specific database/schema declaration and private implementation. */
 object DatabaseImpl extends Database {
   object TableNames {
-    val users: TableName = TableName("users_table")
+    val users:   TableName = TableName("users_table")
+    val domains: TableName = TableName("domains_table")
   }
 
   object UserColumnNames {
     val object_guid: ColumnName = ColumnName("object_guid")
     val user_name: ColumnName = ColumnName("user_name")
     val some_int: ColumnName = ColumnName("some_int")
+  }
+
+  object DomainColumnNames {
+    val object_guid: ColumnName = ColumnName("object_guid")
+    val domain_name: ColumnName = ColumnName("domain_name")
   }
 
   private val usersTable = {

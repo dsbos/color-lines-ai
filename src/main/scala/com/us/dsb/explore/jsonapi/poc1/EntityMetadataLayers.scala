@@ -65,12 +65,15 @@ object EntityMetadataImpl extends EntityMetadata {
   }
 
   // Entity-type identifiers:
-  case object UserType extends EntityType
+  case object UserType   extends EntityType
+  case object DomainType extends EntityType
 
   // Entity-type-attribute identifiers:
-  case object User_ObjectGuid extends Attribute
-  case object User_UserName   extends Attribute
-  case object User_SomeInt    extends Attribute
+  case object User_ObjectGuid   extends Attribute
+  case object User_UserName     extends Attribute
+  case object User_SomeInt      extends Attribute
+  case object Domain_ObjectGuid extends Attribute
+  case object Domain_DomainName extends Attribute
 
   // Entity-type--level data:
 
@@ -81,6 +84,7 @@ object EntityMetadataImpl extends EntityMetadata {
                             attributes: Seq[Attribute])
 
   private def getEntityTypeData(`type`: EntityType): EntityTypeData = {
+    //?? rework into map/etc.
     import DatabaseImpl._
     `type` match {
       case UserType =>
@@ -91,6 +95,13 @@ object EntityMetadataImpl extends EntityMetadata {
                        List(User_ObjectGuid,
                             User_UserName,
                             User_SomeInt))
+      case DomainType =>
+        EntityTypeData(EntityTypeName("domain"),
+                       EntityTypeSegment("domains"),
+                       TableNames.domains,
+                       DomainColumnNames.object_guid,
+                       List(Domain_ObjectGuid,
+                            Domain_DomainName))
     }
   }
 
@@ -122,8 +133,8 @@ object EntityMetadataImpl extends EntityMetadata {
   private case class AttrData(name: AttributeName,
                               `type`: DataType,
                               dbColumn: ColumnName)
-  //?? rework into map/etc.
   private def getAttributeData(attribute: Attribute): AttrData = {
+    //?? rework into map/etc.
     import DatabaseImpl._
     attribute match {
       case User_ObjectGuid =>
@@ -132,6 +143,12 @@ object EntityMetadataImpl extends EntityMetadata {
         AttrData(AttributeName("userName"),   DT_String, UserColumnNames.user_name)
       case User_SomeInt =>
         AttrData(AttributeName("someInt"),    DT_Int,    UserColumnNames.some_int)
+
+      case Domain_ObjectGuid =>
+        AttrData(AttributeName("objectGuid"), DT_String, DomainColumnNames.object_guid)
+      case Domain_DomainName =>
+        AttrData(AttributeName("userName"),   DT_String, DomainColumnNames.domain_name)
+
       //?? do something with enumeration
       //?? maybe do some times with same enumeration; how to share?
       // (should "meta" have a "datatypes" member for ~parameterized data-type

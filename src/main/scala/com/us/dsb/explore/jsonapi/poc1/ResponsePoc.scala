@@ -18,35 +18,40 @@ object ResponsePoc extends App {
   import EntityMetadata._
   import EntityMetadataImpl._
 
-  //?? expand to multiple entity type (re "included", multi-type relationships like hasMember)
-  def makeTopMetadata(`type`: EntityType): Json = {
-    val typeName = getEntityTypeName(`type`)
-    val allAttributes = getEntityTypeAttributes(`type`)
-    val attributesValue: Json = {
-      Json.fromValues(
-        allAttributes.map { attribute =>
-          val typeStr = getDataTypeString(getAttributeType(attribute))
-          Json.obj(
-            "name" -> Json.fromString(getAttributeName(attribute).raw),
-            "type" -> Json.fromString(typeStr.raw)
-            //?? expand "type" to object--allow for more type info (phys., log.; class, parameterized)
-            )
-        }
-        )
-    }
-    val entityTypeValue =
-      Json.obj(
-        "typeName" -> Json.fromString(typeName.raw),
-        // typeUrlPathSegment
-        "attributes" -> attributesValue
-        //"relationships"
+  def makeTopMetadata(types: EntityType*): Json = {
 
-        )
+    /** Returns member name and value. */
+    def makeEntityTypeMetadataMember(`type`: EntityType): (String, Json)  = {
+      val typeName = getEntityTypeName(`type`)
+      val allAttributes = getEntityTypeAttributes(`type`)
+      val attributesValue: Json = {
+        Json.fromValues(
+          allAttributes.map { attribute =>
+            val typeStr = getDataTypeString(getAttributeType(attribute))
+            Json.obj(
+              "name" -> Json.fromString(getAttributeName(attribute).raw),
+              "type" -> Json.fromString(typeStr.raw)
+              //?? expand "type" to object--allow for more type info (phys., log.; class, parameterized)
+              )
+          }
+          )
+      }
+      val entityTypeValue =
+        Json.obj(
+          "typeName" -> Json.fromString(typeName.raw),
+          // typeUrlPathSegment
+          "attributes" -> attributesValue
+          //"relationships"
+          )
+      typeName.raw -> entityTypeValue
+    }
+
+    val entityTypeMembers = types.map(makeEntityTypeMetadataMember(_))
 
     //??? split out type metadata from "data metadata" (e.g, counts)
 
     Json.obj(
-      "entityTypes" -> Json.obj(typeName.raw -> entityTypeValue)
+      "entityTypes" -> Json.obj(entityTypeMembers: _*)
       //?? dataTypes if we need to declare names for enumeration types (having
       //  enumerators list separate from references to enumeration type)
       )
@@ -89,11 +94,9 @@ object ResponsePoc extends App {
         // (no "relationships" yet or in this case)
         "links" -> Json.obj(
           "self" -> Json.fromString(s"$apiUrlPathPrefix/${getEntityTypeSegment(`type`).raw}/$entityId")
-
           )
         )
     rowResourceObject
-    //????? :factor out row rendering
   }
 
   def makeSingleEntityResponse(apiUrlPathPrefix: URI, // (concat., don't resolve)
@@ -103,7 +106,6 @@ object ResponsePoc extends App {
     val requestedAttributes = getEntityTypeAttributes(`type`)  //??? factor out/move up
 
     def makeData: Json = {
-
       //??? factor out commonality (from single- vs. multiple-entity methods)
       //?? add entity ID column (primary key) if not explicitly requested
       val requestedDbColumns =
@@ -121,13 +123,10 @@ object ResponsePoc extends App {
         case None => ???  //??? untangle no-such-entity (404) case
         case Some(rowColumnNameToValueMap1) =>
 
-
-        val xxresourceObject =
+        val resourceObject =
           renderRow(apiUrlPathPrefix, `type`, requestedAttributes, rowColumnNameToValueMap1)
-
-        xxresourceObject
+        resourceObject
       }
-
     }
 
     // top-level object
@@ -137,7 +136,7 @@ object ResponsePoc extends App {
         "self" -> Json.fromString(s"$apiUrlPathPrefix/${getEntityTypeSegment(`type`).raw}/${entityId.raw}")
         //?? links: pagination
         ),
-      "meta" -> makeTopMetadata(`type`),
+      "meta" -> makeTopMetadata(`type`, DomainType/*???? temp.: showing multiple */),
       "data" -> makeData
       )
   }
@@ -176,7 +175,7 @@ object ResponsePoc extends App {
         "self" -> Json.fromString(s"$apiUrlPathPrefix/${getEntityTypeSegment(`type`).raw}")
         //?? links: pagination
         ),
-      "meta" -> makeTopMetadata(`type`),
+      "meta" -> makeTopMetadata(`type`, DomainType /*???? temp.: showing multiple */),
       "data" -> makeData
       )
   }
