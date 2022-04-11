@@ -1,7 +1,7 @@
 package com.us.dsb.explore.jsonapi.poc1
 
 import com.us.dsb.explore.jsonapi.poc1.Database._
-import io.circe.Json
+import io.circe.{ACursor, Decoder, Json}
 
 import java.net.URI
 
@@ -190,10 +190,25 @@ object ResponsePoc extends App {
     println(s"ResponsePoc.makeSingleEntityResponse: responseDoc = $responseDoc")
   }
   {
-    val responseDoc =
+    val responseDoc: Json =
       makeEntityCollectionResponse(URI.create("/someApi"),
                                    UserType,
                                    ())
     println(s"ResponsePoc.makeEntityCollectionResponse: responseDoc = $responseDoc")
+
+    val `hc_/data`: ACursor = responseDoc.hcursor.downField("data")
+    println("`hc_data` = " + `hc_/data`)
+    val `hc_data[1]` = `hc_/data`.downN(1)  // use as array; get element as offset
+    println("`hc_data[1]` = " + `hc_data[1]`)
+    val `hc_data[1].links.self` = `hc_data[1]`.downField("links").downField("self")  // resource object to link value
+    println("`hc_data[1].links.self` = " + `hc_data[1].links.self`)
+    //?? handle link string vs. link object(?)
+    val x4: Decoder.Result[String] = `hc_data[1].links.self`.as[String]
+    println("x4 = " + x4)
+    val `value_data[1].links.self` = x4.toOption.get
+    println("`value_data[1].links.self` = " + `value_data[1].links.self`)
+
+    //???? continue: parse extract URL into makeSingleEntityResponse call
+
   }
 }
