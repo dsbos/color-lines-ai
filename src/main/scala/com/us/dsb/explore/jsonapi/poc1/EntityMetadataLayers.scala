@@ -37,6 +37,7 @@ trait EntityMetadata {
   def getDataTypeString(`type`: DataType): DataTypeString
   def getEntityTypeName(`type`: EntityType): EntityTypeName
   def getEntityTypeSegment(`type`: EntityType): EntityTypeSegment
+  def getEntityTypeForSegment(segment: EntityTypeSegment): EntityType
   def getEntityTypeAttributes(`type`: EntityType): Seq[Attribute]
   def getEntityTableName(`type`: EntityType): TableName
   def getEntityTableKeyColumn(`type`: EntityType): ColumnName
@@ -70,6 +71,12 @@ object EntityMetadataImpl extends EntityMetadata {
   override def getEntityTypeSegment(`type`: EntityType): EntityTypeSegment = {
     `type` match {
       case UserType => EntityTypeSegment("users")
+    }
+  }
+
+  def getEntityTypeForSegment(segment: EntityTypeSegment): EntityType = {
+    segment match {
+      case EntityTypeSegment("users") => UserType
     }
   }
 

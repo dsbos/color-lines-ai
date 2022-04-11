@@ -18,6 +18,7 @@ object ResponsePoc extends App {
   import EntityMetadata._
   import EntityMetadataImpl._
 
+  //?? expand to multiple entity type (re "included", multi-type relationships like hasMember)
   def makeTopMetadata(`type`: EntityType): Json = {
     val typeName = getEntityTypeName(`type`)
     val allAttributes = getEntityTypeAttributes(`type`)
@@ -42,12 +43,12 @@ object ResponsePoc extends App {
 
         )
 
+    //??? split out type metadata from "data metadata" (e.g, counts)
+
     Json.obj(
       "entityTypes" -> Json.obj(typeName.raw -> entityTypeValue)
       //?? dataTypes if we need to declare names for enumeration types (having
       //  enumerators list separate from references to enumeration type)
-      //?? non-type metadata, e.g., entity counts
-
       )
   }
 
@@ -181,7 +182,7 @@ object ResponsePoc extends App {
   }
 
 
-  {
+  if (false) {
     val responseDoc =
       makeSingleEntityResponse(URI.create("/someApi"),
                                    UserType,
@@ -190,23 +191,54 @@ object ResponsePoc extends App {
     println(s"ResponsePoc.makeSingleEntityResponse: responseDoc = $responseDoc")
   }
   {
-    val responseDoc: Json =
+    val responseDoc1: Json =
       makeEntityCollectionResponse(URI.create("/someApi"),
                                    UserType,
                                    ())
-    println(s"ResponsePoc.makeEntityCollectionResponse: responseDoc = $responseDoc")
+    println(s"ResponsePoc.makeEntityCollectionResponse: responseDoc1 = $responseDoc1")
 
-    val `hc_/data`: ACursor = responseDoc.hcursor.downField("data")
-    println("`hc_data` = " + `hc_/data`)
-    val `hc_data[1]` = `hc_/data`.downN(1)  // use as array; get element as offset
-    println("`hc_data[1]` = " + `hc_data[1]`)
-    val `hc_data[1].links.self` = `hc_data[1]`.downField("links").downField("self")  // resource object to link value
-    println("`hc_data[1].links.self` = " + `hc_data[1].links.self`)
-    //?? handle link string vs. link object(?)
-    val x4: Decoder.Result[String] = `hc_data[1].links.self`.as[String]
-    println("x4 = " + x4)
-    val `value_data[1].links.self` = x4.toOption.get
-    println("`value_data[1].links.self` = " + `value_data[1].links.self`)
+    def getCollectionFirstSelfLinkURL(responseDoc: Json): String = {
+      val `hc_/data`: ACursor = responseDoc.hcursor.downField("data")
+      //println("`hc_data` = " + `hc_/data`)
+      val `hc_data[0]` = `hc_/data`.downN(0)  // use as array; get element at offset
+      //println("`hc_data[0]` = " + `hc_data[0]`)
+      val `hc_data[0].links.self` = `hc_data[0]`.downField("links").downField("self")  // resource object to link value
+      //println("`hc_data[0].links.self` = " + `hc_data[0].links.self`)
+      //?? handle link string vs. link object(?)
+      val x4: Decoder.Result[String] = `hc_data[0].links.self`.as[String]
+      //println("x4 = " + x4)
+      val `value_data[0].links.self` = x4.toOption.get
+      //println("`value_data[0].links.self` = " + `value_data[0].links.self`)
+      `value_data[0].links.self`
+    }
+
+    object requestData {
+      val firstItemUrlStr = getCollectionFirstSelfLinkURL(responseDoc1)
+      println("firstItemUrlStr = " + firstItemUrlStr)
+
+      val apiRootRelativeUrlStr = firstItemUrlStr.drop("/someApi/".length)
+      println("apiRootRelativeUrlStr = " + apiRootRelativeUrlStr)
+      val path :: query = apiRootRelativeUrlStr.split("\\?").toList
+      println("path = " + path)
+      println("query = " + query)
+      val entityTypeSegmentStr :: idSegmentStr :: Nil = path.split("/").toList
+      println("entityTypeSegmentStr = " + entityTypeSegmentStr)
+      println("idSegmentStr = " + idSegmentStr)
+      val entityTypeSegment = EntityTypeSegment(entityTypeSegmentStr)
+      val entityType = getEntityTypeForSegment(entityTypeSegment)
+      val entityId = EntityId(idSegmentStr)
+    }
+
+
+    {
+      val responseDoc2 =
+        makeSingleEntityResponse(URI.create("/someApi"),
+                                 requestData.entityType,
+                                 requestData.entityId,
+                                 ())
+      println(s"ResponsePoc.makeSingleEntityResponse: responseDoc2 = $responseDoc2")
+    }
+
 
     //???? continue: parse extract URL into makeSingleEntityResponse call
 
