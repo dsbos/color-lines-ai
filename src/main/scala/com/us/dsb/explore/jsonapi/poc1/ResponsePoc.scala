@@ -121,30 +121,53 @@ object ResponsePoc extends App {
           )
   }
 
+  def determineRequestedAttributes(`type`: EntityType,
+                                  attributeSelection: Option[Seq[Attribute]]
+                                  ): Seq[Attribute] = {
+    // default to all attributes (and no relationships, once they're implemented)
+    attributeSelection.getOrElse(getEntityTypeAttributes(`type`))
+  }
+
+  def determineNetRequestedColumns(`type`: EntityType,
+                                   requestedAttributes: Seq[Attribute]
+                                  ): Seq[ColumnName] = {
+    val columnsForRequestAttributes =
+      requestedAttributes.map { attribute =>
+        getAttributeColumnName(attribute)
+      }
+    val keyCol = getEntityTableKeyColumn(`type`)
+    val netColumns =
+      if (columnsForRequestAttributes.contains(keyCol)) {
+        columnsForRequestAttributes
+      }
+      else {
+        columnsForRequestAttributes :+ keyCol
+      }
+    println(s"netColumns = $netColumns")
+    netColumns
+  }
+
+  //??? factor out remaining commonality from single- vs. multiple-entity methods
+
   def makeSingleEntityResponse(apiUrlPathPrefix: URI, // (concat., don't resolve)
-                               `type`          : EntityType,
-                               entityId        : EntityId,
-                               other           : TBD): Json = {
-    val requestedAttributes = getEntityTypeAttributes(`type`)  //??? factor out/move up
+                               `type`            : EntityType,
+                               attributeSelection: Option[Seq[Attribute]],
+                               entityId          : EntityId,
+                               other             : TBD): Json = {
+    val requestedAttributes = determineRequestedAttributes(`type`,
+                                                           attributeSelection)
+    val table = getEntityTableName(`type`)
+    val requestedDbColumns = determineNetRequestedColumns(`type`,
+                                                          requestedAttributes)
 
-    def makeData: Json = {
-      //??? factor out commonality (from single- vs. multiple-entity methods)
+    // Execute query (into some intermediate data form):
+    val dbRowOpt = DatabaseImpl.selectSpecificRow(table,
+                                                  RowKey(entityId.raw),
+                                                  requestedDbColumns: _*)
+    //println(s"makeData.x1: dbRowOpt = " + dbRowOpt)
 
-      //?? add entity ID column (primary key) if not explicitly requested
-      val requestedDbColumns =
-        requestedAttributes.map { attribute =>
-          getAttributeColumnName(attribute)
-        }
-
-      val table = getEntityTableName(`type`)
-
-
-      // - execute query (into some intermediate data)
-      val dbRowOpt = DatabaseImpl.selectSpecificRow(table,
-                                                    RowKey(entityId.raw),
-                                                    requestedDbColumns: _*)
-      //println(s"makeData.x1: dbRowOpt = " + dbRowOpt)
-
+    // Construct JSON response entity data:
+    val primaryData: Json = {
       dbRowOpt match {
         case None => Json.Null
         case Some(rowColumnNameToValueMap1) =>
@@ -156,55 +179,51 @@ object ResponsePoc extends App {
 
     assembleToplevelObject(`type`,
                            s"$apiUrlPathPrefix/${getEntityTypeSegment(`type`).raw}/${entityId.raw}",
-                           makeData)
+                           primaryData)
   }
 
   def makeEntityCollectionResponse(apiUrlPathPrefix: URI, // (concat., don't resolve)
-                                   `type`          : EntityType,
-                                   other           : TBD): Json = {
-    val requestedAttributes = getEntityTypeAttributes(`type`)  //??? factor out/move up
+                                   `type`            : EntityType,
+                                   attributeSelection: Option[Seq[Attribute]],
+                                   other             : TBD): Json = {
+    val requestedAttributes = determineRequestedAttributes(`type`,
+                                                           attributeSelection)
+    val table = getEntityTableName(`type`)
+    val requestedDbColumns = determineNetRequestedColumns(`type`,
+                                                          requestedAttributes)
 
-    def makeData: Json = {
-      //??? factor out commonality (from single- vs. multiple-entity methods)
+    // Execute query (into some intermediate data form)
+    val dbRows = DatabaseImpl.selectAllRows(table, requestedDbColumns: _*)
+    //println(s"makeData.x1: dbRows = " + dbRows)
 
-      //?? add entity ID column (primary key) if not explicitly requested
-      val requestedDbColumns =
-        requestedAttributes.map { attribute =>
-          getAttributeColumnName(attribute)
-        }
-
-      val table = getEntityTableName(`type`)
-
-
-      // - execute query (into some intermediate data)
-      val dbRows = DatabaseImpl.selectAllRows(table, requestedDbColumns: _*)
-      //println(s"makeData.x1: dbRows = " + dbRows)
-
-      // - construct JSON response entity data
-      val resourceObjects = dbRows.map { rowColumnNameToValueMap1 =>
-        renderRow(apiUrlPathPrefix, `type`, requestedAttributes, rowColumnNameToValueMap1)
-      }
+    // Construct JSON response entity data
+    val resourceObjects = dbRows.map { rowColumnNameToValueMap1 =>
+      renderRow(apiUrlPathPrefix, `type`, requestedAttributes, rowColumnNameToValueMap1)
+    }
+    val primaryData: Json = {
       Json.fromValues(resourceObjects)
     }
 
     assembleToplevelObject(`type`,
                            s"$apiUrlPathPrefix/${getEntityTypeSegment(`type`).raw}",
-                           makeData)
+                           primaryData)
   }
 
 
   if (false) {
     val responseDoc =
       makeSingleEntityResponse(URI.create("/someApi"),
-                                   UserType,
-                                   EntityId("user0123-fake-guid"),
-                                   ())
+                               UserType,
+                               None,
+                               EntityId("user0123-fake-guid"),
+                               ())
     println(s"ResponsePoc.makeSingleEntityResponse: responseDoc = $responseDoc")
   }
   {
     val responseDoc1: Json =
       makeEntityCollectionResponse(URI.create("/someApi"),
                                    UserType,
+                                   None,
                                    ())
     println(s"ResponsePoc.makeEntityCollectionResponse: responseDoc1 = $responseDoc1")
 
@@ -245,13 +264,28 @@ object ResponsePoc extends App {
       val responseDoc2 =
         makeSingleEntityResponse(URI.create("/someApi"),
                                  requestData.entityType,
+                                 None,
                                  requestData.entityId,
                                  ())
       println(s"ResponsePoc.makeSingleEntityResponse: responseDoc2 = $responseDoc2")
+      val responseDoc2b =
+        makeSingleEntityResponse(URI.create("/someApi"),
+                                 requestData.entityType,
+                                 Some(Seq()),
+                                 requestData.entityId,
+                                 ())
+      println(s"ResponsePoc.makeSingleEntityResponse: responseDoc2b = $responseDoc2b")
+      val responseDoc2c =
+        makeSingleEntityResponse(URI.create("/someApi"),
+                                 requestData.entityType,
+                                 Some(Seq(User_UserName)),
+                                 requestData.entityId,
+                                 ())
+      println(s"ResponsePoc.makeSingleEntityResponse: responseDoc2c = $responseDoc2c")
     }
 
 
-    //???? continue: parse extract URL into makeSingleEntityResponse call
+    //???? continue: parse extracted URL into makeSingleEntityResponse call
 
   }
 }
