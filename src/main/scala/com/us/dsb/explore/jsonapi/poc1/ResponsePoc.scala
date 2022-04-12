@@ -100,7 +100,7 @@ object ResponsePoc extends App {
         // (no "relationships" yet or in this case)
         "links" -> Json.obj(
           "self" -> Json.fromString(
-            s"$apiUrlPathPrefix/${getEntityTypeSegment(`type`).raw}/$entityId")
+            s"$apiUrlPathPrefix/${getEntityTypeSegment(`type`).raw}/$entityId?<plus parameters (e.g., 'fields')?>")
           //?? do we need to propagate any query parameters?
           )
         )
@@ -113,7 +113,7 @@ object ResponsePoc extends App {
     Json.obj(
           "links" -> Json.obj(
             //?? later, include relevant query parameters
-            "self" -> Json.fromString(selfUrlStr)
+            "self" -> Json.fromString(selfUrlStr + "?<plus any parameters>")
             //?? links: pagination
             ),
           "meta" -> makeTopMetadata(`type`, DomainType /*??? temp.: showing multiple */),
@@ -143,7 +143,7 @@ object ResponsePoc extends App {
       else {
         columnsForRequestAttributes :+ keyCol
       }
-    println(s"netColumns = $netColumns")
+    //println(s"netColumns = $netColumns")
     netColumns
   }
 
@@ -177,9 +177,10 @@ object ResponsePoc extends App {
       }
     }
 
-    assembleToplevelObject(`type`,
-                           s"$apiUrlPathPrefix/${getEntityTypeSegment(`type`).raw}/${entityId.raw}",
-                           primaryData)
+    assembleToplevelObject(
+      `type`,
+      s"$apiUrlPathPrefix/${getEntityTypeSegment(`type`).raw}/${entityId.raw}",
+      primaryData)
   }
 
   def makeEntityCollectionResponse(apiUrlPathPrefix: URI, // (concat., don't resolve)
@@ -204,9 +205,10 @@ object ResponsePoc extends App {
       Json.fromValues(resourceObjects)
     }
 
-    assembleToplevelObject(`type`,
-                           s"$apiUrlPathPrefix/${getEntityTypeSegment(`type`).raw}",
-                           primaryData)
+    assembleToplevelObject(
+      `type`,
+      s"$apiUrlPathPrefix/${getEntityTypeSegment(`type`).raw}",
+      primaryData)
   }
 
 
@@ -246,6 +248,7 @@ object ResponsePoc extends App {
       val firstItemUrlStr = getCollectionFirstSelfLinkURL(responseDoc1)
       println("firstItemUrlStr = " + firstItemUrlStr)
 
+      //???? split query out before this relative path:
       val apiRootRelativeUrlStr = firstItemUrlStr.drop("/someApi/".length)
       println("apiRootRelativeUrlStr = " + apiRootRelativeUrlStr)
       val path :: query = apiRootRelativeUrlStr.split("\\?").toList
