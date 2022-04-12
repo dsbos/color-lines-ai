@@ -22,7 +22,7 @@ object RequestHandling {
     }
 
     //println("parseQueryToQueryParameters:  queryOpt = " + queryOpt)
-    val mappings2 = {
+    val mappings = {
       queryOpt.fold(Seq[(String, String)]()) { query =>
 
         val rawMappings = query.split("&").toSeq
@@ -36,8 +36,8 @@ object RequestHandling {
         }
       }
     }
-    //println("parseQueryToQueryParameters:  mappings = " + mappings2)
-    mappings2
+    //println("parseQueryToQueryParameters:  mappings = " + mappings)
+    mappings
   }
 
 }
@@ -81,11 +81,11 @@ object RequestHandlingTemp extends App {
         case _ => ???
       }
 
-
-
       ()
     }
 
+    //??? interpret URL path segments into part of request
+    //??? interpret string-level query parameters into part of request
 
   }
 

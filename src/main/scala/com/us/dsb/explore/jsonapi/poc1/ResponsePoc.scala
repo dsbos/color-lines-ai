@@ -18,6 +18,9 @@ object ResponsePoc extends App {
   import EntityMetadata._
   import EntityMetadataImpl._
 
+  //?? need emit datatypes too; set probably derived from entity types (and
+  // entity types are derived from query--primary data's type or types, included
+  // data's type(s), maybe related data's type(s) in relationships)
   def makeTopMetadata(types: EntityType*): Json = {
 
     /** Returns member name and value. */
@@ -58,10 +61,13 @@ object ResponsePoc extends App {
   }
 
 
+  /** Renders database query result row data to resource object.
+   */
   def renderRow(apiUrlPathPrefix: URI,
                 `type`: EntityType,
                 requestedAttributes: Seq[Attribute],
-                rowColumnNameToValueMap2: Map[ColumnName, Any]): Json = {
+                rowColumnNameToValueMap2: Map[ColumnName, Any]
+               ): Json = {
 
     def dbAnyToJson(any: Any): Json = {
       any match {
@@ -93,10 +99,26 @@ object ResponsePoc extends App {
         "attributes" -> attributesObject,
         // (no "relationships" yet or in this case)
         "links" -> Json.obj(
-          "self" -> Json.fromString(s"$apiUrlPathPrefix/${getEntityTypeSegment(`type`).raw}/$entityId")
+          "self" -> Json.fromString(
+            s"$apiUrlPathPrefix/${getEntityTypeSegment(`type`).raw}/$entityId")
+          //?? do we need to propagate any query parameters?
           )
         )
     rowResourceObject
+  }
+
+  def assembleToplevelObject(`type`: EntityType,
+                             selfUrlStr: String,
+                             primaryData: Json): Json = {
+    Json.obj(
+          "links" -> Json.obj(
+            //?? later, include relevant query parameters
+            "self" -> Json.fromString(selfUrlStr)
+            //?? links: pagination
+            ),
+          "meta" -> makeTopMetadata(`type`, DomainType /*??? temp.: showing multiple */),
+          "data" -> primaryData
+          )
   }
 
   def makeSingleEntityResponse(apiUrlPathPrefix: URI, // (concat., don't resolve)
@@ -107,38 +129,34 @@ object ResponsePoc extends App {
 
     def makeData: Json = {
       //??? factor out commonality (from single- vs. multiple-entity methods)
+
       //?? add entity ID column (primary key) if not explicitly requested
       val requestedDbColumns =
-      requestedAttributes.map { attribute =>
-        getAttributeColumnName(attribute)
-      }
+        requestedAttributes.map { attribute =>
+          getAttributeColumnName(attribute)
+        }
 
       val table = getEntityTableName(`type`)
 
+
       // - execute query (into some intermediate data)
-      val dbRowOpt = DatabaseImpl.selectSpecificRow(table, RowKey(entityId.raw), requestedDbColumns: _*)
+      val dbRowOpt = DatabaseImpl.selectSpecificRow(table,
+                                                    RowKey(entityId.raw),
+                                                    requestedDbColumns: _*)
       //println(s"makeData.x1: dbRowOpt = " + dbRowOpt)
 
       dbRowOpt match {
-        case None => ???  //??? untangle no-such-entity (404) case
+        case None => Json.Null
         case Some(rowColumnNameToValueMap1) =>
-
-        val resourceObject =
-          renderRow(apiUrlPathPrefix, `type`, requestedAttributes, rowColumnNameToValueMap1)
-        resourceObject
+          val resourceObject =
+            renderRow(apiUrlPathPrefix, `type`, requestedAttributes, rowColumnNameToValueMap1)
+          resourceObject
       }
     }
 
-    // top-level object
-    Json.obj(
-      "links" -> Json.obj(
-        //?? later, include relevant query parameters
-        "self" -> Json.fromString(s"$apiUrlPathPrefix/${getEntityTypeSegment(`type`).raw}/${entityId.raw}")
-        //?? links: pagination
-        ),
-      "meta" -> makeTopMetadata(`type`, DomainType/*???? temp.: showing multiple */),
-      "data" -> makeData
-      )
+    assembleToplevelObject(`type`,
+                           s"$apiUrlPathPrefix/${getEntityTypeSegment(`type`).raw}/${entityId.raw}",
+                           makeData)
   }
 
   def makeEntityCollectionResponse(apiUrlPathPrefix: URI, // (concat., don't resolve)
@@ -147,15 +165,16 @@ object ResponsePoc extends App {
     val requestedAttributes = getEntityTypeAttributes(`type`)  //??? factor out/move up
 
     def makeData: Json = {
-
       //??? factor out commonality (from single- vs. multiple-entity methods)
+
       //?? add entity ID column (primary key) if not explicitly requested
       val requestedDbColumns =
-      requestedAttributes.map { attribute =>
-        getAttributeColumnName(attribute)
-      }
+        requestedAttributes.map { attribute =>
+          getAttributeColumnName(attribute)
+        }
 
       val table = getEntityTableName(`type`)
+
 
       // - execute query (into some intermediate data)
       val dbRows = DatabaseImpl.selectAllRows(table, requestedDbColumns: _*)
@@ -168,16 +187,9 @@ object ResponsePoc extends App {
       Json.fromValues(resourceObjects)
     }
 
-    // top-level object
-    Json.obj(
-      "links" -> Json.obj(
-        //?? later, include relevant query parameters
-        "self" -> Json.fromString(s"$apiUrlPathPrefix/${getEntityTypeSegment(`type`).raw}")
-        //?? links: pagination
-        ),
-      "meta" -> makeTopMetadata(`type`, DomainType /*???? temp.: showing multiple */),
-      "data" -> makeData
-      )
+    assembleToplevelObject(`type`,
+                           s"$apiUrlPathPrefix/${getEntityTypeSegment(`type`).raw}",
+                           makeData)
   }
 
 
