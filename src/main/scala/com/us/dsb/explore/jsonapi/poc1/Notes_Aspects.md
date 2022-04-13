@@ -1,7 +1,6 @@
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
 
-assimilate:
+to be assimilated:
 - chain(s) of dependencies between things:
   - (dependencies across things (e.g., JSON subtrees) that seem somewhat
     independent)
@@ -40,6 +39,7 @@ assimilate:
   - relationships:
     - ... "simple" vs. association table ...
     - ... ("included", JOIN stuff, etc.
+  - entity counts
 - error handling:
   - general
   - JSON:API-specific (e.g,. "errors")
@@ -51,20 +51,41 @@ assimilate:
     - Maybe, use metadata to create multiple routes:
       - (If framework can do something useful when given individual routes/paths
         (showing what's available? better logging?))
+- design, decision, and implementation order:
+  - Identify higher-priority features (e.g., features/cases/combinations needed
+    to replace (chunks of) current functionality, plus known-wantd new ones.)
+    - e.g., all entities of type; paging; current filtering, sorting;
+    - Identify risk areas re prototyping, etc.
+  - Identify "fancier" features (beyond parity with current support and
+    know-required new support).
+    - Identify likelihood of "fancier" features.
+  - Re fancier features, determine what design/details can be deferred vs. what
+    needs to be planned for (e.g., reserve "syntax" for possible future
+    features/cases/etc.)
+- links:  which query parameters propagate and not?
+- filtering and visibility to UI?
+  - How soon will UI support editing queries?  Will UI need to parse current
+   filtering condition from response (e.g., to start from something other than
+   UI's query editor (e.g., pre-built filter string) but then let user adjust
+   from there?)?
   
-
-
 
 Semi-sorted:
 - High-level query types:
-  - support like:  all users, user with specific ID (for all entity types)
-  - maybe support traversing relationships (e.g., all domains related via
+  - Support like:  all users, user with specific ID (for all entity types)
+  - Maybe support traversing relationships (e.g., all domains related via
     users' containingDomain relationships from users)
     - Q:  Confirm:  Different from filtering domain collection via some
       expression detecting relationships from users?
-- Base query synax in URL path:
- - 
-
+    - ??:  assimilate SQL-mapping aspects as for "include"(?)
+    - ??:  assimilate single-/multi-hop aspects
+    - 
+- Base query syntax in URL path:
+ - Initial draft:
+   - /users, /users/123,    /users/123/someRel,        /users/123/rel1/rel2...
+ - More flexible:
+   - /users, /users/id=123, /users/id=123/rel=someRel, ...rel/rel2...;
+     allows adding /users/rel=someRel
   
 - Result metadata
   - Type metadata:
@@ -118,9 +139,20 @@ Semi-sorted:
 
 - Relationships:
   - Mapping from logical relationships to database representation:
-    - Represented in model metadata
-
-
+    - Represented in model metadata (e.g., SQL fragments, code fragments)
+    - Expected database representations:
+      - Simple:  Foreign key in relationship source table to primary key in
+        target table.
+      - Association table:  Association table with foreign keys to source
+        and target tables.
+      - Other?  (Maybe something complex behind the scenes, like table
+        expression instead of direct table reference?)
+    - Levels of ~access:
+      - What minimun level of relationship support allows access to relevant
+        data (related entities)?
+        - Is it:  "fields" to list relatinship(s) and  "related" links?
+          (Note:  Avoid forcing UI to known "user"/"users" correspondence.)
+        
 
 - generally, things in top-level metadata vs. things in various levels' metadata
 
@@ -128,6 +160,7 @@ Semi-sorted:
   - Paging:
     - assimilate:  threshold for paging by default?
     - assimilate:  any hard limits on page size/limit?
+    - assimilate:  any metadata reporting default/hard limits?
     - (Not for single-entity queries.)
     - For:  primary data.  Q: What about "included" and relationship collections?
     - Accept which forms: 1. offset and limit, 2. page size and number, or
@@ -141,8 +174,10 @@ Semi-sorted:
         traversal)
     - Provide first/prev/next/last links:
       - Only when paged?
-      - "When available";  Are "first" and "last" always available?  Is
-        availability of "prev" and "next" clear?
+      - Re spec's "When available":
+        - Links "first" and "last" probably always available. (Can to go to
+          first/last even if already there.)
+        - Is availability of "prev" and "next" clear?
     
     - TBD:  support UI's display of paging state and available actions
       - (e.g., state like current page number and/or offsets, and actions like
@@ -150,6 +185,23 @@ Semi-sorted:
       - probably have entity count in metadata (top-level only? relationships'
         too?)
       - probably have current page/offset/etc. numbers in metadata
+
+  - Field selection:
+    - Basic/regular (as specified by JSON:API):
+      - Select by simple field names.
+      - Select specific attributes and/or relationhips.
+      - Have default attributes (and/or relationships):
+        - Probably API simply default to all attributes (and no
+          relationships(?))--UI can have its own defaults.
+        - But what about having different defaults for different predefined
+          filterings?  All on UI side?  
+      - (Per entity type.  Affects all resource objects, regardliness of
+        where (main primary data, primary data's related ovbjects, "included's
+         objects).)
+    - Possibly, allow pseudo-submember references:
+      - To select members of values that are JSON objects (e.g., if timestamps
+        carry both milliseconds numbrer and string ).
+
 
   - Sorting:
     - (Primary data only.  Not order in "included" or in relationship objects.)
@@ -167,14 +219,6 @@ Semi-sorted:
           simpler to implement.)
       - One-hop or multiple-hop?
       - (Any other levels/features?)
-    - No duplicate resource objects, even if entity multiply referenced.
-    
-
-
-    
-    
-     
-    
-
-
-
+      - How to multiple hops map to SQL queries
+    - No duplicate resource objects, even if entity is multiply referenced.
+ 
