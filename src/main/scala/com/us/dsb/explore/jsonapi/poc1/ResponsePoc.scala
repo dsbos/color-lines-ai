@@ -262,7 +262,6 @@ object ResponsePoc extends App {
       val entityId = EntityId(idSegmentStr)
     }
 
-
     {
       val responseDoc2 =
         makeSingleEntityResponse(URI.create("/someApi"),
@@ -286,7 +285,6 @@ object ResponsePoc extends App {
                                  ())
       println(s"ResponsePoc.makeSingleEntityResponse: responseDoc2c = $responseDoc2c")
     }
-
 
     //???? continue: parse extracted URL into makeSingleEntityResponse call
 
