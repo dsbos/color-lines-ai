@@ -74,18 +74,40 @@ Semi-sorted:
 - High-level query types:
   - Support like:  all users, user with specific ID (for all entity types)
   - Maybe support traversing relationships (e.g., all domains related via
-    users' containingDomain relationships from users)
+    users' containingDomain relationship from users)
     - Q:  Confirm:  Different from filtering domain collection via some
       expression detecting relationships from users?
     - ??:  assimilate SQL-mapping aspects as for "include"(?)
     - ??:  assimilate single-/multi-hop aspects
     - 
 - Base query syntax in URL path:
- - Initial draft:
-   - /users, /users/123,    /users/123/someRel,        /users/123/rel1/rel2...
- - More flexible:
-   - /users, /users/id=123, /users/id=123/rel=someRel, ...rel/rel2...;
-     allows adding /users/rel=someRel
+  - (Depends on (how many) types of high-level queryies supported.)
+  - Candidate:  Initial simple-segments draft:
+    -
+      - /users                          - all users
+      - /users/123                      - user 123
+      - /users/123/someRel              - user 123 -> someRel -> related entities
+      - /users/123/relationship/someRel - similar but relationships itself
+      - /users/123/rel1/rel2...         - (maybe) chained ...
+    - (Has some irregularities/limitations.)
+  - Candidate:  Segments like "<step type>=<step param>":
+    - e.g.:
+      - /users                             - all users
+      - /users/id=123                      - user 123
+      - /users/id=123/related=someRel      - user 123  -> someRel -> related entities
+      - /users/related=someRel             - all users -> someRel -> related entities
+      - /users/id=123/relationship=someRel - similar but relationships itself
+      - ...
+    - Explicit syntax allows easier ~co-existence of different cases
+      (note /users/rel=someRel and /users/id=123).
+    - Specifics are TBD (including whether first segment has step type too).
+  - Incrementality:  Even if we start with  /users/123, we could can move to
+    /users/byId=123 and/users/other=other by treating unrecognized-prefix
+    segment  as ID.
+  - See more in
+    https://rationemllc.atlassian.net/wiki/spaces/CA/pages/3123085352/URL+Paths+request+cases+path+forms+related+aspects)
+
+  
   
 - Result metadata
   - Type metadata:
