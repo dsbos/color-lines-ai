@@ -1,6 +1,7 @@
 
 
 to be assimilated:
+
 - chain(s) of dependencies between things:
   - (dependencies across things (e.g., JSON subtrees) that seem somewhat
     independent)
@@ -11,6 +12,7 @@ to be assimilated:
     in primary data (including relationships) and from other included objects
     - (depends on "included" and "fields")
     - (how does that map to SQL (without querying for each referring object)?)
+
 - multi-entity-type relationships (e.g., groups members (e.g., users, computers,
   other groups, if as one relationship)
   - entity type handled fine in "type" member
@@ -23,13 +25,6 @@ to be assimilated:
     - multiple joins?
   - probably just reserve "syntax" to represent union types (e.g., entity
     type names can map to either regular entity type or union entity type)
-- What was relationships choice re avoiding "user" vs. "users" in UI re
-  references?
-  - In resource objects, avoid using "data" (which lists resource identifier
-    objects (with type and ID, needing lookup)) and do use "links.related"
-    (which gets full resource objects)
-  - (probably don't provide "links.self" or even way to get relationship itself
-    as primary data) (is getting relationship ever needed for read-only access?)
 
 - mapping to DB queries (~collected)
   - adding customer account ID (not in logical entity model)
@@ -44,28 +39,7 @@ to be assimilated:
     - ... ("included", JOIN stuff, etc.)
   - entity counts
 
-- error handling:
-  - general
-  - JSON:API-specific (e.g,. "errors")
-- HTTP server connection:
-  - general
-  - Don't _manually_ create _multiple_ HTTP-framework "routes" for available
-    paths:
-    - Create one ~high-level route, get path tail, interpret path segments.
-    - Maybe, use metadata to create multiple routes:
-      - (If framework can do something useful when given individual routes/paths
-        (showing what's available? better logging?))
-- design, decision, and implementation order:
-  - Identify higher-priority features (e.g., features/cases/combinations needed
-    to replace (chunks of) current functionality, plus known-wantd new ones.)
-    - e.g., all entities of type; paging; current filtering, sorting;
-    - Identify risk areas re prototyping, etc.
-  - Identify "fancier" features (beyond parity with current support and
-    know-required new support).
-    - Identify likelihood of "fancier" features.
-  - Re fancier features, determine what design/details can be deferred vs. what
-    needs to be planned for (e.g., reserve "syntax" for possible future
-    features/cases/etc.)
+
 - links:  which query parameters propagate and not?
 - filtering and visibility to UI?
   - How soon will UI support editing queries?  Will UI need to parse current
@@ -79,33 +53,50 @@ to be assimilated:
   
 
 Semi-sorted:
-- Likely feature-level increments:
-  - Relationships and dependent things:  Likely increments:
-    - Start with no relationships (not used in current non-graph UI/back end).
-    - Add minimal[*] access to related entities:  Relationship objects, with
-     "related" links usable to get related entities as primary data.
-     [* Minimum such that client doesn't need to map "user" to "users" (type
-     name vs. corresponding  segment/parameter "users").]
-   - Defer fancier features until/unless needed:
-     - compound documents ("include" query parameter and "included" member")
-     - multi-hop relationship access (e.g, "/users/123/rel1/rel2")
-  - Type metadata:
-    - Data types:
-      - Start with at physical vs. logical type.
-      - Maybe defer multi-level types.
-  - Paging:
-    - Start with minimum for UI to drive paging:
-      - Accept query parameters (probably just offset and limit).
-      - Report resource counts.
-      - Maybe pass parsed/decoded paging parameters in metadata.
-    - Likely defer first/prev/next/last links, etc.
-  - Field selection:
-    - Start with "fields" only for primary-data type.  (There are no resource
-       objects of other entity types unless/until relationships.)  No submember
-        syntax.
-    - Likely defer submember syntax unless/until needed.
-    - Defer multiple types until/unless relationships.
 
+- Feature-level increments:
+  - Design, decision, and implementation order:
+    - Identify higher-priority features (e.g., features/cases/combinations needed
+      to replace (chunks of) current functionality, plus known-wanted new ones.)
+      - e.g., all entities of type; paging; current filtering, sorting;
+      - Identify risk areas re prototyping, etc.
+    - Identify "fancier" features (beyond parity with current support and
+      know-required new support).
+      - Identify likelihood "fancier" features (need, support, and use).
+    - Re fancier features, determine what design/details can be deferred vs. what
+      needs to be planned for (e.g., reserve "syntax" for possible future
+      features/cases/etc.)
+ 
+  - Likely feature-level increments:
+    - (No POST, PATCH, etc.)
+    - Relationships and dependent things:  Likely increments:
+      - Start with _no_ relationships. (None in current non-graph UI or back end.)
+      - Add minimal[*] access to related entities:  Relationship objects, with
+       "related" links usable to get related entities as primary data, as full
+       resource objects.  (Avoid resource identifier objects, at least without
+       corresonding resource objects in "included".)
+       [* Minimum such that client doesn't need to map "user" to "users" (type
+       name vs. corresponding  segment/parameter "users").]
+     - Defer fancier features until/unless needed:
+       - compound documents ("include" query parameter and "included" member")
+       - multi-hop relationship access (e.g, "/users/123/rel1/rel2")
+    - Type metadata:
+      - Data types:
+        - Start with at physical vs. logical type.
+        - Maybe defer multi-level types.
+    - Paging:
+      - Start with minimum for UI to drive paging:
+        - Accept query parameters (probably just offset and limit).
+        - Report resource counts.
+        - Maybe pass parsed/decoded paging parameters in metadata.  ??? update --not in start
+      - Likely defer first/prev/next/last links, etc.
+    - Field selection:
+      - Start with "fields" only for primary-data type.  (There are no resource
+         objects of other entity types unless/until relationships.)  No submember
+          syntax.
+      - Likely defer submember syntax unless/until needed.
+      - Defer multiple types until/unless relationships.
+    - ??? FILTERING
 
 - High-level query types:
   - Support like:  all users, user with specific ID (for all entity types)
@@ -136,11 +127,17 @@ Semi-sorted:
       - ...
     - Explicit syntax allows easier ~co-existence of different cases
       (note /users/rel=someRel and /users/id=123).
-    - Specifics are TBD (including whether first segment has step type too).
+    - Maybe use step type on first segment (e.g., "/collType=user" for consistency.
+    - Specifics are TBD.
   - Other candidates are possible.
-  - Incrementality:  Even if we start with  /users/123, we could can move to
-    /users/byId=123 and/users/other=other by treating unrecognized-prefix
-    segment  as ID.
+  - Incrementality:
+    - Maybe start with just "/users" and "/users/123".
+      - Because no relationships to start with.     
+      - Or something like "/collections/users/..." to reserve syntax for
+        relationships
+    -  Even if we start with /users/123, we could move to
+      /users/byId=123 and/users/other=other by treating unrecognized-prefix
+      segment  as ID.
   - See more in
     https://rationemllc.atlassian.net/wiki/spaces/CA/pages/3123085352/URL+Paths+request+cases+path+forms+related+aspects)
 
@@ -191,17 +188,17 @@ Semi-sorted:
 
 - "Model" metadata:
   - (The model-specific metadata defining our logical entities and mappings
-    to the data store. "driver metadata"?  "control ..."?  "master ..."?
-    "mapping ..."? )
+    to the database. "driver metadata"?  "control ..."?  "master ..."?
+    "mapping ..."?)
   - Contains metadata selected from to make response metadata (e.g., response's
     specfic entity type(s)), e.g., entity types, data types.
-  - Contains mappings to/from data store:
+  - Contains mappings to/from database:
     - E.g., an entity type's corresponding table (or table expression/etc.).
     - E.g., an attribute's corresponding column (or other expression/etc.).
     - E.g., a relationship's corresponding query components (joined tables,
       joining columns, maybe other SQL fragments).
      
-- Mapping between data store and JSON:API response:
+- Mapping between database and JSON:API response:
   - (See model metadata.)
   - 
 
@@ -219,8 +216,8 @@ Semi-sorted:
       - Other?  (Maybe something complex behind the scenes, like table
         expression instead of direct table reference?)
     - Minimum level for access to related objects, without client's needing to
-     know "user"-to-"users" correspondence:  Support relationship objects
-     having "related" links usable to get related entities as primary data.
+      know "user"-to-"users" correspondence:  Support relationship objects
+      having "related" links usable to get related entities as primary data.
 
 - Query parameter aspects:
   - Paging:
@@ -294,3 +291,37 @@ Semi-sorted:
       - (Any other levels/features?)
       - How do multiple hops map to SQL queries?
     - No duplicate resource objects, even if entity is multiply referenced.
+
+
+- "Implementation architecture" aspects:
+
+  - Error reporting:
+    - internal general handling implementation
+    - JSON:API-specific aspects (e.g., "errors" member and content specified 400
+      errors)n
+    - (Hooking into HTTP service framework.)
+    
+  - HTTP server connection:
+    - "Connecting" input path and query (and prefix for regenerating URLs):
+      - Don't _manually_ create _multiple_ HTTP-framework "routes" for available
+        paths:
+        - Maybe create one high-level route, get path tail, use metadata to
+          interpret path tail segments.
+        - Maybe, use metadata to create multiple routes, each hooked to call
+          passing static and dynamic values (e.g., entity type vs. entity ID).
+          - (Probably only if framework can do something useful when given
+            individual routes/paths (showing available paths somewhere? better
+            logging?))
+      - Query parameters:
+        - (What basic parsing support does/will framework provide?)
+    - "Connecting" errors:
+
+  - Database ~connection:
+    - Much goes through metadata (e.g., table and column names, specific SQL
+     fragments).
+    - Layer adding non--model-visible things like customer account ID.
+    - What else?
+    
+    
+    
+
