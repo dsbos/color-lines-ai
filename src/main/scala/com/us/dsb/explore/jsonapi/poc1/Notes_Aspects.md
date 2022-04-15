@@ -1,57 +1,4 @@
 
-
-to be assimilated:
-
-- chain(s) of dependencies between things:
-  - (dependencies across things (e.g., JSON subtrees) that seem somewhat
-    independent)
-  - type-metadata chain:  to datatypes, from entity types derived from
-    query--primary data's type or types, included data's type(s), maybe related
-    data's type(s) in relationships); depends on "fields"
-  - included-data chain:  to included resource objects, from resource ID objects
-    in primary data (including relationships) and from other included objects
-    - (depends on "included" and "fields")
-    - (how does that map to SQL (without querying for each referring object)?)
-
-- multi-entity-type relationships (e.g., groups members (e.g., users, computers,
-  other groups, if as one relationship)
-  - entity type handled fine in "type" member
-  - need some kind of union entity type (e.g., "user or computer or group")
-  - how would query map to SQL and return resource objects of different types?
-    - multiple single-join queries?
-    - one query using multiple joins getting different tables' data into
-      separate groups of columns, UNIONED, with each row mapped to entity type
-      per which column group filled in
-    - multiple joins?
-  - probably just reserve "syntax" to represent union types (e.g., entity
-    type names can map to either regular entity type or union entity type)
-
-- mapping to DB queries (~collected)
-  - adding customer account ID (not in logical entity model)
-  - attributes:  normally to columns, but maybe to expressions
-  - entity collections:  normally to tables, but maybe to table expressions
-    (e.g., JOINs)
-  - filtering:  narrows down WHERE clause
-    - What about filtering via exists/forall on relationships?  Just
-      SQL subexpression, or change to form of query?
-  - relationships:
-    - ... "simple" vs. association table ...
-    - ... ("included", JOIN stuff, etc.)
-  - entity counts
-
-
-- links:  which query parameters propagate and not?
-- filtering and visibility to UI?
-  - How soon will UI support editing queries?  Will UI need to parse current
-   filtering condition from response (e.g., to start from something other than
-   UI's query editor (e.g., pre-built filter string) but then let user adjust
-   from there?)?
-- assim: avoid "user" <--> "users" if path segment uses something else (not
-  plural) to indicate collection (e.g., "/collByType=user"?
-  - 
- 
-  
-
 Semi-sorted:
 
 - Feature-level increments:
@@ -192,20 +139,17 @@ Semi-sorted:
     "mapping ..."?)
   - Contains metadata selected from to make response metadata (e.g., response's
     specfic entity type(s)), e.g., entity types, data types.
-  - Contains mappings to/from database:
-    - E.g., an entity type's corresponding table (or table expression/etc.).
-    - E.g., an attribute's corresponding column (or other expression/etc.).
-    - E.g., a relationship's corresponding query components (joined tables,
+  - Contains mappings to/from database, etc.:
+    - an entity type's corresponding table (or table expression/etc.).
+    - an attribute's corresponding column (or other expression/etc.).
+    - a relationship's corresponding query components (joined tables,
       joining columns, maybe other SQL fragments).
-     
-- Mapping between database and JSON:API response:
-  - (See model metadata.)
-  - 
-
-
-
-
+    - maybe filter-expression metadata (beyond columns, types, etc.)
+- 
 - Relationships:
+  - Note:  No initial support; limited next-phase support; maybe never much 
+    support.
+  - TBD:  Query path syntax, filtering aspects.
   - Mapping from logical relationships to database representation:
     - Represented in model metadata (e.g., SQL fragments, code fragments)
     - Expected database representations:
@@ -218,6 +162,21 @@ Semi-sorted:
     - Minimum level for access to related objects, without client's needing to
       know "user"-to-"users" correspondence:  Support relationship objects
       having "related" links usable to get related entities as primary data.
+  - Multi-entity-type relationships (e.g., groups members (e.g., users,
+    computers, other groups, if presented as one relationship):
+    - Different entity types are handled fine in "type" members of different
+      resource objects.
+    - Need some kind of union entity type (e.g., "user or computer or group").
+    - How would query map to SQL and return resource objects of different types?
+      - Multiple single-join queries?
+      - One query using multiple joins getting different tables' data into
+        separate groups of columns, UNIONED, with each row mapped to entity type
+        per which column group filled in?
+      - Multiple joins?
+    - Probably just reserve "syntax" to represent union types (i.e., metadata
+      structure ~declaring entity type names indicates whether regular entity
+      type (e.g., listing attributes) or other (for union entity type listing
+       member entity type names)).
 
 - Query parameter aspects:
   - Paging:
@@ -279,7 +238,11 @@ Semi-sorted:
   - Filtering:
     - *TBD*
     - see https://rationemllc.atlassian.net/wiki/spaces/CA/pages/3116040208/Proposed+Filtering)
-    
+    - UI interaction:
+      - How soon will UI support editing filter conditions?
+      - Will it even need to parse/interpret "filter" query parameter values?
+        (It will only construct such expression values (from whatever its
+        editor's representation is) and won't need to decode them, right?)
 
   - Included data:
     - (Depends on supporting relationships.)
@@ -318,10 +281,19 @@ Semi-sorted:
 
   - Database ~connection:
     - Much goes through metadata (e.g., table and column names, specific SQL
-     fragments).
+      fragments).  (See model metadata.)
     - Layer adding non--model-visible things like customer account ID.
     - What else?
-    
-    
-    
 
+  
+  - Chain(s) of dependencies between things:
+    - (Only minor architecture/internal.)
+    - (Dependencies between things (e.g., JSON subtrees) that seem somewhat
+      independent or at least "non-adjacent".)
+    - Chain to type metadata:  to datatypes, from entity types derived from
+      query--primary data's type or types, included data's type(s), maybe related
+      data's type(s) in relationships (which depends on "fields").
+    - Chain to included data:  to included resource objects, from resource ID
+      objects in primary data (including relationships) and from other included
+      objects.  Depends on "included" and "fields".
+    - Note:  Simple without relationships.
