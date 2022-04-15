@@ -11,9 +11,6 @@ to be assimilated:
     in primary data (including relationships) and from other included objects
     - (depends on "included" and "fields")
     - (how does that map to SQL (without querying for each referring object)?)
-- query parameters:  interpretation needs to look up entity types, attributes,
-  relationships, etc.
-- (query parameters . other)
 - multi-entity-type relationships (e.g., groups members (e.g., users, computers,
   other groups, if as one relationship)
   - entity type handled fine in "type" member
@@ -26,8 +23,14 @@ to be assimilated:
     - multiple joins?
   - probably just reserve "syntax" to represent union types (e.g., entity
     type names can map to either regular entity type or union entity type)
-- what was relationships choice re avoiding "user" vs. "users" in UI re
+- What was relationships choice re avoiding "user" vs. "users" in UI re
   references?
+  - In resource objects, avoid using "data" (which lists resource identifier
+    objects (with type and ID, needing lookup)) and do use "links.related"
+    (which gets full resource objects)
+  - (probably don't provide "links.self" or even way to get relationship itself
+    as primary data) (is getting relationship ever needed for read-only access?)
+
 - mapping to DB queries (~collected)
   - adding customer account ID (not in logical entity model)
   - attributes:  normally to columns, but maybe to expressions
@@ -38,8 +41,9 @@ to be assimilated:
       SQL subexpression, or change to form of query?
   - relationships:
     - ... "simple" vs. association table ...
-    - ... ("included", JOIN stuff, etc.
+    - ... ("included", JOIN stuff, etc.)
   - entity counts
+
 - error handling:
   - general
   - JSON:API-specific (e.g,. "errors")
@@ -68,9 +72,41 @@ to be assimilated:
    filtering condition from response (e.g., to start from something other than
    UI's query editor (e.g., pre-built filter string) but then let user adjust
    from there?)?
+- assim: avoid "user" <--> "users" if path segment uses something else (not
+  plural) to indicate collection (e.g., "/collByType=user"?
+  - 
+ 
   
 
 Semi-sorted:
+- Likely feature-level increments:
+  - Relationships and dependent things:  Likely increments:
+    - Start with no relationships (not used in current non-graph UI/back end).
+    - Add minimal[*] access to related entities:  Relationship objects, with
+     "related" links usable to get related entities as primary data.
+     [* Minimum such that client doesn't need to map "user" to "users" (type
+     name vs. corresponding  segment/parameter "users").]
+   - Defer fancier features until/unless needed:
+     - compound documents ("include" query parameter and "included" member")
+     - multi-hop relationship access (e.g, "/users/123/rel1/rel2")
+  - Type metadata:
+    - Data types:
+      - Start with at physical vs. logical type.
+      - Maybe defer multi-level types.
+  - Paging:
+    - Start with minimum for UI to drive paging:
+      - Accept query parameters (probably just offset and limit).
+      - Report resource counts.
+      - Maybe pass parsed/decoded paging parameters in metadata.
+    - Likely defer first/prev/next/last links, etc.
+  - Field selection:
+    - Start with "fields" only for primary-data type.  (There are no resource
+       objects of other entity types unless/until relationships.)  No submember
+        syntax.
+    - Likely defer submember syntax unless/until needed.
+    - Defer multiple types until/unless relationships.
+
+
 - High-level query types:
   - Support like:  all users, user with specific ID (for all entity types)
   - Maybe support traversing relationships (e.g., all domains related via
@@ -101,6 +137,7 @@ Semi-sorted:
     - Explicit syntax allows easier ~co-existence of different cases
       (note /users/rel=someRel and /users/id=123).
     - Specifics are TBD (including whether first segment has step type too).
+  - Other candidates are possible.
   - Incrementality:  Even if we start with  /users/123, we could can move to
     /users/byId=123 and/users/other=other by treating unrecognized-prefix
     segment  as ID.
@@ -109,33 +146,35 @@ Semi-sorted:
 
   
   
-- Result metadata
+- Response metadata (returnd in API responses):
   - Type metadata:
     - Entity-type metadata:
-      - List/describe fields (attributes and relationship)
-        - so client can know what "fields" takes.
+      - List/describe fields (attributes and relationship).
+        - So UI knows what is can page to "fields" query parameter.
       - (Reserve "syntax" for union types re multi-entity-type relationships.)
     - Datatype metadata:
-      - At least phystical and logical types (e.g., "string" and "entityName" ).
+      - At least phystical and logical types (e.g., "string" and "entityName").
       - Maybe chain of subtyping, like "string" -> "entityNane" -> "userName".
-        - (UI uses most-specific one it knows. E.g., map types to HTML element
+        - (UI uses most-specific one it knows.  E.g., map types to HTML element
           classes; whichever classes CSS covers affect rendering.)
       - "Obvious" types:  string, int/long, float/double, boolean, etc.
       - Enumeration types:
-        - (Presumably to UI can help user select value for filter expressions?)
+        - List enumerators, UI can help user select values for filter expressions.
         - Q:  Ordered by enumerator name or by order given somewhere?  (See
-          pseudo-submembern_ note.)
+          pseudo-submembers note.)
       - Timestamps:
-        - Maybe JSON object carrying both milliseconds offset and timestamp string.
+        - Maybe JSON object carrying both milliseconds offset and timestampk
+          string as currently.
           - Maybe simply ~hard-coded (defined) that way.
           - Maybe instance of class of types for JSON object structures? (Can
-            probably for allow adding that later.)
+            probably allow for adding that later.)
           - (See pseudo-submember note.)
-      - Possibly use submember syntax to refer to psuedo-members to request
+      - Possibly use submember syntax to refer to (psuedo-)members to request
         ~variations:
-        - e.g., in "fields", "created.epochMillis" vs. "created.stringForm" (vs.
+        - e.g., in "fields": "created.epochMillis" vs. "created.stringForm" (vs.
           just "created" to get JSON object with both)
-        - e.g., in "sort", "enumAttr.logicalOrder" vs. "enumAttr.stringOrder"
+        - e.g., in "sort": "enumAttr.logicalOrder" vs. "enumAttr.stringOrder"
+          (vs. just "enumAttr" to use enumeration type's default order)
 
 
   - Instance metadata:
@@ -143,19 +182,29 @@ Semi-sorted:
       - Query total (without paging; after filtering).
         - (For, e.g., showing number of pages.)
       - Entity/relationship list total (before filtering).
-        - (For showing ...)
+        - (As we currently show.)
+
+  - Response metadata's locations:
+   - Some in top-level "meta" member
+   - Maybe some in deeper "meta" members.  (Anything likely?)
+
 
 - "Model" metadata:
   - (The model-specific metadata defining our logical entities and mappings
-    to the data store. "driver metadata"? "control ..."? "master .."?
+    to the data store. "driver metadata"?  "control ..."?  "master ..."?
     "mapping ..."? )
-  - Contains metadata selected to make result metadata (e.g., result's specfic
-    entity type(s)), e.g., entity types, data types.
+  - Contains metadata selected from to make response metadata (e.g., response's
+    specfic entity type(s)), e.g., entity types, data types.
   - Contains mappings to/from data store:
-    - E.g., an entity type's corresponding table (or table expression?).
-    - E.g., an attribute's corresponding column (or other expression?).
-    - E.g., a relationship's corresponding query components.
+    - E.g., an entity type's corresponding table (or table expression/etc.).
+    - E.g., an attribute's corresponding column (or other expression/etc.).
+    - E.g., a relationship's corresponding query components (joined tables,
+      joining columns, maybe other SQL fragments).
      
+- Mapping between data store and JSON:API response:
+  - (See model metadata.)
+  - 
+
 
 
 
@@ -169,14 +218,9 @@ Semi-sorted:
         and target tables.
       - Other?  (Maybe something complex behind the scenes, like table
         expression instead of direct table reference?)
-    - Levels of ~access:
-      - What minimun level of relationship support allows access to relevant
-        data (related entities)?
-        - Is it:  "fields" to list relatinship(s) and  "related" links?
-          (Note:  Avoid forcing UI to known "user"/"users" correspondence.)
-        
-
-- generally, things in top-level metadata vs. things in various levels' metadata
+    - Minimum level for access to related objects, without client's needing to
+     know "user"-to-"users" correspondence:  Support relationship objects
+     having "related" links usable to get related entities as primary data.
 
 - Query parameter aspects:
   - Paging:
@@ -184,7 +228,9 @@ Semi-sorted:
     - assimilate:  any hard limits on page size/limit?
     - assimilate:  any metadata reporting default/hard limits?
     - (Not for single-entity queries.)
-    - For:  primary data.  Q: What about "included" and relationship collections?
+    - For:  primary data.
+    -  Q: What about "included" and relationship collections?  (Probably 
+       deferred/dropped anyway.)
     - Accept which forms: 1. offset and limit, 2. page size and number, or
       3. either (or 4. somethine else)?
       - if page size and number/offset, client can't get arbitrary range (e.g.,
@@ -192,10 +238,10 @@ Semi-sorted:
       - if offset and limit, might complicate generating first/prev/next/last
         links, especially if client sends offset that is not multiple of limit
         or changes limit
-        - maybe just ignore irregularities (Prev then Next isn't "identity"
-        traversal)
+        - maybe just ignore irregularities (Prev then Next isn't always the
+          "identity" traversal)
     - Provide first/prev/next/last links:
-      - Only when paged?
+      - Only when paged?  (That's a way to tell UI whether paged, if needed.)
       - Re spec's "When available":
         - Links "first" and "last" probably always available. (Can to go to
           first/last even if already there.)
@@ -213,16 +259,16 @@ Semi-sorted:
       - Select by simple field names.
       - Select specific attributes and/or relationhips.
       - Have default attributes (and/or relationships):
-        - Probably API simply default to all attributes (and no
-          relationships(?))--UI can have its own defaults.
+        - Probably API simply defaults to all attributes (and no
+          relationships)--UI can have its own defaults.
         - But what about having different defaults for different predefined
-          filterings?  All on UI side?  
+          filterings?  All on UI side?
       - (Per entity type.  Affects all resource objects, regardliness of
         where (main primary data, primary data's related ovbjects, "included's
-         objects).)
+        objects).)
     - Possibly, allow pseudo-submember references:
       - To select members of values that are JSON objects (e.g., if timestamps
-        carry both milliseconds numbrer and string ).
+        carry both milliseconds numbrer and string).
 
 
   - Sorting:
@@ -231,7 +277,12 @@ Semi-sorted:
       ascending/descending; most datatype ordering obvious--enumerations by
       value string or some listing order?).
     - Presumably don't support sorting by related entities (e.g.,
-      ...?sort=someRel/someAttr).
+      ...?sort=someRel/someAttr), at least not for a while.
+
+  - Filtering:
+    - *TBD*
+    - see https://rationemllc.atlassian.net/wiki/spaces/CA/pages/3116040208/Proposed+Filtering)
+    
 
   - Included data:
     - (Depends on supporting relationships.)
@@ -241,6 +292,5 @@ Semi-sorted:
           simpler to implement.)
       - One-hop or multiple-hop?
       - (Any other levels/features?)
-      - How to multiple hops map to SQL queries
+      - How do multiple hops map to SQL queries?
     - No duplicate resource objects, even if entity is multiply referenced.
- 
