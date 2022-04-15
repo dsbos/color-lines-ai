@@ -163,11 +163,6 @@ object Requests extends App {
   val testInterpretedPaths = testStringPaths.map(interpretPath(_))
 
 
-
-
-
-
-
   case class RequestURL(
                        path: RequestPath2,
                        tbd: Unit
