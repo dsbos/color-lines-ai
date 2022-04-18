@@ -64,7 +64,7 @@ Semi-sorted:
       - /users/123/relationship/someRel - similar but relationships itself
       - /users/123/rel1/rel2...         - (maybe) chained ...
     - (Has some irregularities/limitations.)
-  - Candidate:  Segments like "<step type>=<step param>":
+  - Candidate:  Segments like "&lt;step type>=&lt;step param>":
     - e.g.:
       - /users                             - all users
       - /users/id=123                      - user 123

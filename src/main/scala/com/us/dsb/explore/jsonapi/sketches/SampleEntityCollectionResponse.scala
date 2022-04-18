@@ -1,7 +1,7 @@
 package com.us.dsb.explore.jsonapi.sketches
 
 import io.circe.literal._
-object SampleEntityCollection {
+object SampleEntityCollectionResponse {
 
   json"""
          {

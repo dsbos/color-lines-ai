@@ -41,6 +41,7 @@ trait EntityMetadata {
 
   def getEntityTypeName(      `type`: EntityType): EntityTypeName
   def getEntityTypeSegment(   `type`: EntityType): EntityTypeSegment
+  //??? add entity type labels (e.g., "User", "Users")
   def getEntityTypeAttributes(`type`: EntityType): Seq[Attribute]
   def getEntityTableName(     `type`: EntityType): TableName
   def getEntityTableKeyColumn(`type`: EntityType): ColumnName
@@ -50,6 +51,7 @@ trait EntityMetadata {
   def getAttributeName(attribute: Attribute): AttributeName
   def getAttributeType(attribute: Attribute): DataType
   def getAttributeColumnName(attribute: Attribute): ColumnName
+  //??? add exposed column names
 }
 
 object EntityMetadataImpl extends EntityMetadata {
