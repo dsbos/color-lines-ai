@@ -32,8 +32,9 @@ object ResponsePoc extends App {
           allAttributes.map { attribute =>
             val typeStr = getDataTypeString(getAttributeType(attribute))
             Json.obj(
-              "name" -> Json.fromString(getAttributeName(attribute).raw),
-              "type" -> Json.fromString(typeStr.raw)
+              "name"    -> Json.fromString(getAttributeName(attribute).raw),
+              "uiLabel" -> Json.fromString(getAttributeLabel(attribute).raw),
+              "type"    -> Json.fromString(typeStr.raw)
               //?? expand "type" to object--allow for more type info (phys., log.; class, parameterized)
               )
           }
@@ -80,9 +81,9 @@ object ResponsePoc extends App {
       val fields: Iterable[(String, Json)] =
         requestedAttributes.map { attr =>
           val dbColumn = getAttributeColumnName(attr)
-          val value = rowColumnNameToValueMap2(dbColumn)
+          val attrValue = rowColumnNameToValueMap2(dbColumn)  //(later: or SQL expression)
           val attrName = EntityMetadataImpl.getAttributeName(attr)
-          attrName.raw -> dbAnyToJson(value)
+          attrName.raw -> dbAnyToJson(attrValue)
         }
       Json.fromFields(fields)
     }

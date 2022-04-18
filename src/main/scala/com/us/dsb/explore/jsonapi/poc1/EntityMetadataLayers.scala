@@ -26,10 +26,13 @@ object EntityMetadata {
   sealed trait Attribute
   //?? relationships (outgoing half?)
 
+  //?? (refine to member-syntax strings, etc.:)
+
   case class EntityTypeName(raw: String) extends AnyVal
   case class EntityTypeSegment(raw: String) extends AnyVal
   case class EntityId(raw: String) extends AnyVal
   case class AttributeName(raw: String) extends AnyVal
+  case class AttributeLabel(raw: String) extends AnyVal  //(exposed name)
 
 }
 
@@ -49,9 +52,9 @@ trait EntityMetadata {
   def getEntityTypeForSegment(segment: EntityTypeSegment): EntityType
 
   def getAttributeName(attribute: Attribute): AttributeName
+  def getAttributeLabel(attribute: Attribute): AttributeLabel
   def getAttributeType(attribute: Attribute): DataType
   def getAttributeColumnName(attribute: Attribute): ColumnName
-  //??? add exposed column names
 }
 
 object EntityMetadataImpl extends EntityMetadata {
@@ -135,37 +138,44 @@ object EntityMetadataImpl extends EntityMetadata {
   // Attribute--level data:
 
   private case class AttrData(name: AttributeName,
+                              label: AttributeLabel,
                               `type`: DataType,
                               dbColumn: ColumnName)
   private def getAttributeData(attribute: Attribute): AttrData = {
     //?? rework into map/etc.
     import DatabaseImpl._
-    attribute match {
-      case User_ObjectGuid =>
-        AttrData(AttributeName("objectGuid"), DT_String, UserColumnNames.object_guid)
-      case User_UserName =>
-        AttrData(AttributeName("userName"),   DT_String, UserColumnNames.user_name)
-      case User_DomainName =>
-        AttrData(AttributeName("domainName"), DT_String, UserColumnNames.domain_name)
-      case `User_SomeInt` =>
-        AttrData(AttributeName("someInt"),    DT_Int,    UserColumnNames.some_int)
 
-      case Domain_ObjectGuid =>
-        AttrData(AttributeName("objectGuid"), DT_String, DomainColumnNames.object_guid)
-      case Domain_DomainName =>
-        AttrData(AttributeName("userName"),   DT_String, DomainColumnNames.domain_name)
+    val (name: String, label: String, `type`: DataType, colName: ColumnName) =
+      attribute match {
+        case User_ObjectGuid =>
+          ("objectGuid", "GUID",        DT_String, UserColumnNames.object_guid)
+        case User_UserName =>
+          ("userName",   "Name",        DT_String, UserColumnNames.user_name)
+        case User_DomainName =>
+          ("domainName", "Domain Name", DT_String, UserColumnNames.domain_name)
+        case `User_SomeInt` =>
+          ("someInt",    "Some Int",    DT_Int,    UserColumnNames.some_int)
 
-      //?? do something with enumeration
-      //?? maybe do some times with same enumeration; how to share?
-      // (should "meta" have a "datatypes" member for ~parameterized data-type
-      //    classes (e.g., enumeration classes)? should all types be whether,
-      //    with simple ones such as "string" being declared as primitive or
-      //    build it?)
-    }
+        case Domain_ObjectGuid =>
+          ("objectGuid", "GUID",        DT_String, DomainColumnNames.object_guid)
+        case Domain_DomainName =>
+          ("domainName", "Name",        DT_String, DomainColumnNames.domain_name)
+
+        //?? do something with enumeration
+        //?? maybe do some times with same enumeration; how to share?
+        // (should "meta" have a "datatypes" member for ~parameterized data-type
+        //    classes (e.g., enumeration classes)? should all types be whether,
+        //    with simple ones such as "string" being declared as primitive or
+        //    build it?)
+      }
+    AttrData(AttributeName(name), AttributeLabel(label), `type`, colName)
   }
 
   override def getAttributeName(attribute: Attribute): AttributeName =
     getAttributeData(attribute).name
+
+  override def getAttributeLabel(attribute: Attribute): AttributeLabel =
+    getAttributeData(attribute).label
 
   override def getAttributeType(attribute: Attribute): DataType =
     getAttributeData(attribute).`type`
