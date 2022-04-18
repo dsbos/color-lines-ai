@@ -29,8 +29,12 @@ object EntityMetadata {
   //?? (refine to member-syntax strings, etc.:)
 
   case class EntityTypeName(raw: String) extends AnyVal
+  case class EntityTypeSingularLabel(raw: String) extends AnyVal
+  case class EntityTypePluralLabel(raw: String) extends AnyVal
   case class EntityTypeSegment(raw: String) extends AnyVal
+
   case class EntityId(raw: String) extends AnyVal
+
   case class AttributeName(raw: String) extends AnyVal
   case class AttributeLabel(raw: String) extends AnyVal  //(exposed name)
 
@@ -42,12 +46,13 @@ trait EntityMetadata {
   /** (Currently,) not necessarily simple name--e.g., with enumerators */
   def getDataTypeString(`type`: DataType): DataTypeString
 
-  def getEntityTypeName(      `type`: EntityType): EntityTypeName
-  def getEntityTypeSegment(   `type`: EntityType): EntityTypeSegment
-  //??? add entity type labels (e.g., "User", "Users")
-  def getEntityTypeAttributes(`type`: EntityType): Seq[Attribute]
-  def getEntityTableName(     `type`: EntityType): TableName
-  def getEntityTableKeyColumn(`type`: EntityType): ColumnName
+  def getEntityTypeName(         `type`: EntityType): EntityTypeName
+  def getEntityTypeSingularLabel(`type`: EntityType): EntityTypeSingularLabel
+  def getEntityTypePluralLabel(  `type`: EntityType): EntityTypePluralLabel
+  def getEntityTypeSegment(      `type`: EntityType): EntityTypeSegment
+  def getEntityTypeAttributes(   `type`: EntityType): Seq[Attribute]
+  def getEntityTableName(        `type`: EntityType): TableName
+  def getEntityTableKeyColumn(   `type`: EntityType): ColumnName
 
   def getEntityTypeForSegment(segment: EntityTypeSegment): EntityType
 
@@ -84,10 +89,12 @@ object EntityMetadataImpl extends EntityMetadata {
   // Entity-type--level data:
 
   private case class EntityTypeData(name: EntityTypeName,
-                            segment: EntityTypeSegment,
-                            tableName: TableName,
-                            tableKeyColumn: ColumnName,
-                            attributes: Seq[Attribute])
+                                    singularLabel: EntityTypeSingularLabel,
+                                    pluralLabel: EntityTypePluralLabel,
+                                    segment: EntityTypeSegment,
+                                    tableName: TableName,
+                                    tableKeyColumn: ColumnName,
+                                    attributes: Seq[Attribute])
 
   private def getEntityTypeData(`type`: EntityType): EntityTypeData = {
     //?? rework into map/etc.
@@ -95,6 +102,8 @@ object EntityMetadataImpl extends EntityMetadata {
     `type` match {
       case UserType =>
         EntityTypeData(EntityTypeName("user"),
+                       EntityTypeSingularLabel("User"),
+                       EntityTypePluralLabel("Users"),
                        EntityTypeSegment("users"),
                        TableNames.users,
                        UserColumnNames.object_guid,
@@ -104,6 +113,8 @@ object EntityMetadataImpl extends EntityMetadata {
                             User_SomeInt))
       case DomainType =>
         EntityTypeData(EntityTypeName("domain"),
+                       EntityTypeSingularLabel("Domain"),
+                       EntityTypePluralLabel("Domains"),
                        EntityTypeSegment("domains"),
                        TableNames.domains,
                        DomainColumnNames.object_guid,
@@ -112,9 +123,13 @@ object EntityMetadataImpl extends EntityMetadata {
     }
   }
 
-  override def getEntityTypeName(`type`: EntityType): EntityTypeName = {
+  override def getEntityTypeName(`type`: EntityType): EntityTypeName =
     getEntityTypeData(`type`).name
-  }
+
+  override def getEntityTypeSingularLabel(  `type`: EntityType): EntityTypeSingularLabel =
+    getEntityTypeData(`type`).singularLabel
+  override def getEntityTypePluralLabel(  `type`: EntityType): EntityTypePluralLabel =
+    getEntityTypeData(`type`).pluralLabel
 
   override def getEntityTypeSegment(`type`: EntityType): EntityTypeSegment =
     getEntityTypeData(`type`).segment

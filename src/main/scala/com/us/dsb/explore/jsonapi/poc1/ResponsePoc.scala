@@ -26,6 +26,9 @@ object ResponsePoc extends App {
     /** Returns member name and value. */
     def makeEntityTypeMetadataMember(`type`: EntityType): (String, Json)  = {
       val typeName = getEntityTypeName(`type`)
+      val singularLabel = getEntityTypeSingularLabel(`type`)
+      val pluralLabel = getEntityTypePluralLabel(`type`)
+
       val allAttributes = getEntityTypeAttributes(`type`)
       val attributesValue: Json = {
         Json.fromValues(
@@ -43,6 +46,9 @@ object ResponsePoc extends App {
       val entityTypeValue =
         Json.obj(
           "typeName" -> Json.fromString(typeName.raw),
+          "uiLabelSingular" -> Json.fromString(singularLabel.raw),
+          "uiLabelPlural"   -> Json.fromString(pluralLabel.raw),
+
           // typeUrlPathSegment
           "attributes" -> attributesValue
           //"relationships"
@@ -95,8 +101,8 @@ object ResponsePoc extends App {
     val typeName = getEntityTypeName(`type`)
     val rowResourceObject =
       Json.obj(
-        "type" -> Json.fromString(typeName.raw),
-        "id" -> dbAnyToJson(entityId),
+        "type"       -> Json.fromString(typeName.raw),
+        "id"         -> dbAnyToJson(entityId),
         "attributes" -> attributesObject,
         // (no "relationships" yet or in this case)
         "links" -> Json.obj(
