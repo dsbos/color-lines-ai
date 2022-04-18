@@ -21,7 +21,8 @@ object ResponsePoc extends App {
   //?? need emit datatypes too; set probably derived from entity types (and
   // entity types are derived from query--primary data's type or types, included
   // data's type(s), maybe related data's type(s) in relationships)
-  def makeTopMetadata(types: EntityType*): Json = {
+  def makeTopMetadata(primaryType: EntityType,
+                      types: EntityType*): Json = {
 
     /** Returns member name and value. */
     def makeEntityTypeMetadataMember(`type`: EntityType): (String, Json)  = {
@@ -30,6 +31,9 @@ object ResponsePoc extends App {
       val pluralLabel = getEntityTypePluralLabel(`type`)
 
       val allAttributes = getEntityTypeAttributes(`type`)
+      //?? revisit: confirm array elements vs. object members
+      // - how inconvenient is "manual" lookup in array (vs. member reference)
+      // - ?????
       val attributesValue: Json = {
         Json.fromValues(
           allAttributes.map { attribute =>
@@ -37,8 +41,10 @@ object ResponsePoc extends App {
             Json.obj(
               "name"    -> Json.fromString(getAttributeName(attribute).raw),
               "uiLabel" -> Json.fromString(getAttributeLabel(attribute).raw),
-              "type"    -> Json.fromString(typeStr.raw)
-              //?? expand "type" to object--allow for more type info (phys., log.; class, parameterized)
+              "type"    -> Json.fromString(typeStr.raw),
+              //??? does visibility move from back end to UI?  should back end
+              // reflect columns selection?
+              "shown"   -> Json.fromString("TBD") // "visible"? "selected"?
               )
           }
           )
@@ -61,6 +67,7 @@ object ResponsePoc extends App {
     //??? split out type metadata from "data metadata" (e.g, counts)
 
     Json.obj(
+      "primaryType" -> Json.fromString(getEntityTypeName(primaryType).raw),
       "entityTypes" -> Json.obj(entityTypeMembers: _*)
       //?? dataTypes if we need to declare names for enumeration types (having
       //  enumerators list separate from references to enumeration type)
@@ -83,6 +90,10 @@ object ResponsePoc extends App {
       }
     }
 
+    //??? decide attribute order; does back end return attributes in order for
+    // UI columns?  or does UI decide column order and do whatever it needs to
+    // implement that (possibly setting "fields", if back end copies order from
+    // there)
     val attributesObject = {
       val fields: Iterable[(String, Json)] =
         requestedAttributes.map { attr =>
@@ -123,7 +134,7 @@ object ResponsePoc extends App {
             "self" -> Json.fromString(selfUrlStr + "?<plus any parameters>")
             //?? links: pagination
             ),
-          "meta" -> makeTopMetadata(`type`, DomainType /*??? temp.: showing multiple */),
+          "meta" -> makeTopMetadata(`type`, `type`, DomainType /*??? temp.: showing multiple */),
           "data" -> primaryData
           )
   }
@@ -218,6 +229,7 @@ object ResponsePoc extends App {
       primaryData)
   }
 
+  //////////////////////////////////////////////////////////////////////
 
   if (false) {
     val responseDoc =
@@ -229,23 +241,112 @@ object ResponsePoc extends App {
     println(s"ResponsePoc.makeSingleEntityResponse: responseDoc = $responseDoc")
   }
   {
+    println
+    println("1. Listing users (as if 'GET /someapi/users'):")
     val responseDoc1: Json =
       makeEntityCollectionResponse(URI.create("/someApi"),
                                    UserType,
                                    None,
                                    ())
-    println(s"ResponsePoc.makeEntityCollectionResponse: responseDoc1 = $responseDoc1")
+    println(s"- responseDoc1: $responseDoc1")
+
+    println
+    println("2. Rendering using metadata:")
+    //???? demo using UI labels
+    // - simulate making HTML with table
+
+    // - label table with entity type's plural UI label
+    val primaryTypeName =
+      responseDoc1.hcursor.downField("meta").downField("primaryType")
+          .as[String].toOption.get
+    val primaryTypeJson =
+      responseDoc1.hcursor.downField("meta").downField("entityTypes").downField(primaryTypeName)
+          .as[Json].toOption.get
+    //println("primaryTypeJson = " + primaryTypeJson)
+    val tableLabel =
+      primaryTypeJson.hcursor.downField("uiLabelPlural")
+          .as[Json].toOption.get
+    println(s"[HTML]: $tableLabel:")
+    println(s"[HTML]: <table>")
+    // - make row labeling each column with attribute's UI label
+    println(s"[HTML]:   <tr>")
+    val attrs = primaryTypeJson.hcursor.downField("attributes")
+        .as[List[Json]].toOption.get
+    attrs.foreach { attr =>
+      //?? currenting defaulting table column order "attributes" odrer
+      //???? check whether visible/shown/hidden
+      val attrColumnLabel = attr.hcursor.downField("uiLabel").as[String].toOption.get
+      println(s"[HTML]:     <td>$attrColumnLabel</td>")
+
+    }
+    println(s"[HTML]:   </tr>")
+
+    // - make row per listed entity:
+    responseDoc1.hcursor.downField("data")
+
+    val entities = responseDoc1.hcursor.downField("data")
+           .as[List[Json]].toOption.get
+    entities.foreach { entity =>
+      //println("entity = " + entity)
+      //?????? FIX: not (row) _sort_ order; field order; does "?fields" determine order?
+      //???? Q:  Re sort order:  List attributes metadata in sort order, or
+      // specify sort order separately/explicitly?
+      // Note:  If we "list" attributes as members instead of array elements,
+      // then we can't convey order with them.
+      //
+
+      //??? What if attributes aren't elements but are members?  (We
+
+      println(s"[HTML]:   <tr>")
+
+      attrs.foreach { attr =>
+
+        val attrName = attr.hcursor.downField("name").as[String].toOption.get
+        val attrType = attr.hcursor.downField("type").as[String].toOption.get
+        //??? handle absent members (possibly representation of null)
+        // - is there reliable difference between null and complete absence of
+        //   attribute? probably not in JSON here, but visibility in metadata could
+        //   differentiate
+        val jsonValue =
+          entity.hcursor.downField("attributes").downField(attrName)
+              .as[Json].toOption.get
+        //println(s"raw: $attrName: $attrType = $jsonValue")
+        val renderedHtml = {
+          attrType match {
+            //??? handle nulls
+            case "string" =>
+              val typedValue: String = jsonValue.asString.get
+              s"""<span class="type-$attrType">$typedValue</span>"""  //?? doesn't encode
+            case "int" =>
+              val typedValue: Int = jsonValue.as[Int].toOption.get
+              s"""<span class="type-$attrType">$typedValue<span>"""  //?? doesn't encode
+
+
+            case dataType =>
+              println(s"UNHANDLED data type: '$dataType'")
+              ???
+          }
+        }
+        println(s"""[HTML]:     <td>$renderedHtml</td>""")
+      }
+      println(s"[HTML]:   </tr>")
+    }
+
+
+    //   - make column cell per enabled attribute:
+    //     - per attribute type, read from JSON and render to text/HTML
+    //   - (what about JSON:API-level "id" value? maybe <tr id="...">?
+    println(s"[HTML]: </table>")
+
+    println
+    println("3. Getting just first user listed (via self link):")
 
     def getCollectionFirstSelfLinkURL(responseDoc: Json): String = {
       val `hc_/data`: ACursor = responseDoc.hcursor.downField("data")
-      //println("`hc_data` = " + `hc_/data`)
       val `hc_data[0]` = `hc_/data`.downN(0)  // use as array; get element at offset
-      //println("`hc_data[0]` = " + `hc_data[0]`)
       val `hc_data[0].links.self` = `hc_data[0]`.downField("links").downField("self")  // resource object to link value
-      //println("`hc_data[0].links.self` = " + `hc_data[0].links.self`)
-      //?? handle link string vs. link object(?)
+      //?? also handle link object if we (might) generated the
       val x4: Decoder.Result[String] = `hc_data[0].links.self`.as[String]
-      //println("x4 = " + x4)
       val `value_data[0].links.self` = x4.toOption.get
       //println("`value_data[0].links.self` = " + `value_data[0].links.self`)
       `value_data[0].links.self`
