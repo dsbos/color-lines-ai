@@ -86,7 +86,7 @@ object DatabaseImpl extends Database {
       "domain01-fake-guid" -> Map[ColumnName, Any](
         object_guid -> "user0123-fake-guid",
         domain_name -> "Domain 1",
-        domain_enum -> "Dough"
+        domain_enum -> "dough"
         )
       )
   }

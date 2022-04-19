@@ -22,21 +22,28 @@ object ResponsePoc extends App {
     /** Returns member name and value. */
     def makeDataTypeMetadataMember(dataType: DataType): (String, Json) = {
       val typeName = getDataTypeName(dataType)
-
-      //???? emit data type kind, any enumerators
-      //???? soon emit base type, maybe type chain
+      val typeKind = getDataTypeKind(dataType)
+      val typeKindName = getDataKindName(typeKind)
 
       val dataTypeValue =
          Json.obj(
+           //?? shorten names?
            "typeName" -> Json.fromString(typeName.raw),
+           "typeKind" -> Json.fromString(typeKindName.raw),
 
-           //????? CONTINUE:  differentiate primitive/whatever types vs. enum. types (vs. other?)
-           //??? will kind be like "~primitive" vs. "enumeration", or like
-           //  "string"/"int"/... vs. "enumeration"?  probably former
-           //?? "primitive"? "simple"?
-           //???? how SUBTYPES / logical vs. physical?
-           "TBD.kind" -> Json.fromString("????"),
-           "TBD.enumerators" -> Json.fromString("????")
+           //????? clean "null" to suppressing member:
+           "enumerators" -> {
+             typeKind match {  //
+               case PrimitiveKind => Json.Null
+               case EnumerationKind =>
+                 //???? CLEAN asInstanceOf: probably change match from type kind to data type
+                 val enumType = dataType.asInstanceOf[DT_Enumeration]
+                 Json.arr(
+                   enumType.enumerators.map(enum => Json.fromString(enum.raw)): _*
+                 )
+             }
+           }
+           //??? soon:  logical vs. physical? type chain? subtypes?
            )
       // Q: Will we return logical numbers as JSON numbers or as strings?
       // (Are we guaranteed to avoid Float and Double NaN/Inf.etc values? Any
@@ -60,11 +67,11 @@ object ResponsePoc extends App {
       val attributesValue: Json = {
         Json.fromValues(
           allAttributes.map { attribute =>
-            val typeStr = getDataTypeName(getAttributeType(attribute))
+            val typeName = getDataTypeName(getAttributeType(attribute))
             Json.obj(
               "name"    -> Json.fromString(getAttributeName(attribute).raw),
               "uiLabel" -> Json.fromString(getAttributeLabel(attribute).raw),
-              "type"    -> Json.fromString(typeStr.raw),
+              "type"    -> Json.fromString(typeName.raw),
               //??? does visibility move from back end to UI?  should back end
               // reflect columns selection?
               "shown"   -> Json.fromString("TBD") // "visible"? "selected"?
@@ -103,7 +110,11 @@ object ResponsePoc extends App {
 
 
     Json.obj(
-      "primaryType" -> Json.fromString(getEntityTypeName(primaryType).raw),
+      //?? revisit name:  this is means "primary-data type" (or "primary-data
+      // entity type") but "primaryDataType" sounds like "primary data type";
+      // "primaryEntityType" sounds slightly ambiguous; "primaryDataEntityType"
+      // would resolve ambiguities, but is "uglily" long
+      "primaryEntityType" -> Json.fromString(getEntityTypeName(primaryType).raw),
       "dataTypes" -> Json.obj(dataTypeMembers: _*),
       "entityTypes" -> Json.obj(entityTypeMembers: _*)
       )
@@ -299,7 +310,7 @@ object ResponsePoc extends App {
 
     // - label table with entity type's plural UI label
     val primaryTypeName =
-      responseDoc1.hcursor.downField("meta").downField("primaryType")
+      responseDoc1.hcursor.downField("meta").downField("primaryEntityType")
           .as[String].toOption.get
     val primaryTypeJson =
       responseDoc1.hcursor.downField("meta").downField("entityTypes").downField(primaryTypeName)
@@ -365,9 +376,9 @@ object ResponsePoc extends App {
             responseDoc1.hcursor.downField("meta").downField("dataTypes").downField(attrTypeName)
                 .as[Json].toOption.get
 
-          println("dataTypeJson = " + dataTypeJson)
-          //????? CONTINUE:  re enum. types:  above, add type kind or whatever;
-          // then, here, differentiate enum-type case via type kind (probably
+          //println("dataTypeJson = " + dataTypeJson)
+
+          //?????? CONTINUE:  re enum. types: differentiate enum-type case via type kind (probably
           // first differentiate by type kind, then differentiate primitives/whatever
           // by name)
 

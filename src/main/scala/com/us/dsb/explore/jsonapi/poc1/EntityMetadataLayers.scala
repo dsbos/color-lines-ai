@@ -9,7 +9,16 @@ import java.net.URI
 object EntityMetadata {
   type TBD = Unit
 
+  trait DataTypeKind
+  case class DataKindName(raw: String) extends AnyVal
+
+  //(??: "primitive"? "predefined"? other?
+  case object PrimitiveKind   extends DataTypeKind
+  case object EnumerationKind extends DataTypeKind
+  //?? maybe some JsonKind for JSON object types (with schema(?))
+
   trait DataType
+  case class DataTypeName(raw: String) extends AnyVal
 
   case object DT_String extends DataType
   case object DT_Int extends DataType
@@ -22,7 +31,6 @@ object EntityMetadata {
   case class DT_JsonObject1()            extends DataType  // (maybe)
   case class DT_JsonObject2(Schema: TBD) extends DataType  // (possibly)
 
-  case class DataTypeName(raw: String) extends AnyVal
 
   //??? address physical type vs. logical type(s)
 
@@ -47,8 +55,10 @@ object EntityMetadata {
 import EntityMetadata._
 
 trait EntityMetadata {
-  /** (Currently,) not necessarily simple name--e.g., with enumerators */
+  def getDataKindName(kind: DataTypeKind): DataKindName
+
   def getDataTypeName(`type`: DataType): DataTypeName
+  def getDataTypeKind(`type`: DataType): DataTypeKind
 
   def getEntityTypeName(         `type`: EntityType): EntityTypeName
   def getEntityTypeSingularLabel(`type`: EntityType): EntityTypeSingularLabel
@@ -68,16 +78,38 @@ trait EntityMetadata {
 
 object EntityMetadataImpl extends EntityMetadata {
 
+  override def getDataKindName(kind: DataTypeKind): DataKindName = {
+    kind match {
+      case PrimitiveKind   => DataKindName("primitive")
+      case EnumerationKind => DataKindName("enumeration")
+      case _ =>
+        println(s"getDataTypeString: unknown data-type kind '$kind'")
+        ???
+    }
+  }
+
   override def getDataTypeName(`type`: DataType): DataTypeName = {
     `type` match {
       case DT_String                => DataTypeName("string")
       case DT_Int                   => DataTypeName("int")
       case DT_Enumeration(name, _*) => name
       case _ =>
-        println(s"getDataTypeString: unknown datatype name '${`type`}'")
+        println(s"getDataTypeString: unknown data type '${`type`}'")
         ???
     }
   }
+
+  override def getDataTypeKind(`type`: DataType): DataTypeKind = {
+    `type` match {
+      case DT_String         => PrimitiveKind
+      case DT_Int            => PrimitiveKind
+      case _: DT_Enumeration => EnumerationKind
+      case _ =>
+        println(s"getDataTypeKind: unknown datatype '${`type`}'")
+        ???
+    }
+  }
+
   //???? soon maybe getDataTypeKind (int, string, enum, "schemaed" JSON)
 
   // <??? what kind of> data types:
