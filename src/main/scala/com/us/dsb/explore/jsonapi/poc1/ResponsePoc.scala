@@ -6,27 +6,47 @@ import io.circe.{ACursor, Decoder, Json}
 import java.net.URI
 
 object ResponsePoc extends App {
-  /*
-   - scalar data: "data" will be for one entity, not list
-   - "data": type, id, attributes w/some, relationships w/some
-   - "meta": entity type name, attributes and types, relationships and maybe types
-   - "links": "self", no "related"
-   - "included": not initially
-
-   */
 
   import EntityMetadata._
-  import EntityMetadataImpl._
+  val specificModelViaIntf: EntityMetadata = EntityMetadataImpl
+  import specificModelViaIntf._
+  //????temporarily:
+  import EntityMetadataImpl.DomainType
 
-  //?? need emit datatypes too; set probably derived from entity types (and
+  //?? need to emit data types too; set probably derived from entity types (and
   // entity types are derived from query--primary data's type or types, included
   // data's type(s), maybe related data's type(s) in relationships)
+
+  //?? _multiple_ entity types only for "included" or multi-target-type relationships
   def makeTopMetadata(primaryType: EntityType,
-                      types: EntityType*): Json = {
+                      entityTypes: EntityType*): Json = {
 
     /** Returns member name and value. */
-    def makeEntityTypeMetadataMember(`type`: EntityType): (String, Json)  = {
+    def makeDataTypeMetadataMember(dataType: DataType): (String, Json) = {
+      val typeName = getDataTypeName(dataType)
+
+      //???? emit data type kind, any enumerators
+      //???? soon emit base type, maybe type chain
+
+      val dataTypeValue =
+         Json.obj(
+           "typeName" -> Json.fromString(typeName.raw),
+           //??? will kind be like "~primitive" vs. "enumeration", or like
+           //  "string"/"int"/... vs. "enumeration"?  probably former ()
+           "TBD.kind" -> Json.fromString("????"),
+           "TBD.enumerators" -> Json.fromString("????")
+           )
+      // Q: Will we return logical numbers as JSON numbers or as strings?
+      // (Are we guaranteed to avoid Float and Double NaN/Inf.etc values? Any
+      // other considerations?)
+      typeName.raw -> dataTypeValue
+    }
+
+
+    /** Returns member name and value. */
+    def makeEntityTypeMetadataMember(`type`: EntityType): (String, Json) = {
       val typeName = getEntityTypeName(`type`)
+      val pathSegment = getEntityTypeSegment(`type`)
       val singularLabel = getEntityTypeSingularLabel(`type`)
       val pluralLabel = getEntityTypePluralLabel(`type`)
 
@@ -52,6 +72,7 @@ object ResponsePoc extends App {
       val entityTypeValue =
         Json.obj(
           "typeName" -> Json.fromString(typeName.raw),
+          "pathSegment" -> Json.fromString(pathSegment.raw),
           "uiLabelSingular" -> Json.fromString(singularLabel.raw),
           "uiLabelPlural"   -> Json.fromString(pluralLabel.raw),
 
@@ -62,14 +83,30 @@ object ResponsePoc extends App {
       typeName.raw -> entityTypeValue
     }
 
-    //?????? make datatype metadata, especially for enumeration type
+    //?????? make data-type metadata, especially for enumeration type
 
-    val entityTypeMembers = types.map(makeEntityTypeMetadataMember(_))
+
+    /** Gets (de-duplicated) list of all data type in given entity types. */
+    def getEntityTypeDataTypes(entityTypes: Seq[EntityType]): Seq[DataType] = {
+      val dataTypes =
+        entityTypes.flatMap { entityType =>
+          getEntityTypeAttributes(entityType).map(attr => getAttributeType(attr))
+        }
+            .toSet.toSeq
+      println("dataTypes = " + dataTypes)
+      dataTypes
+    }
+    val dataTypes = getEntityTypeDataTypes(entityTypes)
+
+    val dataTypeMembers = dataTypes.map(makeDataTypeMetadataMember(_))
+
+    val entityTypeMembers = entityTypes.map(makeEntityTypeMetadataMember(_))
 
     //??? split out type metadata from "data metadata" (e.g, counts)
 
     Json.obj(
       "primaryType" -> Json.fromString(getEntityTypeName(primaryType).raw),
+      "dataTypes" -> Json.obj(dataTypeMembers: _*),
       "entityTypes" -> Json.obj(entityTypeMembers: _*)
       //?????? dataTypes if we need to declare names for enumeration types (having
       //  enumerators list separate from references to enumeration type)
@@ -199,6 +236,7 @@ object ResponsePoc extends App {
 
     assembleToplevelObject(
       `type`,
+      //??? pass original URL (instead of re-creating)?
       s"$apiUrlPathPrefix/${getEntityTypeSegment(`type`).raw}/${entityId.raw}",
       primaryData)
   }
@@ -227,11 +265,15 @@ object ResponsePoc extends App {
 
     assembleToplevelObject(
       `type`,
+      //??? pass original URL (instead of re-creating)?
       s"$apiUrlPathPrefix/${getEntityTypeSegment(`type`).raw}",
       primaryData)
   }
 
   //////////////////////////////////////////////////////////////////////
+
+  import EntityMetadataImpl.UserType
+  import EntityMetadataImpl.User_UserName
 
   if (false) {
     val responseDoc =
@@ -256,6 +298,8 @@ object ResponsePoc extends App {
     println("2. Rendering using metadata:")
     //???? demo using UI labels
     // - simulate making HTML with table
+
+    //???? clean; maybe see https://stackoverflow.com/questions/46144555/decoding-structured-json-arrays-with-circe-in-scala
 
     // - label table with entity type's plural UI label
     val primaryTypeName =
@@ -290,7 +334,7 @@ object ResponsePoc extends App {
            .as[List[Json]].toOption.get
     entities.foreach { entity =>
       //println("entity = " + entity)
-      //?????? FIX: not (row) _sort_ order; field order; does "?fields" determine order?
+      //?????? FIX wording: not (row) _sort_ order; field order; does "?fields" determine order?
       //???? Q:  Re sort order:  List attributes metadata in sort order, or
       // specify sort order separately/explicitly?
       // Note:  If we "list" attributes as members instead of array elements,
@@ -305,7 +349,7 @@ object ResponsePoc extends App {
 
         val attrName = attr.hcursor.downField("name").as[String].toOption.get
         val attrTypeName = attr.hcursor.downField("type").as[String].toOption.get
-        //?????? add datatype metadata so client can look up names of enumeration
+        //?????? add data-type metadata so client can look up names of enumeration
         // types and determine that they are enumeration types)
         //???? maybe soon do physical vs. logical types, so enumeration-type
         // attribute User_SomeEnum can have '<span class="type-enum type-someEnum">'
@@ -321,6 +365,15 @@ object ResponsePoc extends App {
               .as[Json].toOption.get
         //println(s"raw: $attrName: $attrType = $jsonValue")
         val renderedHtml = {
+          val dataTypeJson =
+            responseDoc1.hcursor.downField("meta").downField("dataTypes").downField(attrTypeName)
+                .as[Json].toOption.get
+
+          println("dataTypeJson = " + dataTypeJson)
+
+
+
+
           attrTypeName match {
             //??? handle nulls
             case "string" =>
@@ -391,13 +444,8 @@ object ResponsePoc extends App {
                                  requestData.entityId,
                                  ())
       println(s"ResponsePoc.makeSingleEntityResponse: responseDoc2 = $responseDoc2")
-      val responseDoc2b =
-        makeSingleEntityResponse(URI.create("/someApi"),
-                                 requestData.entityType,
-                                 Some(Seq()),
-                                 requestData.entityId,
-                                 ())
-      println(s"ResponsePoc.makeSingleEntityResponse: responseDoc2b = $responseDoc2b")
+
+      println("4. Getting just selected field(s):")
       val responseDoc2c =
         makeSingleEntityResponse(URI.create("/someApi"),
                                  requestData.entityType,
@@ -405,6 +453,7 @@ object ResponsePoc extends App {
                                  requestData.entityId,
                                  ())
       println(s"ResponsePoc.makeSingleEntityResponse: responseDoc2c = $responseDoc2c")
+
     }
 
     //???? continue: parse extracted URL into makeSingleEntityResponse call

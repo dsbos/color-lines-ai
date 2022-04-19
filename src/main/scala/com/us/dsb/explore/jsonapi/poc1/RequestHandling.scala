@@ -57,10 +57,10 @@ object RequestHandlingTemp extends App {
     val segments = path.split("/").toList.drop(1)
     println("segments = " + segments)
 
-    val queryxx = Option(url.getQuery)  //?? getQuery? getRawQuery?
-    println("URL query = " + queryxx)
+    val query = Option(url.getQuery)  //?? getQuery? getRawQuery?
+    println("URL query = " + query)
 
-    val syntacticQueryParamsPairs = parseQueryToQueryParameters(queryxx)
+    val syntacticQueryParamsPairs = parseQueryToQueryParameters(query)
     println("syntacticQueryParamsPairs = " + syntacticQueryParamsPairs)
 
     val syntacticQueryParamsMap = syntacticQueryParamsPairs.toMap

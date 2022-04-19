@@ -69,7 +69,6 @@ trait EntityMetadata {
 object EntityMetadataImpl extends EntityMetadata {
 
   override def getDataTypeName(`type`: DataType): DataTypeName = {
-    println("getDataTypeName: `type` = " + `type`)
     `type` match {
       case DT_String                => DataTypeName("string")
       case DT_Int                   => DataTypeName("int")
@@ -86,6 +85,9 @@ object EntityMetadataImpl extends EntityMetadata {
   val DT_SomeEnum = DT_Enumeration(DataTypeName("someEnum"),
                                    EnumeratorName("One"),
                                    EnumeratorName("Two"))
+  val DT_DomainEnum = DT_Enumeration(DataTypeName("domainEnum"),
+                                     EnumeratorName("dough"),
+                                     EnumeratorName("mein"))
 
   // Entity-type identifiers:
   case object UserType   extends EntityType
@@ -99,6 +101,7 @@ object EntityMetadataImpl extends EntityMetadata {
   case object User_SomeEnum     extends Attribute
   case object Domain_ObjectGuid extends Attribute
   case object Domain_DomainName extends Attribute
+  case object Domain_DomainEnum extends Attribute
 
   // Entity-type--level data:
 
@@ -134,7 +137,8 @@ object EntityMetadataImpl extends EntityMetadata {
                        TableNames.domains,
                        DomainColumnNames.object_guid,
                        List(Domain_ObjectGuid,
-                            Domain_DomainName))
+                            Domain_DomainName,
+                            Domain_DomainEnum))
     }
   }
 
@@ -184,18 +188,20 @@ object EntityMetadataImpl extends EntityMetadata {
         case User_DomainName =>
           ("domainName", "Domain Name", DT_String,   UserColumnNames.domain_name)
         case User_SomeInt =>
-          ("someInt",    "Some Int",    DT_Int,      UserColumnNames.some_intxx)
+          ("someInt",    "Some Int",    DT_Int,      UserColumnNames.some_int)
         case User_SomeEnum =>
-          ("someEnum",   "Some Enum",   DT_SomeEnum, UserColumnNames.some_enumxx)
+          ("someEnum",   "Some Enum",   DT_SomeEnum, UserColumnNames.some_enum)
 
         case Domain_ObjectGuid =>
-          ("objectGuid", "GUID",        DT_String, DomainColumnNames.object_guid)
+          ("objectGuid", "GUID",        DT_String,     DomainColumnNames.object_guid)
         case Domain_DomainName =>
-          ("domainName", "Name",        DT_String, DomainColumnNames.domain_name)
+          ("domainName", "Name",        DT_String,     DomainColumnNames.domain_name)
+        case Domain_DomainEnum =>
+          ("domainEnum", "Domain Enum", DT_DomainEnum, DomainColumnNames.domain_enum)
 
         //?? do something with enumeration
         //?? maybe do some times with same enumeration; how to share?
-        // (should "meta" have a "datatypes" member for ~parameterized data-type
+        // (should "meta" have a "dataTypes" member for ~parameterized data-type
         //    classes (e.g., enumeration classes)? should all types be whether,
         //    with simple ones such as "string" being declared as primitive or
         //    build it?)
