@@ -13,9 +13,7 @@ object ResponsePoc extends App {
   //????temporarily:
   import EntityMetadataImpl.DomainType
 
-  //?? need to emit data types too; set probably derived from entity types (and
-  // entity types are derived from query--primary data's type or types, included
-  // data's type(s), maybe related data's type(s) in relationships)
+  //??? split out type metadata from "data metadata" (e.g, counts)
 
   //?? _multiple_ entity types only for "included" or multi-target-type relationships
   def makeTopMetadata(primaryType: EntityType,
@@ -31,14 +29,19 @@ object ResponsePoc extends App {
       val dataTypeValue =
          Json.obj(
            "typeName" -> Json.fromString(typeName.raw),
+
+           //????? CONTINUE:  differentiate primitive/whatever types vs. enum. types (vs. other?)
            //??? will kind be like "~primitive" vs. "enumeration", or like
-           //  "string"/"int"/... vs. "enumeration"?  probably former ()
+           //  "string"/"int"/... vs. "enumeration"?  probably former
+           //?? "primitive"? "simple"?
+           //???? how SUBTYPES / logical vs. physical?
            "TBD.kind" -> Json.fromString("????"),
            "TBD.enumerators" -> Json.fromString("????")
            )
       // Q: Will we return logical numbers as JSON numbers or as strings?
       // (Are we guaranteed to avoid Float and Double NaN/Inf.etc values? Any
-      // other considerations?)
+      // other considerations?)  Might affect whether logically numeric type
+      // needs to specify which way it's represented.
       typeName.raw -> dataTypeValue
     }
 
@@ -83,33 +86,26 @@ object ResponsePoc extends App {
       typeName.raw -> entityTypeValue
     }
 
-    //?????? make data-type metadata, especially for enumeration type
-
-
     /** Gets (de-duplicated) list of all data type in given entity types. */
     def getEntityTypeDataTypes(entityTypes: Seq[EntityType]): Seq[DataType] = {
       val dataTypes =
         entityTypes.flatMap { entityType =>
           getEntityTypeAttributes(entityType).map(attr => getAttributeType(attr))
         }
-            .toSet.toSeq
-      println("dataTypes = " + dataTypes)
+            .distinct
+      //println("dataTypes = " + dataTypes)
       dataTypes
     }
+
     val dataTypes = getEntityTypeDataTypes(entityTypes)
+    val dataTypeMembers = dataTypes.map(dt => makeDataTypeMetadataMember(dt))
+    val entityTypeMembers = entityTypes.map(et => makeEntityTypeMetadataMember(et))
 
-    val dataTypeMembers = dataTypes.map(makeDataTypeMetadataMember(_))
-
-    val entityTypeMembers = entityTypes.map(makeEntityTypeMetadataMember(_))
-
-    //??? split out type metadata from "data metadata" (e.g, counts)
 
     Json.obj(
       "primaryType" -> Json.fromString(getEntityTypeName(primaryType).raw),
       "dataTypes" -> Json.obj(dataTypeMembers: _*),
       "entityTypes" -> Json.obj(entityTypeMembers: _*)
-      //?????? dataTypes if we need to declare names for enumeration types (having
-      //  enumerators list separate from references to enumeration type)
       )
   }
 
@@ -370,9 +366,10 @@ object ResponsePoc extends App {
                 .as[Json].toOption.get
 
           println("dataTypeJson = " + dataTypeJson)
-
-
-
+          //????? CONTINUE:  re enum. types:  above, add type kind or whatever;
+          // then, here, differentiate enum-type case via type kind (probably
+          // first differentiate by type kind, then differentiate primitives/whatever
+          // by name)
 
           attrTypeName match {
             //??? handle nulls
