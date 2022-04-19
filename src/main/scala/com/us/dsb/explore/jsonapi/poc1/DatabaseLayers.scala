@@ -49,7 +49,8 @@ object DatabaseImpl extends Database {
     val domain_name: ColumnName = ColumnName("domain_name")
     /** (assuming: to-1 relationship; FK to domain tables PK */
     val domain_fk:   ColumnName = ColumnName("domain_fk")  //???? rel. metadata must identity FK and target PK
-    val some_int:    ColumnName = ColumnName("some_int")
+    val some_intxx:    ColumnName = ColumnName("some_int")
+    val some_enumxx:    ColumnName = ColumnName("some_enum")
   }
 
   object DomainColumnNames {
@@ -65,14 +66,16 @@ object DatabaseImpl extends Database {
         user_name -> "User 123",
         domain_name -> "Domain 1",
         domain_fk -> "domain01-fake-guid",
-        some_int -> 1
+        some_intxx -> 1,
+        some_enumxx -> "One"
         ),
       "user0456-fake-guid" -> Map[ColumnName, Any](
         object_guid -> "user0456-fake-guid",
         user_name -> "User 456",
         domain_name -> "Domain 1",
         domain_fk -> "domain01-fake-guid",
-        some_int -> 2
+        some_intxx -> 2,
+        some_enumxx -> "BogUs"
         )
       )
   }

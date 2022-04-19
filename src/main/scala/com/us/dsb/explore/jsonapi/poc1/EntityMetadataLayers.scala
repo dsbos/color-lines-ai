@@ -14,13 +14,17 @@ object EntityMetadata {
   case object DT_String extends DataType
   case object DT_Int extends DataType
   case object DT_Timestamp extends DataType
-  case class DT_Enumeration(enumerators: TBD) extends DataType //?? where do specific enumeration types go?
-  case class DT_JsonObject1()            extends DataType // (maybe)
-  case class DT_JsonObject2(Schema: TBD) extends DataType // (possibly)
 
-  case class DataTypeString(raw: String) extends AnyVal
+  case class EnumeratorName(raw: String) extends AnyVal
+  case class DT_Enumeration(typeName: DataTypeName,
+                            enumerators: EnumeratorName*) extends DataType
 
-  //?? address physical type vs. logical type(s)
+  case class DT_JsonObject1()            extends DataType  // (maybe)
+  case class DT_JsonObject2(Schema: TBD) extends DataType  // (possibly)
+
+  case class DataTypeName(raw: String) extends AnyVal
+
+  //??? address physical type vs. logical type(s)
 
   sealed trait EntityType
   sealed trait Attribute
@@ -44,7 +48,7 @@ import EntityMetadata._
 
 trait EntityMetadata {
   /** (Currently,) not necessarily simple name--e.g., with enumerators */
-  def getDataTypeString(`type`: DataType): DataTypeString
+  def getDataTypeName(`type`: DataType): DataTypeName
 
   def getEntityTypeName(         `type`: EntityType): EntityTypeName
   def getEntityTypeSingularLabel(`type`: EntityType): EntityTypeSingularLabel
@@ -63,16 +67,25 @@ trait EntityMetadata {
 }
 
 object EntityMetadataImpl extends EntityMetadata {
-  override def getDataTypeString(`type`: DataType): DataTypeString = {
-    val nameThis =
-      `type` match {
-        case DT_String => "string"
-        case DT_Int => "int"
-        //?? what about enumeration types? hacky string?  richer representation?
-        // named (and sharable) or anonymous?
-      }
-    DataTypeString(nameThis)
+
+  override def getDataTypeName(`type`: DataType): DataTypeName = {
+    println("getDataTypeName: `type` = " + `type`)
+    `type` match {
+      case DT_String                => DataTypeName("string")
+      case DT_Int                   => DataTypeName("int")
+      case DT_Enumeration(name, _*) => name
+      case _ =>
+        println(s"getDataTypeString: unknown datatype name '${`type`}'")
+        ???
+    }
   }
+  //???? soon maybe getDataTypeKind (int, string, enum, "schemaed" JSON)
+
+  // <??? what kind of> data types:
+  //???? revisit:  consider:  case object with DT_Enumeration being non-case class?
+  val DT_SomeEnum = DT_Enumeration(DataTypeName("someEnum"),
+                                   EnumeratorName("One"),
+                                   EnumeratorName("Two"))
 
   // Entity-type identifiers:
   case object UserType   extends EntityType
@@ -83,6 +96,7 @@ object EntityMetadataImpl extends EntityMetadata {
   case object User_UserName     extends Attribute
   case object User_DomainName   extends Attribute
   case object User_SomeInt      extends Attribute
+  case object User_SomeEnum     extends Attribute
   case object Domain_ObjectGuid extends Attribute
   case object Domain_DomainName extends Attribute
 
@@ -110,7 +124,8 @@ object EntityMetadataImpl extends EntityMetadata {
                        List(User_ObjectGuid,
                             User_UserName,
                             User_DomainName,
-                            User_SomeInt))
+                            User_SomeInt,
+                            User_SomeEnum))
       case DomainType =>
         EntityTypeData(EntityTypeName("domain"),
                        EntityTypeSingularLabel("Domain"),
@@ -163,13 +178,15 @@ object EntityMetadataImpl extends EntityMetadata {
     val (name: String, label: String, `type`: DataType, colName: ColumnName) =
       attribute match {
         case User_ObjectGuid =>
-          ("objectGuid", "GUID",        DT_String, UserColumnNames.object_guid)
+          ("objectGuid", "GUID",        DT_String,   UserColumnNames.object_guid)
         case User_UserName =>
-          ("userName",   "Name",        DT_String, UserColumnNames.user_name)
+          ("userName",   "Name",        DT_String,   UserColumnNames.user_name)
         case User_DomainName =>
-          ("domainName", "Domain Name", DT_String, UserColumnNames.domain_name)
-        case `User_SomeInt` =>
-          ("someInt",    "Some Int",    DT_Int,    UserColumnNames.some_int)
+          ("domainName", "Domain Name", DT_String,   UserColumnNames.domain_name)
+        case User_SomeInt =>
+          ("someInt",    "Some Int",    DT_Int,      UserColumnNames.some_intxx)
+        case User_SomeEnum =>
+          ("someEnum",   "Some Enum",   DT_SomeEnum, UserColumnNames.some_enumxx)
 
         case Domain_ObjectGuid =>
           ("objectGuid", "GUID",        DT_String, DomainColumnNames.object_guid)

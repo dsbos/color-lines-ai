@@ -37,7 +37,7 @@ object ResponsePoc extends App {
       val attributesValue: Json = {
         Json.fromValues(
           allAttributes.map { attribute =>
-            val typeStr = getDataTypeString(getAttributeType(attribute))
+            val typeStr = getDataTypeName(getAttributeType(attribute))
             Json.obj(
               "name"    -> Json.fromString(getAttributeName(attribute).raw),
               "uiLabel" -> Json.fromString(getAttributeLabel(attribute).raw),
@@ -62,6 +62,8 @@ object ResponsePoc extends App {
       typeName.raw -> entityTypeValue
     }
 
+    //?????? make datatype metadata, especially for enumeration type
+
     val entityTypeMembers = types.map(makeEntityTypeMetadataMember(_))
 
     //??? split out type metadata from "data metadata" (e.g, counts)
@@ -69,7 +71,7 @@ object ResponsePoc extends App {
     Json.obj(
       "primaryType" -> Json.fromString(getEntityTypeName(primaryType).raw),
       "entityTypes" -> Json.obj(entityTypeMembers: _*)
-      //?? dataTypes if we need to declare names for enumeration types (having
+      //?????? dataTypes if we need to declare names for enumeration types (having
       //  enumerators list separate from references to enumeration type)
       )
   }
@@ -241,7 +243,7 @@ object ResponsePoc extends App {
     println(s"ResponsePoc.makeSingleEntityResponse: responseDoc = $responseDoc")
   }
   {
-    println
+    println()
     println("1. Listing users (as if 'GET /someapi/users'):")
     val responseDoc1: Json =
       makeEntityCollectionResponse(URI.create("/someApi"),
@@ -250,7 +252,7 @@ object ResponsePoc extends App {
                                    ())
     println(s"- responseDoc1: $responseDoc1")
 
-    println
+    println()
     println("2. Rendering using metadata:")
     //???? demo using UI labels
     // - simulate making HTML with table
@@ -302,7 +304,14 @@ object ResponsePoc extends App {
       attrs.foreach { attr =>
 
         val attrName = attr.hcursor.downField("name").as[String].toOption.get
-        val attrType = attr.hcursor.downField("type").as[String].toOption.get
+        val attrTypeName = attr.hcursor.downField("type").as[String].toOption.get
+        //?????? add datatype metadata so client can look up names of enumeration
+        // types and determine that they are enumeration types)
+        //???? maybe soon do physical vs. logical types, so enumeration-type
+        // attribute User_SomeEnum can have '<span class="type-enum type-someEnum">'
+        // (and then entity and domain name can have "type-string type-entityName");
+        // (later, add chains, for "type-string type-entityName type-userName")
+
         //??? handle absent members (possibly representation of null)
         // - is there reliable difference between null and complete absence of
         //   attribute? probably not in JSON here, but visibility in metadata could
@@ -312,14 +321,18 @@ object ResponsePoc extends App {
               .as[Json].toOption.get
         //println(s"raw: $attrName: $attrType = $jsonValue")
         val renderedHtml = {
-          attrType match {
+          attrTypeName match {
             //??? handle nulls
             case "string" =>
               val typedValue: String = jsonValue.asString.get
-              s"""<span class="type-$attrType">$typedValue</span>"""  //?? doesn't encode
+              s"""<span class="type-$attrTypeName">$typedValue</span>"""  //?? doesn't encode
             case "int" =>
               val typedValue: Int = jsonValue.as[Int].toOption.get
-              s"""<span class="type-$attrType">$typedValue<span>"""  //?? doesn't encode
+              s"""<span class="type-$attrTypeName">$typedValue<span>"""  //?? doesn't encode
+            //???? temporary hard-coding (hackily-know enumeration type):
+            case "someEnum" =>
+              val typedValue: String = jsonValue.asString.get
+              s"""<span class="type-enum type-$attrTypeName">$typedValue</span>"""  //?? doesn't encode
 
 
             case dataType =>
@@ -338,7 +351,7 @@ object ResponsePoc extends App {
     //   - (what about JSON:API-level "id" value? maybe <tr id="...">?
     println(s"[HTML]: </table>")
 
-    println
+    println()
     println("3. Getting just first user listed (via self link):")
 
     def getCollectionFirstSelfLinkURL(responseDoc: Json): String = {
