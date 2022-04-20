@@ -63,7 +63,6 @@ object ResponsePoc extends App {
       val allAttributes = getEntityTypeAttributes(`type`)
       //?? revisit: confirm array elements vs. object members
       // - how inconvenient is "manual" lookup in array (vs. member reference)
-      // - ?????
       val attributesValue: Json = {
         Json.fromValues(
           allAttributes.map { attribute =>
@@ -329,7 +328,7 @@ object ResponsePoc extends App {
       //?? currenting defaulting table column order "attributes" odrer
       //???? check whether visible/shown/hidden
       val attrColumnLabel = attr.hcursor.downField("uiLabel").as[String].toOption.get
-      println(s"[HTML]:     <td>$attrColumnLabel</td>")
+      println(s"[HTML]:     <th>$attrColumnLabel</th>")
 
     }
     println(s"[HTML]:   </tr>")
@@ -341,7 +340,7 @@ object ResponsePoc extends App {
            .as[List[Json]].toOption.get
     entities.foreach { entity =>
       //println("entity = " + entity)
-      //?????? FIX wording: not (row) _sort_ order; field order; does "?fields" determine order?
+      //????? FIX wording: not (row) _sort_ order; field order; does "?fields" determine order?
       //???? Q:  Re sort order:  List attributes metadata in sort order, or
       // specify sort order separately/explicitly?
       // Note:  If we "list" attributes as members instead of array elements,
@@ -356,8 +355,6 @@ object ResponsePoc extends App {
 
         val attrName = attr.hcursor.downField("name").as[String].toOption.get
         val attrTypeName = attr.hcursor.downField("type").as[String].toOption.get
-        //?????? add data-type metadata so client can look up names of enumeration
-        // types and determine that they are enumeration types)
         //???? maybe soon do physical vs. logical types, so enumeration-type
         // attribute User_SomeEnum can have '<span class="type-enum type-someEnum">'
         // (and then entity and domain name can have "type-string type-entityName");
@@ -367,39 +364,40 @@ object ResponsePoc extends App {
         // - is there reliable difference between null and complete absence of
         //   attribute? probably not in JSON here, but visibility in metadata could
         //   differentiate
-        val jsonValue =
+        val attrJsonValue =
           entity.hcursor.downField("attributes").downField(attrName)
               .as[Json].toOption.get
         //println(s"raw: $attrName: $attrType = $jsonValue")
         val renderedHtml = {
-          val dataTypeJson =
+          val attrDataTypeJson =
             responseDoc1.hcursor.downField("meta").downField("dataTypes").downField(attrTypeName)
                 .as[Json].toOption.get
+          val attrDataTypeKind =
+            attrDataTypeJson.hcursor.downField("typeKind").as[String].toOption.get
 
-          //println("dataTypeJson = " + dataTypeJson)
-
-          //?????? CONTINUE:  re enum. types: differentiate enum-type case via type kind (probably
-          // first differentiate by type kind, then differentiate primitives/whatever
-          // by name)
-
-          attrTypeName match {
-            //??? handle nulls
-            case "string" =>
-              val typedValue: String = jsonValue.asString.get
-              s"""<span class="type-$attrTypeName">$typedValue</span>"""  //?? doesn't encode
-            case "int" =>
-              val typedValue: Int = jsonValue.as[Int].toOption.get
-              s"""<span class="type-$attrTypeName">$typedValue<span>"""  //?? doesn't encode
-            //???? temporary hard-coding (hackily-know enumeration type):
-            case "someEnum" =>
-              val typedValue: String = jsonValue.asString.get
-              s"""<span class="type-enum type-$attrTypeName">$typedValue</span>"""  //?? doesn't encode
-
-
-            case dataType =>
-              println(s"UNHANDLED data type: '$dataType'")
-              ???
-          }
+          val (classes: String, renderedValue: String) =
+            attrDataTypeKind match {
+              // (note: those don't do HTML encoding)
+              case k @ "primitive" =>
+                attrTypeName match {
+                  case "string" =>
+                    val typedValue: String = attrJsonValue.asString.get
+                    (s"type-$attrTypeName", typedValue)
+                  case "int" =>
+                    val typedValue: Int = attrJsonValue.as[Int].toOption.get
+                    (s"type-$attrTypeName", typedValue.toString)
+                  case dataType =>
+                    println(s"UNHANDLED '$k'-kind data type: '$dataType'")
+                    ???
+                }
+              case k @ "enumeration" =>
+                val typedValue: String = attrJsonValue.asString.get
+                (s"type-enum type-$attrTypeName", typedValue)
+              case kind =>
+                println(s"UNHANDLED data type kind: '$kind'")
+                ???
+            }
+          s"""<span class="$classes">$renderedValue</span>"""
         }
         println(s"""[HTML]:     <td>$renderedHtml</td>""")
       }
