@@ -1,7 +1,7 @@
 package com.us.dsb.explore.jsonapi.poc1
 
 import java.net.URI
-import io.circe.{ACursor, Decoder, Json}
+import io.circe.{ACursor, Decoder, HCursor, Json}
 
 object CrudeClient extends App {
   println("***: CrudeClient")
@@ -16,64 +16,52 @@ object CrudeClient extends App {
   import ResponsePoc.makeSingleEntityResponse
   import ResponsePoc.makeEntityCollectionResponse
 
+  {//?? clean
 
-  if (false) {
-    val responseDoc =
-      makeSingleEntityResponse(URI.create("/someApi"),
-                               UserType,
-                               None,
-                               EntityId("user0123-fake-guid"),
-                               ())
-    println(s"ResponsePoc.makeSingleEntityResponse: responseDoc = $responseDoc")
-  }
-  {
     println()
     println("1. Listing users (as if 'GET /someapi/users'):")
-    val responseDoc1: Json =
-      makeEntityCollectionResponse(URI.create("/someApi"),
-                                   UserType,
-                                   None,
-                                   ())
-    println(s"- responseDoc1: $responseDoc1")
+    val listResponseDoc1: Json = makeEntityCollectionResponse(URI.create("/someApi"),
+                                                              UserType,
+                                                              None,
+                                                              ())
+    println(s"- listResponseDoc1: $listResponseDoc1")
 
     println()
     println("2. Rendering using metadata:")
-    //???? demo using UI labels
-    // - simulate making HTML with table
 
     //???? clean; maybe see https://stackoverflow.com/questions/46144555/decoding-structured-json-arrays-with-circe-in-scala
 
-    // - label table with entity type's plural UI label
-    val primaryTypeName =
-      responseDoc1.hcursor.downField("meta").downField("primaryEntityType")
-          .as[String].toOption.get
-    val primaryTypeJson =
-      responseDoc1.hcursor.downField("meta").downField("entityTypes").downField(primaryTypeName)
-          .as[Json].toOption.get
-    //println("primaryTypeJson = " + primaryTypeJson)
-    val tableLabel =
-      primaryTypeJson.hcursor.downField("uiLabelPlural")
-          .as[Json].toOption.get
+    //?? clean string literals in core, then clean up prototype client
+    
+    val docMetaCursor = listResponseDoc1.hcursor.downField("meta")
+
+    // - 1. label table with entity type's plural UI label
+
+    val primaryTypeCursor = {
+      val typeName = docMetaCursor.get[String]("primaryEntityType").toOption.get
+      val typeJson = docMetaCursor.downField("entityTypes").downField(typeName).as[Json].toOption.get
+      typeJson.hcursor
+    }
+    val tableLabel = primaryTypeCursor.downField("uiLabelPlural").as[String].toOption.get
     println(s"[HTML]: $tableLabel:")
+
     println(s"[HTML]: <table>")
-    // - make row labeling each column with attribute's UI label
+
+    // - 2. make row labeling each column with attribute's UI label
     println(s"[HTML]:   <tr>")
-    val attrs = primaryTypeJson.hcursor.downField("attributes")
-        .as[List[Json]].toOption.get
-    attrs.foreach { attr =>
-      //?? currenting defaulting table column order "attributes" odrer
-      //???? check whether visible/shown/hidden
-      val attrColumnLabel = attr.hcursor.downField("uiLabel").as[String].toOption.get
+    val attrsJson = primaryTypeCursor.downField("attributes").values.get
+
+    attrsJson.foreach { attr =>
+      //?? currently defaulting table column order to "attributes" order
+      //???? check whether visible/shown/hidden (and below in data rows)
+      val attrColumnLabel = attr.hcursor.get[String]("uiLabel").toOption.get
       println(s"[HTML]:     <th>$attrColumnLabel</th>")
 
     }
     println(s"[HTML]:   </tr>")
 
-    // - make row per listed entity:
-    responseDoc1.hcursor.downField("data")
-
-    val entities = responseDoc1.hcursor.downField("data")
-           .as[List[Json]].toOption.get
+    // - 3. make row per listed entity:
+    val entities = listResponseDoc1.hcursor.downField("data").values.get
     entities.foreach { entity =>
       //println("entity = " + entity)
 
@@ -104,30 +92,29 @@ object CrudeClient extends App {
       //     order-propagation code?
 
       println(s"[HTML]:   <tr>")
+      //?? maybe add onclick="..." with expression referring to entity's
+      //   self-link URL (see code below crude-HTML generation)
 
-      attrs.foreach { attr =>
-
-        val attrName = attr.hcursor.downField("name").as[String].toOption.get
-        val attrTypeName = attr.hcursor.downField("type").as[String].toOption.get
-        //???? maybe soon do physical vs. logical types, so enumeration-type
-        // attribute User_SomeEnum can have '<span class="type-enum type-someEnum">'
-        // (and then entity and domain name can have "type-string type-entityName");
-        // (later, add chains, for "type-string type-entityName type-userName")
+      //  3.1 - make column cell per enabled attribute:
+      //       - per attribute type, read from JSON and render to text/HTML
+      attrsJson.foreach { attr =>
+        val attrName = attr.hcursor.get[String]("name").toOption.get
+        val attrTypeName = attr.hcursor.get[String]("type").toOption.get
+        //???? maybe soon do physical vs. logical types, so entity and domain
+        // name can have "type-string type-entityName", or with type chains,
+        // "type-string type-entityName type-userName")
 
         //??? handle absent members (possibly representation of null)
         // - is there reliable difference between null and complete absence of
         //   attribute? probably not in JSON here, but visibility in metadata could
         //   differentiate
         val attrJsonValue =
-          entity.hcursor.downField("attributes").downField(attrName)
-              .as[Json].toOption.get
-        //println(s"raw: $attrName: $attrType = $jsonValue")
+          entity.hcursor.downField("attributes").downField(attrName).as[Json].toOption.get
         val renderedHtml = {
           val attrDataTypeJson =
-            responseDoc1.hcursor.downField("meta").downField("dataTypes").downField(attrTypeName)
-                .as[Json].toOption.get
+            docMetaCursor.downField("dataTypes").downField(attrTypeName).as[Json].toOption.get
           val attrDataTypeKind =
-            attrDataTypeJson.hcursor.downField("typeKind").as[String].toOption.get
+            attrDataTypeJson.hcursor.get[String]("typeKind").toOption.get
 
           val (classes: String, renderedValue: String) =
             attrDataTypeKind match {
@@ -158,10 +145,6 @@ object CrudeClient extends App {
       println(s"[HTML]:   </tr>")
     }
 
-
-    //   - make column cell per enabled attribute:
-    //     - per attribute type, read from JSON and render to text/HTML
-    //   - (what about JSON:API-level "id" value? maybe <tr id="...">?
     println(s"[HTML]: </table>")
 
     println()
@@ -179,7 +162,7 @@ object CrudeClient extends App {
     }
 
     object requestData {
-      val firstItemUrlStr = getCollectionFirstSelfLinkURL(responseDoc1)
+      val firstItemUrlStr = getCollectionFirstSelfLinkURL(listResponseDoc1)
       println("firstItemUrlStr = " + firstItemUrlStr)
 
       //???? split query out before this relative path:
