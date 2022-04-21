@@ -31,7 +31,7 @@ object ResponsePoc extends App {
            "typeName" -> Json.fromString(typeName.raw),
            "typeKind" -> Json.fromString(typeKindName.raw),
 
-           //????? clean "null" to suppressing member:
+           //???? clean "null" to suppressing member:
            "enumerators" -> {
              typeKind match {  //
                case PrimitiveKind => Json.Null
@@ -340,14 +340,32 @@ object ResponsePoc extends App {
            .as[List[Json]].toOption.get
     entities.foreach { entity =>
       //println("entity = " + entity)
-      //????? FIX wording: not (row) _sort_ order; field order; does "?fields" determine order?
-      //???? Q:  Re sort order:  List attributes metadata in sort order, or
-      // specify sort order separately/explicitly?
-      // Note:  If we "list" attributes as members instead of array elements,
-      // then we can't convey order with them.
-      //
 
-      //??? What if attributes aren't elements but are members?  (We
+      //??? Q: Should response data specify/reflect intended UI column order?
+      // - Probably yes, since back end already provides UI support like that in
+      //   the current ADMon architecture:
+      //   - Back end determines UI column order:  back end gives column
+      //     metadata in some order and UI follows that order.
+      //   - Back end mostly determines table column labels:  back end gives
+      //     lower-camel-case names of JSON members (and for columns) and UI
+      //     tries to interpret camel case back into words and then capitalizes
+      //     them.
+      //   - Back end determines non-table attribute labels:  back end uses
+      //     JSON member names formatted as labels (title case, space-separated,
+      //     punctuated).
+      // - If yes, determine how to convey UI order of attributes:
+      //   - Via order in which attributes are listed in metadata (assuming still
+      //     array elements, and not object members)?
+      //   - Via separate metadata for attribute/column order (and maybe
+      //     visibility e.g., separate ~static vs. ~dynamic (basic vs.
+      //     UI-support) data)?
+      //   - (Via explicit ordinality value in attribute metadata?)
+      //   - (If separate, revisit whether attributes metadata is array or object.)
+      // - If yes:
+      //   - Will UI allow changing column order?
+      //   - If so, will it just do so itself, or will it want to tell back end
+      //     to use a different order (so UI can just piggyback on existing
+      //     order-propagation code?
 
       println(s"[HTML]:   <tr>")
 
