@@ -1,16 +1,17 @@
 package com.us.dsb.explore.jsonapi.poc1
 
+import com.us.dsb.explore.jsonapi.poc1.EntityMetadata._
 import com.us.dsb.explore.jsonapi.poc1.Database._
+
 import io.circe.{ACursor, Decoder, Json}
 
 import java.net.URI
 
-object ResponseGeneration {
+//????? clean:
+object SpecificModelResponseGeneration extends ResponseGeneration(EntityMetadataImpl)
 
-  //????? clean: change above object to class, change following to class parameter
-  // to paramater to
-  import EntityMetadata._
-  val specificModelViaIntf: EntityMetadata = EntityMetadataImpl
+class ResponseGeneration(specificModelViaIntf: EntityMetadata) {
+
   import specificModelViaIntf._
 
   //??temporary:

@@ -13,8 +13,8 @@ object CrudeClient extends App {
   import EntityMetadataImpl.UserType
   import EntityMetadataImpl.User_UserName
   import EntityMetadataImpl.getEntityTypeForSegment
-  import ResponseGeneration.makeSingleEntityResponse
-  import ResponseGeneration.makeEntityCollectionResponse
+  import SpecificModelResponseGeneration.makeSingleEntityResponse
+  import SpecificModelResponseGeneration.makeEntityCollectionResponse
 
   {//?? clean
 
