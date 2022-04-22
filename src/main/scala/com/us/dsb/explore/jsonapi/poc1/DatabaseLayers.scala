@@ -20,7 +20,7 @@ trait Database {
                     columnNames: ColumnName*
                    ): Seq[Map[ColumnName, Any]]
   //?? Q: Prototype what other "shapes" of queries?
-  // - ???? Q: HEY, what query(-ies) would populate a list of user entities
+  // - ??? Q: HEY, what query(-ies) would populate a list of user entities
   //   _each_ of which lists related groups?  (A JOIN to get related groups
   //   could list multiple rows for each user.  (Maybe no columns; maybe many.)
   //   (Even more duplication if multiple relationships "done" in single query.))
@@ -48,7 +48,7 @@ object DatabaseImpl extends Database {
     val user_name:   ColumnName = ColumnName("user_name")
     val domain_name: ColumnName = ColumnName("domain_name")
     /** (assuming: to-1 relationship; FK to domain tables PK */
-    val domain_fk:   ColumnName = ColumnName("domain_fk")  //???? rel. metadata must identity FK and target PK
+    val domain_fk:   ColumnName = ColumnName("domain_fk")  //?? rel. metadata must identity FK and target PK
     val some_int:    ColumnName = ColumnName("some_int")
     val some_enum:   ColumnName = ColumnName("some_enum")
   }

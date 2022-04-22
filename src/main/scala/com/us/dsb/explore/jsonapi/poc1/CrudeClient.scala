@@ -167,7 +167,7 @@ object CrudeClient extends App {
       val firstItemUrlStr = getCollectionFirstSelfLinkURL(listResponseDoc1)
       println("firstItemUrlStr = " + firstItemUrlStr)
 
-      //???? split query out before this relative path:
+      //??? split query out before this relative path:
       val apiRootRelativeUrlStr = firstItemUrlStr.drop("/someApi/".length)
       println("apiRootRelativeUrlStr = " + apiRootRelativeUrlStr)
       val path :: query = apiRootRelativeUrlStr.split("\\?").toList
@@ -201,9 +201,6 @@ object CrudeClient extends App {
 
     }
 
-    //???? continue: parse extracted URL into makeSingleEntityResponse call
-
   }
-
 
 }

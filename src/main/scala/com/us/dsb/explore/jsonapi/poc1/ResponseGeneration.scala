@@ -7,12 +7,13 @@ import java.net.URI
 
 object ResponseGeneration {
 
-  //???? clean: change above object to class, change following to class parameter
+  //????? clean: change above object to class, change following to class parameter
   // to paramater to
   import EntityMetadata._
   val specificModelViaIntf: EntityMetadata = EntityMetadataImpl
   import specificModelViaIntf._
-  //????temporarily:
+
+  //??temporary:
   import EntityMetadataImpl.DomainType
 
   //??? split out type metadata from "data metadata" (e.g, counts)
@@ -33,7 +34,7 @@ object ResponseGeneration {
            "typeName" -> Json.fromString(typeName.raw),
            "typeKind" -> Json.fromString(typeKindName.raw),
 
-           //???? clean "null" to suppressing member:
+           //??? clean "null" to suppressing member:
            "enumerators" -> {
              typeKind match {  //
                case PrimitiveKind => Json.Null

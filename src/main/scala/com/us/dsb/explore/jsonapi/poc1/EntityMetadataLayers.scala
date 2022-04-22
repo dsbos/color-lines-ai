@@ -110,10 +110,8 @@ object EntityMetadataImpl extends EntityMetadata {
     }
   }
 
-  //???? soon maybe getDataTypeKind (int, string, enum, "schemaed" JSON)
-
   // <??? what kind of> data types:
-  //???? revisit:  consider:  case object with DT_Enumeration being non-case class?
+  //??? revisit:  consider:  case object with DT_Enumeration being non-case class?
   val DT_SomeEnum = DT_Enumeration(DataTypeName("someEnum"),
                                    EnumeratorName("One"),
                                    EnumeratorName("Two"))
