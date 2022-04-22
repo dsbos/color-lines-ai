@@ -5,8 +5,10 @@ import io.circe.{ACursor, Decoder, Json}
 
 import java.net.URI
 
-object ResponsePoc {
+object ResponseGeneration {
 
+  //???? clean: change above object to class, change following to class parameter
+  // to paramater to
   import EntityMetadata._
   val specificModelViaIntf: EntityMetadata = EntityMetadataImpl
   import specificModelViaIntf._

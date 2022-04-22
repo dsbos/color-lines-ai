@@ -13,8 +13,8 @@ object CrudeClient extends App {
   import EntityMetadataImpl.UserType
   import EntityMetadataImpl.User_UserName
   import EntityMetadataImpl.getEntityTypeForSegment
-  import ResponsePoc.makeSingleEntityResponse
-  import ResponsePoc.makeEntityCollectionResponse
+  import ResponseGeneration.makeSingleEntityResponse
+  import ResponseGeneration.makeEntityCollectionResponse
 
   {//?? clean
 
@@ -29,7 +29,7 @@ object CrudeClient extends App {
     println()
     println("2. Rendering using metadata:")
 
-    //???? clean; maybe see https://stackoverflow.com/questions/46144555/decoding-structured-json-arrays-with-circe-in-scala
+    //??? clean; maybe see https://stackoverflow.com/questions/46144555/decoding-structured-json-arrays-with-circe-in-scala
 
     //?? clean string literals in core, then clean up prototype client
     
@@ -53,7 +53,7 @@ object CrudeClient extends App {
 
     attrsJson.foreach { attr =>
       //?? currently defaulting table column order to "attributes" order
-      //???? check whether visible/shown/hidden (and below in data rows)
+      //?? eventually, condition on whether visible/shown/hidden (same in data rows)
       val attrColumnLabel = attr.hcursor.get[String]("uiLabel").toOption.get
       println(s"[HTML]:     <th>$attrColumnLabel</th>")
 
@@ -98,6 +98,8 @@ object CrudeClient extends App {
       //  3.1 - make column cell per enabled attribute:
       //       - per attribute type, read from JSON and render to text/HTML
       attrsJson.foreach { attr =>
+        //?? eventually, condition on whether visible/shown/hidden (same in data rows)
+
         val attrName = attr.hcursor.get[String]("name").toOption.get
         val attrTypeName = attr.hcursor.get[String]("type").toOption.get
         //???? maybe soon do physical vs. logical types, so entity and domain
@@ -186,7 +188,7 @@ object CrudeClient extends App {
                                  None,
                                  requestData.entityId,
                                  ())
-      println(s"ResponsePoc.makeSingleEntityResponse: responseDoc2 = $responseDoc2")
+      println(s"ResponseGeneration.makeSingleEntityResponse: responseDoc2 = $responseDoc2")
 
       println("4. Getting just selected field(s):")
       val responseDoc2c =
@@ -195,7 +197,7 @@ object CrudeClient extends App {
                                  Some(Seq(User_UserName)),
                                  requestData.entityId,
                                  ())
-      println(s"ResponsePoc.makeSingleEntityResponse: responseDoc2c = $responseDoc2c")
+      println(s"ResponseGeneration.makeSingleEntityResponse: responseDoc2c = $responseDoc2c")
 
     }
 
