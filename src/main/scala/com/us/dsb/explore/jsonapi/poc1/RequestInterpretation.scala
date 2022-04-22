@@ -3,7 +3,7 @@ package com.us.dsb.explore.jsonapi.poc1
 import java.net.{URI, URLDecoder}
 import java.nio.charset.StandardCharsets
 
-object RequestHandling {
+object RequestInterpretation {
 
   /**
    * Parses a URL query string into application/x-www-form-urlencoded query
@@ -43,7 +43,7 @@ object RequestHandling {
 }
 
 object RequestHandlingTemp extends App {
-  import RequestHandling._
+  import RequestInterpretation._
 
   def nameThis(urlStr: String): Unit = {
     println(s"urlStr = '$urlStr'")
