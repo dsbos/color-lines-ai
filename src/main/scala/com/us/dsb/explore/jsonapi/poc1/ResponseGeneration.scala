@@ -11,13 +11,9 @@ import java.net.URI
 object SpecificModelResponseGeneration extends ResponseGeneration(EntityMetadataImpl)
 
 class ResponseGeneration(model: EntityMetadata) {
-  //?? decide whether to import model._ or leave explict
-  // - first explore model-API options/steps:
-  //   - extension methods on current lightweight case objects(+)?
-  //   - move methods to base traits, implementing with case or non-case classes
-  //     as needed
-  //     - recall questions of mutual dependencies and initialization order
-  //       (maybe limited to relationships)
+
+  // for exploratory EntityType extension methods (see EntityTypeOps):
+  implicit val implicitModel = model
 
   //??temporary:
   import EntityMetadataImpl.DomainType
@@ -62,15 +58,9 @@ class ResponseGeneration(model: EntityMetadata) {
       typeName.raw -> dataTypeValue
     }
 
-
     /** Returns member name and value. */
     def makeEntityTypeMetadataMember(`type`: EntityType): (String, Json) = {
-      val typeName = model.getEntityTypeName(`type`)
-      val pathSegment = model.getEntityTypeSegment(`type`)
-      val singularLabel = model.getEntityTypeSingularLabel(`type`)
-      val pluralLabel = model.getEntityTypePluralLabel(`type`)
-
-      val allAttributes = model.getEntityTypeAttributes(`type`)
+      val allAttributes = `type`.attributes
       //?? revisit: confirm array elements vs. object members
       // - how inconvenient is "manual" lookup in array (vs. member reference)
       val attributesValue: Json = {
@@ -88,25 +78,26 @@ class ResponseGeneration(model: EntityMetadata) {
           }
           )
       }
+      val typeNameStr = `type`.name.raw
       val entityTypeValue =
         Json.obj(
-          "typeName" -> Json.fromString(typeName.raw),
-          "pathSegment" -> Json.fromString(pathSegment.raw),
-          "uiLabelSingular" -> Json.fromString(singularLabel.raw),
-          "uiLabelPlural"   -> Json.fromString(pluralLabel.raw),
+          "typeName" -> Json.fromString(typeNameStr),
+          "pathSegment" -> Json.fromString(`type`.pathSegment.raw),
+          "uiLabelSingular" -> Json.fromString(`type`.singularLabel.raw),
+          "uiLabelPlural"   -> Json.fromString(`type`.pluralLabel.raw),
 
           // typeUrlPathSegment
           "attributes" -> attributesValue
           //"relationships"
           )
-      typeName.raw -> entityTypeValue
+      typeNameStr -> entityTypeValue
     }
 
     /** Gets (de-duplicated) list of all data type in given entity types. */
     def getEntityTypeDataTypes(entityTypes: Seq[EntityType]): Seq[DataType] = {
       val dataTypes =
         entityTypes.flatMap { entityType =>
-          model.getEntityTypeAttributes(entityType).map(attr => model.getAttributeType(attr))
+          entityType.attributes.map(attr => model.getAttributeType(attr))
         }
             .distinct
       //println("dataTypes = " + dataTypes)
@@ -117,13 +108,12 @@ class ResponseGeneration(model: EntityMetadata) {
     val dataTypeMembers = dataTypes.map(dt => makeDataTypeMetadataMember(dt))
     val entityTypeMembers = entityTypes.map(et => makeEntityTypeMetadataMember(et))
 
-
     Json.obj(
       //?? revisit name:  this is means "primary-data type" (or "primary-data
       // entity type") but "primaryDataType" sounds like "primary data type";
       // "primaryEntityType" sounds slightly ambiguous; "primaryDataEntityType"
       // would resolve ambiguities, but is "uglily" long
-      "primaryEntityType" -> Json.fromString(model.getEntityTypeName(primaryType).raw),
+      "primaryEntityType" -> Json.fromString(primaryType.name.raw),
       "dataTypes" -> Json.obj(dataTypeMembers: _*),
       "entityTypes" -> Json.obj(entityTypeMembers: _*)
       )
@@ -160,20 +150,19 @@ class ResponseGeneration(model: EntityMetadata) {
       Json.fromFields(fields)
     }
     val entityId = {
-      val dbColumn = model.getEntityTableKeyColumn(`type`)
+      val dbColumn = `type`.tableKeyColumn
       val value = rowColumnNameToValueMap2(dbColumn)
       value
     }
-    val typeName = model.getEntityTypeName(`type`)
     val rowResourceObject =
       Json.obj(
-        "type"       -> Json.fromString(typeName.raw),
+        "type"       -> Json.fromString(`type`.name.raw),
         "id"         -> dbAnyToJson(entityId),
         "attributes" -> attributesObject,
         // (no "relationships" yet or in this case)
         "links" -> Json.obj(
           "self" -> Json.fromString(
-            s"$apiUrlPathPrefix/${model.getEntityTypeSegment(`type`).raw}/$entityId?<plus parameters (e.g., 'fields')?>")
+            s"$apiUrlPathPrefix/${`type`.pathSegment.raw}/$entityId?<plus parameters (e.g., 'fields')?>")
           //?? do we need to propagate any query parameters?
           )
         )
@@ -198,7 +187,7 @@ class ResponseGeneration(model: EntityMetadata) {
                                    attributeSelection: Option[Seq[Attribute]]
                                    ): Seq[Attribute] = {
     // default to all attributes (and no relationships, once they're implemented)
-    attributeSelection.getOrElse(model.getEntityTypeAttributes(`type`))
+    attributeSelection.getOrElse(`type`.attributes)
   }
 
   def determineNetRequestedColumns(`type`: EntityType,
@@ -208,7 +197,7 @@ class ResponseGeneration(model: EntityMetadata) {
       requestedAttributes.map { attribute =>
         model.getAttributeColumnName(attribute)
       }
-    val keyCol = model.getEntityTableKeyColumn(`type`)
+    val keyCol = `type`.tableKeyColumn
     val netColumns =
       if (columnsForRequestAttributes.contains(keyCol)) {
         columnsForRequestAttributes
@@ -229,7 +218,7 @@ class ResponseGeneration(model: EntityMetadata) {
                                other             : TBD): Json = {
     val requestedAttributes = determineRequestedAttributes(`type`,
                                                            attributeSelection)
-    val table = model.getEntityTableName(`type`)
+    val table = `type`.tableName
     val requestedDbColumns = determineNetRequestedColumns(`type`,
                                                           requestedAttributes)
 
@@ -253,7 +242,7 @@ class ResponseGeneration(model: EntityMetadata) {
     assembleToplevelObject(
       `type`,
       //??? pass original URL (instead of re-creating)?
-      s"$apiUrlPathPrefix/${model.getEntityTypeSegment(`type`).raw}/${entityId.raw}",
+      s"$apiUrlPathPrefix/${`type`.pathSegment.raw}/${entityId.raw}",
       primaryData)
   }
 
@@ -263,7 +252,7 @@ class ResponseGeneration(model: EntityMetadata) {
                                    other             : TBD): Json = {
     val requestedAttributes = determineRequestedAttributes(`type`,
                                                            attributeSelection)
-    val table = model.getEntityTableName(`type`)
+    val table = `type`.tableName
     val requestedDbColumns = determineNetRequestedColumns(`type`,
                                                           requestedAttributes)
 
@@ -282,7 +271,7 @@ class ResponseGeneration(model: EntityMetadata) {
     assembleToplevelObject(
       `type`,
       //??? pass original URL (instead of re-creating)?
-      s"$apiUrlPathPrefix/${model.getEntityTypeSegment(`type`).raw}",
+      s"$apiUrlPathPrefix/${`type`.pathSegment.raw}",
       primaryData)
   }
 

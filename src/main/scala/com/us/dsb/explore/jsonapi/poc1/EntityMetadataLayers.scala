@@ -9,6 +9,14 @@ import java.net.URI
 object EntityMetadata {
   type TBD = Unit
 
+  // Note:  _Current_ setup uses type/entity/attribute objects that don't
+  // actually carry associated data, and separate methods to get that associated
+  // data.  (This was done to defer dealing with questions of mutual
+  // dependencies (between types, relationships, etc.) and initialization
+  // order.)  This will likely change, moving methods to base traits implemented
+  // by case--or non-case--classes.  See EntityTypeOps and its extension
+  // methods.
+
   trait DataTypeKind
   case class DataKindName(raw: String) extends AnyVal
 
@@ -50,6 +58,28 @@ object EntityMetadata {
   case class AttributeName(raw: String) extends AnyVal
   case class AttributeLabel(raw: String) extends AnyVal  //(exposed name)
 
+  // exploratory:  for callability via extension methods while current setup
+  // still uses entity/attributes/etc. objects don't actually carry data;
+  // (note that setup likely will be changed, possibly to have regular methods
+  // on entity/attributes/etc. objects, resulting in same calling pattern that
+  // these extension methods currently support)
+  implicit class EntityTypeOps(`type`: EntityType) {
+    def name(implicit model: EntityMetadata): EntityTypeName =
+      model.getEntityTypeName(`type`)
+    def singularLabel( implicit model: EntityMetadata): EntityTypeSingularLabel =
+      model.getEntityTypeSingularLabel(`type`)
+    def pluralLabel(   implicit model: EntityMetadata): EntityTypePluralLabel =
+      model.getEntityTypePluralLabel(`type`)
+    def pathSegment(   implicit model: EntityMetadata): EntityTypeSegment =
+      model.getEntityTypeSegment(`type`)
+    def attributes(    implicit model: EntityMetadata): Seq[Attribute] =
+      model.getEntityTypeAttributes(`type`)
+    def tableName(     implicit model: EntityMetadata): TableName =
+      model.getEntityTypeTableName(`type`)
+    def tableKeyColumn(implicit model: EntityMetadata): ColumnName =
+      model.getEntityTypeTableKeyColumn(`type`)
+  }
+
 }
 
 import EntityMetadata._
@@ -60,13 +90,14 @@ trait EntityMetadata {
   def getDataTypeName(`type`: DataType): DataTypeName
   def getDataTypeKind(`type`: DataType): DataTypeKind
 
-  def getEntityTypeName(         `type`: EntityType): EntityTypeName
-  def getEntityTypeSingularLabel(`type`: EntityType): EntityTypeSingularLabel
-  def getEntityTypePluralLabel(  `type`: EntityType): EntityTypePluralLabel
-  def getEntityTypeSegment(      `type`: EntityType): EntityTypeSegment
-  def getEntityTypeAttributes(   `type`: EntityType): Seq[Attribute]
-  def getEntityTableName(        `type`: EntityType): TableName
-  def getEntityTableKeyColumn(   `type`: EntityType): ColumnName
+  def getEntityTypeName(          `type`: EntityType): EntityTypeName
+  def getEntityTypeSingularLabel( `type`: EntityType): EntityTypeSingularLabel
+  def getEntityTypePluralLabel(   `type`: EntityType): EntityTypePluralLabel
+  def getEntityTypeSegment(       `type`: EntityType): EntityTypeSegment
+  def getEntityTypeAttributes(    `type`: EntityType): Seq[Attribute]
+  def getEntityTypeTableName(     `type`: EntityType): TableName
+  def getEntityTypeTableKeyColumn(`type`: EntityType): ColumnName
+
 
   def getEntityTypeForSegment(segment: EntityTypeSegment): EntityType
 
@@ -183,10 +214,10 @@ object EntityMetadataImpl extends EntityMetadata {
   override def getEntityTypeSegment(`type`: EntityType): EntityTypeSegment =
     getEntityTypeData(`type`).segment
 
-  override def getEntityTableName(`type`: EntityType): TableName =
+  override def getEntityTypeTableName(`type`: EntityType): TableName =
     getEntityTypeData(`type`).tableName
 
-  override def getEntityTableKeyColumn(`type`: EntityType): ColumnName =
+  override def getEntityTypeTableKeyColumn(`type`: EntityType): ColumnName =
     getEntityTypeData(`type`).tableKeyColumn
 
   override def getEntityTypeAttributes(`type`: EntityType): Seq[Attribute] =
