@@ -45,7 +45,8 @@ object RequestInterpretation {
 object RequestHandlingTemp extends App {
   import RequestInterpretation._
 
-  def nameThis(urlStr: String): Unit = {
+  def analyzeURL(urlStr: String): Unit = {
+    println()
     println(s"urlStr = '$urlStr'")
     val url = URI.create(urlStr)
 
@@ -103,7 +104,7 @@ object RequestHandlingTemp extends App {
   println("url1          = " + url1)
   println("url1.toString = " + url1.toString)
   val urlStr = url1.toString
-  nameThis(urlStr)
+  analyzeURL(urlStr)
 
 
 
@@ -140,10 +141,10 @@ object RequestHandlingTemp extends App {
     // sort
     // page?
     )
-  someCases.foreach{ nameThisx =>
+  someCases.foreach{ url =>
     println()
-    println(s"nameThisx = '$nameThisx'")
-    nameThis(nameThisx)
+    println(s"url = '$url'")
+    analyzeURL(url)
   }
 
 

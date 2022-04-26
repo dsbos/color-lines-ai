@@ -221,7 +221,7 @@ object Responses extends App {
                           )
 
 
-  // "data" - primary data- resource object(s) when primary data is normal
+  // "data" - primary data - resource object(s) when primary data is normal
   //    entity(-ies), but resource _identifier_ object(s) when primary data is
   //    relationship object;
   //   (Do we have any need to serve relationship objects?  (Do we need to
