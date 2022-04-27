@@ -1,3 +1,12 @@
+To Be Assimilated:
+- continue support of UI-specific aspects such as field/column order
+  - (see big comment in CrudeClient.scala)
+  - address issue of _possibly_ different orders for different filterings (like
+    various (backend-provided) <something>-users views in current system)
+    - also different default column visibilty
+    - does that all move to UI? (UI knows set of tuples of filtering, default
+      columns, default column order, maybe also default sorting)?
+    
 
 Semi-sorted:
 
@@ -57,7 +66,7 @@ Semi-sorted:
 - Base query syntax in URL path:
   - (Depends on (how many) types of high-level queryies supported.)
   - Candidate:  Initial simple-segments draft:
-    -
+    - .
       - /users                          - all users
       - /users/123                      - user 123
       - /users/123/someRel              - user 123 -> someRel -> related entities
@@ -87,10 +96,8 @@ Semi-sorted:
       segment  as ID.
   - See more in
     https://rationemllc.atlassian.net/wiki/spaces/CA/pages/3123085352/URL+Paths+request+cases+path+forms+related+aspects)
-
   
-  
-- Response metadata (returnd in API responses):
+- Response metadata (returned in API responses):
   - Type metadata:
     - Entity-type metadata:
       - List/describe fields (attributes and relationship).
@@ -145,7 +152,7 @@ Semi-sorted:
     - a relationship's corresponding query components (joined tables,
       joining columns, maybe other SQL fragments).
     - maybe filter-expression metadata (beyond columns, types, etc.)
-- 
+
 - Relationships:
   - Note:  No initial support; limited next-phase support; maybe never much 
     support.
@@ -225,7 +232,6 @@ Semi-sorted:
     - Possibly, allow pseudo-submember references:
       - To select members of values that are JSON objects (e.g., if timestamps
         carry both milliseconds numbrer and string).
-
 
   - Sorting:
     - (Primary data only.  Not order in "included" or in relationship objects.)
