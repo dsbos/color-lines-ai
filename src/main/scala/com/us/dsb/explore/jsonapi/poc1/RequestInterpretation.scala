@@ -136,10 +136,15 @@ object RequestInterpretation {
 //    // - automatic listing of enumerators:
 //    val values: IndexedSeq[KnownParameter] = findValues
   }
+  import ParameterSpec._
+
+  case class ParametersBlock(dummyOne: Option[DummyOne],
+                             dummyTwos: Seq[DummyTwo])
 
 
 
 
+  //??? can I relax Seq to say order doesn't matter? Set isn't right either
   def resolveToKnownParameters(rawParametersSeq: Seq[(String, String)]
                               ): Either[String, Seq[ParameterSpec]] = {
     val zero: Either[String, Seq[ParameterSpec]] = Right(Seq())
