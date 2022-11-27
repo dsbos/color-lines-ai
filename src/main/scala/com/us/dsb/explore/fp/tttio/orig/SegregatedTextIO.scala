@@ -1,4 +1,4 @@
-package com.us.dsb.explore.fp.namethis.orig
+package com.us.dsb.explore.fp.tttio.orig
 
 private[orig] trait SegregatedTextIO {
   def printStateText(lineOrLines: String): Unit

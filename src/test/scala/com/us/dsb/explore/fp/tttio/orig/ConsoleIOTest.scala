@@ -1,6 +1,5 @@
-package com.us.dsb.explore.fp.namethis.io
+package com.us.dsb.explore.fp.tttio.orig
 
-import cats.effect.IO
 import org.scalatest.LoneElement
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers._
@@ -21,18 +20,17 @@ class ConsoleIOTest extends AnyFunSpec {
     private var printedStringsReversed: List[String] = Nil;
     def getPrintedStrings: List[String] = printedStringsReversed.reverse
 
-    override def println(lineOrLines: String): IO[Unit] = {
+    override def println(lineOrLines: String): Unit = {
       printedStringsReversed ::= lineOrLines
-      IO(())
     }
 
-    override def readLine(prompt: String): IO[String] = {
+    override def readLine(prompt: String): String = {
       printedStringsReversed ::= prompt
 
       stringsToRead match {
         case head +: tail =>
           stringsToRead = tail
-          IO(head)
+          head
         case _ =>
           ???
       }
@@ -133,7 +131,7 @@ class ConsoleIOTest extends AnyFunSpec {
           printedStrings.loneElement should not be ("given text")
         }
       }
-      ignore("NT.should read input line text") {
+      it("NT.should read input line text") {
         lineRead should be ("given input")
       }
     }

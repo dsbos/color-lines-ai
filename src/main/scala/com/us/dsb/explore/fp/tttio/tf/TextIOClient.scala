@@ -1,7 +1,7 @@
 //??? BEING REWORKED tagless-final(?) form:
-package com.us.dsb.explore.fp.namethis.tf
+package com.us.dsb.explore.fp.tttio.tf
 
-import com.us.dsb.explore.fp.namethis.tf.LiveColoredConsoleTextIO
+import com.us.dsb.explore.fp.tttio.tf.LiveColoredConsoleTextIO
 import cats.syntax.either._
 
 /** TTT UI controller. */

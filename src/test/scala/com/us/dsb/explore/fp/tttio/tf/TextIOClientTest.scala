@@ -1,8 +1,8 @@
 //??? BEING REWORKED tagless-final(?) form:
-package com.us.dsb.explore.fp.namethis.tf
+package com.us.dsb.explore.fp.tttio.tf
 
 import cats.{Applicative, Id}
-import com.us.dsb.explore.fp.namethis.tf.TextIOClient.UICommand
+import com.us.dsb.explore.fp.tttio.tf.TextIOClient.UICommand
 //?????import cats.effect.IO
 import cats.syntax.applicative._
 import org.scalatest.AppendedClues._
