@@ -66,7 +66,7 @@ object Requests extends App {
     val result =
       entitiesSegment match {
         case "users" => Right(User)
-        case unknown => Left(s"Unknown entity-type-related segment '$entitiesSegment'")
+        case unknown => Left(s"Unknown entity-type-related segment '$unknown'")
       }
     result
   }
@@ -139,7 +139,7 @@ object Requests extends App {
                      .map(relationship => SimpleRelatedDataPath2(entityPath,
                                                                         relationship))
                }
-            case chainTail =>
+            case chainTail@_ =>
               NIY
           }
       }

@@ -9,6 +9,8 @@ object Database {
 }
 import Database._
 
+import scala.annotation.unused
+
 /** Generic database actions. */
 trait Database {
   /** Like SELECT via (scalar) primary key, for specified columns. */
@@ -131,7 +133,7 @@ object DatabaseImpl extends Database {
     //println(s"selectAllRows.1: tableName = $tableName, columnNames = ${columnNames}")
     val tableFullRows = tables(tableName)
     val rows = {
-      tableFullRows.map { case (key, allColumns) =>
+      tableFullRows.map { case (key@_, allColumns) =>
         //println(s"selectAllRows.2: key = $key, allColumns = ${allColumns}")
         val selectedColumns: Map[ColumnName, Any] =
           columnNames.map { columnName =>

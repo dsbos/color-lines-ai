@@ -4,6 +4,7 @@ package com.us.dsb.explore.jsonapi.poc1
 
 import java.net.{URI, URLDecoder}
 import java.nio.charset.StandardCharsets
+import scala.annotation.unused
 
 object RequestInterpretation {
 
@@ -223,7 +224,7 @@ object RequestHandlingTemp extends App {
     val syntacticQueryParamsMap = syntacticQueryParamsPairs.toMap
     println("syntacticQueryParamsMap = " + syntacticQueryParamsMap)
 
-    syntacticQueryParamsMap.foreach { case (name, value) =>
+    syntacticQueryParamsMap.foreach { case (name, value@_) =>
       println(s"name = '$name'")
       name match {
         case "a" | "c" | "p" | "p%q" => // known dummy
