@@ -161,6 +161,7 @@ libraryDependencies ++= Seq(
   // try circe ~adapter
 
   "org.typelevel"  %% "cats-core"           % "2.1.0",
+  "org.typelevel"  %% "cats-free"           % "2.9.0",
   // "org.typelevel"  %% "cats-effect"         % "2.1.0",
 
   "org.scalaz" %% "scalaz-core" % "7.3.5",
