@@ -6,6 +6,8 @@ import eu.timepit.refined.numeric.NonNegative
 import eu.timepit.refined.types.numeric.PosInt
 import eu.timepit.refined.types.numeric.NonNegInt
 
+import scala.annotation.unused
+
 // *** See doc>:
 // https://www.mvndoc.com/c/eu.timepit/refined_sjs0.6_2.11/index.html#eu.timepit.refined.auto$
 object AutoThingsExpl extends App {

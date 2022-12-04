@@ -2,7 +2,7 @@ package com.us.dsb.explore.libs.cats
 
 
 
-class CatsShowExpl {
+object CatsShowExpl extends App {
 
   class A {
     class B
