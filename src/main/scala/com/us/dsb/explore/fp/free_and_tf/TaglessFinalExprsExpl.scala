@@ -1,17 +1,17 @@
 package com.us.dsb.explore.fp.free_and_tf
 
 //import cats.{Applicative, Apply, FlatMap, Functor, Id, Monad}
-import cats.{Applicative, FlatMap, Functor, Id, Monad}
+import cats.{Applicative, Apply, FlatMap, Functor, Id, Monad}
 import cats.effect.IO
 
 // (https://speakerdeck.com/markus1189/functional-web-services-with-final-encoding)
 object TaglessFinalExprsExpl extends App {
 
-  // tagless-final algebra:
-  sealed trait Expressions[F[_], A] {
-    def literal(v: Int): F[A]
-    def add(v1: F[A], v2: F[A]): F[A]
-    def neg(v: F[A]): F[A]
+  // tagless-final algebra: (N: Int, etc. (something addable, etc.))
+  sealed trait Expressions[F[_], N] {
+    def literal(v: Int): F[N]
+    def add(v1: F[N], v2: F[N]): F[N]
+    def neg(v: F[N]): F[N]
   }
 
   // algebra client computation:
@@ -53,31 +53,23 @@ object TaglessFinalExprsExpl extends App {
     new Expressions[F, Int] {
       override def literal(v: Int): F[Int] = {
         Applicative[F].pure(v)
+        Monad[F].pure(v)
         import cats.syntax.applicative._
-        //???? "ambiguous implicit...": v.pure
         v.pure
-        /* 'v.pure' yields:
-        ambiguous implicit values:
-          both value evidence$1 of type cats.Monad[F]
-          and method catsStdInstancesForArraySeq in trait ArraySeqInstances of
-            type cats.Traverse[scala.collection.immutable.ArraySeq]
-            with cats.Monad[scala.collection.immutable.ArraySeq]
-            with cats.Alternative[scala.collection.immutable.ArraySeq]
-            with cats.CoflatMap[scala.collection.immutable.ArraySeq]
-            with cats.Align[scala.collection.immutable.ArraySeq]
-          match expected type cats.Applicative[F]:
-         */
       }
       override def add(v1: F[Int], v2: F[Int]): F[Int] = {
         FlatMap[F].flatMap(v1)(v1v => Functor[F].map(v2)(v2v => v1v + v2v))
+        Monad[F].flatMap(v1)(v1v => Monad[F].map(v2)(v2v => v1v + v2v))
         import cats.syntax.flatMap._
         import cats.syntax.functor._
+        // not: import cats.syntax.monad._
         v1.flatMap(v1v => (v2.map(v2v => v1v + v2v)))
       }
       override def neg(v: F[Int]): F[Int] = {
         Functor[F].map(v)(-_)
         Monad[F].map(v)(-_)
         import cats.syntax.functor._
+        // not: import cats.syntax.monad._
         v.map(-_)
       }
     }
