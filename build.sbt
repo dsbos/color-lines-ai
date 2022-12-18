@@ -2,7 +2,7 @@ name := "expl-scala"
 
 version := "0.1"
 
-scalaVersion := "2.13.7"
+scalaVersion := "2.13.10"
 //???? Q: how to insert below in scala-parallel-collections, etc.?
 
  // https://medium.com/@awesomeorji/sbt-for-the-absolute-beginner-2-settings-and-tasks-6f3b00be1a81
@@ -113,10 +113,10 @@ libraryDependencies ++= Seq(
   //"org.specs2" %% "specs2-junit_2.12" % "3.9.4" % Test,
 
 
-  "org.json4s" % "json4s-core_2.13"   % "3.6.11",  // 3.7.x?, 4.x?
-  "org.json4s" % "json4s-native_2.13" % "3.6.11",  // 3.7.x?, 4.x?
-  "org.json4s" % "json4s-jackson_2.13" % "3.6.11",  // 3.7.x?, 4.x?
-  //"org.json4s" % "json4s-ast_2.13" % "3.6.11",  // 3.7.x?, 4.x?
+  "org.json4s" %% "json4s-core"   % "3.6.11",  // 3.7.x?, 4.x?
+  "org.json4s" %% "json4s-native" % "3.6.11",  // 3.7.x?, 4.x?
+  "org.json4s" %% "json4s-jackson" % "3.6.11",  // 3.7.x?, 4.x?
+  //"org.json4s" %% "json4s-ast" % "3.6.11",  // 3.7.x?, 4.x?
 
   "io.circe" %% "circe-core" % "0.14.1",
   //("io.circe" %% "circe-derivation" % "0.14.1",)
