@@ -152,9 +152,10 @@ object RefinedTypesExpl extends App {
     //uuid("00000000-0000-0000-0000-00000000000")
     uuid("00000000-0000-0000-0000-000000000000")
 
+    // XML support disappeared from Refined between 0.9.28 and 0.10.1:
     //xml("")
     //xml("<x>/<y>")
-    xml("<x></x>")
+    //xml("<x></x>")
   }
   SpecialStringTypes
 

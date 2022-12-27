@@ -147,7 +147,7 @@ libraryDependencies ++= Seq(
 
   // Stronger types:  newtypes and refine's refinement types
   "io.estatico" %% "newtype"             % "0.4.3",
-  "eu.timepit"  %% "refined"                 % "0.9.28",
+  "eu.timepit"  %% "refined"                 % "0.10.1",
   //"eu.timepit"  %% "refined"                 % "0.9.28",/
   //"eu.timepit"  %% "refined-cats"            % "0.9.28", // optional
   //"eu.timepit"  %% "refined-eval"            % "0.9.28", // optional, JVM-only
