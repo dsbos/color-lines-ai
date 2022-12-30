@@ -1,7 +1,7 @@
 package com.us.dsb.explore.algs.coloredlines.manual.game
 
 import cats.syntax.option._
-import com.us.dsb.explore.algs.coloredlines.manual.game.Board.BallKind
+import com.us.dsb.explore.algs.coloredlines.manual.game.BallKind
 import org.scalatest.PrivateMethodTester
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers._

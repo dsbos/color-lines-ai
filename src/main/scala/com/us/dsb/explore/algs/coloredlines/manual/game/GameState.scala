@@ -2,7 +2,7 @@ package com.us.dsb.explore.algs.coloredlines.manual.game
 
 import cats.syntax.option._
 import cats.syntax.either._
-import com.us.dsb.explore.algs.coloredlines.manual.game.Board.BallKind
+import com.us.dsb.explore.algs.coloredlines.manual.game.BallKind
 import com.us.dsb.explore.algs.coloredlines.manual.game.XxGameState.XxGameResult.XxxPlaceholderDone
 import com.us.dsb.explore.algs.coloredlines.manual.game.{ColumnIndex, RowIndex}
 
