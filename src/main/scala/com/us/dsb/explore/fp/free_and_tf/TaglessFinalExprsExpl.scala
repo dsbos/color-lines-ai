@@ -21,6 +21,19 @@ object TaglessFinalExprsExpl extends App {
         neg(add(literal(6),
                 literal(2))))
   }
+//  def exprCalculation[F[_]: Monad, A](implicit e: Expressions[F, A]): F[A] = {
+//    import e._
+//
+//    for {
+//      lit1 <- e.literal(50)
+//
+//
+//
+//    } yield ???
+//    add(literal(50),
+//        neg(add(literal(6),
+//                literal(2))))
+//  }
 
   // interpreter with Int data and Id effect, without Int instead of Id[Int]:
   val interpreterIntId1: Expressions[Id, Int] = {
