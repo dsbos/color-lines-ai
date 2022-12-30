@@ -13,15 +13,22 @@ private[manual] object Board {
   sealed class BallKind(val initial: String,
                         val setFgColorSeq: String,
                         val setBgColorSeq: String
-                       ) extends EnumEntry
+                       ) extends EnumEntry {
+    def getColoredCharSeq(background: Boolean): String =
+      (if (background) this.setBgColorSeq else this.setFgColorSeq) +
+          initial +
+          AnsiColor.RESET
+  }
+
   object BallKind extends Enum[BallKind] {
-    // original: blue.dark, blue.light, brown, purple, green, yellow
-    case object Blue   extends BallKind("b",  AnsiColor.BLUE,   AnsiColor.BLUE_B)
-    case object Cyan   extends BallKind("c",  AnsiColor.CYAN,   AnsiColor.CYAN_B)
-    case object Red    extends BallKind("r",  AnsiColor.RED,    AnsiColor.RED_B)
-    case object Green  extends BallKind("g",  AnsiColor.GREEN,  AnsiColor.GREEN_B)
-    case object Black  extends BallKind("k",  AnsiColor.BLACK,  AnsiColor.BLACK_B)  //??? magenta?
-    case object Yellow extends BallKind("y",  AnsiColor.YELLOW, AnsiColor.YELLOW_B)
+    // original: blue.dark, blue.light, brown, green, purple, red, yellow
+    case object Blue    extends BallKind("b",  AnsiColor.BLUE,    AnsiColor.BLUE_B)
+    case object Cyan    extends BallKind("c",  AnsiColor.CYAN,    AnsiColor.CYAN_B)
+    case object Black   extends BallKind("k",  AnsiColor.BLACK,   AnsiColor.BLACK_B)
+    case object Green   extends BallKind("g",  AnsiColor.GREEN,   AnsiColor.GREEN_B)
+    case object Magenta extends BallKind("m",  AnsiColor.MAGENTA, AnsiColor.MAGENTA_B)
+    case object Red     extends BallKind("r",  AnsiColor.RED,     AnsiColor.RED_B)
+    case object Yellow  extends BallKind("y",  AnsiColor.YELLOW,  AnsiColor.YELLOW_B)
 
     override val values: IndexedSeq[BallKind] = findValues
   }
@@ -142,24 +149,13 @@ private[game] class Board(private val cellStates: Vector[Cell]) {
       - for each with five or more:
         - assimilate length into move score (total 5 -> 10 pt, +1 -> +4 pt;  (4 * N - 10)
         - remove balls from cells (watch overlap)
-
-
-
-
    */
 
-  def xxgetStateChar(state: CellState) = {  //???? move out
-    val baseChar =
-      state.ballState match {
-        case Some(ball) => ball.initial
-        case None => "-"
-      }
-    val netChar =
-      if (! state.isSelected)
-        baseChar
-      else
-        baseChar.toUpperCase().replace("-", "*")
-    netChar
+  def xxgetStateChar(state: CellState): String = {  //???? move out
+    state.ballState match {
+      case Some(ball) => ball.getColoredCharSeq(state.isSelected)
+      case None => if (! state.isSelected) "-" else "@"
+    }
   }
 
   /** Makes compact single-line string like Xx"<X-O/-X-/O-X>". */
