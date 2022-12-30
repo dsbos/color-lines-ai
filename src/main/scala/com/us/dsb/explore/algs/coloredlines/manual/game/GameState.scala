@@ -115,34 +115,37 @@ private[manual] case class XxGameState(rng: Random,
     }
     import Action._
 
-    val onBall  = board.hasABallAt(row, column)
-    val hadBall = board.hasABallSelected
-    val hadSel  = board.hasACellSelected
-    val onSel   = board.getSelectionStateAt(row, column)
-    val conditions1 = Tuple4(onBall, hadBall, onSel, hadSel)
-//    println("conditions = " +
-//                conditions.productIterator.map(x => x.asInstanceOf[Boolean]).map(if (_) "t" else "f").mkString(","))
+    sealed trait OnBallOrEmpty
+    case object OnBall  extends OnBallOrEmpty
+    case object OnEmpty extends OnBallOrEmpty
+
+    sealed trait OnSelOrUnsel
+    case object OnSel   extends OnSelOrUnsel
+    case object OnUnsel extends OnSelOrUnsel
+
+    sealed trait HadBallOrNot
+    case object HadBall extends HadBallOrNot
+    case object NoBall  extends HadBallOrNot
+
+    sealed trait HadSelOrNot
+    case object HadSel extends HadSelOrNot
+    case object NoSel   extends HadSelOrNot
+
+    val onBallOrEmpty = if (board.hasABallAt(row, column))   OnBall  else OnEmpty
+    val onSelOrUnsel  = if (board.isSelectedAt(row, column)) OnSel   else OnUnsel
+    val hadBallOrNot  = if (board.hasABallSelected)          HadBall else NoBall
+    val hadSelOrNot   = if (board.hasAnyCellSelected)        HadSel  else NoSel
     val action: Action = {
-      if (onBall) {
-        // Tap on ball--select it, except clear if it was selected:
-        if (! onSel) SelectBall else Deselect
-      }
-      else {
-        // Top on empty cell:
-        val conditions2 = (hadBall, onSel, hadSel)
-        //??? onSel  implies hadSel
-        //??? hadBal implies hasSel
-        conditions2 match {
-          case (true,  true,  _    ) => ???          // - can't be on empty AND on ball that was selected
-          case (true,  false, true ) => TryMoveBall  // - had ball, now tap on empty
-          case (true,  false, false) => ???          // - can't have a selected ball AND no selection
+        val conditions = (onBallOrEmpty, hadBallOrNot, onSelOrUnsel, hadSelOrNot)
+        conditions match {
+          case (OnBall,  _,       OnUnsel, _     ) => SelectBall   // - tap on ball  when unselected
+          case (OnEmpty, HadBall, _,       _     ) => TryMoveBall  // - tap on empty when ball selected
 
-          case (false, true,  _    ) => Deselect     // - had empty, now tap on _same_ empty
-          case (false, false, true ) => Pass         // - had empty, tap on different empty
-          case (false, false, false) => SelectEmpty  // - had no selection, tap on emptuy
+          case (OnEmpty, NoBall,  OnUnsel, NoSel ) => SelectEmpty  // - tap on empty when no selection
+          case (OnEmpty, NoBall,  OnUnsel, HadSel) => Pass         // - tap on empty when selected
+
+          case (_,       _,       OnSel,   _     ) => Deselect     // - tap on either when selected
         }
-      }
-
     }
     val nextBoard =
       action match {

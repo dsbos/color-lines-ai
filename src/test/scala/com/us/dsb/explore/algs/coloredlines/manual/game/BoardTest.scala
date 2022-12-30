@@ -48,7 +48,7 @@ private[manual] class XxBoardTest extends AnyFunSpec {
           // ?? which is clearer ("new" DSL vs. regular code; in code and in failure messages?)?:
 
           assert(board.getBallStateAt(row, column).isEmpty)
-          assert(board.getSelectionStateAt(row, column) == false)
+          assert(board.isSelectedAt(row, column) == false)
 
         }
       }
@@ -120,7 +120,7 @@ private[manual] class XxBoardTest extends AnyFunSpec {
         val selectedBoard = board0.withCellSelected(someRow, someCol)
         val deselectedBoard = selectedBoard.withNoSelection
         assertResult(false) {
-          deselectedBoard.getSelectionStateAt(someRow, someCol)
+          deselectedBoard.isSelectedAt(someRow, someCol)
         }
       }
   }

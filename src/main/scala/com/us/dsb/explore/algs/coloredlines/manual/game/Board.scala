@@ -29,7 +29,7 @@ private[manual] object Board {
 
   /** Empty or ball of some color, plus marked or not for physical move. */
   /*private*/ case class CellState(ballState: Option[BallKind],
-                                   selectionState: Boolean)
+                                   isSelected: Boolean)
   private object CellState {
     val empty: CellState = CellState(None, false)
   }
@@ -67,12 +67,13 @@ private[game] class Board(private val cellStates: Vector[Cell]) {
   def hasABallAt(row: RowIndex, column: ColumnIndex): Boolean = {
     cellStates(vectorIndex(row, column)).state.ballState.isDefined
   }
-  def getSelectionStateAt(row: RowIndex, column: ColumnIndex): Boolean = {
-    cellStates(vectorIndex(row, column)).state.selectionState
+  def isSelectedAt(row: RowIndex, column: ColumnIndex): Boolean = {
+    cellStates(vectorIndex(row, column)).state.isSelected
   }
   def hasABallSelected: Boolean =
-    cellStates.find(_.state.selectionState).exists(_.state.ballState.isDefined)
-  def hasACellSelected: Boolean = cellStates.exists(_.state.selectionState)
+    cellStates.find(_.state.isSelected).exists(_.state.ballState.isDefined)
+
+  def hasAnyCellSelected: Boolean = cellStates.exists(_.state.isSelected)
 
 
 
@@ -88,10 +89,10 @@ private[game] class Board(private val cellStates: Vector[Cell]) {
     withCellState(row, column, getStateAt(row, column).copy(ballState = Some(ball)))
 
   def withCellSelected(row: RowIndex, column: ColumnIndex): Board =
-    withNoSelection.withCellState(row, column, getStateAt(row, column).copy(selectionState = true))
+    withNoSelection.withCellState(row, column, getStateAt(row, column).copy(isSelected = true))
 
   def withNoSelection: Board =
-    new Board(cellStates.map(c => c.copy(state = c.state.copy(selectionState = false))))
+    new Board(cellStates.map(c => c.copy(state = c.state.copy(isSelected = false))))
 
 
 
@@ -154,7 +155,7 @@ private[game] class Board(private val cellStates: Vector[Cell]) {
         case None => "-"
       }
     val netChar =
-      if (! state.selectionState)
+      if (! state.isSelected)
         baseChar
       else
         baseChar.toUpperCase().replace("-", "*")
