@@ -76,7 +76,6 @@ private[manual] object GameUI {
   private[this] def moveAtSelection(io: SegregatedTextIO,
                                     uiState: GameUIState
                                    ): GameUIState = {
-    //???????
     val moveResult = uiState.gameState.tryMoveAt(uiState.selectedRow,
                                                  uiState.selectedColumn)
     moveResult match {

@@ -2,15 +2,14 @@ package com.us.dsb.explore.algs.coloredlines.manual.game
 
 private[manual] object Board {
 
-  /** Empty or ball of some color, plus marked or not for physical move. */
-  private[game] case class CellState(ballState: Option[BallKind],
-                                     isSelected: Boolean)
+  /** Empty or ball of some color. */
+  private[game] case class CellState(ballState: Option[BallKind])
   private[game] object CellState {
-    private[game] val empty: CellState = CellState(None, false)
+    private[game] val empty: CellState = CellState(None)
   }
 
   private[game] def empty: Board =
-    new Board(Vector.fill[CellState](BoardOrder * BoardOrder)(CellState.empty), Nil)
+    new Board(Vector.fill[CellState](BoardOrder * BoardOrder)(CellState.empty), Nil, None)
 }
 
 import Board._
@@ -19,7 +18,11 @@ import Board._
  * State of board (just cells; not other game state (e.g., score).)
  */
 private[manual] class Board(private[this] val cellStates: Vector[CellState],
-                            private[this] val onDeck: Iterable[BallKind]) {
+                            private[this] val onDeck: Iterable[BallKind],
+                           //???? move to game (low-level UI) state:
+                           //?????? Tuple2 -> case class
+                            private[this] val selectionCoordinates: Option[(RowIndex, ColumnIndex)]
+                           ) {
 
   /** Computes row-major cell-array index from row and column numbers. */
   private[this] def vectorIndex(row: RowIndex, column: ColumnIndex): Int =
@@ -32,6 +35,9 @@ private[manual] class Board(private[this] val cellStates: Vector[CellState],
 
   private[game] def getOnDeckBalls: Iterable[BallKind] = onDeck
 
+  private[game] def withOnDeckBalls(newBalls: Iterable[BallKind]): Board =
+    new Board(cellStates, newBalls, selectionCoordinates)
+
   private[game] def isFull: Boolean = ! cellStates.exists(_.ballState.isEmpty)
 
   private[game] def getBallStateAt(row: RowIndex, column: ColumnIndex): Option[BallKind] = {
@@ -40,21 +46,21 @@ private[manual] class Board(private[this] val cellStates: Vector[CellState],
   private[game] def hasABallAt(row: RowIndex, column: ColumnIndex): Boolean = {
     cellStates(vectorIndex(row, column)).ballState.isDefined
   }
-  private[game] def isSelectedAt(row: RowIndex, column: ColumnIndex): Boolean = {
-    cellStates(vectorIndex(row, column)).isSelected
+  private[manual] def isSelectedAt(row: RowIndex, column: ColumnIndex): Boolean = {
+    selectionCoordinates.fold(false)(coords => coords._1 == row && coords._2 == column)
   }
   private[game] def hasABallSelected: Boolean =
-    cellStates.find(_.isSelected).exists(_.ballState.isDefined)
+    selectionCoordinates.fold(false)(coords => hasABallAt(coords._1, coords._2))
 
-  private[game] def hasAnyCellSelected: Boolean = cellStates.exists(_.isSelected)
+  private[game] def hasAnyCellSelected: Boolean = selectionCoordinates.isDefined
 
-  private[game] def withOnDeckBalls(balls: Iterable[BallKind]): Board =
-    new Board(cellStates, balls)
+  private[game] def getSelectionCoordinates: Option[(RowIndex, ColumnIndex)] =
+    selectionCoordinates
 
   private def withCellState(row: RowIndex,
                             column: ColumnIndex,
                             newState: CellState): Board =
-    new Board(cellStates.updated(vectorIndex(row, column), newState), onDeck)
+    new Board(cellStates.updated(vectorIndex(row, column), newState), onDeck, selectionCoordinates)
 
   private[game] def withCellHavingBall(row: RowIndex,
                                        column: ColumnIndex,
@@ -62,11 +68,11 @@ private[manual] class Board(private[this] val cellStates: Vector[CellState],
     withCellState(row, column, getCellStateAt(row, column).copy(ballState = Some(ball)))
 
   private[game] def withCellSelected(row: RowIndex,
-                       column: ColumnIndex): Board =
-    withNoSelection.withCellState(row, column, getCellStateAt(row, column).copy(isSelected = true))
+                                     column: ColumnIndex): Board =
+    new Board(cellStates, onDeck, Some((row, column)))
 
   private[game] def withNoSelection: Board =
-    new Board(cellStates.map(c => c.copy(isSelected = false)), onDeck)
+    new Board(cellStates, onDeck, None)
 
   /*
     getting (multiple) lines of 5 given a cell (with a ball)
@@ -83,10 +89,10 @@ private[manual] class Board(private[this] val cellStates: Vector[CellState],
         - remove balls from cells (watch overlap)
    */
 
-  private[manual] def getStateChar(state: CellState): String = {  //???? move out
+  private[manual] def getStateChar(state: CellState, isSelected: Boolean): String = {  //???? move out
     state.ballState match {
-      case Some(ball) => ball.getColoredCharSeq(state.isSelected)
-      case None => if (! state.isSelected) "-" else "@"
+      case Some(ball) => ball.getColoredCharSeq(isSelected)
+      case None => if (! isSelected) "-" else "@"
     }
   }
 
@@ -94,7 +100,7 @@ private[manual] class Board(private[this] val cellStates: Vector[CellState],
   override def toString: String = {
     rowIndices.map { row =>
       columnIndices.map { column =>
-        getStateChar(getCellStateAt(row, column))
+        getStateChar(getCellStateAt(row, column), isSelectedAt(row, column))
       }.mkString("")
     }.mkString("<", "/", ">")
   }
@@ -109,7 +115,7 @@ private[manual] class Board(private[this] val cellStates: Vector[CellState],
 
     rowIndices.map { row =>
       columnIndices.map { column =>
-          "" + getStateChar(getCellStateAt(row, column)) + " "
+          "" + getStateChar(getCellStateAt(row, column), isSelectedAt(row, column)) + " "
       }.mkString(cellSeparator)  // make each row line
     }.mkString(rowSeparator)     // make whole-board multi-line string
   }
@@ -117,7 +123,7 @@ private[manual] class Board(private[this] val cellStates: Vector[CellState],
   private[this] def renderCompactMultiline: String = {
     rowIndices.map { row =>
       columnIndices.map { column =>
-        getStateChar(getCellStateAt(row, column))
+        getStateChar(getCellStateAt(row, column), isSelectedAt(row, column))
       }.mkString("|")  // make each row line
     }.mkString("\n")
   }

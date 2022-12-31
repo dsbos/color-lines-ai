@@ -62,8 +62,9 @@ private[manual] case class GameState(rng: Random,
         case Deselect    =>
           MoveResult(board.withNoSelection, None)
         case TryMoveBall =>
+          val (selRow, selColumn) = board.getSelectionCoordinates.get //???? unsafe
           //?????? clear selection (conditionally here); decide: check here or get bit from doMove...
-          GameLogicSupport.doTryMoveBall(rng, board, ???, ???, row, column)
+          GameLogicSupport.doTryMoveBall(rng, board, selRow, selColumn, row, column)
         case Pass        =>
           val x = GameLogicSupport.doPass(rng, board)
           assert(x.addedScore.isEmpty)

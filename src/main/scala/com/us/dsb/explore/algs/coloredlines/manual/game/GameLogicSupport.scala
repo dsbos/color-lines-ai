@@ -34,7 +34,7 @@ object GameLogicSupport {
                 .getOrElse(scala.sys.error("Unexpectedly full board"))
           curBoard.withCellHavingBall(row, column, pickRandomBallKind(rng))
       }
-    newBoard1.withOnDeckBalls( List.fill(3)(pickRandomBallKind(rng)))
+    newBoard1.withOnDeckBalls(List.fill(3)(pickRandomBallKind(rng)))
   }
 
   private[game] sealed trait Action
@@ -42,7 +42,7 @@ object GameLogicSupport {
     private[game] case object SelectBall  extends Action
     private[game] case object SelectEmpty extends Action
     private[game] case object Deselect    extends Action
-    private[game] case object TryMoveBall extends Action
+    private[game] case object TryMoveBall extends Action  //???? should this capture, carry coords?
     private[game] case object Pass        extends Action
   }
   import Action._
