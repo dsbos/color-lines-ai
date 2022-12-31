@@ -1,12 +1,5 @@
 package com.us.dsb.explore.algs.coloredlines.manual.game
 
-import cats.syntax.option._
-import cats.syntax.either._
-import com.us.dsb.explore.algs.coloredlines.manual.game.{BoardOrder, ColumnIndex, RowIndex}
-import enumeratum.{Enum, EnumEntry}
-
-import scala.io.AnsiColor
-
 private[manual] object Board {
 
   /** Empty or ball of some color, plus marked or not for physical move. */
@@ -17,23 +10,27 @@ private[manual] object Board {
   }
 
   private[game] def empty: Board =
-    new Board(Vector.fill[CellState](BoardOrder * BoardOrder)(CellState.empty))
+    new Board(Vector.fill[CellState](BoardOrder * BoardOrder)(CellState.empty), Nil)
 }
 
 import Board._
 
 /**
- * State of TTT board (just cells; not whose turn it is/etc.)
+ * State of board (just cells; not other game state (e.g., score).)
  */
-private[manual] class Board(private[this] val cellStates: Vector[CellState]) {
+private[manual] class Board(private[this] val cellStates: Vector[CellState],
+                            private[this] val onDeck: Iterable[BallKind]) {
 
   /** Computes row-major cell-array index from row and column numbers. */
   private[this] def vectorIndex(row: RowIndex, column: ColumnIndex): Int =
     (row.value.value - 1) * BoardOrder + (column.value.value - 1)
 
+
   private[manual] def getCellStateAt(row: RowIndex, column: ColumnIndex): CellState = {
     cellStates(vectorIndex(row, column))
   }
+
+  private[game] def getOnDeckBalls: Iterable[BallKind] = onDeck
 
   private[game] def isFull: Boolean = ! cellStates.exists(_.ballState.isEmpty)
 
@@ -51,15 +48,17 @@ private[manual] class Board(private[this] val cellStates: Vector[CellState]) {
 
   private[game] def hasAnyCellSelected: Boolean = cellStates.exists(_.isSelected)
 
-  // (Maybe less private in future.)
+  private[game] def withOnDeckBalls(balls: Iterable[BallKind]): Board =
+    new Board(cellStates, balls)
+
   private def withCellState(row: RowIndex,
-                              column: ColumnIndex,
-                              newState: CellState): Board =
-    new Board(cellStates.updated(vectorIndex(row, column), newState))
+                            column: ColumnIndex,
+                            newState: CellState): Board =
+    new Board(cellStates.updated(vectorIndex(row, column), newState), onDeck)
 
   private[game] def withCellHavingBall(row: RowIndex,
-                         column: ColumnIndex,
-                         ball: BallKind): Board =
+                                       column: ColumnIndex,
+                                       ball: BallKind): Board =
     withCellState(row, column, getCellStateAt(row, column).copy(ballState = Some(ball)))
 
   private[game] def withCellSelected(row: RowIndex,
@@ -67,7 +66,7 @@ private[manual] class Board(private[this] val cellStates: Vector[CellState]) {
     withNoSelection.withCellState(row, column, getCellStateAt(row, column).copy(isSelected = true))
 
   private[game] def withNoSelection: Board =
-    new Board(cellStates.map(c => c.copy(isSelected = false)))
+    new Board(cellStates.map(c => c.copy(isSelected = false)), onDeck)
 
   /*
     getting (multiple) lines of 5 given a cell (with a ball)

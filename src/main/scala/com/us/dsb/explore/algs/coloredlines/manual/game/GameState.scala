@@ -3,7 +3,8 @@ package com.us.dsb.explore.algs.coloredlines.manual.game
 import cats.syntax.option._
 import cats.syntax.either._
 import com.us.dsb.explore.algs.coloredlines.manual.game.BallKind
-import com.us.dsb.explore.algs.coloredlines.manual.game.GameState.GameResult.PlaceholderDone
+import com.us.dsb.explore.algs.coloredlines.manual.game.GameLogicSupport.MoveResult
+import com.us.dsb.explore.algs.coloredlines.manual.game.GameState.GameResult.Done
 import com.us.dsb.explore.algs.coloredlines.manual.game.{ColumnIndex, RowIndex}
 
 import scala.util.Random
@@ -15,27 +16,16 @@ private[manual] object GameState {
    */
   private[manual] sealed trait GameResult //???? change to final score (and maybe stats?)
   private[manual] object GameResult {
-    private[manual] case class PlaceholderDone(stats: Float) extends GameResult
+    private[manual] case class Done(score: Int) extends GameResult
   }
 
-  private[this] def xxselectRandomEmptyCell(rng: Random, board: Board): (RowIndex, ColumnIndex) = {
-    val row = rowIndices(rng.nextInt(BoardOrder))
-    val col = columnIndices(rng.nextInt(BoardOrder))
-    if (board.getBallStateAt(row, col).isEmpty)
-      (row, col)
-    else
-      xxselectRandomEmptyCell(rng, board) // loop: try again
-  }
-
-  private def getRandomBallKind(rng: Random): BallKind = BallKind.values(rng.nextInt(BallKind.values.size))
-
-  private[this] def xxmakeInitialState(rng: Random): GameState = {
+  private[this] def makeInitialState(rng: Random): GameState = {
     val board = GameLogicSupport.placeInitialBalls(rng, Board.empty)
-    GameState(rng, board, None)
+    GameState(rng, board, 0, None)
   }
 
-  private[game] def initial(seed: Long): GameState = xxmakeInitialState(new Random(seed))
-  private[manual] def initial: GameState = xxmakeInitialState(new Random())
+  private[game] def initial(seed: Long): GameState = makeInitialState(new Random(seed))
+  private[manual] def initial: GameState = makeInitialState(new Random())
 }
 import GameState._
 
@@ -50,6 +40,7 @@ import GameState._
  */
 private[manual] case class GameState(rng: Random,
                                      board: Board,
+                                     score: Int, //???? with Positive
                                      gameResult: Option[GameResult]
                                     ) {
 
@@ -62,23 +53,30 @@ private[manual] case class GameState(rng: Random,
                                ): Either[String, GameState] = {
     import GameLogicSupport.Action._
     val tapAction = GameLogicSupport.interpretTapLocationToTapAction(board, row, column)
-    val nextBoard =
+    println("tryMoveAt: tapAction = " + tapAction)
+    val moveResult: MoveResult =
       tapAction match {
         case SelectBall |
-             SelectEmpty => board.withCellSelected(row, column)
-        case Deselect    => board.withNoSelection
+             SelectEmpty =>
+          MoveResult(board.withCellSelected(row, column), None)
+        case Deselect    =>
+          MoveResult(board.withNoSelection, None)
         case TryMoveBall =>
-          //?????? do ... path check, ball update, on deck, etc. around here
-          println("NIY: " + tapAction); board.withNoSelection
-        case Pass        => GameLogicSupport.doPass(rng, board).withNoSelection  //??? clean board ref
+          //?????? clear selection (conditionally here); decide: check here or get bit from doMove...
+          GameLogicSupport.doTryMoveBall(rng, board, ???, ???, row, column)
+        case Pass        =>
+          val x = GameLogicSupport.doPass(rng, board)
+          assert(x.addedScore.isEmpty)
+          x.copy(newBoard = board.withNoSelection)
       }
+    val newScore = score + moveResult.addedScore.getOrElse(0)
 
     val nextState =
-      if (! nextBoard.isFull) {
-        GameState(rng, nextBoard, gameResult).asRight
+      if (! moveResult.newBoard.isFull) {
+        GameState(rng, moveResult.newBoard, newScore, gameResult).asRight
       }
       else {
-        GameState(rng, nextBoard, Some(PlaceholderDone(1.23f))).asRight
+        GameState(rng, moveResult.newBoard, newScore, Some(Done(newScore))).asRight
       }
     nextState
   }

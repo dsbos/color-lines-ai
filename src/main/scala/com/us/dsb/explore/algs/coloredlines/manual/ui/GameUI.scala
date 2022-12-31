@@ -123,7 +123,7 @@ private[manual] object GameUI {
             import GameState.GameResult._
             val resultText =
               gameResult match {
-                case result: PlaceholderDone => s"Done: $result"
+                case result: Done => s"Done: $result"
               }
             GameUIResult(resultText).asLeft
         }

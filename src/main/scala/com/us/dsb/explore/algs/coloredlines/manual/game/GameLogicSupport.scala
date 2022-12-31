@@ -113,18 +113,41 @@ object GameLogicSupport {
     newBoard.withOnDeckBalls(List.fill(3)(pickRandomBallKind(rng)))
   }
 
-  private[game] def doPass(rng: Random, board: Board): Board =
-    placeNextBalls(rng, board)
+  //????? decide where movability check is called and how/where tap state is udpated
+  case class MoveResult(newBoard: Board, addedScore: Option[Int])
 
-  private[game] def doMoveBall(rng: Random,
-                               board: Board,  //???? change to game state to carry, update score
-                               fromRow: RowIndex,
-                               fromCol: ColumnIndex, //???? combine into cell coord. pair/ID
-                               toRow: RowIndex,
-                               toCol: ColumnIndex): Board = {
-    //?????? do ... path check ... remove balls and score, or place next balls
-    println("NIY: doMoveBall")
-    board.withNoSelection
+  private[game] def doPass(rng: Random, board: Board): MoveResult =
+    MoveResult(placeNextBalls(rng, board), None)
+
+
+  private[game] def doTryMoveBall(rng: Random,
+                                  board: Board,  //???? change to game state to carry, update score
+                                  fromRow: RowIndex,
+                                  fromCol: ColumnIndex, //???? combine into cell coord. pair/ID
+                                  toRow: RowIndex,
+                                  toCol: ColumnIndex
+                                  ): MoveResult = {
+    val canMoveBall = rng.nextBoolean()
+    println("NIY: doMoveBall; doing RANDOM: canMoveBall " + canMoveBall)
+
+    canMoveBall match {
+      case false =>  // can't move--ignore (keep selection state)
+        MoveResult(board, None)
+      case true =>
+        val completesAnyLines = rng.nextBoolean()
+        println("-                              completesAnyLines " + completesAnyLines)
+        completesAnyLines match {
+          case false =>
+            //?????? place next three
+            MoveResult(placeNextBalls(rng, board), None) //???? clear selection state
+          case true =>
+            val ballCount = rng.between(5, 10)
+            println("-                              ballCount " + ballCount)
+            val moveScore = ballCount * 4 - 10
+            //?????? "harvest" lines (clear, score)
+            MoveResult(placeNextBalls(rng, board), Some(moveScore)) //???? clear selection state
+        }
+    }
   }
 
 }
