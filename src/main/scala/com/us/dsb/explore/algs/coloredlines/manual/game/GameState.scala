@@ -30,16 +30,8 @@ private[manual] object GameState {
   private def getRandomBallKind(rng: Random): BallKind = BallKind.values(rng.nextInt(BallKind.values.size))
 
   private[this] def xxmakeInitialState(rng: Random): GameState = {
-    val board1 = Board.empty
-    val board3 =
-      (1 to 5).foldLeft(board1) {
-        case (board2, _) =>
-          val (row, column) = xxselectRandomEmptyCell(rng, board2)
-          board2.withCellHavingBall(row, column, getRandomBallKind(rng))
-      }
-    //?????? add 3 on-back balls
-
-    GameState(rng, board3, None)
+    val board = GameLogicSupport.placeInitialBalls(rng, Board.empty)
+    GameState(rng, board, None)
   }
 
   private[game] def initial(seed: Long): GameState = xxmakeInitialState(new Random(seed))

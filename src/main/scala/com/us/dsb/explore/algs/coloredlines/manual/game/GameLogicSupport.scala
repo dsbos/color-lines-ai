@@ -5,6 +5,35 @@ import scala.util.Random
 
 object GameLogicSupport {
 
+  private[this] def getRandomBallKind(rng: Random): BallKind = BallKind.values(rng.nextInt(BallKind.values.size))
+
+  @tailrec
+  private[this] def pickRandomEmptyCell(rng: Random, board: Board): Option[(RowIndex, ColumnIndex)] = {
+    if (board.isFull)
+      None
+    else {
+      val row = rowIndices(rng.nextInt(BoardOrder))
+      val col = columnIndices(rng.nextInt(BoardOrder))
+      if (board.getBallStateAt(row, col).isEmpty)
+        Some((row, col))
+      else
+        pickRandomEmptyCell(rng, board) // loop: try again
+    }
+  }
+
+  private[game] def placeInitialBalls(rng: Random, board: Board): Board = {
+    val newBoard =
+      (1 to 5).foldLeft(board) { //???? parameterize
+        case (board2, _) =>
+          val (row, column) =
+            pickRandomEmptyCell(rng, board2)
+                .getOrElse(scala.sys.error("Unexpectedly full board"))
+          board2.withCellHavingBall(row, column, getRandomBallKind(rng))
+      }
+    //?????? add 3 on-deck balls
+    newBoard
+  }
+
   private[game] sealed trait Action
   private[game] object Action {
     private[game] case object SelectBall  extends Action
@@ -60,22 +89,6 @@ object GameLogicSupport {
       }
     }
     action
-  }
-
-  private[this] def getRandomBallKind(rng: Random): BallKind = BallKind.values(rng.nextInt(BallKind.values.size))
-
-  @tailrec
-  private[this] def pickRandomEmptyCell(rng: Random, board: Board): Option[(RowIndex, ColumnIndex)] = {
-    if (board.isFull)
-      None
-    else {
-      val row = rowIndices(rng.nextInt(BoardOrder))
-      val col = columnIndices(rng.nextInt(BoardOrder))
-      if (board.getBallStateAt(row, col).isEmpty)
-        Some((row, col))
-      else
-        pickRandomEmptyCell(rng, board) // loop: try again
-    }
   }
 
   private[game] def doPass(rng: Random, board: Board): Board = {
