@@ -21,17 +21,20 @@ object GameLogicSupport {
     }
   }
 
+  /**
+   * @param board
+   *   expected to be empty //???? maybe refactor something?
+   */
   private[game] def placeInitialBalls(rng: Random, board: Board): Board = {
-    val newBoard =
+    val newBoard1 =
       (1 to 5).foldLeft(board) { //???? parameterize
-        case (board2, _) =>
+        case (curBoard, _) =>  //???? refactor?
           val (row, column) =
-            pickRandomEmptyCell(rng, board2)
+            pickRandomEmptyCell(rng, curBoard)
                 .getOrElse(scala.sys.error("Unexpectedly full board"))
-          board2.withCellHavingBall(row, column, pickRandomBallKind(rng))
+          curBoard.withCellHavingBall(row, column, pickRandomBallKind(rng))
       }
-    //?????? add 3 on-deck balls
-    newBoard
+    newBoard1.withOnDeckBalls( List.fill(3)(pickRandomBallKind(rng)))
   }
 
   private[game] sealed trait Action
@@ -44,37 +47,42 @@ object GameLogicSupport {
   }
   import Action._
 
-  def interpretTapLocationToTapAction(board: Board, row: RowIndex, column: ColumnIndex): Action =
-    tapAndStateToTapAction(hasABall           = board.hasABallSelected,
+  def interpretTapLocationToTapAction(board: Board,
+                                      row: RowIndex,
+                                      column: ColumnIndex): Action =
+    tapAndStateToTapAction(onABall            = board.hasABallAt(row, column),
                            isSelectedAt       = board.isSelectedAt(row, column),
                            hasABallSelected   = board.hasABallSelected,
                            hasAnyCellSelected = board.hasAnyCellSelected)
 
-  private def tapAndStateToTapAction(hasABall: Boolean,
+  private def tapAndStateToTapAction(onABall: Boolean,
                                      isSelectedAt: Boolean,
                                      hasABallSelected: Boolean,
                                      hasAnyCellSelected: Boolean
                                     ): Action = {
-    sealed trait OnBallOrEmpty
-    case object OnBall extends OnBallOrEmpty
-    case object OnEmpty extends OnBallOrEmpty
+    object RenameOrFlattenThis { // grouped/nested re debugger clutter
+      sealed trait OnBallOrEmpty
+      case object OnBall extends OnBallOrEmpty
+      case object OnEmpty extends OnBallOrEmpty
 
-    sealed trait OnSelOrUnsel
-    case object OnSel extends OnSelOrUnsel
-    case object OnUnsel extends OnSelOrUnsel
+      sealed trait OnSelOrUnsel
+      case object OnSel extends OnSelOrUnsel
+      case object OnUnsel extends OnSelOrUnsel
 
-    sealed trait HadBallOrNot
-    case object HadBall extends HadBallOrNot
-    case object NoBall extends HadBallOrNot
+      sealed trait HadBallOrNot
+      case object HadBall extends HadBallOrNot
+      case object NoBall extends HadBallOrNot
 
-    sealed trait HadSelOrNot
-    case object HadSel extends HadSelOrNot
-    case object NoSel extends HadSelOrNot
+      sealed trait HadSelOrNot
+      case object HadSel extends HadSelOrNot
+      case object NoSel extends HadSelOrNot
+    }
+    import RenameOrFlattenThis._
 
-    val onBallOrEmpty = if (hasABall) OnBall else OnEmpty
-    val onSelOrUnsel  = if (isSelectedAt) OnSel else OnUnsel
-    val hadBallOrNot  = if (hasABallSelected) HadBall else NoBall
-    val hadSelOrNot   = if (hasAnyCellSelected) HadSel else NoSel
+    val onBallOrEmpty = if (onABall)            OnBall  else OnEmpty
+    val onSelOrUnsel  = if (isSelectedAt)       OnSel   else OnUnsel
+    val hadBallOrNot  = if (hasABallSelected)   HadBall else NoBall
+    val hadSelOrNot   = if (hasAnyCellSelected) HadSel  else NoSel
 
     val action: Action = {
       val conditions = (onBallOrEmpty, hadBallOrNot, onSelOrUnsel, hadSelOrNot)
@@ -91,20 +99,32 @@ object GameLogicSupport {
     action
   }
 
-  private[game] def doPass(rng: Random, board: Board): Board = {
-    //?????? scatter from real on-deck list, and replenish it too
-    val onDeckListPlaceholder = List.fill(3)(pickRandomBallKind(rng))
+  private[this] def placeNextBalls(rng: Random, board: Board): Board = {
     val newBoard =
-      onDeckListPlaceholder
+      board.getOnDeckBalls
         .foldLeft(board) {
-          case (board2, _) =>
-            pickRandomEmptyCell(rng, board2) match {
-              case None => board2
+          case (curBoard, _) =>
+            pickRandomEmptyCell(rng, curBoard) match {
+              case None => curBoard
               case Some((row, column)) =>
-                board2.withCellHavingBall(row, column, pickRandomBallKind(rng))
+                curBoard.withCellHavingBall(row, column, pickRandomBallKind(rng))
             }
         }
-    newBoard
+    newBoard.withOnDeckBalls(List.fill(3)(pickRandomBallKind(rng)))
+  }
+
+  private[game] def doPass(rng: Random, board: Board): Board =
+    placeNextBalls(rng, board)
+
+  private[game] def doMoveBall(rng: Random,
+                               board: Board,  //???? change to game state to carry, update score
+                               fromRow: RowIndex,
+                               fromCol: ColumnIndex, //???? combine into cell coord. pair/ID
+                               toRow: RowIndex,
+                               toCol: ColumnIndex): Board = {
+    //?????? do ... path check ... remove balls and score, or place next balls
+    println("NIY: doMoveBall")
+    board.withNoSelection
   }
 
 }
