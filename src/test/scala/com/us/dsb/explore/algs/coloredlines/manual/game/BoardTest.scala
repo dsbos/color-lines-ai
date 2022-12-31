@@ -13,7 +13,7 @@ import org.scalatest.matchers.should.Matchers._
 private[manual] class XxBoardTest extends AnyFunSpec {
 
 
-  private lazy val regularFilledBoard = {
+  private[this] lazy val regularFilledBoard = {
     var index = 0
     rowIndices.foldLeft(Board.empty) { (board, row) =>
       columnIndices.foldLeft(board){ (board, column) =>
@@ -22,7 +22,7 @@ private[manual] class XxBoardTest extends AnyFunSpec {
       }
     }
   }
-  private lazy val variedAllButFilledBoard = {
+  private[this] lazy val variedAllButFilledBoard = {
     var index = 0
     rowIndices.foldLeft(Board.empty) { (board, row) =>
       columnIndices.foldLeft(board){ (board, column) =>

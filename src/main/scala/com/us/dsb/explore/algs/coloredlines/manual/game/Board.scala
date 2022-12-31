@@ -25,10 +25,10 @@ import Board._
 /**
  * State of TTT board (just cells; not whose turn it is/etc.)
  */
-private[manual] class Board(private val cellStates: Vector[CellState]) {
+private[manual] class Board(private[this] val cellStates: Vector[CellState]) {
 
   /** Computes row-major cell-array index from row and column numbers. */
-  private def vectorIndex(row: RowIndex, column: ColumnIndex): Int =
+  private[this] def vectorIndex(row: RowIndex, column: ColumnIndex): Int =
     (row.value.value - 1) * BoardOrder + (column.value.value - 1)
 
   private[manual] def getCellStateAt(row: RowIndex, column: ColumnIndex): CellState = {
@@ -100,7 +100,7 @@ private[manual] class Board(private val cellStates: Vector[CellState]) {
     }.mkString("<", "/", ">")
   }
 
-  private def renderMultiline: String = {
+  private[this] def renderMultiline: String = {
     val cellWidth = " X ".length
     val cellSeparator = "|"
     val wholeWidth =
@@ -115,7 +115,7 @@ private[manual] class Board(private val cellStates: Vector[CellState]) {
     }.mkString(rowSeparator)     // make whole-board multi-line string
   }
 
-  private def renderCompactMultiline: String = {
+  private[this] def renderCompactMultiline: String = {
     rowIndices.map { row =>
       columnIndices.map { column =>
         getStateChar(getCellStateAt(row, column))

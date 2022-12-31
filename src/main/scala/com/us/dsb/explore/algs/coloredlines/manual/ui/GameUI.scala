@@ -18,8 +18,8 @@ private[manual] object GameUI {
   // ("extends EnumEntry" gets .entryName, enables Enum; "extends Enum[...]"
   // enables (and requires) .values.
 
-  private sealed trait UICommand
-  private object UICommand {
+  private[ui] sealed trait UICommand
+  private[ui] object UICommand {
     // (Q: Why doesn't UICommand's "sealed" obviate the following one (for
     //   exhaustive-match checks)?
     private[ui] sealed trait UIMoveCommand extends UICommand
@@ -36,7 +36,7 @@ private[manual] object GameUI {
   // parse function, but then (sub)layers wouldn't be separated.)
 
   // ?? revisit Either--use something fancier (MonadError)?
-  private def parseCommand(rawCmd: String): Either[String, UICommand] = {
+  private[this] def parseCommand(rawCmd: String): Either[String, UICommand] = {
     import UICommand._
     rawCmd match {
       case "u" => Up.asRight
@@ -51,7 +51,7 @@ private[manual] object GameUI {
   }
 
   @tailrec
-  private def getCommand(io: SegregatedTextIO): UICommand = {
+  private[this] def getCommand(io: SegregatedTextIO): UICommand = {
     val rawCmd = io.readPromptedLine(s"Command?: ")
     parseCommand(rawCmd) match {
       case Right(cmd) => cmd
@@ -61,7 +61,7 @@ private[manual] object GameUI {
     }
   }
 
-  private def moveSelection(uiState: XxGameUIState,
+  private[this] def moveSelection(uiState: XxGameUIState,
                             moveCommand: UICommand.UIMoveCommand
                            ): XxGameUIState = {
     import UICommand._
@@ -73,7 +73,7 @@ private[manual] object GameUI {
     }
   }
 
-  private def moveAtSelection(io: SegregatedTextIO,
+  private[this] def moveAtSelection(io: SegregatedTextIO,
                               uiState: XxGameUIState
                              ): XxGameUIState = {
     //???????
@@ -90,7 +90,7 @@ private[manual] object GameUI {
     }
   }
 
-  private def doQuit: XxGameUIResult = {
+  private[this] def doQuit: XxGameUIResult = {
     XxGameUIResult("Game was quit")
   }
 
@@ -98,7 +98,7 @@ private[manual] object GameUI {
    *
    * @return next state (`Right`) or disposition of game (`Left`)
    */
-  private def doCommand(io: SegregatedTextIO,
+  private[this] def doCommand(io: SegregatedTextIO,
                         uiState: XxGameUIState,
                         command: UICommand
                        ): Either[XxGameUIResult, XxGameUIState] = {
@@ -138,7 +138,7 @@ private[manual] object GameUI {
    * game over or quit.
    */
   @tailrec
-  private def getAndDoUiCommands(io: SegregatedTextIO,
+  private[this] def getAndDoUiCommands(io: SegregatedTextIO,
                                  uiState: XxGameUIState
                                 ): XxGameUIResult = {
     io.printStateText("")

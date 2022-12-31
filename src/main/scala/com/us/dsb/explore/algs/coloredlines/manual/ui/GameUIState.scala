@@ -4,12 +4,12 @@ import com.us.dsb.explore.algs.coloredlines.manual.game._
 import com.us.dsb.explore.algs.coloredlines.manual.game.{ColumnIndex, Index, RowIndex}
 
 // ?? somewhere expand to allow for history (maybe via Semigroup or whatever has .compose?)
-private case class XxGameUIState(gameState: XxGameState,
-                               selectedRow: RowIndex,
-                               selectedColumn: ColumnIndex) {
+private[this] case class XxGameUIState(gameState: XxGameState,
+                                     selectedRow: RowIndex,
+                                     selectedColumn: ColumnIndex) {
 
   // ?? clean up that floorMod; I just want plain mathematical mod:
-  private def adjustAndWrapToRange(unincremented: Index, delta: Int): Index = {
+  private[this] def adjustAndWrapToRange(unincremented: Index, delta: Int): Index = {
     // ?? maybe enable auto-wrapping and -unwrapping around math
     val indexOrigin = Index.MinValue.value
     val rangeSize = Index.MaxValue.value - Index.MinValue.value + 1
@@ -31,7 +31,7 @@ private case class XxGameUIState(gameState: XxGameState,
   private[ui] def withColumnAdjustedBy(delta: Int): XxGameUIState =
     copy(selectedColumn = ColumnIndex(adjustAndWrapToRange(selectedColumn.value, delta)))
 
-  private def renderTableMultilineWithSelection: String = {
+  private[this] def renderTableMultilineWithSelection: String = {
     val cellWidth = " X ".length
     val cellSeparator = "|"
     // ?? use new Order or leave using indices declarations?

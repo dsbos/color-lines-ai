@@ -1,12 +1,12 @@
 package com.us.dsb.explore.algs.coloredlines
 
-private object XxComputeLineRows extends App {
+private[this] object XxComputeLineRows extends App {
 
   //  trait XxCellPosition
-  private case class CellCoordinates(rowOrdinal: Int,
-                             columnOrdinal: Int) //??????extends CellPosition;
+  private[this] case class CellCoordinates(rowOrdinal: Int,
+                                           columnOrdinal: Int) //??????extends CellPosition;
 
-  private val nameThis = {
+  private[this] val nameThis = {
     import scala.collection.{SortedSet, mutable}
     implicit def orderingForCellCoordinates[A <: CellCoordinates]: Ordering[A] =
       Ordering.by(cc => (cc.rowOrdinal, cc.columnOrdinal))

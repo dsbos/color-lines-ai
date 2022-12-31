@@ -3,10 +3,10 @@ package com.us.dsb.explore.algs.coloredlines
 //import scala.tools.nsc.doc.html.HtmlTags.Input
 
 
-private object XxxTicTacToeSomething extends App {
+private[this] object XxxTicTacToeSomething extends App {
 
 
-  private trait XxNeuralStructure
+  private[this] trait XxNeuralStructure
   // - defines structure:
   //   - number and IDs/labels of input and output neurons
   //   - number of hidden-layer neurons
@@ -31,31 +31,31 @@ private object XxxTicTacToeSomething extends App {
   def sigmoid(x: Double): Double = 1 / (1 + math.exp(-x))
 
 
-  private case class XxActivation(v: Double = 0.5f) extends AnyVal
-  private case class XxWeight(v: Double) extends AnyVal
-  private case class XxBias(v: Double) extends AnyVal
+  private[this] case class XxActivation(v: Double = 0.5f) extends AnyVal
+  private[this] case class XxWeight(v: Double) extends AnyVal
+  private[this] case class XxBias(v: Double) extends AnyVal
 
   type XxNeuronRef = Int
-  private case class XxEdge1(weight: XxWeight, sourceRef: XxNeuronRef)
-  private case class XxNeuron(bias1: XxWeight, edges: Vector[XxEdge1])
+  private[this] case class XxEdge1(weight: XxWeight, sourceRef: XxNeuronRef)
+  private[this] case class XxNeuron(bias1: XxWeight, edges: Vector[XxEdge1])
 
-  private trait XxNeuron2 {
+  private[this] trait XxNeuron2 {
     def getActivation: XxActivation
   }
-  private trait XxInputNeuron2 extends XxNeuron2 {
+  private[this] trait XxInputNeuron2 extends XxNeuron2 {
     def setActivation(activation: XxActivation): Unit
   }
-  private trait XxNoninputNeuron2 extends XxNeuron2 {
+  private[this] trait XxNoninputNeuron2 extends XxNeuron2 {
     def getBias: XxBias
     def getInputEdges: Seq[XxEdge2]
   }
-  private trait XxEdge2 {
+  private[this] trait XxEdge2 {
     def getSource: XxNeuron2
     def getWeight: XxWeight
     def getWeightedActivation: Double  //????
   }
 
-  private class XxInputNeuron2Impl() extends XxInputNeuron2 {
+  private[this] class XxInputNeuron2Impl() extends XxInputNeuron2 {
     var activation: XxActivation = _
     override def setActivation(activation: XxActivation): Unit = {
       this.activation = activation
@@ -63,7 +63,7 @@ private object XxxTicTacToeSomething extends App {
     override def getActivation: XxActivation = activation
   }
 
-  private class XxEdge2Impl(source: XxNeuron2, weight: XxWeight) extends XxEdge2 {
+  private[this] class XxEdge2Impl(source: XxNeuron2, weight: XxWeight) extends XxEdge2 {
     override def getSource: XxNeuron2 = source
     override def getWeight: XxWeight = weight
     override def getWeightedActivation: Double = {
@@ -71,7 +71,7 @@ private object XxxTicTacToeSomething extends App {
     }
   }
 
-  private class XxNoninputNeuron2Impl(bias: XxBias, inputEdges: Seq[XxEdge2]) extends XxNoninputNeuron2 {
+  private[this] class XxNoninputNeuron2Impl(bias: XxBias, inputEdges: Seq[XxEdge2]) extends XxNoninputNeuron2 {
     override def getBias: XxBias = bias
 
     override def getInputEdges: Seq[XxEdge2] = inputEdges
@@ -88,12 +88,12 @@ private object XxxTicTacToeSomething extends App {
     }
   }
 
-  private val in1 = new XxInputNeuron2Impl()
-  private val in2 = new XxInputNeuron2Impl()
+  private[this] val in1 = new XxInputNeuron2Impl()
+  private[this] val in2 = new XxInputNeuron2Impl()
 
-  private val e1 = new XxEdge2Impl(in1, XxWeight(1))
-  private val e2 = new XxEdge2Impl(in2, XxWeight(-1))
-  private val xn1 = new XxNoninputNeuron2Impl(XxBias(0), Vector(e1, e2))
+  private[this] val e1 = new XxEdge2Impl(in1, XxWeight(1))
+  private[this] val e2 = new XxEdge2Impl(in2, XxWeight(-1))
+  private[this] val xn1 = new XxNoninputNeuron2Impl(XxBias(0), Vector(e1, e2))
 
   in1.setActivation(XxActivation(0.2))
   in2.setActivation(XxActivation(0.1))
@@ -103,7 +103,7 @@ private object XxxTicTacToeSomething extends App {
   println(s"xn1.getActivation = ${xn1.getActivation}")
   println("---")
 
-  private val lines = Vector(
+  private[this] val lines = Vector(
     ( (1, 1), (1, 2), (1, 3) ),
     ( (2, 1), (2, 2), (2, 3) ),
     ( (3, 1), (3, 2), (3, 3) ),
@@ -118,8 +118,8 @@ private object XxxTicTacToeSomething extends App {
 
   //  trait XxCellPosition
 
-  private case class XxCellCoordinates(rowOrdinal: Int,
-                             columnOrdinal: Int) //??????extends CellPosition;
+  private[this] case class XxCellCoordinates(rowOrdinal: Int,
+                                           columnOrdinal: Int) //??????extends CellPosition;
 
 
 

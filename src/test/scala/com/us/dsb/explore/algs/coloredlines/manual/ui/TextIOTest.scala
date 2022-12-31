@@ -16,8 +16,8 @@ private[manual] class XxTextIOTest extends AnyFunSpec {
 
   // Crude, manual stub and spy ConsoleIO.
   class ConsoleIODouble(inputLines: String*) extends ConsoleIO {
-    private var stringsToRead = inputLines
-    private var printedStringsReversed: List[String] = Nil;
+    private[this] var stringsToRead = inputLines
+    private[this] var printedStringsReversed: List[String] = Nil;
     def getPrintedStrings: List[String] = printedStringsReversed.reverse
 
     override def println(lineOrLines: String): Unit = {

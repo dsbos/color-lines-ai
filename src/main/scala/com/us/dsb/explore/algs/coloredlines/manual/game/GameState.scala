@@ -19,7 +19,7 @@ private[manual] object XxGameState {
     private[manual] case class XxxPlaceholderDone(stats: Float) extends XxxGameResult
   }
 
-  private def xxselectRandomEmptyCell(rng: Random, board: Board): (RowIndex, ColumnIndex) = {
+  private[this] def xxselectRandomEmptyCell(rng: Random, board: Board): (RowIndex, ColumnIndex) = {
     val row = rowIndices(rng.nextInt(BoardOrder))
     val col = columnIndices(rng.nextInt(BoardOrder))
     if (board.getBallStateAt(row, col).isEmpty)
@@ -30,7 +30,7 @@ private[manual] object XxGameState {
 
   private def getRandomBallKind(rng: Random): BallKind = BallKind.values(rng.nextInt(BallKind.values.size))
 
-  private def xxmakeInitialState(rng: Random): XxGameState = {
+  private[this] def xxmakeInitialState(rng: Random): XxGameState = {
 
     val board1 = Board.empty
 
@@ -47,7 +47,7 @@ private[manual] object XxGameState {
     XxGameState(rng, board3, None)
   }
 
-  private def xxinitial(seed: Long): XxGameState = xxmakeInitialState(new Random(seed))
+  private[this] def xxinitial(seed: Long): XxGameState = xxmakeInitialState(new Random(seed))
   private[manual] def xxinitial: XxGameState = xxmakeInitialState(new Random())
 }
 import XxGameState._
@@ -67,7 +67,7 @@ private[manual] case class XxGameState(rng: Random,
                                        gameResult: Option[XxxGameResult]
                                       ) {
 
-  private def xxpickRandomEmptyCell(): Option[(RowIndex, ColumnIndex)] = {
+  private[this] def xxpickRandomEmptyCell(): Option[(RowIndex, ColumnIndex)] = {
     if (board.isFull)
       None
     else {
@@ -80,7 +80,7 @@ private[manual] case class XxGameState(rng: Random,
     }
   }
 
-  private def xxdoPass(): Board = {
+  private[this] def xxdoPass(): Board = {
     // ???? scatter 3 on-deck balls around board (unless no more room)
     val onDeckListPlaceholder = List.fill(3)(getRandomBallKind(rng))
     val newBoard =
