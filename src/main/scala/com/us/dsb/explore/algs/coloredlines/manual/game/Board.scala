@@ -13,19 +13,14 @@ private[manual] object Board {
 
 
   /** Empty or ball of some color, plus marked or not for physical move. */
-  /*private*/ case class CellState(ballState: Option[BallKind],
-                                   isSelected: Boolean)
+  case class CellState(ballState: Option[BallKind],
+                  isSelected: Boolean)
   private object CellState {
     val empty: CellState = CellState(None, false)
   }
 
-  private case class Cell(state: CellState)  //???? coalesce Cell and CellState
-  private object Cell {
-    val empty: Cell = Cell(CellState.empty)
-  }
-
   private[game] def empty: Board =
-    new Board(Vector.fill[Cell](BoardOrder * BoardOrder)(Cell.empty))
+    new Board(Vector.fill[CellState](BoardOrder * BoardOrder)(CellState.empty))
 }
 
 import Board._
@@ -33,55 +28,52 @@ import Board._
 /**
  * State of TTT board (just cells; not whose turn it is/etc.)
  */
-private[game] class Board(private val cellStates: Vector[Cell]) {
+private[game] class Board(private val cellStates: Vector[CellState]) {
 
 
   /** Computes row-major cell-array index from row and column numbers. */
   private def vectorIndex(row: RowIndex, column: ColumnIndex): Int =
     (row.value.value - 1) * BoardOrder + (column.value.value - 1)
 
-  def getStateAt(row: RowIndex, column: ColumnIndex): CellState = {
-    cellStates(vectorIndex(row, column)).state
+  def getCellStateAt(row: RowIndex, column: ColumnIndex): CellState = {
+    cellStates(vectorIndex(row, column))
   }
 
-  def isFull: Boolean = ! cellStates.exists(_.state.ballState.isEmpty)
+  def isFull: Boolean = ! cellStates.exists(_.ballState.isEmpty)
 
   def getBallStateAt(row: RowIndex, column: ColumnIndex): Option[BallKind] = {
-    cellStates(vectorIndex(row, column)).state.ballState
+    cellStates(vectorIndex(row, column)).ballState
   }
   def hasABallAt(row: RowIndex, column: ColumnIndex): Boolean = {
-    cellStates(vectorIndex(row, column)).state.ballState.isDefined
+    cellStates(vectorIndex(row, column)).ballState.isDefined
   }
   def isSelectedAt(row: RowIndex, column: ColumnIndex): Boolean = {
-    cellStates(vectorIndex(row, column)).state.isSelected
+    cellStates(vectorIndex(row, column)).isSelected
   }
   def hasABallSelected: Boolean =
-    cellStates.find(_.state.isSelected).exists(_.state.ballState.isDefined)
+    cellStates.find(_.isSelected).exists(_.ballState.isDefined)
 
-  def hasAnyCellSelected: Boolean = cellStates.exists(_.state.isSelected)
+  def hasAnyCellSelected: Boolean = cellStates.exists(_.isSelected)
 
 
 
   // (Maybe less private in future.)
-  private def withCellState(row: RowIndex,
-                            column: ColumnIndex,
-                            cellState: CellState): Board =
-    new Board(cellStates.updated(vectorIndex(row, column), Cell(cellState)))
+  private def zzwithCellState(row: RowIndex,
+                              column: ColumnIndex,
+                              newState: CellState): Board =
+    new Board(cellStates.updated(vectorIndex(row, column), newState))
 
   def withCellHavingBall(row: RowIndex,
-                          column: ColumnIndex,
-                          ball: BallKind): Board =
-    withCellState(row, column, getStateAt(row, column).copy(ballState = Some(ball)))
+                         column: ColumnIndex,
+                         ball: BallKind): Board =
+    zzwithCellState(row, column, getCellStateAt(row, column).copy(ballState = Some(ball)))
 
-  def withCellSelected(row: RowIndex, column: ColumnIndex): Board =
-    withNoSelection.withCellState(row, column, getStateAt(row, column).copy(isSelected = true))
+  def withCellSelected(row: RowIndex,
+                       column: ColumnIndex): Board =
+    withNoSelection.zzwithCellState(row, column, getCellStateAt(row, column).copy(isSelected = true))
 
   def withNoSelection: Board =
-    new Board(cellStates.map(c => c.copy(state = c.state.copy(isSelected = false))))
-
-
-
-
+    new Board(cellStates.map(c => c.copy(isSelected = false)))
 
   // ?? Q: How to use Tuple3 in data and then convert to or use as 3-element
   //   List and call .forall?
@@ -129,7 +121,7 @@ private[game] class Board(private val cellStates: Vector[Cell]) {
         - remove balls from cells (watch overlap)
    */
 
-  def xxgetStateChar(state: CellState): String = {  //???? move out
+  def getStateChar(state: CellState): String = {  //???? move out
     state.ballState match {
       case Some(ball) => ball.getColoredCharSeq(state.isSelected)
       case None => if (! state.isSelected) "-" else "@"
@@ -140,12 +132,12 @@ private[game] class Board(private val cellStates: Vector[Cell]) {
   override def toString: String = {
     rowIndices.map { row =>
       columnIndices.map { column =>
-        xxgetStateChar(getStateAt(row, column))
+        getStateChar(getCellStateAt(row, column))
       }.mkString("")
     }.mkString("<", "/", ">")
   }
 
-  def xxrenderMultiline: String = {
+  def renderMultiline: String = {
     val cellWidth = " X ".length
     val cellSeparator = "|"
     val wholeWidth =
@@ -155,15 +147,15 @@ private[game] class Board(private val cellStates: Vector[Cell]) {
 
     rowIndices.map { row =>
       columnIndices.map { column =>
-          "" + xxgetStateChar(getStateAt(row, column)) + " "
+          "" + getStateChar(getCellStateAt(row, column)) + " "
       }.mkString(cellSeparator)  // make each row line
     }.mkString(rowSeparator)     // make whole-board multi-line string
   }
 
-  def xxrenderCompactMultiline: String = {
+  def renderCompactMultiline: String = {
     rowIndices.map { row =>
       columnIndices.map { column =>
-        xxgetStateChar(getStateAt(row, column))
+        getStateChar(getCellStateAt(row, column))
       }.mkString("|")  // make each row line
     }.mkString("\n")
   }

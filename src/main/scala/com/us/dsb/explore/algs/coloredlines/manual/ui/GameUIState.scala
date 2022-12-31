@@ -43,7 +43,7 @@ private case class XxGameUIState(gameState: XxGameState,
     rowIndices.map { row =>
       columnIndices.map { column =>
         val cellStateStr =
-          gameState.board.xxgetStateChar(gameState.board.getStateAt(row, column))
+          gameState.board.getStateChar(gameState.board.getCellStateAt(row, column))
         if (row == selectedRow && column == selectedColumn ) {
           "*" + cellStateStr + "*"
         }
