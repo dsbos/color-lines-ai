@@ -2,7 +2,7 @@ package com.us.dsb.explore.algs.coloredlines.manual.ui
 
 import cats.syntax.option._
 import cats.syntax.either._
-import com.us.dsb.explore.algs.coloredlines.manual.game.{ColumnIndex, XxGameState, Index, RowIndex}
+import com.us.dsb.explore.algs.coloredlines.manual.game.{ColumnIndex, GameState, Index, RowIndex}
 import enumeratum.{Enum, EnumEntry}
 
 import scala.annotation.tailrec
@@ -12,7 +12,7 @@ import scala.util.chaining.scalaUtilChainingOps
 private[manual] object GameUI {
 
   // ?? enhance; maybe just put clean strings in; maybe build on GameResult (plus quit case)
-  private[ui] case class XxGameUIResult(text: String)
+  private[ui] case class GameUIResult(text: String)
 
 
   // ("extends EnumEntry" gets .entryName, enables Enum; "extends Enum[...]"
@@ -27,7 +27,7 @@ private[manual] object GameUI {
     private[ui] case object Down  extends UIMoveCommand
     private[ui] case object Left  extends UIMoveCommand
     private[ui] case object Right extends UIMoveCommand
-    private[ui] case object XxMove  extends UICommand  // tap to select if ..., tap to move if ...
+    private[ui] case object Move  extends UICommand  // tap to select if ..., tap to move if ...
     private[ui] case object Quit  extends UICommand
   }
   // ?? Decide "UICommand._" re little scala.Right ~clashes.
@@ -43,7 +43,7 @@ private[manual] object GameUI {
       case "d" => Down.asRight
       case "l" => Left.asRight
       case "r" => Right.asRight
-      case "m" => XxMove.asRight
+      case "m" => Move.asRight
       case "q" => Quit.asRight
       case _ =>
         s"Invalid input \"$rawCmd\"; try u(p), d(own), l(eft), r(right), m(ove), or q(uit)".asLeft
@@ -61,9 +61,9 @@ private[manual] object GameUI {
     }
   }
 
-  private[this] def moveSelection(uiState: XxGameUIState,
-                            moveCommand: UICommand.UIMoveCommand
-                           ): XxGameUIState = {
+  private[this] def moveSelection(uiState: GameUIState,
+                                  moveCommand: UICommand.UIMoveCommand
+                                 ): GameUIState = {
     import UICommand._
     moveCommand match {
       case Up    => uiState.withRowAdjustedBy(-1)
@@ -74,10 +74,10 @@ private[manual] object GameUI {
   }
 
   private[this] def moveAtSelection(io: SegregatedTextIO,
-                              uiState: XxGameUIState
-                             ): XxGameUIState = {
+                                    uiState: GameUIState
+                                   ): GameUIState = {
     //???????
-    val moveResult = uiState.gameState.xxtryMoveAt(uiState.selectedRow,
+    val moveResult = uiState.gameState.tryMoveAt(uiState.selectedRow,
                                                  uiState.selectedColumn)
     moveResult match {
       case Right(newGameState) =>
@@ -90,8 +90,8 @@ private[manual] object GameUI {
     }
   }
 
-  private[this] def doQuit: XxGameUIResult = {
-    XxGameUIResult("Game was quit")
+  private[this] def doQuit: GameUIResult = {
+    GameUIResult("Game was quit")
   }
 
   /**
@@ -99,16 +99,16 @@ private[manual] object GameUI {
    * @return next state (`Right`) or disposition of game (`Left`)
    */
   private[this] def doCommand(io: SegregatedTextIO,
-                        uiState: XxGameUIState,
-                        command: UICommand
-                       ): Either[XxGameUIResult, XxGameUIState] = {
+                              uiState: GameUIState,
+                              command: UICommand
+                             ): Either[GameUIResult, GameUIState] = {
     import UICommand._
     command match {
       case Quit =>
         doQuit.asLeft
       case move: UIMoveCommand => // any move-selection command
         moveSelection(uiState, move).asRight
-      case XxMove =>
+      case Move =>
         // Xx?? should following win/draw logic be 1) in moveAtSelection (with
         //   other Move impl. logic), 2) in here, or 3) out in separate method
         //   first calling moveAtSelection? (what level is moveAtSelection for:
@@ -120,12 +120,12 @@ private[manual] object GameUI {
           case None => // game not done yet (after valid _or_ invalid mark try)
             newState.asRight
           case Some(gameResult) =>
-            import XxGameState.XxGameResult._
+            import GameState.GameResult._
             val resultText =
               gameResult match {
-                case result: XxxPlaceholderDone => s"Done: $result"
+                case result: PlaceholderDone => s"Done: $result"
               }
-            XxGameUIResult(resultText).asLeft
+            GameUIResult(resultText).asLeft
         }
     }
   }
@@ -139,8 +139,8 @@ private[manual] object GameUI {
    */
   @tailrec
   private[this] def getAndDoUiCommands(io: SegregatedTextIO,
-                                 uiState: XxGameUIState
-                                ): XxGameUIResult = {
+                                       uiState: GameUIState
+                                      ): GameUIResult = {
     io.printStateText("")
     io.printStateText(uiState.toDisplayString)
     val command = getCommand(io)
@@ -161,9 +161,9 @@ private[manual] object GameUI {
   // - 1:  driving from outside to normal insides--do more: checking SegregatedTextIO output
   // - 2:  driving from outside to special GameState (inject; test double; spy/reporter/?)
 
-  def runGame(io: SegregatedTextIO): XxGameUIResult = {
+  def runGame(io: SegregatedTextIO): GameUIResult = {
     val initialState =
-      XxGameUIState(XxGameState.xxinitial, RowIndex(Index(1)), ColumnIndex(Index(1)))
+      GameUIState(GameState.initial, RowIndex(Index(1)), ColumnIndex(Index(1)))
     //?????? do initial 5 and first 5 on deck by here, maybe in XxGameState.Xxxinitial
 
     getAndDoUiCommands(io, initialState)

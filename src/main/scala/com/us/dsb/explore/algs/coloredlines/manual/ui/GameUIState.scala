@@ -4,7 +4,7 @@ import com.us.dsb.explore.algs.coloredlines.manual.game._
 import com.us.dsb.explore.algs.coloredlines.manual.game.{ColumnIndex, Index, RowIndex}
 
 // ?? somewhere expand to allow for history (maybe via Semigroup or whatever has .compose?)
-private[this] case class XxGameUIState(gameState: XxGameState,
+private[this] case class GameUIState(gameState: GameState,
                                      selectedRow: RowIndex,
                                      selectedColumn: ColumnIndex) {
 
@@ -25,10 +25,10 @@ private[this] case class XxGameUIState(gameState: XxGameState,
   //   our cursor-based row/column specification; what would GUI use, just
   //   9 table-level IDs tied to GUI cells/buttons?);
 
-  private[ui] def withRowAdjustedBy(delta: Int): XxGameUIState =
+  private[ui] def withRowAdjustedBy(delta: Int): GameUIState =
     copy(selectedRow = RowIndex(adjustAndWrapToRange(selectedRow.value, delta)))
 
-  private[ui] def withColumnAdjustedBy(delta: Int): XxGameUIState =
+  private[ui] def withColumnAdjustedBy(delta: Int): GameUIState =
     copy(selectedColumn = ColumnIndex(adjustAndWrapToRange(selectedColumn.value, delta)))
 
   private[this] def renderTableMultilineWithSelection: String = {

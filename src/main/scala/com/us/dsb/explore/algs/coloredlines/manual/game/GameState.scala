@@ -3,20 +3,20 @@ package com.us.dsb.explore.algs.coloredlines.manual.game
 import cats.syntax.option._
 import cats.syntax.either._
 import com.us.dsb.explore.algs.coloredlines.manual.game.BallKind
-import com.us.dsb.explore.algs.coloredlines.manual.game.XxGameState.XxGameResult.XxxPlaceholderDone
+import com.us.dsb.explore.algs.coloredlines.manual.game.GameState.GameResult.PlaceholderDone
 import com.us.dsb.explore.algs.coloredlines.manual.game.{ColumnIndex, RowIndex}
 
 import scala.util.Random
 
 
-private[manual] object XxGameState {
+private[manual] object GameState {
 
   /**
    * Result of completed game.
    */
-  private[manual] sealed trait XxxGameResult //???? change to final score (and maybe stats?)
-  private[manual] object XxGameResult {
-    private[manual] case class XxxPlaceholderDone(stats: Float) extends XxxGameResult
+  private[manual] sealed trait GameResult //???? change to final score (and maybe stats?)
+  private[manual] object GameResult {
+    private[manual] case class PlaceholderDone(stats: Float) extends GameResult
   }
 
   private[this] def xxselectRandomEmptyCell(rng: Random, board: Board): (RowIndex, ColumnIndex) = {
@@ -30,7 +30,7 @@ private[manual] object XxGameState {
 
   private def getRandomBallKind(rng: Random): BallKind = BallKind.values(rng.nextInt(BallKind.values.size))
 
-  private[this] def xxmakeInitialState(rng: Random): XxGameState = {
+  private[this] def xxmakeInitialState(rng: Random): GameState = {
 
     val board1 = Board.empty
 
@@ -41,16 +41,16 @@ private[manual] object XxGameState {
           board2.withCellHavingBall(row, column, getRandomBallKind(rng))
       }
 
-    //??? add 3 on-back balls
+    //?????? add 3 on-back balls
 
 
-    XxGameState(rng, board3, None)
+    GameState(rng, board3, None)
   }
 
-  private[this] def xxinitial(seed: Long): XxGameState = xxmakeInitialState(new Random(seed))
-  private[manual] def xxinitial: XxGameState = xxmakeInitialState(new Random())
+  private[game] def initial(seed: Long): GameState = xxmakeInitialState(new Random(seed))
+  private[manual] def initial: GameState = xxmakeInitialState(new Random())
 }
-import XxGameState._
+import GameState._
 
 /**
  * TTT game state _and_ controller--should functions be separated or together?
@@ -62,10 +62,10 @@ import XxGameState._
 
 /** Game state AND currently controller.
  */
-private[manual] case class XxGameState(rng: Random,
-                                       board: Board,
-                                       gameResult: Option[XxxGameResult]
-                                      ) {
+private[manual] case class GameState(rng: Random,
+                                     board: Board,
+                                     gameResult: Option[GameResult]
+                                    ) {
 
   private[this] def xxpickRandomEmptyCell(): Option[(RowIndex, ColumnIndex)] = {
     if (board.isFull)
@@ -80,8 +80,8 @@ private[manual] case class XxGameState(rng: Random,
     }
   }
 
-  private[this] def xxdoPass(): Board = {
-    // ???? scatter 3 on-deck balls around board (unless no more room)
+  private[this] def doPass(): Board = {
+    //?????? scatter from real on-deck list, and replenish it too
     val onDeckListPlaceholder = List.fill(3)(getRandomBallKind(rng))
     val newBoard =
       onDeckListPlaceholder
@@ -96,22 +96,20 @@ private[manual] case class XxGameState(rng: Random,
     newBoard
   }
 
-
   // ?? later refine from Either[String, ...] to "fancier" error type
   // Xx?? maybe add result of move (win/draw/other) with new state (so caller
   //  doesn't have to check state's gameResult; also, think about where I'd add
   //  game history
-
-  private[manual] def xxtryMoveAt(row: RowIndex,
-                column: ColumnIndex
-               ): Either[String, XxGameState] = {
+  private[manual] def tryMoveAt(row: RowIndex,
+                                column: ColumnIndex
+                               ): Either[String, GameState] = {
     sealed trait Action
     object Action {
-      private[XxGameState] case object SelectBall  extends Action
-      private[XxGameState] case object SelectEmpty extends Action
-      private[XxGameState] case object Deselect    extends Action
-      private[XxGameState] case object TryMoveBall extends Action
-      private[XxGameState] case object Pass        extends Action
+      private[GameState] case object SelectBall  extends Action
+      private[GameState] case object SelectEmpty extends Action
+      private[GameState] case object Deselect    extends Action
+      private[GameState] case object TryMoveBall extends Action
+      private[GameState] case object Pass        extends Action
     }
     import Action._
 
@@ -155,16 +153,16 @@ private[manual] case class XxGameState(rng: Random,
         case TryMoveBall =>
           //?????? do ... path check, ball update, on deck, etc. around here
           println("NIY: " + action); board.withNoSelection
-        case Pass        => xxdoPass().withNoSelection  //??? clean board ref
+        case Pass        => doPass().withNoSelection  //??? clean board ref
 
       }
 
     val nextState =
       if (! nextBoard.isFull) {
-        XxGameState(rng, nextBoard, gameResult).asRight
+        GameState(rng, nextBoard, gameResult).asRight
       }
       else {
-        XxGameState(rng, nextBoard, Some(XxxPlaceholderDone(1.23f))).asRight
+        GameState(rng, nextBoard, Some(PlaceholderDone(1.23f))).asRight
       }
     nextState
   }

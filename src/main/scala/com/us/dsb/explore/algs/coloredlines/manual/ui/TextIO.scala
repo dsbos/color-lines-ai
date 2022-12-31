@@ -1,6 +1,6 @@
 package com.us.dsb.explore.algs.coloredlines.manual.ui
 
-import com.us.dsb.explore.algs.coloredlines.manual.ui.GameUI.XxGameUIResult
+import com.us.dsb.explore.algs.coloredlines.manual.ui.GameUI.GameUIResult
 
 // Doing ConsoleIO as separate layer to have more simple layers for exploring
 // testing, ZIO, etc.
@@ -22,7 +22,7 @@ private[ui] trait SegregatedTextIO {
   private[ui] def printError(fullLine: String): Unit
   // ?? first, second, or both?:
   private[ui] def printResult(lineOrLines: String): Unit
-  private[ui] def printResult(result: XxGameUIResult): Unit = printResult(result.text)
+  private[ui] def printResult(result: GameUIResult): Unit = printResult(result.text)
 }
 
 private[ui] class BaseConsoleTextIO(cio: ConsoleIO) extends SegregatedTextIO {
@@ -33,7 +33,7 @@ private[ui] class BaseConsoleTextIO(cio: ConsoleIO) extends SegregatedTextIO {
 }
 
 private[this] class PlainConsoleTextIO(cio: ConsoleIO) extends BaseConsoleTextIO(cio)
-private[this] object XxLivePlainConsoleTextIO extends PlainConsoleTextIO(LiveConsoleIO)
+private[this] object LivePlainConsoleTextIO extends PlainConsoleTextIO(LiveConsoleIO)
 // (Expect to have test version in tests.)
 
 private[manual] class ColoredConsoleTextIO(cio: ConsoleIO) extends BaseConsoleTextIO(cio) {

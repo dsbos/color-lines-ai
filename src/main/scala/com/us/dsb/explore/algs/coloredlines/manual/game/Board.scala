@@ -52,7 +52,7 @@ private[manual] class Board(private[this] val cellStates: Vector[CellState]) {
   private[game] def hasAnyCellSelected: Boolean = cellStates.exists(_.isSelected)
 
   // (Maybe less private in future.)
-  private def zzwithCellState(row: RowIndex,
+  private def withCellState(row: RowIndex,
                               column: ColumnIndex,
                               newState: CellState): Board =
     new Board(cellStates.updated(vectorIndex(row, column), newState))
@@ -60,11 +60,11 @@ private[manual] class Board(private[this] val cellStates: Vector[CellState]) {
   private[game] def withCellHavingBall(row: RowIndex,
                          column: ColumnIndex,
                          ball: BallKind): Board =
-    zzwithCellState(row, column, getCellStateAt(row, column).copy(ballState = Some(ball)))
+    withCellState(row, column, getCellStateAt(row, column).copy(ballState = Some(ball)))
 
   private[game] def withCellSelected(row: RowIndex,
                        column: ColumnIndex): Board =
-    withNoSelection.zzwithCellState(row, column, getCellStateAt(row, column).copy(isSelected = true))
+    withNoSelection.withCellState(row, column, getCellStateAt(row, column).copy(isSelected = true))
 
   private[game] def withNoSelection: Board =
     new Board(cellStates.map(c => c.copy(isSelected = false)))
