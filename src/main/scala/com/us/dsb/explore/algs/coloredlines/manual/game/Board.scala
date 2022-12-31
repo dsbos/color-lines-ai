@@ -31,25 +31,25 @@ private[manual] class Board(private val cellStates: Vector[CellState]) {
   private def vectorIndex(row: RowIndex, column: ColumnIndex): Int =
     (row.value.value - 1) * BoardOrder + (column.value.value - 1)
 
-  def getCellStateAt(row: RowIndex, column: ColumnIndex): CellState = {
+  private[manual] def getCellStateAt(row: RowIndex, column: ColumnIndex): CellState = {
     cellStates(vectorIndex(row, column))
   }
 
-  def isFull: Boolean = ! cellStates.exists(_.ballState.isEmpty)
+  private[game] def isFull: Boolean = ! cellStates.exists(_.ballState.isEmpty)
 
-  def getBallStateAt(row: RowIndex, column: ColumnIndex): Option[BallKind] = {
+  private[game] def getBallStateAt(row: RowIndex, column: ColumnIndex): Option[BallKind] = {
     cellStates(vectorIndex(row, column)).ballState
   }
-  def hasABallAt(row: RowIndex, column: ColumnIndex): Boolean = {
+  private[game] def hasABallAt(row: RowIndex, column: ColumnIndex): Boolean = {
     cellStates(vectorIndex(row, column)).ballState.isDefined
   }
-  def isSelectedAt(row: RowIndex, column: ColumnIndex): Boolean = {
+  private[game] def isSelectedAt(row: RowIndex, column: ColumnIndex): Boolean = {
     cellStates(vectorIndex(row, column)).isSelected
   }
-  def hasABallSelected: Boolean =
+  private[game] def hasABallSelected: Boolean =
     cellStates.find(_.isSelected).exists(_.ballState.isDefined)
 
-  def hasAnyCellSelected: Boolean = cellStates.exists(_.isSelected)
+  private[game] def hasAnyCellSelected: Boolean = cellStates.exists(_.isSelected)
 
   // (Maybe less private in future.)
   private def zzwithCellState(row: RowIndex,
@@ -57,16 +57,16 @@ private[manual] class Board(private val cellStates: Vector[CellState]) {
                               newState: CellState): Board =
     new Board(cellStates.updated(vectorIndex(row, column), newState))
 
-  def withCellHavingBall(row: RowIndex,
+  private[game] def withCellHavingBall(row: RowIndex,
                          column: ColumnIndex,
                          ball: BallKind): Board =
     zzwithCellState(row, column, getCellStateAt(row, column).copy(ballState = Some(ball)))
 
-  def withCellSelected(row: RowIndex,
+  private[game] def withCellSelected(row: RowIndex,
                        column: ColumnIndex): Board =
     withNoSelection.zzwithCellState(row, column, getCellStateAt(row, column).copy(isSelected = true))
 
-  def withNoSelection: Board =
+  private[game] def withNoSelection: Board =
     new Board(cellStates.map(c => c.copy(isSelected = false)))
 
   /*
@@ -84,7 +84,7 @@ private[manual] class Board(private val cellStates: Vector[CellState]) {
         - remove balls from cells (watch overlap)
    */
 
-  def getStateChar(state: CellState): String = {  //???? move out
+  private[manual] def getStateChar(state: CellState): String = {  //???? move out
     state.ballState match {
       case Some(ball) => ball.getColoredCharSeq(state.isSelected)
       case None => if (! state.isSelected) "-" else "@"
@@ -100,7 +100,7 @@ private[manual] class Board(private val cellStates: Vector[CellState]) {
     }.mkString("<", "/", ">")
   }
 
-  def renderMultiline: String = {
+  private def renderMultiline: String = {
     val cellWidth = " X ".length
     val cellSeparator = "|"
     val wholeWidth =
@@ -115,7 +115,7 @@ private[manual] class Board(private val cellStates: Vector[CellState]) {
     }.mkString(rowSeparator)     // make whole-board multi-line string
   }
 
-  def renderCompactMultiline: String = {
+  private def renderCompactMultiline: String = {
     rowIndices.map { row =>
       columnIndices.map { column =>
         getStateChar(getCellStateAt(row, column))

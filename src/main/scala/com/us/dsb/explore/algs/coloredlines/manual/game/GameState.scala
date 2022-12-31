@@ -14,12 +14,12 @@ private[manual] object XxGameState {
   /**
    * Result of completed game.
    */
-  private[manual] sealed trait XxxGameResult //???? change to final score (ane maybe stats?)
+  private[manual] sealed trait XxxGameResult //???? change to final score (and maybe stats?)
   private[manual] object XxGameResult {
     private[manual] case class XxxPlaceholderDone(stats: Float) extends XxxGameResult
   }
 
-  def xxselectRandomEmptyCell(rng: Random, board: Board): (RowIndex, ColumnIndex) = {
+  private def xxselectRandomEmptyCell(rng: Random, board: Board): (RowIndex, ColumnIndex) = {
     val row = rowIndices(rng.nextInt(BoardOrder))
     val col = columnIndices(rng.nextInt(BoardOrder))
     if (board.getBallStateAt(row, col).isEmpty)
@@ -28,8 +28,9 @@ private[manual] object XxGameState {
       xxselectRandomEmptyCell(rng, board) // loop: try again
   }
 
+  private def getRandomBallKind(rng: Random): BallKind = BallKind.values(rng.nextInt(BallKind.values.size))
+
   private def xxmakeInitialState(rng: Random): XxGameState = {
-    def getRandomBallKind() = BallKind.values(rng.nextInt(BallKind.values.size))
 
     val board1 = Board.empty
 
@@ -37,7 +38,7 @@ private[manual] object XxGameState {
       (1 to 5).foldLeft(board1) {
         case (board2, _) =>
           val (row, column) = xxselectRandomEmptyCell(rng, board2)
-          board2.withCellHavingBall(row, column, getRandomBallKind())
+          board2.withCellHavingBall(row, column, getRandomBallKind(rng))
       }
 
     //??? add 3 on-back balls
@@ -46,8 +47,8 @@ private[manual] object XxGameState {
     XxGameState(rng, board3, None)
   }
 
-  def xxinitial(seed: Long): XxGameState = xxmakeInitialState(new Random(seed))
-  def xxinitial: XxGameState = xxmakeInitialState(new Random())
+  private def xxinitial(seed: Long): XxGameState = xxmakeInitialState(new Random(seed))
+  private[manual] def xxinitial: XxGameState = xxmakeInitialState(new Random())
 }
 import XxGameState._
 
@@ -66,7 +67,7 @@ private[manual] case class XxGameState(rng: Random,
                                        gameResult: Option[XxxGameResult]
                                       ) {
 
-  def xxpickRandomEmptyCell(): Option[(RowIndex, ColumnIndex)] = {
+  private def xxpickRandomEmptyCell(): Option[(RowIndex, ColumnIndex)] = {
     if (board.isFull)
       None
     else {
@@ -79,18 +80,17 @@ private[manual] case class XxGameState(rng: Random,
     }
   }
 
-  def xxgetRandomBallKind() = BallKind.values(rng.nextInt(BallKind.values.size))
-
-  def xxdoPass(): Board = {
+  private def xxdoPass(): Board = {
     // ???? scatter 3 on-deck balls around board (unless no more room)
-    val onDeckListPlaceholder = List.fill(3)(xxgetRandomBallKind())
+    val onDeckListPlaceholder = List.fill(3)(getRandomBallKind(rng))
     val newBoard =
       onDeckListPlaceholder
         .foldLeft(board) {
           case (board2, _) =>
-            xxpickRandomEmptyCell match {
+            xxpickRandomEmptyCell() match {
               case None => board2
-              case Some((row, column)) => board2.withCellHavingBall(row, column, xxgetRandomBallKind())
+              case Some((row, column)) =>
+                board2.withCellHavingBall(row, column, getRandomBallKind(rng))
             }
         }
     newBoard
@@ -102,10 +102,10 @@ private[manual] case class XxGameState(rng: Random,
   //  doesn't have to check state's gameResult; also, think about where I'd add
   //  game history
 
-  def xxtryMoveAt(row: RowIndex,
+  private[manual] def xxtryMoveAt(row: RowIndex,
                 column: ColumnIndex
                ): Either[String, XxGameState] = {
-    trait Action
+    sealed trait Action
     object Action {
       private[XxGameState] case object SelectBall  extends Action
       private[XxGameState] case object SelectEmpty extends Action
@@ -155,7 +155,7 @@ private[manual] case class XxGameState(rng: Random,
         case TryMoveBall =>
           //?????? do ... path check, ball update, on deck, etc. around here
           println("NIY: " + action); board.withNoSelection
-        case Pass        => xxdoPass.withNoSelection  //??? clean board ref
+        case Pass        => xxdoPass().withNoSelection  //??? clean board ref
 
       }
 
