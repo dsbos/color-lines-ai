@@ -4,11 +4,11 @@ import com.us.dsb.explore.algs.coloredlines.manual.ui.GameUI.XxGameUIResult
 
 // Doing ConsoleIO as separate layer to have more simple layers for exploring
 // testing, ZIO, etc.
-private[ui] trait ConsoleIO {
+private trait ConsoleIO {
   def println(lineOrLines: String): Unit
   def readLine(prompt: String): String
 }
-private[manual] object LiveConsoleIO extends ConsoleIO {
+private object LiveConsoleIO extends ConsoleIO {
   override def println(lineOrLines: String): Unit = Predef.println(lineOrLines)
   override def readLine(prompt: String): String = scala.io.StdIn.readLine(prompt)
 }
@@ -16,7 +16,7 @@ private[manual] object LiveConsoleIO extends ConsoleIO {
 
 // ?? revisit names:
 
-private[ui] trait SegregatedTextIO {
+private trait SegregatedTextIO {
   private[ui] def printStateText(lineOrLines: String): Unit
   private[ui] def readPromptedLine(prompt: String): String
   private[ui] def printError(fullLine: String): Unit
@@ -32,11 +32,11 @@ private[ui] class BaseConsoleTextIO(cio: ConsoleIO) extends SegregatedTextIO {
   private[ui] override def printResult(lineOrLines: String): Unit = cio.println(lineOrLines)
 }
 
-private[manual] class PlainConsoleTextIO(cio: ConsoleIO) extends BaseConsoleTextIO(cio)
-object XxLivePlainConsoleTextIO extends PlainConsoleTextIO(LiveConsoleIO)
+private class PlainConsoleTextIO(cio: ConsoleIO) extends BaseConsoleTextIO(cio)
+private object XxLivePlainConsoleTextIO extends PlainConsoleTextIO(LiveConsoleIO)
 // (Expect to have test version in tests.)
 
-class ColoredConsoleTextIO(cio: ConsoleIO) extends BaseConsoleTextIO(cio) {
+private[manual] class ColoredConsoleTextIO(cio: ConsoleIO) extends BaseConsoleTextIO(cio) {
   import scala.io.AnsiColor._
   private[ui] override def readPromptedLine(prompt: String): String =
     super.readPromptedLine(BLUE + prompt + RESET)

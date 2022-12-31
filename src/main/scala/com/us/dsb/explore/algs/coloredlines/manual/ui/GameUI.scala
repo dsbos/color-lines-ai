@@ -12,23 +12,23 @@ import scala.util.chaining.scalaUtilChainingOps
 private[manual] object GameUI {
 
   // ?? enhance; maybe just put clean strings in; maybe build on GameResult (plus quit case)
-  case class XxGameUIResult(text: String)
+  private[ui] case class XxGameUIResult(text: String)
 
 
   // ("extends EnumEntry" gets .entryName, enables Enum; "extends Enum[...]"
   // enables (and requires) .values.
 
-  private[ui] sealed trait UICommand
-  private[ui] object UICommand {
+  private sealed trait UICommand
+  private object UICommand {
     // (Q: Why doesn't UICommand's "sealed" obviate the following one (for
     //   exhaustive-match checks)?
-    sealed trait UIMoveCommand extends UICommand
-    case object Up    extends UIMoveCommand
-    case object Down  extends UIMoveCommand
-    case object Left  extends UIMoveCommand
-    case object Right extends UIMoveCommand
-    case object XxMove  extends UICommand  // tap to select if ..., tap to move if ...
-    case object Quit  extends UICommand
+    private[ui] sealed trait UIMoveCommand extends UICommand
+    private[ui] case object Up    extends UIMoveCommand
+    private[ui] case object Down  extends UIMoveCommand
+    private[ui] case object Left  extends UIMoveCommand
+    private[ui] case object Right extends UIMoveCommand
+    private[ui] case object XxMove  extends UICommand  // tap to select if ..., tap to move if ...
+    private[ui] case object Quit  extends UICommand
   }
   // ?? Decide "UICommand._" re little scala.Right ~clashes.
 

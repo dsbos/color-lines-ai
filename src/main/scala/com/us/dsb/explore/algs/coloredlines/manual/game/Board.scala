@@ -10,10 +10,10 @@ import scala.io.AnsiColor
 private[manual] object Board {
 
   /** Empty or ball of some color, plus marked or not for physical move. */
-  case class CellState(ballState: Option[BallKind],
-                  isSelected: Boolean)
-  private object CellState {
-    val empty: CellState = CellState(None, false)
+  private[game] case class CellState(ballState: Option[BallKind],
+                                     isSelected: Boolean)
+  private[game] object CellState {
+    private[game] val empty: CellState = CellState(None, false)
   }
 
   private[game] def empty: Board =
@@ -25,7 +25,7 @@ import Board._
 /**
  * State of TTT board (just cells; not whose turn it is/etc.)
  */
-private[game] class Board(private val cellStates: Vector[CellState]) {
+private[manual] class Board(private val cellStates: Vector[CellState]) {
 
   /** Computes row-major cell-array index from row and column numbers. */
   private def vectorIndex(row: RowIndex, column: ColumnIndex): Int =

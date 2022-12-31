@@ -14,9 +14,9 @@ private[manual] object XxGameState {
   /**
    * Result of completed game.
    */
-  sealed trait XxxGameResult //???? change to final score (ane maybe stats?)
-  object XxGameResult {
-    case class XxxPlaceholderDone(stats: Float) extends XxxGameResult
+  private[manual] sealed trait XxxGameResult //???? change to final score (ane maybe stats?)
+  private[manual] object XxGameResult {
+    private[manual] case class XxxPlaceholderDone(stats: Float) extends XxxGameResult
   }
 
   def xxselectRandomEmptyCell(rng: Random, board: Board): (RowIndex, ColumnIndex) = {
@@ -107,11 +107,11 @@ private[manual] case class XxGameState(rng: Random,
                ): Either[String, XxGameState] = {
     trait Action
     object Action {
-      case object SelectBall  extends Action
-      case object SelectEmpty extends Action
-      case object Deselect    extends Action
-      case object TryMoveBall extends Action
-      case object Pass        extends Action
+      private[XxGameState] case object SelectBall  extends Action
+      private[XxGameState] case object SelectEmpty extends Action
+      private[XxGameState] case object Deselect    extends Action
+      private[XxGameState] case object TryMoveBall extends Action
+      private[XxGameState] case object Pass        extends Action
     }
     import Action._
 

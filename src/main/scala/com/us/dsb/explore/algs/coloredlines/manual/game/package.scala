@@ -7,12 +7,12 @@ import io.estatico.newtype.macros.newtype
 
 package object game {
 
-  private[manual] type BoardOrder = 4  //???? 9
+  private type BoardOrder = 4  //???? 9
   private[manual] val BoardOrder: BoardOrder = valueOf[BoardOrder]
-  private[manual] type LineOrder = 2  //???? 5
-  private[manual] val LineOrder: LineOrder = valueOf[LineOrder]
-  private[manual] type ColorOrder = 6  // blue.dark, blue.light, brown, green, purple, yellow
-  private[manual] val ColorOrder: ColorOrder = valueOf[ColorOrder]
+  private type LineOrder = 2  //???? 5
+  private val LineOrder: LineOrder = valueOf[LineOrder]
+  private type ColorOrder = 6  // blue.dark, blue.light, brown, green, purple, yellow
+  private val ColorOrder: ColorOrder = valueOf[ColorOrder]
 
   /** board row or column index integer; 1-based; top row, left column row are #1. */
   private[manual] type Index = Int Refined Closed[1, BoardOrder]
@@ -20,8 +20,8 @@ package object game {
 
   import scala.language.implicitConversions  // suppress warning from @newtype
   // ?? what exactly does "private" on a newtype affect?
-  @newtype case class RowIndex(value: Index)
-  @newtype case class ColumnIndex(value: Index)
+  @newtype private[manual] case class RowIndex(value: Index)
+  @newtype private[manual] case class ColumnIndex(value: Index)
 
   // (unsafeFrom that should be okay since based on BoardOrder:)
   private[manual] val rowIndices: IndexedSeq[RowIndex] =
