@@ -61,35 +61,6 @@ private[manual] case class GameState(rng: Random,
                                      gameResult: Option[GameResult]
                                     ) {
 
-  private[this] def xxpickRandomEmptyCell(): Option[(RowIndex, ColumnIndex)] = {
-    if (board.isFull)
-      None
-    else {
-      val row = rowIndices(rng.nextInt(BoardOrder))
-      val col = columnIndices(rng.nextInt(BoardOrder))
-      if (board.getBallStateAt(row, col).isEmpty)
-        Some((row, col))
-      else
-        xxpickRandomEmptyCell() // loop: try again
-    }
-  }
-
-  private[this] def doPass(): Board = {
-    //?????? scatter from real on-deck list, and replenish it too
-    val onDeckListPlaceholder = List.fill(3)(getRandomBallKind(rng))
-    val newBoard =
-      onDeckListPlaceholder
-        .foldLeft(board) {
-          case (board2, _) =>
-            xxpickRandomEmptyCell() match {
-              case None => board2
-              case Some((row, column)) =>
-                board2.withCellHavingBall(row, column, getRandomBallKind(rng))
-            }
-        }
-    newBoard
-  }
-
   // ?? later refine from Either[String, ...] to "fancier" error type
   // Xx?? maybe add result of move (win/draw/other) with new state (so caller
   //  doesn't have to check state's gameResult; also, think about where I'd add
@@ -107,7 +78,7 @@ private[manual] case class GameState(rng: Random,
         case TryMoveBall =>
           //?????? do ... path check, ball update, on deck, etc. around here
           println("NIY: " + tapAction); board.withNoSelection
-        case Pass        => doPass().withNoSelection  //??? clean board ref
+        case Pass        => GameLogicSupport.doPass(rng, board).withNoSelection  //??? clean board ref
       }
 
     val nextState =

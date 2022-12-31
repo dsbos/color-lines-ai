@@ -1,5 +1,8 @@
 package com.us.dsb.explore.algs.coloredlines.manual.game
 
+import scala.annotation.tailrec
+import scala.util.Random
+
 object GameLogicSupport {
 
   private[game] sealed trait Action
@@ -57,6 +60,38 @@ object GameLogicSupport {
       }
     }
     action
+  }
+
+  private[this] def getRandomBallKind(rng: Random): BallKind = BallKind.values(rng.nextInt(BallKind.values.size))
+
+  @tailrec
+  private[this] def pickRandomEmptyCell(rng: Random, board: Board): Option[(RowIndex, ColumnIndex)] = {
+    if (board.isFull)
+      None
+    else {
+      val row = rowIndices(rng.nextInt(BoardOrder))
+      val col = columnIndices(rng.nextInt(BoardOrder))
+      if (board.getBallStateAt(row, col).isEmpty)
+        Some((row, col))
+      else
+        pickRandomEmptyCell(rng, board) // loop: try again
+    }
+  }
+
+  private[game] def doPass(rng: Random, board: Board): Board = {
+    //?????? scatter from real on-deck list, and replenish it too
+    val onDeckListPlaceholder = List.fill(3)(getRandomBallKind(rng))
+    val newBoard =
+      onDeckListPlaceholder
+        .foldLeft(board) {
+          case (board2, _) =>
+            pickRandomEmptyCell(rng, board2) match {
+              case None => board2
+              case Some((row, column)) =>
+                board2.withCellHavingBall(row, column, getRandomBallKind(rng))
+            }
+        }
+    newBoard
   }
 
 }
