@@ -5,7 +5,7 @@ import scala.util.Random
 
 object GameLogicSupport {
 
-  private[this] def getRandomBallKind(rng: Random): BallKind = BallKind.values(rng.nextInt(BallKind.values.size))
+  private[this] def pickRandomBallKind(rng: Random): BallKind = BallKind.values(rng.nextInt(BallKind.values.size))
 
   @tailrec
   private[this] def pickRandomEmptyCell(rng: Random, board: Board): Option[(RowIndex, ColumnIndex)] = {
@@ -28,7 +28,7 @@ object GameLogicSupport {
           val (row, column) =
             pickRandomEmptyCell(rng, board2)
                 .getOrElse(scala.sys.error("Unexpectedly full board"))
-          board2.withCellHavingBall(row, column, getRandomBallKind(rng))
+          board2.withCellHavingBall(row, column, pickRandomBallKind(rng))
       }
     //?????? add 3 on-deck balls
     newBoard
@@ -93,7 +93,7 @@ object GameLogicSupport {
 
   private[game] def doPass(rng: Random, board: Board): Board = {
     //?????? scatter from real on-deck list, and replenish it too
-    val onDeckListPlaceholder = List.fill(3)(getRandomBallKind(rng))
+    val onDeckListPlaceholder = List.fill(3)(pickRandomBallKind(rng))
     val newBoard =
       onDeckListPlaceholder
         .foldLeft(board) {
@@ -101,7 +101,7 @@ object GameLogicSupport {
             pickRandomEmptyCell(rng, board2) match {
               case None => board2
               case Some((row, column)) =>
-                board2.withCellHavingBall(row, column, getRandomBallKind(rng))
+                board2.withCellHavingBall(row, column, pickRandomBallKind(rng))
             }
         }
     newBoard
