@@ -7,10 +7,7 @@ import enumeratum.{Enum, EnumEntry}
 
 import scala.io.AnsiColor
 
-
 private[manual] object Board {
-
-
 
   /** Empty or ball of some color, plus marked or not for physical move. */
   case class CellState(ballState: Option[BallKind],
@@ -29,7 +26,6 @@ import Board._
  * State of TTT board (just cells; not whose turn it is/etc.)
  */
 private[game] class Board(private val cellStates: Vector[CellState]) {
-
 
   /** Computes row-major cell-array index from row and column numbers. */
   private def vectorIndex(row: RowIndex, column: ColumnIndex): Int =
@@ -55,8 +51,6 @@ private[game] class Board(private val cellStates: Vector[CellState]) {
 
   def hasAnyCellSelected: Boolean = cellStates.exists(_.isSelected)
 
-
-
   // (Maybe less private in future.)
   private def zzwithCellState(row: RowIndex,
                               column: ColumnIndex,
@@ -74,37 +68,6 @@ private[game] class Board(private val cellStates: Vector[CellState]) {
 
   def withNoSelection: Board =
     new Board(cellStates.map(c => c.copy(isSelected = false)))
-
-  // ?? Q: How to use Tuple3 in data and then convert to or use as 3-element
-  //   List and call .forall?
-  // ?? any way auto-generate this _simply_?  or factor out repeated cell pairs?
-  private type XxCellRawIndices = (Int, Int)
-  private val XxxlinesData: List[(XxCellRawIndices, XxCellRawIndices, XxCellRawIndices)] =
-        List(
-          ((1, 1), (1, 2), (1, 3)),
-          ((2, 1), (2, 2), (2, 3)),
-          ((3, 1), (3, 2), (3, 3)),
-          ((1, 1), (2, 1), (3, 1)),
-          ((1, 2), (2, 2), (3, 2)),
-          ((1, 3), (2, 3), (3, 3)),
-          ((1, 1), (2, 2), (3, 3)),
-          ((1, 3), (2, 2), (3, 1)))
-
-
-//  def xxXxxhasThreeInARow: Boolean = {
-//    // See if there _exists_ line where _all_ cells are marked by the same player:
-//    XxxlinesData.exists { case (cell1, cell2, cell3) =>
-//      val lineCellValues =
-//        List(cell1, cell2, cell3) .map { case (row, column) =>
-//              XxgetMarkAt(RowIndex(Index.unsafeFrom(row)),
-//                        ColumnIndex(Index.unsafeFrom(column)))
-//        }
-//      // if first not None and all same as that first one:
-//      // compare all to first (if not None)
-//      val firstCellState = lineCellValues.head  // .get -- list size > 0
-//      firstCellState.isDefined && lineCellValues.forall(_ == firstCellState)
-//    }
-//  }
 
   /*
     getting (multiple) lines of 5 given a cell (with a ball)
