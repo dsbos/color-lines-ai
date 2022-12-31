@@ -9,6 +9,70 @@ import com.us.dsb.explore.algs.coloredlines.manual.game.{ColumnIndex, RowIndex}
 import scala.util.Random
 
 
+
+object NEWGameLogicSupport {
+
+  private[game] sealed trait Action
+  private[game] object Action {
+    private[game] case object SelectBall  extends Action
+    private[game] case object SelectEmpty extends Action
+    private[game] case object Deselect    extends Action
+    private[game] case object TryMoveBall extends Action
+    private[game] case object Pass        extends Action
+  }
+  import Action._
+
+  def interpretTapLocationToTapAction(board: Board, row: RowIndex, column: ColumnIndex): Action = {
+    tapAndStateToTapAction(hasABall           = board.hasABallSelected,
+                           isSelectedAt       = board.isSelectedAt(row, column),
+                           hasABallSelected   = board.hasABallSelected,
+                           hasAnyCellSelected = board.hasAnyCellSelected)
+  }
+
+  def tapAndStateToTapAction(hasABall: Boolean,
+                             isSelectedAt: Boolean,
+                             hasABallSelected: Boolean,
+                             hasAnyCellSelected: Boolean
+                            ): Action = {
+    sealed trait OnBallOrEmpty
+    case object OnBall extends OnBallOrEmpty
+    case object OnEmpty extends OnBallOrEmpty
+
+    sealed trait OnSelOrUnsel
+    case object OnSel extends OnSelOrUnsel
+    case object OnUnsel extends OnSelOrUnsel
+
+    sealed trait HadBallOrNot
+    case object HadBall extends HadBallOrNot
+    case object NoBall extends HadBallOrNot
+
+    sealed trait HadSelOrNot
+    case object HadSel extends HadSelOrNot
+    case object NoSel extends HadSelOrNot
+
+    val onBallOrEmpty = if (hasABall) OnBall else OnEmpty
+    val onSelOrUnsel  = if (isSelectedAt) OnSel else OnUnsel
+    val hadBallOrNot  = if (hasABallSelected) HadBall else NoBall
+    val hadSelOrNot   = if (hasAnyCellSelected) HadSel else NoSel
+
+    val action: Action = {
+      val conditions = (onBallOrEmpty, hadBallOrNot, onSelOrUnsel, hadSelOrNot)
+      conditions match {
+        case (OnBall,  _,       OnUnsel, _     ) => SelectBall  // - tap on ball  when unselected
+        case (OnEmpty, HadBall, _,       _     ) => TryMoveBall // - tap on empty when ball selected
+
+        case (OnEmpty, NoBall,  OnUnsel, NoSel ) => SelectEmpty // - tap on empty when no selection
+        case (OnEmpty, NoBall,  OnUnsel, HadSel) => Pass        // - tap on empty when selected
+
+        case (_,       _,       OnSel,   _     ) => Deselect    // - tap on either when selected
+      }
+    }
+    action
+  }
+
+}
+
+
 private[manual] object GameState {
 
   /**
@@ -31,18 +95,14 @@ private[manual] object GameState {
   private def getRandomBallKind(rng: Random): BallKind = BallKind.values(rng.nextInt(BallKind.values.size))
 
   private[this] def xxmakeInitialState(rng: Random): GameState = {
-
     val board1 = Board.empty
-
     val board3 =
       (1 to 5).foldLeft(board1) {
         case (board2, _) =>
           val (row, column) = xxselectRandomEmptyCell(rng, board2)
           board2.withCellHavingBall(row, column, getRandomBallKind(rng))
       }
-
     //?????? add 3 on-back balls
-
 
     GameState(rng, board3, None)
   }
@@ -53,12 +113,11 @@ private[manual] object GameState {
 import GameState._
 
 /**
- * TTT game state _and_ controller--should functions be separated or together?
+ *  game state _and_ controller--should functions be separated or together?
  *
  * @param gameResult  `None` means no win or draw yet
  */
  //???? add random-data state
-
 
 /** Game state AND currently controller.
  */
@@ -103,58 +162,17 @@ private[manual] case class GameState(rng: Random,
   private[manual] def tryMoveAt(row: RowIndex,
                                 column: ColumnIndex
                                ): Either[String, GameState] = {
-    sealed trait Action
-    object Action {
-      private[GameState] case object SelectBall  extends Action
-      private[GameState] case object SelectEmpty extends Action
-      private[GameState] case object Deselect    extends Action
-      private[GameState] case object TryMoveBall extends Action
-      private[GameState] case object Pass        extends Action
-    }
-    import Action._
-
-    sealed trait OnBallOrEmpty
-    case object OnBall  extends OnBallOrEmpty
-    case object OnEmpty extends OnBallOrEmpty
-
-    sealed trait OnSelOrUnsel
-    case object OnSel   extends OnSelOrUnsel
-    case object OnUnsel extends OnSelOrUnsel
-
-    sealed trait HadBallOrNot
-    case object HadBall extends HadBallOrNot
-    case object NoBall  extends HadBallOrNot
-
-    sealed trait HadSelOrNot
-    case object HadSel extends HadSelOrNot
-    case object NoSel   extends HadSelOrNot
-
-    val onBallOrEmpty = if (board.hasABallAt(row, column))   OnBall  else OnEmpty
-    val onSelOrUnsel  = if (board.isSelectedAt(row, column)) OnSel   else OnUnsel
-    val hadBallOrNot  = if (board.hasABallSelected)          HadBall else NoBall
-    val hadSelOrNot   = if (board.hasAnyCellSelected)        HadSel  else NoSel
-    val action: Action = {
-        val conditions = (onBallOrEmpty, hadBallOrNot, onSelOrUnsel, hadSelOrNot)
-        conditions match {
-          case (OnBall,  _,       OnUnsel, _     ) => SelectBall   // - tap on ball  when unselected
-          case (OnEmpty, HadBall, _,       _     ) => TryMoveBall  // - tap on empty when ball selected
-
-          case (OnEmpty, NoBall,  OnUnsel, NoSel ) => SelectEmpty  // - tap on empty when no selection
-          case (OnEmpty, NoBall,  OnUnsel, HadSel) => Pass         // - tap on empty when selected
-
-          case (_,       _,       OnSel,   _     ) => Deselect     // - tap on either when selected
-        }
-    }
+    import NEWGameLogicSupport.Action._
+    val tapAction = NEWGameLogicSupport.interpretTapLocationToTapAction(board, row, column)
     val nextBoard =
-      action match {
+      tapAction match {
         case SelectBall |
              SelectEmpty => board.withCellSelected(row, column)
         case Deselect    => board.withNoSelection
         case TryMoveBall =>
           //?????? do ... path check, ball update, on deck, etc. around here
-          println("NIY: " + action); board.withNoSelection
+          println("NIY: " + tapAction); board.withNoSelection
         case Pass        => doPass().withNoSelection  //??? clean board ref
-
       }
 
     val nextState =
