@@ -19,7 +19,7 @@ class BoardTest extends AnyFunSpec {
     rowIndices.foldLeft(Board.empty) { (board, row) =>
       columnIndices.foldLeft(board){ (board, column) =>
         index = (index + 1) % BallKind.values.length
-        board.xxwithCellHavingBall(CellAddress(row, column), BallKind.values(index))
+        board.withCellHavingBall(CellAddress(row, column), BallKind.values(index))
       }
     }
   }
@@ -32,7 +32,7 @@ class BoardTest extends AnyFunSpec {
         }
         else {
           index = (index + 1) % BallKind.values.length
-          board.xxwithCellHavingBall(CellAddress(row, column), BallKind.values(index))
+          board.withCellHavingBall(CellAddress(row, column), BallKind.values(index))
         }
       }
     }
@@ -44,12 +44,12 @@ class BoardTest extends AnyFunSpec {
       rowIndices.foreach { row =>
         columnIndices.foreach { column =>
           val address = CellAddress(row, column)
-          assert(board.xxgetBallStateAt(address).isEmpty)
+          assert(board.getBallStateAt(address).isEmpty)
         }
       }
     }
     it("- with empty on-deck list") {
-      assert(board.xxgetOnDeckBalls.isEmpty)
+      assert(board.getOnDeckBalls.isEmpty)
     }
     it("- with no selection") {
       assert(board.hasAnyCellSelected == false)
@@ -155,7 +155,7 @@ class BoardTest extends AnyFunSpec {
 
   describe("XxBoard.xxxisFull") {
     it("Xxshould not detect empty board as full") {
-      Board.empty.xxisFull shouldBe false
+      Board.empty.isFull shouldBe false
     }
 //    it ("Xxshould not detect 1-move board as  full") {
 //      val board0 = Board.Xxinitial
@@ -165,13 +165,13 @@ class BoardTest extends AnyFunSpec {
 //      oneXboard.hasNoMovesLeft shouldBe false
 //    }
     it ("Xxshould not detect 8-moves board as full") {
-      variedAllButFilledBoard.xxisFull shouldBe(false)
+      variedAllButFilledBoard.isFull shouldBe(false)
     }
     // ?? theoretically, check other cardinalities
     // ?? theoretically, check other ~permutations
 
     it("Xxshould detect full board as full") {
-      regularFilledBoard.xxisFull shouldBe true
+      regularFilledBoard.isFull shouldBe true
     }
   }
 

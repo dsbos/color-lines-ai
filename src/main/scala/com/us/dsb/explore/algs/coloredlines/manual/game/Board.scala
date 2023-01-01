@@ -3,15 +3,15 @@ package com.us.dsb.explore.algs.coloredlines.manual.game
 private[manual] object Board {
 
   /** Empty or ball of some color. */
-  private[game] case class CellState(ballState: Option[BallKind])
-  private[game] object CellState {
-    private[game] val empty: CellState = CellState(None)
+  private[game] case class CellBallState(ballState: Option[BallKind])
+  private[game] object CellBallState {
+    private[game] val empty: CellBallState = CellBallState(None)
   }
 
   private[manual] case class CellAddress(row: RowIndex, column: ColumnIndex)
 
   private[game] def empty: Board =
-    new Board(Vector.fill[CellState](BoardOrder * BoardOrder)(CellState.empty), Nil, None)
+    new Board(Vector.fill[CellBallState](BoardOrder * BoardOrder)(CellBallState.empty), Nil, None)
 }
 
 import Board._
@@ -19,7 +19,7 @@ import Board._
 /**
  * State of board (just cells; not other game state (e.g., score).)
  */
-private[manual] class Board(private[this] val cellStates: Vector[CellState],
+private[manual] class Board(private[this] val cellStates: Vector[CellBallState],  //????? grid?
                             private[this] val onDeck: Iterable[BallKind],
                             //???? move to game (low-level tap-UI) state:
                             private[this] val selectionAddress: Option[CellAddress]
@@ -30,7 +30,7 @@ private[manual] class Board(private[this] val cellStates: Vector[CellState],
     (address.row.value.value - 1) * BoardOrder + (address.column.value.value - 1)
 
 
-  private[manual] def getCellStateAt(address: CellAddress): CellState = {
+  private[manual] def getCellBallStateAt(address: CellAddress): CellBallState = {
     cellStates(vectorIndex(address))
   }
 
@@ -58,13 +58,13 @@ private[manual] class Board(private[this] val cellStates: Vector[CellState],
   private[game] def hasABallSelected: Boolean = selectionAddress.fold(false)(hasABallAt)
 
 
-  private def withCellState(address: CellAddress,
-                            newState: CellState): Board =
+  private def withCellBallState(address: CellAddress,
+                                newState: CellBallState): Board =
     new Board(cellStates.updated(vectorIndex(address), newState), onDeck, selectionAddress)
 
   private[game] def withCellHavingBall(address: CellAddress,
                                        ball: BallKind): Board =
-    withCellState(address, getCellStateAt(address).copy(ballState = Some(ball)))
+    withCellBallState(address, getCellBallStateAt(address).copy(ballState = Some(ball)))
 
   private[game] def withCellSelected(address: CellAddress): Board =
     new Board(cellStates, onDeck, Some(address))
@@ -87,7 +87,7 @@ private[manual] class Board(private[this] val cellStates: Vector[CellState],
         - remove balls from cells (watch overlap)
    */
 
-  private[manual] def getStateChar(state: CellState, isSelected: Boolean): String = {  //???? move out
+  private[manual] def getCellBallStateChar(state: CellBallState, isSelected: Boolean): String = {  //???? move out
     state.ballState match {
       case Some(ball) => ball.getColoredCharSeq(isSelected)
       case None       => if (! isSelected) "-" else "@"
@@ -99,7 +99,7 @@ private[manual] class Board(private[this] val cellStates: Vector[CellState],
     rowIndices.map { row =>
       columnIndices.map { column =>
         val addr = CellAddress(row, column)
-        getStateChar(getCellStateAt(addr), isSelectedAt(addr))
+        getCellBallStateChar(getCellBallStateAt(addr), isSelectedAt(addr))
       }.mkString("")
     }.mkString("<", "/", ">")
   }
@@ -115,7 +115,7 @@ private[manual] class Board(private[this] val cellStates: Vector[CellState],
     rowIndices.map { row =>
       columnIndices.map { column =>
         val addr = CellAddress(row, column)
-        "" + getStateChar(getCellStateAt(addr), isSelectedAt(addr)) + " "
+        "" + getCellBallStateChar(getCellBallStateAt(addr), isSelectedAt(addr)) + " "
       }.mkString(cellSeparator)  // make each row line
     }.mkString(rowSeparator)     // make whole-board multi-line string
   }
@@ -124,7 +124,7 @@ private[manual] class Board(private[this] val cellStates: Vector[CellState],
     rowIndices.map { row =>
       columnIndices.map { column =>
         val addr = CellAddress(row, column)
-        getStateChar(getCellStateAt(addr), isSelectedAt(addr))
+        getCellBallStateChar(getCellBallStateAt(addr), isSelectedAt(addr))
       }.mkString("|")  // make each row line
     }.mkString("\n")
   }
