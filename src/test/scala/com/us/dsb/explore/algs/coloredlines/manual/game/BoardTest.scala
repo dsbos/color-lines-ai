@@ -19,7 +19,7 @@ class BoardTest extends AnyFunSpec {
     rowIndices.foldLeft(Board.empty) { (board, row) =>
       columnIndices.foldLeft(board){ (board, column) =>
         index = (index + 1) % BallKind.values.length
-        board.withCellHavingBall(CellAddress(row, column), BallKind.values(index))
+        board.xxwithCellHavingBall(CellAddress(row, column), BallKind.values(index))
       }
     }
   }
@@ -32,7 +32,7 @@ class BoardTest extends AnyFunSpec {
         }
         else {
           index = (index + 1) % BallKind.values.length
-          board.withCellHavingBall(CellAddress(row, column), BallKind.values(index))
+          board.xxwithCellHavingBall(CellAddress(row, column), BallKind.values(index))
         }
       }
     }
@@ -56,73 +56,18 @@ class BoardTest extends AnyFunSpec {
     }
   }
 
-  describe("XxBoard.XxwithCellMarkedForPlayer") {
 
-    describe("for unmarked cells:") {
+  describe("XxBoard.withNoSelection") {
 
-      describe("for some specified cell for specified player:") {
-        // ??? move lazy-object example to ScalaTest expl.
-//        object LazySharedBreakpointable {
-//          val board0 = Board.Xxinitial
-//          val someRow = rowIndices.head
-//          val someCol = columnIndices.head
-//          val markedXxBoard = board0.XxwithCellMarkedForPlayer(someRow, someCol, XxxPlayer.X)
-//        }
-//        import LazySharedBreakpointable._
-//
-//        it("Xxshould mark cell for player") {
-//          assertResult(Some(XxxPlayer.X), s" (markedXxBoard = $markedXxBoard)") {
-//            markedXxBoard.XxgetMarkAt(someRow, someCol)
-//          }
-//        }
-//        it("Xx(should cause change in string renderings)") {
-//          assert(markedXxBoard.toString != board0.toString)
-//          assert(markedXxBoard.renderMultiline != board0.renderMultiline)
-//        }
-      }
-
-      // ?? theoretically/possibly, exercise more/all cells
-      // ?? theoretically/possibly, check other cells not changed
-
-    }
-    describe("for already-marked cells:") {
-      it("Xxshould blindy mark again (same-player case)") {
-        val someRow = rowIndices.head
-        val someCol = columnIndices.head
-        val board0 = Board.empty
-//        val board1 = board0.XxwithCellMarkedForPlayer(someRow, someCol, XxxPlayer.X)
-//        val result = board1.XxwithCellMarkedForPlayer(someRow, someCol, XxxPlayer.X)
-//
-//        assertResult(XxxPlayer.X.some) {
-//          result.XxgetMarkAt(someRow, someCol)
-//        }
-      }
-      it("Xxshould blindy mark again (other-player case)") {
-        val someRow = rowIndices.last
-        val someCol = columnIndices.last
-        val board0 = Board.empty
-//        val board1 = board0.XxwithCellMarkedForPlayer(someRow, someCol, XxxPlayer.X)
-//        val result = board1.XxwithCellMarkedForPlayer(someRow, someCol, XxxPlayer.O)
-//
-//        assertResult(XxxPlayer.O.some) {
-//          result.XxgetMarkAt(someRow, someCol)
-//        }
-      }
-    }
-
-  }
-
-  describe("Board.withNoSelection") {
-
-      it("should deselect selected cell") {
+      it("Xxshould deselect selected cell") {
         val someRow = rowIndices.head
         val someCol = columnIndices.head
         val board0 = Board.empty
         val address = CellAddress(someRow, someCol)
-        val selectedBoard = board0.withCellSelected(address)
-        val deselectedBoard = selectedBoard.withNoSelection
+        val selectedBoard = board0.xxwithCellSelected(address)
+        val deselectedBoard = selectedBoard.xxwithNoSelection
         assertResult(false) {
-          deselectedBoard.isSelectedAt(address)
+          deselectedBoard.xxisSelectedAt(address)
         }
       }
   }
@@ -132,7 +77,7 @@ class BoardTest extends AnyFunSpec {
   }
 
   describe("XxBoard.toString") {
-    describe("should render board; some cases:") {
+    describe("Xxshould render board; some cases:") {
 
       lazy val board0 = Board.empty
       it("Xxempty board") {
@@ -154,7 +99,7 @@ class BoardTest extends AnyFunSpec {
   }
 
   // ("it" and "cancel" to note without "!!! IGNORED !!!"
-  it("XxXxBoard.renderMultiline") {
+  it("XxBoard.renderMultiline") {
     cancel()
   }
 
@@ -163,9 +108,9 @@ class BoardTest extends AnyFunSpec {
     cancel()
   }
 
-  describe("Board.xxxisFull") {
-    it("should not detect empty board as full") {
-      Board.empty.isFull shouldBe false
+  describe("XxBoard.xxxisFull") {
+    it("Xxshould not detect empty board as full") {
+      Board.empty.xxisFull shouldBe false
     }
 //    it ("Xxshould not detect 1-move board as  full") {
 //      val board0 = Board.Xxinitial
@@ -175,64 +120,14 @@ class BoardTest extends AnyFunSpec {
 //      oneXboard.hasNoMovesLeft shouldBe false
 //    }
     it ("Xxshould not detect 8-moves board as full") {
-      variedAllButFilledBoard.isFull shouldBe(false)
+      variedAllButFilledBoard.xxisFull shouldBe(false)
     }
     // ?? theoretically, check other cardinalities
     // ?? theoretically, check other ~permutations
 
-    it("should detect full board as full") {
-      regularFilledBoard.isFull shouldBe true
+    it("Xxshould detect full board as full") {
+      regularFilledBoard.xxisFull shouldBe true
     }
-  }
-
-  describe("XxBoard.hasThreeInARow") {
-//    import XxxPlayer._
-//    import scala.language.implicitConversions
-//    implicit def intToRow(int: Int) = RowIndex(Index.unsafeFrom(int))
-//    implicit def intToCol(int: Int) = ColumnIndex(Index.unsafeFrom(int))
-//
-//    lazy val `<XX-/---/OO->` = {
-//      Board.Xxinitial
-//          .XxwithCellMarkedForPlayer(1, 1, X)
-//          .XxwithCellMarkedForPlayer(3, 1, O)
-//          .XxwithCellMarkedForPlayer(1, 2, X)
-//          .XxwithCellMarkedForPlayer(3, 2, O)
-//    }
-//    lazy val `<XXX/---/OO->` = {
-//      `<XX-/---/OO->`
-//          .XxwithCellMarkedForPlayer(1, 3, X)
-//    }
-//    lazy val `<XX-/X--/OOO>` = {
-//      `<XX-/---/OO->`
-//          .XxwithCellMarkedForPlayer(2, 1, X)
-//          .XxwithCellMarkedForPlayer(3, 3, O)
-//    }
-//
-//    it("Xxshould not detect for empty board") {
-//      val testXxBoard = Board.Xxinitial
-//      assertResult(false, s" (from .hasThreeInARow for $testXxBoard)") {
-//        testXxBoard.XxxhasThreeInARow
-//      }
-//    }
-//
-//    it("Xxshould detect for some three-in-a-row case for X ") {
-//      assertResult(true, s" (from .hasThreeInARow for ${`<XXX/---/OO->`})") {
-//        `<XXX/---/OO->`.XxxhasThreeInARow
-//      }
-//    }
-//
-//    it("Xxshould for detect some three-in-a-row case for O") {
-//      assertResult(true, s" (from .hasThreeInARow for ${`<XX-/X--/OOO>`})") {
-//        `<XX-/X--/OOO>`.XxxhasThreeInARow
-//      }
-//    }
-//
-//    ignore("possibly check all lines (algorithmically)") {
-//    }
-//
-//    ignore("possibly check more/all non-wins (algorithmically)") {
-//    }
-
   }
 
   describe("XxBoard.vectorIndex (private method we want to test directly):") {
@@ -249,7 +144,7 @@ class BoardTest extends AnyFunSpec {
       index shouldEqual BoardOrder * BoardOrder - 1
     }
 
-    describe("should compute indices in row-major order (chosen but ~isolated)") {
+    describe("Xxshould compute indices in row-major order (chosen but ~isolated)") {
       it("Xx1, 2 => 1") {
         Board.empty invokePrivate vectorIndex(Index(1), Index(2)) shouldEqual 1
       }
