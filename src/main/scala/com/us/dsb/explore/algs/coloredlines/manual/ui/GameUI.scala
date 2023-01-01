@@ -163,8 +163,6 @@ private[manual] object GameUI {
   def runGame(io: SegregatedTextIO): GameUIResult = {
     val initialState =
       GameUIState(GameState.initial, RowIndex(Index(1)), ColumnIndex(Index(1)))
-    //?????? do initial 5 and first 5 on deck by here, maybe in XxGameState.Xxxinitial
-
     getAndDoUiCommands(io, initialState)
   }
 

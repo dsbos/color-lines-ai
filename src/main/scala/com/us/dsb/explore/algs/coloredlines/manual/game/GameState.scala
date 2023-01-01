@@ -44,6 +44,8 @@ private[manual] case class GameState(rng: Random,
                                      gameResult: Option[GameResult]
                                     ) {
 
+  //????? Probably move to GameLogicSupport
+
   // ?? later refine from Either[String, ...] to "fancier" error type
   // Xx?? maybe add result of move (win/draw/other) with new state (so caller
   //  doesn't have to check state's gameResult; also, think about where I'd add
@@ -62,13 +64,14 @@ private[manual] case class GameState(rng: Random,
         case Deselect    =>
           MoveResult(board.withNoSelection, None)
         case TryMoveBall =>
-          val (selRow, selColumn) = board.getSelectionCoordinates.get //???? unsafe
-          //?????? clear selection (conditionally here); decide: check here or get bit from doMove...
+          //???? should TryMoveBall carry coordinates?:
+          val (selRow, selColumn) =
+            board.getSelectionCoordinates.getOrElse(sys.error("Shouldn't be able to happen"))
           GameLogicSupport.doTryMoveBall(rng, board, selRow, selColumn, row, column)
         case Pass        =>
-          val x = GameLogicSupport.doPass(rng, board)
-          assert(x.addedScore.isEmpty)
-          x.copy(newBoard = board.withNoSelection)
+          val passResult = GameLogicSupport.doPass(rng, board)
+          assert(passResult.addedScore.isEmpty)
+          passResult.copy(newBoard = passResult.newBoard.withNoSelection)
       }
     val newScore = score + moveResult.addedScore.getOrElse(0)
 
