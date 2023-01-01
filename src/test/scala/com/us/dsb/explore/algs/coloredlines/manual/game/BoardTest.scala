@@ -52,7 +52,7 @@ class BoardTest extends AnyFunSpec {
       assert(board.xxgetOnDeckBalls.isEmpty)
     }
     it("- with no selection") {
-      assert(board.xxhasAnyCellSelected == false)
+      assert(board.hasAnyCellSelected == false)
     }
   }
 
@@ -85,24 +85,49 @@ class BoardTest extends AnyFunSpec {
     }
   }
 
-  describe("XxBoard.withNoSelection") {
+  describe("Board selection:") {
+    //???? randomize?
+    val someRow = rowIndices.head
+    val someCol = columnIndices.head
+    val board0 = Board.empty
+    val address = CellAddress(someRow, someCol)
 
-      it("Xxshould deselect selected cell") {
-        val someRow = rowIndices.head
-        val someCol = columnIndices.head
-        val board0 = Board.empty
-        val address = CellAddress(someRow, someCol)
-        val selectedBoard = board0.xxwithCellSelected(address)
-        val deselectedBoard = selectedBoard.xxwithNoSelection
-        assertResult(false) {
-          deselectedBoard.xxisSelectedAt(address)
-        }
+    describe("hasAnyCellSelected should:") {
+      it("- return false for fresh, empty board") {
+        board0.hasAnyCellSelected shouldBe false
       }
+      it("- return true for board with selection") {
+        val selectedBoard = board0.withCellSelected(address)
+        board0.hasAnyCellSelected shouldBe false
+      }
+    }
+
+    describe("withCellSelected should") {
+      lazy val selectedBoard = board0.withCellSelected(address)
+
+      it("- select _something_") {
+        selectedBoard.hasAnyCellSelected shouldBe true
+      }
+      it("- select _specified_ cell") {
+        selectedBoard.isSelectedAt(address) shouldBe true
+      }
+    }
+
+    describe("withNoSelection should:") {
+      lazy val selectedBoard = board0.withCellSelected(address)
+      lazy val deselectedBoard = selectedBoard.withNoSelection
+
+      it("- deselect (anything)") {
+        deselectedBoard.hasAnyCellSelected shouldBe false
+      }
+      it("- deselect selected cell") {
+        deselectedBoard.isSelectedAt(address) shouldBe false
+      }
+    }
+    //???? test works when no selection anyway
+    //???? test isSelectedAt matches row/column with withCellSelected
   }
 
-  it("XxBoard.getMarkAt covered somewhat with ?????markCell") {
-    cancel()
-  }
 
   describe("Board.toString should render:") {
 
