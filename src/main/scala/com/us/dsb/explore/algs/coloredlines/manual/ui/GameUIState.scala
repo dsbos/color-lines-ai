@@ -1,5 +1,6 @@
 package com.us.dsb.explore.algs.coloredlines.manual.ui
 
+import com.us.dsb.explore.algs.coloredlines.manual.game.Board.CellAddress
 import com.us.dsb.explore.algs.coloredlines.manual.game._
 import com.us.dsb.explore.algs.coloredlines.manual.game.{ColumnIndex, Index, RowIndex}
 
@@ -42,9 +43,10 @@ private[this] case class GameUIState(gameState: GameState,
 
     rowIndices.map { row =>
       columnIndices.map { column =>
+        val address = CellAddress(row, column)
         val cellStateStr =
-          gameState.board.getStateChar(gameState.board.getCellStateAt(row, column),
-                                       gameState.board.isSelectedAt(row, column))
+          gameState.board.getStateChar(gameState.board.getCellStateAt(address),
+                                       gameState.board.isSelectedAt(address))
         if (row == selectedRow && column == selectedColumn ) {
           "*" + cellStateStr + "*"
         }

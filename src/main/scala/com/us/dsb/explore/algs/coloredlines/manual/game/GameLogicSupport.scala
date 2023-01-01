@@ -1,5 +1,7 @@
 package com.us.dsb.explore.algs.coloredlines.manual.game
 
+import com.us.dsb.explore.algs.coloredlines.manual.game.Board.CellAddress
+
 import scala.annotation.tailrec
 import scala.util.Random
 
@@ -9,14 +11,14 @@ object GameLogicSupport {
     BallKind.values(rng.nextInt(BallKind.values.size))
 
   @tailrec
-  private[this] def pickRandomEmptyCell(board: Board)(implicit rng: Random): Option[(RowIndex, ColumnIndex)] = {
+  private[this] def pickRandomEmptyCell(board: Board)(implicit rng: Random): Option[CellAddress] = {
     if (board.isFull)
       None
     else {
       val row = rowIndices(rng.nextInt(BoardOrder))
       val col = columnIndices(rng.nextInt(BoardOrder))
-      if (board.getBallStateAt(row, col).isEmpty)
-        Some((row, col))
+      if (board.getBallStateAt(CellAddress(row, col)).isEmpty)
+        Some(CellAddress(row, col))
       else
         pickRandomEmptyCell(board) // loop: try again
     }
@@ -30,10 +32,9 @@ object GameLogicSupport {
     val newBoard1 =
       (1 to 5).foldLeft(board) { //???? parameterize
         case (curBoard, _) =>  //???? refactor?
-          val (row, column) =
-            pickRandomEmptyCell(curBoard)
-                .getOrElse(scala.sys.error("Unexpectedly full board"))
-          curBoard.withCellHavingBall(row, column, pickRandomBallKind())
+          val address =
+            pickRandomEmptyCell(curBoard).getOrElse(scala.sys.error("Unexpectedly full board"))
+          curBoard.withCellHavingBall(address, pickRandomBallKind())
       }
     newBoard1.withOnDeckBalls(List.fill(3)(pickRandomBallKind()))
   }
@@ -49,10 +50,9 @@ object GameLogicSupport {
   import Action._
 
   def interpretTapLocationToTapAction(board: Board,
-                                      row: RowIndex,
-                                      column: ColumnIndex): Action =
-    tapAndStateToTapAction(onABall            = board.hasABallAt(row, column),
-                           isSelectedAt       = board.isSelectedAt(row, column),
+                                      address: CellAddress): Action =
+    tapAndStateToTapAction(onABall            = board.hasABallAt(address),
+                           isSelectedAt       = board.isSelectedAt(address),
                            hasABallSelected   = board.hasABallSelected,
                            hasAnyCellSelected = board.hasAnyCellSelected)
 
@@ -107,8 +107,8 @@ object GameLogicSupport {
           case (curBoard, _) =>
             pickRandomEmptyCell(curBoard) match {
               case None => curBoard
-              case Some((row, column)) =>
-                curBoard.withCellHavingBall(row, column, pickRandomBallKind())
+              case Some(address) =>
+                curBoard.withCellHavingBall(address, pickRandomBallKind())
             }
         }
     newBoard.withOnDeckBalls(List.fill(3)(pickRandomBallKind()))
@@ -121,11 +121,9 @@ object GameLogicSupport {
     MoveResult(placeNextBalls(board), None)
 
 
-  private[game] def doTryMoveBall(board: Board,  //???? change to game state to carry, update score?
-                                  fromRow: RowIndex,
-                                  fromCol: ColumnIndex, //???? combine into cell coord. pair/ID
-                                  toRow: RowIndex,
-                                  toCol: ColumnIndex
+  private[game] def doTryMoveBall(board: Board,  //???? change to game state to carry and update score?
+                                  from: CellAddress,
+                                  to: CellAddress
                                   )(implicit rng: Random): MoveResult = {
     val canMoveBall = rng.nextBoolean()
     println("NIY: doMoveBall; doing RANDOM: canMoveBall " + canMoveBall)

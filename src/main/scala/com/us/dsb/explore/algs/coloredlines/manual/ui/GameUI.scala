@@ -2,6 +2,7 @@ package com.us.dsb.explore.algs.coloredlines.manual.ui
 
 import cats.syntax.option._
 import cats.syntax.either._
+import com.us.dsb.explore.algs.coloredlines.manual.game.Board.CellAddress
 import com.us.dsb.explore.algs.coloredlines.manual.game.{ColumnIndex, GameState, Index, RowIndex}
 import enumeratum.{Enum, EnumEntry}
 
@@ -76,8 +77,8 @@ private[manual] object GameUI {
   private[this] def moveAtSelection(io: SegregatedTextIO,
                                     uiState: GameUIState
                                    ): GameUIState = {
-    val moveResult = uiState.gameState.tryMoveAt(uiState.selectedRow,
-                                                 uiState.selectedColumn)
+    val moveResult = uiState.gameState.tryMoveAt(CellAddress(uiState.selectedRow,
+                                                             uiState.selectedColumn))  //???????? decide continue CellAddress?
     moveResult match {
       case Right(newGameState) =>
         uiState.copy(gameState = newGameState)

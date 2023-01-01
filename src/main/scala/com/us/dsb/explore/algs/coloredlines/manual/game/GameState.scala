@@ -3,6 +3,7 @@ package com.us.dsb.explore.algs.coloredlines.manual.game
 import cats.syntax.option._
 import cats.syntax.either._
 import com.us.dsb.explore.algs.coloredlines.manual.game.BallKind
+import com.us.dsb.explore.algs.coloredlines.manual.game.Board.CellAddress
 import com.us.dsb.explore.algs.coloredlines.manual.game.GameLogicSupport.MoveResult
 import com.us.dsb.explore.algs.coloredlines.manual.game.GameState.GameResult.Done
 import com.us.dsb.explore.algs.coloredlines.manual.game.{ColumnIndex, RowIndex}
@@ -49,24 +50,23 @@ private[manual] case class GameState(board: Board,
   // Xx?? maybe add result of move (win/draw/other) with new state (so caller
   //  doesn't have to check state's gameResult; also, think about where I'd add
   //  game history
-  private[manual] def tryMoveAt(row: RowIndex,
-                                column: ColumnIndex
-                               ): Either[String, GameState] = {
+  private[manual] def tryMoveAt(tapAddress: CellAddress): Either[String, GameState] = {
     import GameLogicSupport.Action._
-    val tapAction = GameLogicSupport.interpretTapLocationToTapAction(board, row, column)
+    val tapAction = GameLogicSupport.interpretTapLocationToTapAction(board, tapAddress)
     println("tryMoveAt: tapAction = " + tapAction)
     val moveResult: MoveResult =
       tapAction match {
         case SelectBall |
              SelectEmpty =>
-          MoveResult(board.withCellSelected(row, column), None)
+          MoveResult(board.withCellSelected(tapAddress), None)
         case Deselect    =>
           MoveResult(board.withNoSelection, None)
         case TryMoveBall =>
           //???? should TryMoveBall carry coordinates?:
-          val (selRow, selColumn) =
+          //?????? "sel"? "previous"? from/to?
+          val selAddress =
             board.getSelectionCoordinates.getOrElse(sys.error("Shouldn't be able to happen"))
-          GameLogicSupport.doTryMoveBall(board, selRow, selColumn, row, column)
+          GameLogicSupport.doTryMoveBall(board, selAddress, tapAddress)
         case Pass        =>
           val passResult = GameLogicSupport.doPass(board)
           assert(passResult.addedScore.isEmpty)

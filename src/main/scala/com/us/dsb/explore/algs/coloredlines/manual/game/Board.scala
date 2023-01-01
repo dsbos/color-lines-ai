@@ -8,6 +8,8 @@ private[manual] object Board {
     private[game] val empty: CellState = CellState(None)
   }
 
+  private[manual] case class CellAddress(row: RowIndex, column: ColumnIndex)
+
   private[game] def empty: Board =
     new Board(Vector.fill[CellState](BoardOrder * BoardOrder)(CellState.empty), Nil, None)
 }
@@ -20,56 +22,53 @@ import Board._
 private[manual] class Board(private[this] val cellStates: Vector[CellState],
                             private[this] val onDeck: Iterable[BallKind],
                            //???? move to game (low-level UI) state:
-                           //?????? Tuple2 -> case class
-                            private[this] val selectionCoordinates: Option[(RowIndex, ColumnIndex)]
+                            private[this] val selectionAddress: Option[CellAddress]
                            ) {
 
   /** Computes row-major cell-array index from row and column numbers. */
-  private[this] def vectorIndex(row: RowIndex, column: ColumnIndex): Int =
-    (row.value.value - 1) * BoardOrder + (column.value.value - 1)
+  private[this] def vectorIndex(address: CellAddress): Int =
+    (address.row.value.value - 1) * BoardOrder + (address.column.value.value - 1)
 
 
-  private[manual] def getCellStateAt(row: RowIndex, column: ColumnIndex): CellState = {
-    cellStates(vectorIndex(row, column))
+  private[manual] def getCellStateAt(address: CellAddress): CellState = {
+    cellStates(vectorIndex(address))
   }
 
   private[game] def getOnDeckBalls: Iterable[BallKind] = onDeck
 
   private[game] def withOnDeckBalls(newBalls: Iterable[BallKind]): Board =
-    new Board(cellStates, newBalls, selectionCoordinates)
+    new Board(cellStates, newBalls, selectionAddress)
 
   private[game] def isFull: Boolean = ! cellStates.exists(_.ballState.isEmpty)
 
-  private[game] def getBallStateAt(row: RowIndex, column: ColumnIndex): Option[BallKind] = {
-    cellStates(vectorIndex(row, column)).ballState
+  private[game] def getBallStateAt(address: CellAddress): Option[BallKind] = {
+    cellStates(vectorIndex(address)).ballState
   }
-  private[game] def hasABallAt(row: RowIndex, column: ColumnIndex): Boolean = {
-    cellStates(vectorIndex(row, column)).ballState.isDefined
+  private[game] def hasABallAt(address: CellAddress): Boolean = {
+    cellStates(vectorIndex(address)).ballState.isDefined
   }
-  private[manual] def isSelectedAt(row: RowIndex, column: ColumnIndex): Boolean = {
-    selectionCoordinates.fold(false)(coords => coords._1 == row && coords._2 == column)
+  private[manual] def isSelectedAt(xxaddress: CellAddress): Boolean = {
+    //???????? simple equality
+    selectionAddress.fold(false)(current => current.row == xxaddress.row && current.column == xxaddress.column)
   }
   private[game] def hasABallSelected: Boolean =
-    selectionCoordinates.fold(false)(coords => hasABallAt(coords._1, coords._2))
+    selectionAddress.fold(false)(coords => hasABallAt(coords))
 
-  private[game] def hasAnyCellSelected: Boolean = selectionCoordinates.isDefined
+  private[game] def hasAnyCellSelected: Boolean = selectionAddress.isDefined
 
-  private[game] def getSelectionCoordinates: Option[(RowIndex, ColumnIndex)] =
-    selectionCoordinates
+  private[game] def getSelectionCoordinates: Option[CellAddress] =
+    selectionAddress
 
-  private def withCellState(row: RowIndex,
-                            column: ColumnIndex,
+  private def withCellState(address: CellAddress,
                             newState: CellState): Board =
-    new Board(cellStates.updated(vectorIndex(row, column), newState), onDeck, selectionCoordinates)
+    new Board(cellStates.updated(vectorIndex(address), newState), onDeck, selectionAddress)
 
-  private[game] def withCellHavingBall(row: RowIndex,
-                                       column: ColumnIndex,
+  private[game] def withCellHavingBall(address: CellAddress,
                                        ball: BallKind): Board =
-    withCellState(row, column, getCellStateAt(row, column).copy(ballState = Some(ball)))
+    withCellState(address, getCellStateAt(address).copy(ballState = Some(ball)))
 
-  private[game] def withCellSelected(row: RowIndex,
-                                     column: ColumnIndex): Board =
-    new Board(cellStates, onDeck, Some((row, column)))
+  private[game] def withCellSelected(address: CellAddress): Board =
+    new Board(cellStates, onDeck, Some(address))
 
   private[game] def withNoSelection: Board =
     new Board(cellStates, onDeck, None)
@@ -100,7 +99,8 @@ private[manual] class Board(private[this] val cellStates: Vector[CellState],
   override def toString: String = {
     rowIndices.map { row =>
       columnIndices.map { column =>
-        getStateChar(getCellStateAt(row, column), isSelectedAt(row, column))
+        val addr = CellAddress(row, column)
+        getStateChar(getCellStateAt(addr), isSelectedAt(addr))
       }.mkString("")
     }.mkString("<", "/", ">")
   }
@@ -115,7 +115,8 @@ private[manual] class Board(private[this] val cellStates: Vector[CellState],
 
     rowIndices.map { row =>
       columnIndices.map { column =>
-          "" + getStateChar(getCellStateAt(row, column), isSelectedAt(row, column)) + " "
+        val addr = CellAddress(row, column)
+        "" + getStateChar(getCellStateAt(addr), isSelectedAt(addr)) + " "
       }.mkString(cellSeparator)  // make each row line
     }.mkString(rowSeparator)     // make whole-board multi-line string
   }
@@ -123,7 +124,8 @@ private[manual] class Board(private[this] val cellStates: Vector[CellState],
   private[this] def renderCompactMultiline: String = {
     rowIndices.map { row =>
       columnIndices.map { column =>
-        getStateChar(getCellStateAt(row, column), isSelectedAt(row, column))
+        val addr = CellAddress(row, column)
+        getStateChar(getCellStateAt(addr), isSelectedAt(addr))
       }.mkString("|")  // make each row line
     }.mkString("\n")
   }

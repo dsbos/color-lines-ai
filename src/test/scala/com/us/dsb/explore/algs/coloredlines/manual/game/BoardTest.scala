@@ -2,6 +2,7 @@ package com.us.dsb.explore.algs.coloredlines.manual.game
 
 import cats.syntax.option._
 import com.us.dsb.explore.algs.coloredlines.manual.game.BallKind
+import com.us.dsb.explore.algs.coloredlines.manual.game.Board.CellAddress
 import org.scalatest.PrivateMethodTester
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers._
@@ -18,7 +19,7 @@ private[manual] class XxBoardTest extends AnyFunSpec {
     rowIndices.foldLeft(Board.empty) { (board, row) =>
       columnIndices.foldLeft(board){ (board, column) =>
         index = (index + 1) % BallKind.values.length
-        board.withCellHavingBall(row, column, BallKind.values(index))
+        board.withCellHavingBall(CellAddress(row, column), BallKind.values(index))
       }
     }
   }
@@ -31,7 +32,7 @@ private[manual] class XxBoardTest extends AnyFunSpec {
         }
         else {
           index = (index + 1) % BallKind.values.length
-          board.withCellHavingBall(row, column, BallKind.values(index))
+          board.withCellHavingBall(CellAddress(row, column), BallKind.values(index))
         }
       }
     }
@@ -44,11 +45,12 @@ private[manual] class XxBoardTest extends AnyFunSpec {
       val board = Board.empty
       rowIndices.foreach {row =>
         columnIndices.foreach { column =>
+          val address = CellAddress(row, column)
 
           // ?? which is clearer ("new" DSL vs. regular code; in code and in failure messages?)?:
 
-          assert(board.getBallStateAt(row, column).isEmpty)
-          assert(board.isSelectedAt(row, column) == false)
+          assert(board.getBallStateAt(address).isEmpty)
+          assert(board.isSelectedAt(address) == false)
 
         }
       }
@@ -117,15 +119,16 @@ private[manual] class XxBoardTest extends AnyFunSpec {
         val someRow = rowIndices.head
         val someCol = columnIndices.head
         val board0 = Board.empty
-        val selectedBoard = board0.withCellSelected(someRow, someCol)
+        val address = CellAddress(someRow, someCol)
+        val selectedBoard = board0.withCellSelected(address)
         val deselectedBoard = selectedBoard.withNoSelection
         assertResult(false) {
-          deselectedBoard.isSelectedAt(someRow, someCol)
+          deselectedBoard.isSelectedAt(address)
         }
       }
   }
 
-  it("XxXxBoard.getMarkAt covered somewhat with ?????markCell") {
+  it("XxBoard.getMarkAt covered somewhat with ?????markCell") {
     cancel()
   }
 
