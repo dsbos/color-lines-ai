@@ -5,10 +5,11 @@ import scala.util.Random
 
 object GameLogicSupport {
 
-  private[this] def pickRandomBallKind(rng: Random): BallKind = BallKind.values(rng.nextInt(BallKind.values.size))
+  private[this] def pickRandomBallKind()(implicit rng: Random): BallKind =
+    BallKind.values(rng.nextInt(BallKind.values.size))
 
   @tailrec
-  private[this] def pickRandomEmptyCell(rng: Random, board: Board): Option[(RowIndex, ColumnIndex)] = {
+  private[this] def pickRandomEmptyCell(board: Board)(implicit rng: Random): Option[(RowIndex, ColumnIndex)] = {
     if (board.isFull)
       None
     else {
@@ -17,7 +18,7 @@ object GameLogicSupport {
       if (board.getBallStateAt(row, col).isEmpty)
         Some((row, col))
       else
-        pickRandomEmptyCell(rng, board) // loop: try again
+        pickRandomEmptyCell(board) // loop: try again
     }
   }
 
@@ -25,16 +26,16 @@ object GameLogicSupport {
    * @param board
    *   expected to be empty //???? maybe refactor something?
    */
-  private[game] def placeInitialBalls(rng: Random, board: Board): Board = {
+  private[game] def placeInitialBalls(board: Board)(implicit rng: Random): Board = {
     val newBoard1 =
       (1 to 5).foldLeft(board) { //???? parameterize
         case (curBoard, _) =>  //???? refactor?
           val (row, column) =
-            pickRandomEmptyCell(rng, curBoard)
+            pickRandomEmptyCell(curBoard)
                 .getOrElse(scala.sys.error("Unexpectedly full board"))
-          curBoard.withCellHavingBall(row, column, pickRandomBallKind(rng))
+          curBoard.withCellHavingBall(row, column, pickRandomBallKind())
       }
-    newBoard1.withOnDeckBalls(List.fill(3)(pickRandomBallKind(rng)))
+    newBoard1.withOnDeckBalls(List.fill(3)(pickRandomBallKind()))
   }
 
   private[game] sealed trait Action
@@ -99,34 +100,33 @@ object GameLogicSupport {
     action
   }
 
-  private[this] def placeNextBalls(rng: Random, board: Board): Board = {
+  private[this] def placeNextBalls(board: Board)(implicit rng: Random): Board = {
     val newBoard =
       board.getOnDeckBalls
         .foldLeft(board) {
           case (curBoard, _) =>
-            pickRandomEmptyCell(rng, curBoard) match {
+            pickRandomEmptyCell(curBoard) match {
               case None => curBoard
               case Some((row, column)) =>
-                curBoard.withCellHavingBall(row, column, pickRandomBallKind(rng))
+                curBoard.withCellHavingBall(row, column, pickRandomBallKind())
             }
         }
-    newBoard.withOnDeckBalls(List.fill(3)(pickRandomBallKind(rng)))
+    newBoard.withOnDeckBalls(List.fill(3)(pickRandomBallKind()))
   }
 
   //????? decide where movability check is called and how/where tap state is udpated
   case class MoveResult(newBoard: Board, addedScore: Option[Int])
 
-  private[game] def doPass(rng: Random, board: Board): MoveResult =
-    MoveResult(placeNextBalls(rng, board), None)
+  private[game] def doPass(board: Board)(implicit rng: Random): MoveResult =
+    MoveResult(placeNextBalls(board), None)
 
 
-  private[game] def doTryMoveBall(rng: Random,
-                                  board: Board,  //???? change to game state to carry, update score
+  private[game] def doTryMoveBall(board: Board,  //???? change to game state to carry, update score?
                                   fromRow: RowIndex,
                                   fromCol: ColumnIndex, //???? combine into cell coord. pair/ID
                                   toRow: RowIndex,
                                   toCol: ColumnIndex
-                                  ): MoveResult = {
+                                  )(implicit rng: Random): MoveResult = {
     val canMoveBall = rng.nextBoolean()
     println("NIY: doMoveBall; doing RANDOM: canMoveBall " + canMoveBall)
 
@@ -138,14 +138,13 @@ object GameLogicSupport {
         println("-                              completesAnyLines " + completesAnyLines)
         completesAnyLines match {
           case false =>
-            //?????? place next three
-            MoveResult(placeNextBalls(rng, board), None) //???? clear selection state
+            MoveResult(placeNextBalls(board).withNoSelection, None)
           case true =>
             val ballCount = rng.between(5, 10)
             println("-                              ballCount " + ballCount)
             val moveScore = ballCount * 4 - 10
             //?????? "harvest" lines (clear, score)
-            MoveResult(placeNextBalls(rng, board), Some(moveScore)) //???? clear selection state
+            MoveResult(placeNextBalls(board).withNoSelection, Some(moveScore))
         }
     }
   }

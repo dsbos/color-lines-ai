@@ -19,9 +19,9 @@ private[manual] object GameState {
     private[manual] case class Done(score: Int) extends GameResult
   }
 
-  private[this] def makeInitialState(rng: Random): GameState = {
-    val board = GameLogicSupport.placeInitialBalls(rng, Board.empty)
-    GameState(rng, board, 0, None)
+  private[this] def makeInitialState(implicit rng: Random): GameState = {
+    val board = GameLogicSupport.placeInitialBalls(Board.empty)
+    GameState(board, 0, None)
   }
 
   private[game] def initial(seed: Long): GameState = makeInitialState(new Random(seed))
@@ -38,11 +38,10 @@ import GameState._
 
 /** Game state AND currently controller.
  */
-private[manual] case class GameState(rng: Random,
-                                     board: Board,
+private[manual] case class GameState(board: Board,
                                      score: Int, //???? with Positive
                                      gameResult: Option[GameResult]
-                                    ) {
+                                    )(implicit rng: Random) {
 
   //????? Probably move to GameLogicSupport
 
@@ -67,9 +66,9 @@ private[manual] case class GameState(rng: Random,
           //???? should TryMoveBall carry coordinates?:
           val (selRow, selColumn) =
             board.getSelectionCoordinates.getOrElse(sys.error("Shouldn't be able to happen"))
-          GameLogicSupport.doTryMoveBall(rng, board, selRow, selColumn, row, column)
+          GameLogicSupport.doTryMoveBall(board, selRow, selColumn, row, column)
         case Pass        =>
-          val passResult = GameLogicSupport.doPass(rng, board)
+          val passResult = GameLogicSupport.doPass(board)
           assert(passResult.addedScore.isEmpty)
           passResult.copy(newBoard = passResult.newBoard.withNoSelection)
       }
@@ -77,10 +76,10 @@ private[manual] case class GameState(rng: Random,
 
     val nextState =
       if (! moveResult.newBoard.isFull) {
-        GameState(rng, moveResult.newBoard, newScore, gameResult).asRight
+        GameState(moveResult.newBoard, newScore, gameResult).asRight
       }
       else {
-        GameState(rng, moveResult.newBoard, newScore, Some(Done(newScore))).asRight
+        GameState(moveResult.newBoard, newScore, Some(Done(newScore))).asRight
       }
     nextState
   }

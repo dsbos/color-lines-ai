@@ -58,7 +58,7 @@ private[this] case class GameUIState(gameState: GameState,
 
   private[ui] def toDisplayString: String = {
     renderTableMultilineWithSelection + "\n" +
-    s"XxTurn: Marking cursor: <row $selectedRow / column $selectedColumn>"
+    s"Score: ${gameState.score}  Marking cursor: <row $selectedRow / column $selectedColumn>"
   }
 
 }
