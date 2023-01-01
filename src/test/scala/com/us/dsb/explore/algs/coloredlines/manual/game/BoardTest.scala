@@ -11,7 +11,7 @@ import org.scalatest.matchers.should.Matchers._
 //import org.scalatest.funspec._
 //import org.scalatest.matchers._
 
-private[manual] class XxBoardTest extends AnyFunSpec {
+private[manual] class BoardTest extends AnyFunSpec {
 
 
   private[this] lazy val regularFilledBoard = {
@@ -38,22 +38,21 @@ private[manual] class XxBoardTest extends AnyFunSpec {
     }
   }
 
-  describe("Board$.initial") {
-    //import org.scalatest.matchers.should.Matchers._
-
-    it("should return empty board") {
-      val board = Board.empty
-      rowIndices.foreach {row =>
+  describe("Board$.empty should return board:") {
+    lazy val board = Board.empty
+    it("- with empty grid cells") {
+      rowIndices.foreach { row =>
         columnIndices.foreach { column =>
           val address = CellAddress(row, column)
-
-          // ?? which is clearer ("new" DSL vs. regular code; in code and in failure messages?)?:
-
-          assert(board.getBallStateAt(address).isEmpty)
-          assert(board.isSelectedAt(address) == false)
-
+          assert(board.xxgetBallStateAt(address).isEmpty)
         }
       }
+    }
+    it("- with empty on-deck list") {
+      assert(board.xxgetOnDeckBalls.isEmpty)
+    }
+    it("- with no selection") {
+      assert(board.xxhasAnyCellSelected == false)
     }
   }
 
