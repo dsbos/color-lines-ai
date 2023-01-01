@@ -3,7 +3,7 @@ package com.us.dsb.explore.algs.coloredlines.manual.game
 import org.scalatest.funspec.AnyFunSpec
 import cats.syntax.option._
 
-private[manual] class XxXxGameStateTest extends AnyFunSpec {
+class XxXxGameStateTest extends AnyFunSpec {
 
   describe("XxGameState$?. tryMoveAt") {
 //    import XxxPlayer._

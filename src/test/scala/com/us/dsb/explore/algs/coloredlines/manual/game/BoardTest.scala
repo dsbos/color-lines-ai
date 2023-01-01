@@ -11,7 +11,7 @@ import org.scalatest.matchers.should.Matchers._
 //import org.scalatest.funspec._
 //import org.scalatest.matchers._
 
-private[manual] class BoardTest extends AnyFunSpec {
+class BoardTest extends AnyFunSpec {
 
 
   private[this] lazy val regularFilledBoard = {
