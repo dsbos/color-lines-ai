@@ -21,7 +21,7 @@ import Board._
  */
 private[manual] class Board(private[this] val cellStates: Vector[CellState],
                             private[this] val onDeck: Iterable[BallKind],
-                           //???? move to game (low-level UI) state:
+                            //???? move to game (low-level tap-UI) state:
                             private[this] val selectionAddress: Option[CellAddress]
                            ) {
 
@@ -47,17 +47,16 @@ private[manual] class Board(private[this] val cellStates: Vector[CellState],
   private[game] def hasABallAt(address: CellAddress): Boolean = {
     cellStates(vectorIndex(address)).ballState.isDefined
   }
-  private[manual] def isSelectedAt(address: CellAddress): Boolean = {
-    //???????? simple equality
-    selectionAddress.fold(false)(_ == address)
-  }
-  private[game] def hasABallSelected: Boolean =
-    selectionAddress.fold(false)(hasABallAt)
+
+  // top-UI selection:
 
   private[game] def hasAnyCellSelected: Boolean = selectionAddress.isDefined
+  private[game] def getSelectionCoordinates: Option[CellAddress] = selectionAddress
+  private[manual] def isSelectedAt(address: CellAddress): Boolean =
+    selectionAddress.fold(false)(_ == address)
 
-  private[game] def getSelectionCoordinates: Option[CellAddress] =
-    selectionAddress
+  private[game] def hasABallSelected: Boolean = selectionAddress.fold(false)(hasABallAt)
+
 
   private def withCellState(address: CellAddress,
                             newState: CellState): Board =
