@@ -56,6 +56,34 @@ class BoardTest extends AnyFunSpec {
     }
   }
 
+  describe("Board.vectorIndex (private method we want to test directly):") {
+    import PrivateMethodTester._
+    val vectorIndex = PrivateMethod[Int](Symbol("vectorIndex"))
+
+    it("should compute 0 for first row, first column") {
+      val address_1_1  = CellAddress(RowIndex(Index(1)), columnIndices.head)
+      val index = Board.empty invokePrivate vectorIndex(address_1_1)
+      index shouldEqual 0
+    }
+
+    it("should compute array length - 1 for last row, last column") {
+      val address_n_n  = CellAddress(rowIndices.last, ColumnIndex(Index(4/*????9*/)))
+      val index = Board.empty invokePrivate vectorIndex(address_n_n)
+      index shouldEqual BoardOrder * BoardOrder - 1
+    }
+
+    describe("should compute indices in row-major order (chosen but ~isolated):") {
+      it("- (IO 1) row 1 column 3 => (IO 0) vector index 2") {
+        val `row 1 column 3`  = CellAddress(rowIndices.head, columnIndices(3 - 1))
+        Board.empty invokePrivate vectorIndex(`row 1 column 3`) shouldEqual 3 - 1
+      }
+      it("- (IO 1) row 3 column 1 => (IO 0) vector index 8") {
+        val `row 3 column 1`  = CellAddress(rowIndices(3 - 1), columnIndices.head)
+        Board.empty invokePrivate vectorIndex(`row 3 column 1`) shouldEqual
+            (3 - 1) * BoardOrder + (1 - 1)
+      }
+    }
+  }
 
   describe("XxBoard.withNoSelection") {
 
@@ -130,28 +158,5 @@ class BoardTest extends AnyFunSpec {
     }
   }
 
-  describe("XxBoard.vectorIndex (private method we want to test directly):") {
-    import PrivateMethodTester._
-    val vectorIndex = PrivateMethod[Int](Symbol("vectorIndex"))
-
-    it("Xxshould compute 0 for first row, first column") {
-      val index = Board.empty invokePrivate vectorIndex(Index(1), columnIndices.head)
-      index shouldEqual 0
-    }
-
-    it("Xxshould compute array length - 1 for last row, last column") {
-      val index = Board.empty invokePrivate vectorIndex(rowIndices.last, Index(4/*????9*/))
-      index shouldEqual BoardOrder * BoardOrder - 1
-    }
-
-    describe("Xxshould compute indices in row-major order (chosen but ~isolated)") {
-      it("Xx1, 2 => 1") {
-        Board.empty invokePrivate vectorIndex(Index(1), Index(2)) shouldEqual 1
-      }
-      it("Xx2, 1 => 3 (Order/row length/# columns)") {
-        Board.empty invokePrivate vectorIndex(Index(2), Index(1)) shouldEqual BoardOrder
-      }
-    }
-  }
 
 }
