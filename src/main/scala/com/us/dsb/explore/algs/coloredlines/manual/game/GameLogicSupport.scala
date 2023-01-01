@@ -142,7 +142,7 @@ object GameLogicSupport {
             println("-                              ballCount " + ballCount)
             val moveScore = ballCount * 4 - 10
             //?????? "harvest" lines (clear, score)
-            MoveResult(placeNextBalls(board).withNoSelection, Some(moveScore))
+            MoveResult(board.withNoSelection, Some(moveScore))
         }
     }
   }
