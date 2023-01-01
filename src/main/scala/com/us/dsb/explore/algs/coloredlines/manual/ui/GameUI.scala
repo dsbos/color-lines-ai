@@ -77,8 +77,7 @@ private[manual] object GameUI {
   private[this] def moveAtSelection(io: SegregatedTextIO,
                                     uiState: GameUIState
                                    ): GameUIState = {
-    val moveResult = uiState.gameState.tryMoveAt(CellAddress(uiState.selectedRow,
-                                                             uiState.selectedColumn))  //???????? decide continue CellAddress?
+    val moveResult = uiState.gameState.tryMoveAt(uiState.cursorAddress)
     moveResult match {
       case Right(newGameState) =>
         uiState.copy(gameState = newGameState)
@@ -163,7 +162,9 @@ private[manual] object GameUI {
 
   def runGame(io: SegregatedTextIO): GameUIResult = {
     val initialState =
-      GameUIState(GameState.initial, RowIndex(Index(1)), ColumnIndex(Index(1)))
+      GameUIState(gameState     = GameState.initial,
+                  cursorAddress = CellAddress(RowIndex(Index(1)),
+                                              ColumnIndex(Index(1))))
     getAndDoUiCommands(io, initialState)
   }
 

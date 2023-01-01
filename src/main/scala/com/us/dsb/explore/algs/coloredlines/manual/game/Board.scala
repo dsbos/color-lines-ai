@@ -47,12 +47,12 @@ private[manual] class Board(private[this] val cellStates: Vector[CellState],
   private[game] def hasABallAt(address: CellAddress): Boolean = {
     cellStates(vectorIndex(address)).ballState.isDefined
   }
-  private[manual] def isSelectedAt(xxaddress: CellAddress): Boolean = {
+  private[manual] def isSelectedAt(address: CellAddress): Boolean = {
     //???????? simple equality
-    selectionAddress.fold(false)(current => current.row == xxaddress.row && current.column == xxaddress.column)
+    selectionAddress.fold(false)(_ == address)
   }
   private[game] def hasABallSelected: Boolean =
-    selectionAddress.fold(false)(coords => hasABallAt(coords))
+    selectionAddress.fold(false)(hasABallAt)
 
   private[game] def hasAnyCellSelected: Boolean = selectionAddress.isDefined
 
@@ -91,7 +91,7 @@ private[manual] class Board(private[this] val cellStates: Vector[CellState],
   private[manual] def getStateChar(state: CellState, isSelected: Boolean): String = {  //???? move out
     state.ballState match {
       case Some(ball) => ball.getColoredCharSeq(isSelected)
-      case None => if (! isSelected) "-" else "@"
+      case None       => if (! isSelected) "-" else "@"
     }
   }
 

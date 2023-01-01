@@ -6,8 +6,7 @@ import com.us.dsb.explore.algs.coloredlines.manual.game.{ColumnIndex, Index, Row
 
 // ?? somewhere expand to allow for history (maybe via Semigroup or whatever has .compose?)
 private[this] case class GameUIState(gameState: GameState,
-                                     selectedRow: RowIndex,
-                                     selectedColumn: ColumnIndex) {
+                                     cursorAddress: CellAddress) {
 
   // ?? clean up that floorMod; I just want plain mathematical mod:
   private[this] def adjustAndWrapToRange(unincremented: Index, delta: Int): Index = {
@@ -26,11 +25,15 @@ private[this] case class GameUIState(gameState: GameState,
   //   our cursor-based row/column specification; what would GUI use, just
   //   9 table-level IDs tied to GUI cells/buttons?);
 
-  private[ui] def withRowAdjustedBy(delta: Int): GameUIState =
-    copy(selectedRow = RowIndex(adjustAndWrapToRange(selectedRow.value, delta)))
+  private[ui] def withRowAdjustedBy(delta: Int): GameUIState = {
+    val adjustedRow = RowIndex(adjustAndWrapToRange(cursorAddress.row.value, delta))
+    copy(cursorAddress = cursorAddress.copy(row = adjustedRow))
+  }
 
-  private[ui] def withColumnAdjustedBy(delta: Int): GameUIState =
-    copy(selectedColumn = ColumnIndex(adjustAndWrapToRange(selectedColumn.value, delta)))
+  private[ui] def withColumnAdjustedBy(delta: Int): GameUIState = {
+    val adjustedColumn = ColumnIndex(adjustAndWrapToRange(cursorAddress.column.value, delta))
+    copy(cursorAddress = cursorAddress.copy(column = adjustedColumn))
+  }
 
   private[this] def renderTableMultilineWithSelection: String = {
     val cellWidth = " X ".length
@@ -43,11 +46,11 @@ private[this] case class GameUIState(gameState: GameState,
 
     rowIndices.map { row =>
       columnIndices.map { column =>
-        val address = CellAddress(row, column)
+        val scanAddress = CellAddress(row, column)
         val cellStateStr =
-          gameState.board.getStateChar(gameState.board.getCellStateAt(address),
-                                       gameState.board.isSelectedAt(address))
-        if (row == selectedRow && column == selectedColumn ) {
+          gameState.board.getStateChar(gameState.board.getCellStateAt(scanAddress),
+                                       gameState.board.isSelectedAt(scanAddress))
+        if (scanAddress == cursorAddress ) {
           "*" + cellStateStr + "*"
         }
         else {
@@ -60,7 +63,8 @@ private[this] case class GameUIState(gameState: GameState,
 
   private[ui] def toDisplayString: String = {
     renderTableMultilineWithSelection + "\n" +
-    s"Score: ${gameState.score}  Marking cursor: <row $selectedRow / column $selectedColumn>"
+    s"Score: ${gameState.score}  " +
+        s"Marking cursor: <row ${cursorAddress.row} / column ${cursorAddress.column}>"
   }
 
 }
