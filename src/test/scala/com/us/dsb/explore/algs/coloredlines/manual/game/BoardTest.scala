@@ -104,26 +104,18 @@ class BoardTest extends AnyFunSpec {
     cancel()
   }
 
-  describe("XxBoard.toString") {
-    describe("Xxshould render board; some cases:") {
+  describe("Board.toString should render:") {
 
-      lazy val board0 = Board.empty
-      it("Xxempty board") {
-        //board0.toString shouldBe "<---------/---------/---------/---------/---------/---------/---------/---------/--------->"
-        board0.toString shouldBe "<----/----/----/---->"
-      }
-      // (Does initialize object XxxPlayer during ScalaTest registration:)
-//      (XxxPlayer.X :: XxxPlayer.O :: Nil).foreach { player =>
-//        it(s"board with an $player") {
-//          board0
-//              .XxwithCellMarkedForPlayer(rowIndices(0), ColumnIndex(Index(1)), player)
-//              .toString shouldBe s"<$player--------/---------/---------/---------/---------/---------/---------/---------/--------->"
-//        }
-//      }
-      it("Xxsome full board") {
-        regularFilledBoard.toString shouldBe "<crgk/ybcr/gkyb/crgk>"
-      }
+    it("- empty board") {
+      val expected =   // "<---------/---------/.../--------->"
+        (1 to BoardOrder).map { _ =>
+          columnIndices.map(_ => "-").mkString("")
+        }
+            .mkString("<", "/", ">")
+      Board.empty.toString shouldBe expected
     }
+    it("- board with grid balls") (pending)
+    it("- board with on-deck balls") (pending)
   }
 
   // ("it" and "cancel" to note without "!!! IGNORED !!!"
