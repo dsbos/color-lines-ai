@@ -2,7 +2,9 @@ package com.us.dsb.explore.algs.coloredlines.manual.game
 
 import com.us.dsb.explore.algs.coloredlines.manual.game.Board.CellAddress
 
+import java.util
 import scala.annotation.tailrec
+import scala.collection.mutable
 import scala.util.Random
 
 object GameLogicSupport {
@@ -120,14 +122,68 @@ object GameLogicSupport {
   private[game] def doPass(board: Board)(implicit rng: Random): MoveResult =
     MoveResult(placeNextBalls(board), None)
 
+  //???: likely move core algorithm out; possibly move outer code into Board:
+  /**
+   * @param toTapCell - must be empty */
+  private[this] def pathExists(board: Board,
+                               fromBallCell: CellAddress,
+                               toTapCell: CellAddress): Boolean = {
+    //???? CLEAN ALL THIS:
+    // - mutability (many eliminate, maybe keep for eventually wanted optimization
+    // - looping/recursion and exiting (what is class/method that ~loops until flag return value?_
+
+    // Blocked from (further) "reaching"--by ball or already reached in search.
+    val blockedAt: Array[Array[Boolean]] =
+      rowIndices.map { row =>
+          columnIndices.map { column =>
+            board.hasABallAt(CellAddress(row, column))
+          }.toArray
+      }.toArray
+    val cellsToExpandFrom = mutable.Queue[CellAddress](fromBallCell)
+
+    @tailrec
+    def loop: Boolean = {
+      cellsToExpandFrom.dequeueFirst(_ => true) match {
+        case None =>
+          // no more steps/cells to try
+          false
+        case Some(reachedAddr) =>
+          if (reachedAddr == toTapCell) {
+            // there is a path
+            true
+          }
+          else {
+            // no path yet; queue up neighbors neither blocked nor already processed
+            val neighborOffsets = List((1, 0), (-1, 0), (0, 1), (0, -1))
+            neighborOffsets.foreach { case (rowInc, colInc) =>
+              val rowOffset: Int = reachedAddr.row.value.value    - 1 + rowInc
+              val colOffset: Int = reachedAddr.column.value.value - 1 + colInc
+              if (! (0 <= rowOffset && rowOffset < BoardOrder &&
+                  0 <= colOffset && colOffset < BoardOrder)) {
+              } else if (blockedAt(rowOffset)(colOffset)) {
+              }
+              else            {
+                val neighborAddress = CellAddress(rowIndices(rowOffset),
+                                                  columnIndices(colOffset))
+                blockedAt(rowOffset).update(colOffset, true)
+                cellsToExpandFrom.enqueue(neighborAddress)
+              }
+            }
+            loop
+          }
+      }
+    }
+
+    loop
+  }
+
 
   private[game] def doTryMoveBall(board: Board,  //???? change to game state to carry and update score?
                                   from: CellAddress,
                                   to: CellAddress
                                   )(implicit rng: Random): MoveResult = {
-    val canMoveBall = rng.nextBoolean()
-    println("NIY: doMoveBall; doing RANDOM: canMoveBall " + canMoveBall)
-
+    val canMoveBall = pathExists(board, from, to)
+    println("doMoveBall; canMoveBall " + canMoveBall)
     canMoveBall match {
       case false =>  // can't move--ignore (keep selection state)
         MoveResult(board, None)
