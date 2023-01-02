@@ -102,8 +102,8 @@ libraryDependencies ++= Seq(
   //"org.scala-lang.modules" %% "scala-parser-combinators" % <version>
   //"org.scala-lang.modules" %% "scala-parallel-collections" % "???",
 
-  "org.scalatest" %% "scalatest" % "3.2.10" % Test,
-  //"org.scalatest" %% "scalatest" % "3.2.10",  // Not just in src/test
+  "org.scalatest" %% "scalatest" % "3.2.14" % Test,
+  //"org.scalatest" %% "scalatest" % "3.2.14",  // Not just in src/test
   //"org.scalactic" %% "scalactic" % "3.2.10"
 
   "junit" % "junit" % "4.13.1" % Test,
