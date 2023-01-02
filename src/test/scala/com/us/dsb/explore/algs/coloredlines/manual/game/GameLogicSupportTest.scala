@@ -10,7 +10,7 @@ import scala.util.Random
 
 class GameLogicSupportTest extends AnyFunSpec {
 
-  ignore("pickRandomBallKind") {}
+  describe("pickRandomBallKind") {pending}
 
   describe("pickRandomEmptyCell") {
     it("???NIY") {
@@ -22,12 +22,12 @@ class GameLogicSupportTest extends AnyFunSpec {
       pending
     }
   }
-  describe("interpretTapLocationToTapAction") {
+  ignore("interpretTapLocationToTapAction") {
     it("???NIY") {
       pending
     }
   }
-  describe("tapAndStateToTapAction") {
+  ignore("tapAndStateToTapAction") {
     it("???NIY") {
       pending
     }
@@ -71,7 +71,7 @@ class GameLogicSupportTest extends AnyFunSpec {
       }
     }
 
-    it("ball can't move across block (diagonal; random probe ball location)") {
+    it("ball can't move across block (complete diagonal; random probe ball location)") {
       val probeBall = GameLogicSupport.pickRandomBallKind()
       val diagonalBoard = makeDiagonallyDividedBoard
       val fromBallAddress = GameLogicSupport.pickRandomEmptyCell(diagonalBoard).get
@@ -91,7 +91,7 @@ class GameLogicSupportTest extends AnyFunSpec {
     }
   }
 
-  describe("doTryMoveBall") {
+  ignore("doTryMoveBall") {
     it("???NIY") {
       pending
     }
