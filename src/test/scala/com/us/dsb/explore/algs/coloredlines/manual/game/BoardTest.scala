@@ -153,11 +153,11 @@ class BoardTest extends AnyFunSpec {
     cancel()
   }
 
-  describe("XxBoard.xxxisFull") {
+  describe("XxBoard.isFull") {
     it("Xxshould not detect empty board as full") {
       Board.empty.isFull shouldBe false
     }
-//    it ("Xxshould not detect 1-move board as  full") {
+//    it ("Xxshould not detect 1-move board as full") {
 //      val board0 = Board.Xxinitial
 //      val someRow = rowIndices.head
 //      val someCol = columnIndices.head
