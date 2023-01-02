@@ -143,14 +143,14 @@ class BoardTest extends AnyFunSpec {
     it("- board with on-deck balls") (pending)
   }
 
-  // ("it" and "cancel" to note without "!!! IGNORED !!!"
+  // ("it" and "pending" to note without "!!! IGNORED !!!"
   it("XxBoard.renderMultiline") {
-    cancel()
+    pending
   }
 
   // ("it" and "cancel" to note without "!!! IGNORED !!!"
   it("XxBoard.renderCompactMultiline") {
-    cancel()
+    pending
   }
 
   describe("XxBoard.isFull") {
@@ -158,11 +158,6 @@ class BoardTest extends AnyFunSpec {
       Board.empty.isFull shouldBe false
     }
 //    it ("Xxshould not detect 1-move board as full") {
-//      val board0 = Board.Xxinitial
-//      val someRow = rowIndices.head
-//      val someCol = columnIndices.head
-//      val oneXboard = board0.XxwithCellMarkedForPlayer(someRow, someCol, XxxPlayer.X)
-//      oneXboard.hasNoMovesLeft shouldBe false
 //    }
     it ("Xxshould not detect 8-moves board as full") {
       variedAllButFilledBoard.isFull shouldBe(false)

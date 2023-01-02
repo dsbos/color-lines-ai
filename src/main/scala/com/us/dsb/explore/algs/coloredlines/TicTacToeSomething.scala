@@ -3,7 +3,7 @@ package com.us.dsb.explore.algs.coloredlines
 //import scala.tools.nsc.doc.html.HtmlTags.Input
 
 
-private[this] object XxxTicTacToeSomething extends App {
+private[this] object ColoredLinesSomething extends App {
 
 
   private[this] trait XxNeuralStructure

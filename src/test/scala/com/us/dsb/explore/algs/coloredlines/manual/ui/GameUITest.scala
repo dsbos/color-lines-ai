@@ -43,7 +43,7 @@ class GameUITest extends AnyFunSpec {
     describe("Xxfor some valid command:") {
 //      object LazyShared {
 //        val ioDouble = new SegregatedTextIODouble("u")
-//        val callResult = XxGameUI invokePrivate getCommand(ioDouble, XxxPlayer.X)
+//        val callResult = XxGameUI invokePrivate getCommand(ioDouble, Player.X)
 //      }
 //      import LazyShared._
 //
@@ -62,15 +62,15 @@ class GameUITest extends AnyFunSpec {
     describe("Xxfor invalid command(s) and then valid command:") {
 //      object LazyShared {
 //        val ioDouble = new SegregatedTextIODouble("?", "u")
-//        val callResult = XxGameUI invokePrivate getCommand(ioDouble, XxxPlayer.X)
+//        val callResult = XxGameUI invokePrivate getCommand(ioDouble, Player.X)
 //      }
 //      import LazyShared._
 //
 //      it("Xxshould emit prompt, error, and second prompt line") {
 //        ioDouble.getPrintedStrings shouldBe
-//            List("XxxPlayer X command?: ",
+//            List("Player X command?: ",
 //                 "Invalid input \"?\"; try u(p), d(own), l(eft), r(right), m(ark), or q(uit)",
-//                 "XxxPlayer X command?: ")
+//                 "Player X command?: ")
 //        // Theoretically, check specifics.
 //      }
 //      it("Xxshould return decoded eventual valid command") {
@@ -107,8 +107,8 @@ class GameUITest extends AnyFunSpec {
       it("""Xxnot mention O (probably)""" ) { // not if "X beat O"
         actual should not include ("O")
       }
-      it("""Xxbe "XxxPlayer X won" (currently) """) {
-        actual should be ("XxxPlayer X won")
+      it("""Xxbe "Player X won" (currently) """) {
+        actual should be ("Player X won")
       }
     }
     describe("""XxO win should report O won; text should:""") {
@@ -120,8 +120,8 @@ class GameUITest extends AnyFunSpec {
             and not include ("X")
             )
       }
-      it("""Xxbe "XxxPlayer O won" (currently) """) {
-        actual should be ("XxxPlayer O won")
+      it("""Xxbe "Player O won" (currently) """) {
+        actual should be ("Player O won")
       }
     }
     describe("Xxdraw should report draw; text should:") {
