@@ -63,10 +63,11 @@ private[manual] case class GameState(board: Board,
           MoveResult(board.withNoSelection, None)
         case TryMoveBall =>
           //???? should TryMoveBall carry coordinates?:
-          //?????? "sel"? "previous"? from/to?
-          val selAddress =
+          //???? need to split logical moves/plays (e.g., move ball from source
+          // to target from top-/selection-level ~UI (keep that separate from cursor-to-taps UI))
+          val fromAddress =
             board.getSelectionCoordinates.getOrElse(sys.error("Shouldn't be able to happen"))
-          GameLogicSupport.doTryMoveBall(board, selAddress, tapAddress)
+          GameLogicSupport.doTryMoveBall(board, fromAddress, tapAddress)
         case Pass        =>
           val passResult = GameLogicSupport.doPass(board)
           assert(passResult.addedScore.isEmpty)
