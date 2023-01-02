@@ -24,16 +24,11 @@ class XxTextIOTest extends AnyFunSpec {
       printedStringsReversed ::= lineOrLines
     }
 
-    override def readLine(prompt: String): String = {
+    override def readLine(prompt: String): Option[String] = {
       printedStringsReversed ::= prompt
-
-      stringsToRead match {
-        case head +: tail =>
-          stringsToRead = tail
-          head
-        case _ =>
-          ???
-      }
+      val result = stringsToRead.headOption
+      stringsToRead = stringsToRead.tail
+      result
     }
   }
 

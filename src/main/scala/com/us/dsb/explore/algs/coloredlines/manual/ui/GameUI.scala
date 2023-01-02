@@ -53,7 +53,8 @@ private[manual] object GameUI {
 
   @tailrec
   private[this] def getCommand(io: SegregatedTextIO): UICommand = {
-    val rawCmd = io.readPromptedLine(s"Command?: ")
+    val rawCmdOpt = io.readPromptedLine(s"Command?: ")
+    val rawCmd = rawCmdOpt.getOrElse(throw new RuntimeException("EOF (clean getCommand return path)"))
     parseCommand(rawCmd) match {
       case Right(cmd) => cmd
       case Left(msg) =>

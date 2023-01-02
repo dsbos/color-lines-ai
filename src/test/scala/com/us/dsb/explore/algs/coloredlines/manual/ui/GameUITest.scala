@@ -18,15 +18,11 @@ class GameUITest extends AnyFunSpec {
       printedStringsReversed ::= lineOrLines
     }
 
-    override def readPromptedLine(prompt: String): String = {
+    override def readPromptedLine(prompt: String): Option[String] = {
       printedStringsReversed ::= prompt
-      remainingInputs match {
-        case head +: tail =>
-          remainingInputs = tail
-          head
-        case Nil =>
-          ???
-      }
+      val result = remainingInputs.headOption
+      remainingInputs = remainingInputs.tail
+      result
     }
 
     override def printError(fullLine: String): Unit = {
