@@ -8,9 +8,9 @@ private[manual] class XxTextIOTest extends AnyFunSpec {
 
   it/*describe*/("TextIO?:") {
     cancel()
-    it("XxXxprintln ...") {
+    it("Xxprintln ...") {
     }
-    it("XxXxreadLine ...") {
+    it("XxreadLine ...") {
     }
   }
 
@@ -37,7 +37,7 @@ private[manual] class XxTextIOTest extends AnyFunSpec {
     }
   }
 
-  describe("ColoredConsoleTextIO") {
+  describe("XxColoredConsoleTextIO") {
     import org.scalatest.LoneElement._
 
     def getUUT(consoleIODouble: ConsoleIO): SegregatedTextIO = {
@@ -46,7 +46,7 @@ private[manual] class XxTextIOTest extends AnyFunSpec {
       //new PlainConsoleTextIO(consoleIODouble)
     }
 
-    describe("printStateText should print given text plainly; output should:") {
+    describe("XxprintStateText should print given text plainly; output should:") {
       lazy val printedStrings = {
         val consoleIODouble = new ConsoleIODouble
         val uut = getUUT(consoleIODouble)
@@ -55,19 +55,19 @@ private[manual] class XxTextIOTest extends AnyFunSpec {
 
         consoleIODouble.getPrintedStrings
       }
-      it("XxXxinclude given text") {
+      it("Xxinclude given text") {
         printedStrings.loneElement should include ("text")
       }
-      it("XxXxnot include color/decoration escape sequences") {
+      it("Xxnot include color/decoration escape sequences") {
         printedStrings.loneElement should not include (scala.io.AnsiColor.RED.take(1))
       }
-      it("XxXxinclude only given text") {
+      it("Xxinclude only given text") {
         printedStrings.loneElement should be ("text")
       }
     }
 
     // Demo:  Checking subconditions in multiple leaf-level tests:
-    describe("printError should print given text in red; output should:") {
+    describe("XxprintError should print given text in red; output should:") {
       // Note:  "lazy" avoids executing during ScalaTest's registration phase.
       lazy val printedStrings = {
         val consoleIODouble = new ConsoleIODouble
@@ -77,22 +77,22 @@ private[manual] class XxTextIOTest extends AnyFunSpec {
 
         consoleIODouble.getPrintedStrings
       }
-      it("XxXxinclude given text") {
+      it("Xxinclude given text") {
         printedStrings.loneElement should include ("given text")
       }
-      it("XxXxinclude red escape sequence") {
+      it("Xxinclude red escape sequence") {
         printedStrings.loneElement should include (scala.io.AnsiColor.RED) // ?? in order too
       }
-      it("XxXxinclude reset escape sequence") {
+      it("Xxinclude reset escape sequence") {
         printedStrings.loneElement should include (scala.io.AnsiColor.RESET)  // ?? in order too
       }
-      it("XxXxnot include only given text") {
+      it("Xxnot include only given text") {
         printedStrings.loneElement should not be ("given text")
       }
     }
 
     // Demo:  checking subconditions with "should ... and ..." (in one test):
-    it("XxXxprintResult should print given text in bold (should ... and ...)") {
+    it("XxprintResult should print given text in bold (should ... and ...)") {
       val consoleIODouble = new ConsoleIODouble
       val uut = getUUT(consoleIODouble)
 
@@ -108,7 +108,7 @@ private[manual] class XxTextIOTest extends AnyFunSpec {
               not be ("given text"))
     }
 
-    describe("readPromptedLine should print given prompt value and get input") {
+    describe("XxreadPromptedLine should print given prompt value and get input") {
       lazy val (printedStrings, lineRead) = {
         val consoleIODouble = new ConsoleIODouble("given input")
         val uut = getUUT(consoleIODouble)
@@ -117,21 +117,21 @@ private[manual] class XxTextIOTest extends AnyFunSpec {
 
         (consoleIODouble.getPrintedStrings, lineRead)
       }
-      describe("should print given prompted text in blue; output should:") {
-        it("XxXxinclude given text") {
+      describe("Xxshould print given prompted text in blue; output should:") {
+        it("Xxinclude given text") {
           printedStrings.loneElement should include("given text")
         }
-        it("XxXxinclude blue escape sequence") {
+        it("Xxinclude blue escape sequence") {
           printedStrings.loneElement should include(scala.io.AnsiColor.BLUE) // ?? in order too
         }
-        it("XxXxinclude reset escape sequence") {
+        it("Xxinclude reset escape sequence") {
           printedStrings.loneElement should include(scala.io.AnsiColor.RESET) // ?? in order too
         }
-        it("XxXxnot include only given text") {
+        it("Xxnot include only given text") {
           printedStrings.loneElement should not be ("given text")
         }
       }
-      it("XxXxshould read input line text") {
+      it("Xxshould read input line text") {
         lineRead should be ("given input")
       }
     }

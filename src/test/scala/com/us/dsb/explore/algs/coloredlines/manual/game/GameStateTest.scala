@@ -18,7 +18,7 @@ class XxXxGameStateTest extends AnyFunSpec {
     ignore("accepts marking an unmarked cell") {
 
     }
-    describe("rejects marking an already marked cell:") {
+    describe("Xxrejects marking an already marked cell:") {
 //      it("Xxother player") {
 //        val reMarkResult =
 //          XxGameState.Xxinitial(XxxPlayer.X)
@@ -36,7 +36,7 @@ class XxXxGameStateTest extends AnyFunSpec {
 //        assert(reMarkResult.isLeft, s" (reMarkResult = $reMarkResult)")
 //      }
     }
-    describe("detects wins:") {
+    describe("Xxdetects wins:") {
       it("Xxone case") {
 //
 //        val winState =
@@ -53,7 +53,7 @@ class XxXxGameStateTest extends AnyFunSpec {
       ignore("do more cases") {
       }
     }
-    describe("detects draws") {
+    describe("Xxdetects draws") {
 //      it("Xxone case") {
 //        val drawState =
 //          XxGameState.Xxinitial(XxxPlayer.X)

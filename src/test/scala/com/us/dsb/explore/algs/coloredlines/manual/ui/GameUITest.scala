@@ -40,11 +40,11 @@ private[manual] class GameUITest extends AnyFunSpec {
   }
 
 
-  describe("getCommand:") {
+  describe("XxgetCommand:") {
     import org.scalatest.PrivateMethodTester._
     val getCommand = PrivateMethod[UICommand](Symbol("getCommand"))
 
-    describe("for some valid command:") {
+    describe("Xxfor some valid command:") {
 //      object LazyShared {
 //        val ioDouble = new SegregatedTextIODouble("u")
 //        val callResult = XxGameUI invokePrivate getCommand(ioDouble, XxxPlayer.X)
@@ -63,7 +63,7 @@ private[manual] class GameUITest extends AnyFunSpec {
 //      }
     }
 
-    describe("for invalid command(s) and then valid command:") {
+    describe("Xxfor invalid command(s) and then valid command:") {
 //      object LazyShared {
 //        val ioDouble = new SegregatedTextIODouble("?", "u")
 //        val callResult = XxGameUI invokePrivate getCommand(ioDouble, XxxPlayer.X)
@@ -88,19 +88,19 @@ private[manual] class GameUITest extends AnyFunSpec {
 
   }
 
-  describe("runGame, just end to end (commands to game result):") {
+  describe("XxrunGame, just end to end (commands to game result):") {
     def runViaStrings(inputs: String*): String =
       GameUI.runGame(new SegregatedTextIODouble(inputs: _*)).text
     def runViaChars(inputChars: String): String =
       runViaStrings(inputChars.map("" + _): _*)
 
 
-    describe("'q' should quit (result in message mentioning \"quit\"):") {
+    describe("Xx'q' should quit (result in message mentioning \"quit\"):") {
       it("Xx'q' as first command") {
         runViaStrings("q") should include regex ("(?i)quit")
       }
     }
-    describe("""X win should report X won; text should:""") {
+    describe("""XxX win should report X won; text should:""") {
       lazy val actual = runViaChars("mdmrmdmrm")  // Xx: X--/OX-/-OX
       it("""Xxmention "win""") {
         actual should include regex "(?i)W[o]n"
@@ -115,7 +115,7 @@ private[manual] class GameUITest extends AnyFunSpec {
         actual should be ("XxxPlayer X won")
       }
     }
-    describe("""O win should report O won; text should:""") {
+    describe("""XxO win should report O won; text should:""") {
       lazy val actual = runViaChars("m rm dlm rm rm dlm")  // Xx: XO-/XOX/--O
       it("""Xxmention win, O, and not X (probably)""") {
         actual should (
@@ -128,7 +128,7 @@ private[manual] class GameUITest extends AnyFunSpec {
         actual should be ("XxxPlayer O won")
       }
     }
-    describe("draw should report draw; text should:") {
+    describe("Xxdraw should report draw; text should:") {
       /*
          XXO/OOX/XXO:
         (1, 1) - m
