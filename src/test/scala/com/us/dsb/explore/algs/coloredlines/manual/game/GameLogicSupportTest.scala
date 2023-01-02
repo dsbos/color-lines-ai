@@ -52,11 +52,38 @@ class GameLogicSupportTest extends AnyFunSpec {
           rowIndices.foreach { row =>
             columnIndices.foreach { column =>
               val toVacancyAddress = CellAddress(row, column)
-              GameLogicSupport.pathExists(board, fromBallAddress, toVacancyAddress) shouldBe true
+              val pathExists = GameLogicSupport.pathExists(board, fromBallAddress, toVacancyAddress)
+              withClue( s"from $fromBallAddress to $toVacancyAddress") {
+                pathExists shouldBe true
+              }
             }
           }
         }
       }
+    }
+
+    // top left (1, 1) to bottom right (N, N)
+    def makeDiagonallyDividedBoard: Board = {
+      val diagonalAddresses =
+        rowIndices.zip(columnIndices).map { case (row, column) => CellAddress(row, column) }
+      diagonalAddresses.foldLeft(board0) { case (board, address) =>
+        board.withCellHavingBall(address, GameLogicSupport.pickRandomBallKind())
+      }
+    }
+
+    it("ball can't move across block (diagonal; random probe ball location)") {
+      val probeBall = GameLogicSupport.pickRandomBallKind()
+      val diagonalBoard = makeDiagonallyDividedBoard
+      val fromBallAddress = GameLogicSupport.pickRandomEmptyCell(diagonalBoard).get
+      val boardWithProbe = diagonalBoard.withCellHavingBall(fromBallAddress, probeBall)
+
+      // transpose ball coordinates to get cell across boundary
+      val toVacancyAddress =
+        CellAddress(row = RowIndex(fromBallAddress.column.value),
+                    column = ColumnIndex(fromBallAddress.row.value))
+
+      val pathExists = GameLogicSupport.pathExists(boardWithProbe, fromBallAddress, toVacancyAddress)
+      pathExists shouldBe false
     }
 
     it("???NIY") {
