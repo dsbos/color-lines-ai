@@ -23,10 +23,15 @@ package object game {
   @newtype private[manual] case class RowIndex(value: Index)
   @newtype private[manual] case class ColumnIndex(value: Index)
 
+  //???? add utility methods like withColumnAdjustedBy(delta: Int)? (see GameUIState)
+
   // (unsafeFrom that should be okay since based on BoardOrder:)
   private[manual] val rowIndices: IndexedSeq[RowIndex] =
     (1 to BoardOrder).map(i => RowIndex(Index.unsafeFrom(i)))
   private[manual] val columnIndices: IndexedSeq[ColumnIndex] =
     (1 to BoardOrder).map(i => ColumnIndex(Index.unsafeFrom(i)))
+
+  //?? factor out frequent row-and-column iteration pattern (set of cells, iterate, passing CellAddress
+
 
 }

@@ -9,11 +9,13 @@ import scala.util.Random
 
 object GameLogicSupport {
 
-  private[this] def pickRandomBallKind()(implicit rng: Random): BallKind =
+  // (was "private[this]" before test calls:)
+  private[game] def pickRandomBallKind()(implicit rng: Random): BallKind =
     BallKind.values(rng.nextInt(BallKind.values.size))
 
+  // (was "private[this]" before test calls:)
   @tailrec
-  private[this] def pickRandomEmptyCell(board: Board)(implicit rng: Random): Option[CellAddress] = {
+  private[game] def pickRandomEmptyCell(board: Board)(implicit rng: Random): Option[CellAddress] = {
     if (board.isFull)
       None
     else {
@@ -125,7 +127,8 @@ object GameLogicSupport {
   //???: likely move core algorithm out; possibly move outer code into Board:
   /**
    * @param toTapCell - must be empty */
-  private[this] def pathExists(board: Board,
+  // (was "private[this]" before test calls:)
+  private[game] def pathExists(board: Board,
                                fromBallCell: CellAddress,
                                toTapCell: CellAddress): Boolean = {
     //???? CLEAN ALL THIS:
