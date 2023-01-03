@@ -37,25 +37,28 @@ private[manual] object GameUI {
   // parse function, but then (sub)layers wouldn't be separated.)
 
   // ?? revisit Either--use something fancier (MonadError)?
-  private[this] def parseCommand(rawCmd: String): Either[String, UICommand] = {
+  private[this] def parseCommand(rawCmdLine: Option[String]): Either[String, UICommand] = {
     import UICommand._
-    rawCmd match {
-      case "u" => Up.asRight
-      case "d" => Down.asRight
-      case "l" => Left.asRight
-      case "r" => Right.asRight
-      case "m" => Move.asRight
-      case "q" => Quit.asRight
-      case _ =>
-        s"Invalid input \"$rawCmd\"; try u(p), d(own), l(eft), r(right), m(ove), or q(uit)".asLeft
+    rawCmdLine match {
+      case None       => Quit.asRight
+      case Some(line) =>
+        line match {
+          case "u" => Up.asRight
+          case "d" => Down.asRight
+          case "l" => Left.asRight
+          case "r" => Right.asRight
+          case "m" => Move.asRight
+          case "q" => Quit.asRight
+          case  _  =>
+            s"Invalid input \"$line\"; try u(p), d(own), l(eft), r(right), m(ove), or q(uit)".asLeft
+        }
     }
   }
 
   @tailrec
   private[this] def getCommand(io: SegregatedTextIO): UICommand = {
-    val rawCmdOpt = io.readPromptedLine(s"Command?: ")
-    val rawCmd = rawCmdOpt.getOrElse(throw new RuntimeException("EOF (clean getCommand return path)"))
-    parseCommand(rawCmd) match {
+    val cmdLineOpt = io.readPromptedLine(s"Command?: ")
+    parseCommand(cmdLineOpt) match {
       case Right(cmd) => cmd
       case Left(msg) =>
         io.printError(msg)
