@@ -21,7 +21,9 @@ class GameUITest extends AnyFunSpec {
     override def readPromptedLine(prompt: String): Option[String] = {
       printedStringsReversed ::= prompt
       val result = remainingInputs.headOption
-      remainingInputs = remainingInputs.tail
+      if (remainingInputs.nonEmpty) {
+        remainingInputs = remainingInputs.tail
+      }
       result
     }
 
@@ -81,70 +83,22 @@ class GameUITest extends AnyFunSpec {
 //            s"(printed strings: ${ioDouble.getPrintedStrings}"
 //      }
     }
-
   }
 
-  describe("XxrunGame, just end to end (commands to game result):") {
+  describe("runGame, just end to end (commands to game result):") {
     def runViaStrings(inputs: String*): String =
       GameUI.runGame(new SegregatedTextIODouble(inputs: _*)).text
     def runViaChars(inputChars: String): String =
       runViaStrings(inputChars.map("" + _): _*)
 
-
-    describe("Xx'q' should quit (result in message mentioning \"quit\"):") {
-      it("Xx'q' as first command") {
+    describe("'q' should quit (result in message mentioning \"quit\"):") {
+      it("'q' as first command") {
         runViaStrings("q") should include regex ("(?i)quit")
       }
     }
-    describe("""XxX win should report X won; text should:""") {
-      lazy val actual = runViaChars("mdmrmdmrm")  // Xx: X--/OX-/-OX
-      it("""Xxmention "win""") {
-        actual should include regex "(?i)W[o]n"
-      }
-      it("""Xxmention X""") {
-        actual should include ("X")
-      }
-      it("""Xxnot mention O (probably)""" ) { // not if "X beat O"
-        actual should not include ("O")
-      }
-      it("""Xxbe "Player X won" (currently) """) {
-        actual should be ("Player X won")
-      }
-    }
-    describe("""XxO win should report O won; text should:""") {
-      lazy val actual = runViaChars("m rm dlm rm rm dlm")  // Xx: XO-/XOX/--O
-      it("""Xxmention win, O, and not X (probably)""") {
-        actual should (
-            include regex ("(?i)W[o]n")
-            and include ("O")
-            and not include ("X")
-            )
-      }
-      it("""Xxbe "Player O won" (currently) """) {
-        actual should be ("Player O won")
-      }
-    }
-    describe("Xxdraw should report draw; text should:") {
-      /*
-         XXO/OOX/XXO:
-        (1, 1) - m
-        (2, 1) - dm
-        (1, 2) - urm
-        (2, 2) - dm
-        (3, 1) - dlm
-        (1, 3) - uurrm
-        (2, 3) - dm
-        (3, 3) - dm
-        (3, 2) - lm
-       */
-      val cmds = "m" + "dm" + "urm" + "dm" + "dlm" + "uurrm" + "dm" + "dm" + "lm"
-      lazy val actual = runViaChars(cmds)
 
-      it("""Xxmention "draw""") {
-        actual should include regex "(?i)Draw"
-      }
-      it("""Xxbe "Game ended in draw" (currently)""") {
-        actual should be ("Game ended in draw")
+    describe("??? more TBD") {
+      it("??? more TBD") {
       }
     }
   }

@@ -16,7 +16,7 @@ class XxTextIOTest extends AnyFunSpec {
 
   // Crude, manual stub and spy ConsoleIO.
   class ConsoleIODouble(inputLines: String*) extends ConsoleIO {
-    private[this] var stringsToRead = inputLines
+    private[this] var remainingInputs = inputLines
     private[this] var printedStringsReversed: List[String] = Nil;
     def getPrintedStrings: List[String] = printedStringsReversed.reverse
 
@@ -26,13 +26,15 @@ class XxTextIOTest extends AnyFunSpec {
 
     override def readLine(prompt: String): Option[String] = {
       printedStringsReversed ::= prompt
-      val result = stringsToRead.headOption
-      stringsToRead = stringsToRead.tail
+      val result = remainingInputs.headOption
+      if (remainingInputs.nonEmpty) {
+        remainingInputs = remainingInputs.tail
+      }
       result
     }
   }
 
-  describe("XxColoredConsoleTextIO") {
+  describe("ColoredConsoleTextIO") {
     import org.scalatest.LoneElement._
 
     def getUUT(consoleIODouble: ConsoleIO): SegregatedTextIO = {
@@ -103,31 +105,31 @@ class XxTextIOTest extends AnyFunSpec {
               not be ("given text"))
     }
 
-    describe("XxreadPromptedLine should print given prompt value and get input") {
-      lazy val (printedStrings, lineRead) = {
+    describe("readPromptedLine should print given prompt value and get input") {
+      lazy val (printedStrings, lineReadOpt) = {
         val consoleIODouble = new ConsoleIODouble("given input")
         val uut = getUUT(consoleIODouble)
 
-        val lineRead = uut.readPromptedLine("given text")
+        val lineReadOpt = uut.readPromptedLine("given text")
 
-        (consoleIODouble.getPrintedStrings, lineRead)
+        (consoleIODouble.getPrintedStrings, lineReadOpt)
       }
-      describe("Xxshould print given prompted text in blue; output should:") {
-        it("Xxinclude given text") {
+      describe("should print given prompted text in blue; output should:") {
+        it("include given text") {
           printedStrings.loneElement should include("given text")
         }
-        it("Xxinclude blue escape sequence") {
+        it("include blue escape sequence") {
           printedStrings.loneElement should include(scala.io.AnsiColor.BLUE) // ?? in order too
         }
-        it("Xxinclude reset escape sequence") {
+        it("include reset escape sequence") {
           printedStrings.loneElement should include(scala.io.AnsiColor.RESET) // ?? in order too
         }
-        it("Xxnot include only given text") {
+        it("not include only given text") {
           printedStrings.loneElement should not be ("given text")
         }
       }
-      it("Xxshould read input line text") {
-        lineRead should be ("given input")
+      it("should read input line text") {
+        lineReadOpt shouldBe Some("given input")
       }
     }
 
