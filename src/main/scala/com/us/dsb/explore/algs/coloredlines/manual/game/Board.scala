@@ -62,6 +62,9 @@ private[manual] class Board(private[this] val cellStates: Vector[CellBallState],
                                        ball: BallKind): Board =
     withCellBallState(address, getCellBallStateAt(address).copy(ballState = Some(ball)))
 
+  private[game] def withCellHavingNoBall(address: CellAddress): Board =
+    withCellBallState(address, getCellBallStateAt(address).copy(ballState = None))
+
   private[game] def withCellSelected(address: CellAddress): Board =
     new Board(cellStates, onDeck, Some(address))
 

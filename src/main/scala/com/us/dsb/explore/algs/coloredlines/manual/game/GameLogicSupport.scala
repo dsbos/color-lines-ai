@@ -157,7 +157,7 @@ object GameLogicSupport {
           }
           else {
             // no path yet; queue up neighbors neither blocked nor already processed
-            val neighborOffsets = List((1, 0), (-1, 0), (0, 1), (0, -1))
+            val neighborOffsets = List((+1, 0), (-1, 0), (0, +1), (0, -1))
             neighborOffsets.foreach { case (rowInc, colInc) =>
               val rowOffset: Int = reachedAddr.row.value.value    - 1 + rowInc
               val colOffset: Int = reachedAddr.column.value.value - 1 + colInc
@@ -186,22 +186,22 @@ object GameLogicSupport {
                                   to: CellAddress
                                   )(implicit rng: Random): MoveResult = {
     val canMoveBall = pathExists(board, from, to)
-    println("doMoveBall; canMoveBall " + canMoveBall)
+    println("doTryMoveBall.1: canMoveBall " + canMoveBall)
     canMoveBall match {
       case false =>  // can't move--ignore (keep selection state)
         MoveResult(board, None)
       case true =>
-        val completesAnyLines = rng.nextBoolean()
-        println("-                              completesAnyLines " + completesAnyLines)
-        completesAnyLines match {
-          case false =>
-            MoveResult(placeNextBalls(board).withNoSelection, None)
-          case true =>
-            val ballCount = rng.between(5, 10)
-            println("-                              ballCount " + ballCount)
-            val moveScore = ballCount * 4 - 10
-            //?????? "harvest" lines (clear, score)
-            MoveResult(board.withNoSelection, Some(moveScore))
+        val moveBallColor = board.getBallStateAt(from).get //????
+        val postMoveBoard = board.withCellHavingNoBall(from).withCellHavingBall(to, moveBallColor)
+        println("doTryMoveBall.2: moved $moveBallColor ball from $from to $to")
+
+        val ballMoveScore = LineDetector.scoreMove(postMoveBoard, from, to)
+        println("-                              ballMoveScore " + ballMoveScore)
+        ballMoveScore match {
+          case None =>
+            MoveResult(placeNextBalls(postMoveBoard).withNoSelection, None)
+          case Some(increment) =>
+            MoveResult(postMoveBoard.withNoSelection, Some(increment))
         }
     }
   }
