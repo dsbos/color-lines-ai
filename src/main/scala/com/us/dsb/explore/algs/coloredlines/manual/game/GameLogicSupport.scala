@@ -195,13 +195,13 @@ object GameLogicSupport {
         val postMoveBoard = board.withCellHavingNoBall(from).withCellHavingBall(to, moveBallColor)
         println(s"doTryMoveBall.2: moved $moveBallColor ball from $from to $to")
 
-        val ballMoveScore = LineDetector.scoreMove(postMoveBoard, from, to)
+        val (postHandlingBoard, ballMoveScore) = LineDetector.handleBallArrival(postMoveBoard, from, to)
         println("-                              ballMoveScore " + ballMoveScore)
         ballMoveScore match {
           case None =>
-            MoveResult(placeNextBalls(postMoveBoard).withNoSelection, None)
+            MoveResult(placeNextBalls(postHandlingBoard).withNoSelection, None)
           case Some(increment) =>
-            MoveResult(postMoveBoard.withNoSelection, Some(increment))
+            MoveResult(postHandlingBoard.withNoSelection, Some(increment))
         }
     }
   }

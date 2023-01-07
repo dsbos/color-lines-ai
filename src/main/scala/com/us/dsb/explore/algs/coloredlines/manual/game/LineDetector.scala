@@ -65,7 +65,8 @@ object LineDetector {
   }
 
   //??? maybe save axis vector (for use in ball deletion)
-  private[this] case class AxisResult(axisLineAddedLength: Int,  // length WITHOUT moved ball
+  private[this] case class AxisResult(axis: LineAxis,
+                                      axisLineAddedLength: Int,  // length WITHOUT moved ball
                                       directionDetails: List[RelativeDirectionResult])
 
   private[this] def computeLineAxisResult(moveBallColor: BallKind,
@@ -83,7 +84,7 @@ object LineDetector {
       }
     val axisLineAddedLength = directionsResults.map(_.excursionLength).sum
 
-    val result = AxisResult(axisLineAddedLength, directionsResults)  //????
+    val result = AxisResult(lineDirectionAxis, axisLineAddedLength, directionsResults)  //????
     println(s"-  computeLineAxisResult( axis = $lineDirectionAxis ).9 result = $result")
     result
   }
@@ -92,37 +93,58 @@ object LineDetector {
    * @return
    *   None if no line(s) completed; score increment otherwise
    */
-  private[game] def scoreMove(board: Board,
-                              ballFrom: CellAddress,
-                              ballTo: CellAddress
-                             ): Option[Int] = {
-    println(s"+scoreMove(... ballTo = $ballTo...).1")
+  private[game] def handleBallArrival(board: Board,
+                                      ballFrom: CellAddress,
+                                      ballTo: CellAddress
+                                     ): (Board, Option[Int]) = {
+    println(s"+handleBallArrival(... ballTo = $ballTo...).1")
     val moveBallColor = board.getBallStateAt(ballTo).get //????
 
-    val newBallRowIndex = ballTo.row.value.value
-    val newBallColIndex = ballTo.column.value.value
-
-    val newAxesResults: List[AxisResult] =
+    val allAxesResults: List[AxisResult] =
       lineAxes.map { lineAxis =>
         computeLineAxisResult(moveBallColor, board, ballTo, lineAxis)
       }
-    println("??? newAxesResults:" + newAxesResults.mkString("\n- ", "\n- ", ""))
-    val completedLineAxesResults = newAxesResults.filter(_.axisLineAddedLength + 1 >= LineOrder)
-    val result =
-    completedLineAxesResults match {
-      case Nil =>
-        None // return None for score (signal to place 3 more IF ball moved by user
-      case linesAxes =>
-        val totalBallsBeingRemoved = 1 + linesAxes.map(_.axisLineAddedLength).sum
-        println(s" scoreMove(... ballTo = $ballTo...).x totalBallsBeingRemoved = $totalBallsBeingRemoved")
-        val score = totalBallsBeingRemoved * 4 - 10
+    println("??? allAxesResults:" + allAxesResults.mkString("\n- ", "\n- ", ""))
+    val completedLineAxesResults = allAxesResults.filter(_.axisLineAddedLength + 1 >= LineOrder)
+    println("??? completedLineAxesResults:" + completedLineAxesResults.mkString("\n- ", "\n- ", ""))
+    val (boardResult, scoreResult) =
+      completedLineAxesResults match {
+        case Nil =>
+          (board, None) // return None for score (signal to place 3 more IF ball moved by user)
+        case linesAxes =>
+          val totalBallsBeingRemoved = 1 + linesAxes.map(_.axisLineAddedLength).sum
+          println(s" scoreMove(... ballTo = $ballTo...).x totalBallsBeingRemoved = $totalBallsBeingRemoved")
+          val score = totalBallsBeingRemoved * 4 - 10
 
-        println("?????? CONTINUE: remove line(s) balls")
+          def removeCompletedLineBalls(preremovalBoard: Board,
+                                       completedLineAxesResults: List[AxisResult]): Board = {
+            val newBallRemovedBoard = preremovalBoard.withCellHavingNoBall(ballTo)
+            val linesRemovedBoard =
+              completedLineAxesResults.foldLeft(newBallRemovedBoard){ case (axisBoard, axisData) =>
+                val fromOffset = - axisData.directionDetails(1).excursionLength
+                val toOffset   = axisData.directionDetails(0).excursionLength
+                val lineRemovedBoard =
+                  (fromOffset to toOffset).foldLeft(axisBoard) { case (directionBoard, xxoffset) =>
+                    val xxnewBallRowIndex = ballTo.row.value.value
+                    val xxnewBallColIndex = ballTo.column.value.value
+                    import axisData.axis.{rowDelta, colDelta}
+                    val rawRowIndex = xxnewBallRowIndex + rowDelta * xxoffset
+                    val rawColIndex = xxnewBallColIndex + colDelta * xxoffset
+                    val cellAddress = CellAddress(RowIndex(Index.unsafeFrom(rawRowIndex)),
+                                                 ColumnIndex(Index.unsafeFrom(rawColIndex)))
+                    directionBoard.withCellHavingNoBall(cellAddress)
+                  }
+                lineRemovedBoard
+              }
+            linesRemovedBoard
+          }
 
-        Some(score)
-    }
-    println(s"-scoreMove(... ballTo = $ballTo...).9 = $result")
-    result
+          val postLinesRemovalBoard = removeCompletedLineBalls(board,
+                                                               completedLineAxesResults);
+          (postLinesRemovalBoard, Some(score))
+      }
+    println(s"-handleBallArrival(... ballTo = $ballTo...).9 = score result = $scoreResult")
+    (boardResult, scoreResult)
   }
 
 }
