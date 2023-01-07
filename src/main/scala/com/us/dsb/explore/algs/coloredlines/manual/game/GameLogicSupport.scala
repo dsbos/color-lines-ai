@@ -1,6 +1,7 @@
 package com.us.dsb.explore.algs.coloredlines.manual.game
 
 import com.us.dsb.explore.algs.coloredlines.manual.game.Board.CellAddress
+import com.us.dsb.explore.algs.coloredlines.manual.game.lines.LineDetector
 
 import java.util
 import scala.annotation.tailrec
