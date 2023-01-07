@@ -89,6 +89,28 @@ object LineDetector {
     result
   }
 
+  private[this] def removeCompletedLineBalls(ballTo: CellAddress,
+                                             preremovalBoard: Board,
+                                             completedLineAxesResults: List[AxisResult]): Board = {
+    val newBallRemovedBoard = preremovalBoard.withCellHavingNoBall(ballTo)
+    val linesRemovedBoard =
+      completedLineAxesResults.foldLeft(newBallRemovedBoard){ case (axisBoard, axisResult) =>
+        val fromOffset = - axisResult.directionDetails(1).excursionLength
+        val toOffset   =   axisResult.directionDetails(0).excursionLength
+        val lineRemovedBoard =
+          (fromOffset to toOffset).foldLeft(axisBoard) { case (directionBoard, xxoffset) =>
+            import axisResult.axis.{rowDelta, colDelta}
+            val rawRowIndex = ballTo.row.value.value + rowDelta * xxoffset
+            val rawColIndex = ballTo.column.value.value + colDelta * xxoffset
+            val cellAddress = CellAddress(RowIndex(Index.unsafeFrom(rawRowIndex)),
+                                          ColumnIndex(Index.unsafeFrom(rawColIndex)))
+            directionBoard.withCellHavingNoBall(cellAddress)
+          }
+        lineRemovedBoard
+      }
+    linesRemovedBoard
+  }
+
   /**
    * @return
    *   None if no line(s) completed; score increment otherwise
@@ -116,30 +138,8 @@ object LineDetector {
           println(s" scoreMove(... ballTo = $ballTo...).x totalBallsBeingRemoved = $totalBallsBeingRemoved")
           val score = totalBallsBeingRemoved * 4 - 10
 
-          def removeCompletedLineBalls(preremovalBoard: Board,
-                                       completedLineAxesResults: List[AxisResult]): Board = {
-            val newBallRemovedBoard = preremovalBoard.withCellHavingNoBall(ballTo)
-            val linesRemovedBoard =
-              completedLineAxesResults.foldLeft(newBallRemovedBoard){ case (axisBoard, axisData) =>
-                val fromOffset = - axisData.directionDetails(1).excursionLength
-                val toOffset   = axisData.directionDetails(0).excursionLength
-                val lineRemovedBoard =
-                  (fromOffset to toOffset).foldLeft(axisBoard) { case (directionBoard, xxoffset) =>
-                    val xxnewBallRowIndex = ballTo.row.value.value
-                    val xxnewBallColIndex = ballTo.column.value.value
-                    import axisData.axis.{rowDelta, colDelta}
-                    val rawRowIndex = xxnewBallRowIndex + rowDelta * xxoffset
-                    val rawColIndex = xxnewBallColIndex + colDelta * xxoffset
-                    val cellAddress = CellAddress(RowIndex(Index.unsafeFrom(rawRowIndex)),
-                                                 ColumnIndex(Index.unsafeFrom(rawColIndex)))
-                    directionBoard.withCellHavingNoBall(cellAddress)
-                  }
-                lineRemovedBoard
-              }
-            linesRemovedBoard
-          }
-
-          val postLinesRemovalBoard = removeCompletedLineBalls(board,
+          val postLinesRemovalBoard = removeCompletedLineBalls(ballTo,
+                                                               board,
                                                                completedLineAxesResults);
           (postLinesRemovalBoard, Some(score))
       }
