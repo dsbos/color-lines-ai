@@ -8,44 +8,42 @@ import scala.util.Random
 
 object LineDetector {
 
-  private[this] val lineAxisVectors =
+  private[this] case class LineAxis(labelArray: String,
+                                    rowDelta: Int, // -1 / 0 / 1 (Make refined type?)
+                                    colDelta: Int)
+  private[this] val lineAxes =
     List(
-      ( 0, +1),  // W  --> E
-      (+1, +1),  // NW --> SE
-      (+1,  0),  // N  --> S
-      (+1, -1))  // NW --> SW
-  private val directionFactors = List(1, -1) // use type of length 2 (refined List?, Tuple2?, some array?)
+      LineAxis("→", 0, +1),  // W  --> E    →
+      LineAxis("↘",+1, +1),  // NW --> SE   ↘
+      LineAxis("↓", 0, +1),  // N  --> S    ↓
+      LineAxis("↙",+1, -1))  // NW --> SW   ↙
+  private val relativeDirectionFactors = List(1, -1) // use type of length 2 (refined List?, Tuple2?, some array?)
 
-  //???? add removing in-line balls
   /**
    * @return
-   *   None if not line(s) completed; score increment otherwise
+   *   None if no line(s) completed; score increment otherwise
    */
   private[game] def scoreMove(board: Board,
                               ballFrom: CellAddress,
                               ballTo: CellAddress
                              ): Option[Int] = {
+    println(s"+scoreMove(... ballTo = $ballTo...).1")
     val moveBallColor = board.getBallStateAt(ballTo).get //????
-    println(s"scoreMove(... ballTo = $ballTo...).1")
 
     val newBallRowIndex = ballTo.row.value.value
     val newBallColIndex = ballTo.column.value.value
 
-    //??? maybe save axis vector (for use in ball deletion)
-    case class xxAxisResult(axisLineAddedLength: Int,  // length WITHOUT moved ball
-                            directionDetails: List[xxDirectionResult])
-    case class xxDirectionResult(excursionLength: Int)
-
-    def computeDirectionResult(axisRowDelta: Int,
-                               axisColDelta: Int,
-                               directionFactor: Int): xxDirectionResult = {
-      println(s"??? computeDirectionResult( axis: ($axisRowDelta / $axisColDelta), dir: $directionFactor).1" )
+    case class RelativeDirectionResult(excursionLength: Int)
+    def computeDirectionResult(lineDirectionAxis: LineAxis,
+                               directionFactor: Int): RelativeDirectionResult = {
+      import lineDirectionAxis._
+      println(s"+    computeDirectionResult( axis: $lineDirectionAxis, dir: $directionFactor ).1" )
       var excursionLength = 0
       while ( {
         val candidateExcursionLength = excursionLength + 1
-        val candidateRowIndex = newBallRowIndex + axisRowDelta * directionFactor * candidateExcursionLength
-        val candidateColIndex = newBallColIndex + axisColDelta * directionFactor * candidateExcursionLength
-        println(s"??.n.0: candidate address: ($candidateRowIndex / $candidateColIndex)")
+        val candidateRowIndex = newBallRowIndex + rowDelta * directionFactor * candidateExcursionLength
+        val candidateColIndex = newBallColIndex + colDelta * directionFactor * candidateExcursionLength
+        println(s"    ??.n.0: candidate address: ($candidateRowIndex / $candidateColIndex)")
 
         val inRange =
           1 <= candidateRowIndex && candidateRowIndex <= BoardOrder &&
@@ -80,29 +78,32 @@ object LineDetector {
         }
         haveMatchingBall
       }) {}
-      val result = xxDirectionResult(excursionLength)  //????
-      println(s"??? computeDirectionResult( axis: ($axisRowDelta / $axisColDelta), dir: $directionFactor).2: result = " + result)
+      val result = RelativeDirectionResult(excursionLength)  //????
+      println(s"-    computeDirectionResult( axis: $lineDirectionAxis, dir: $directionFactor ).9 result = $result" )
       result
     }
 
-    def computeLineAxisResult(axisRowDelta: Int, axisColDelta: Int): xxAxisResult = {
-      val directionsResults: List[xxDirectionResult] =
-        directionFactors.map { directionFactor =>
-          computeDirectionResult(axisRowDelta,
-                                 axisColDelta,
+    //??? maybe save axis vector (for use in ball deletion)
+    case class AxisResult(axisLineAddedLength: Int,  // length WITHOUT moved ball
+                          directionDetails: List[RelativeDirectionResult])
+
+    def computeLineAxisResult(lineDirectionAxis: LineAxis): AxisResult = {
+      println(s"+  computeLineAxisResult( axis = $lineDirectionAxis ).1")
+      val directionsResults: List[RelativeDirectionResult] =
+        relativeDirectionFactors.map { directionFactor =>
+          computeDirectionResult(lineDirectionAxis,
                                  directionFactor)
         }
       val axisLineAddedLength = directionsResults.map(_.excursionLength).sum
 
-      val result = xxAxisResult(axisLineAddedLength, directionsResults)  //????
-      println("??? computeLineAxisResult: result = " + result)
+      val result = AxisResult(axisLineAddedLength, directionsResults)  //????
+      println(s"-  computeLineAxisResult( axis = $lineDirectionAxis ).9 result = $result")
       result
     }
 
-    val newAxesResults: List[xxAxisResult] =
-      lineAxisVectors.map { case (axisRowDelta, axisColDelta) =>
-        computeLineAxisResult(axisRowDelta, axisColDelta)
-
+    val newAxesResults: List[AxisResult] =
+      lineAxes.map { lineAxis =>
+        computeLineAxisResult(lineAxis)
       }
     println(s"??? newAxesResults = $newAxesResults")
     val completedLineAxesResults = newAxesResults.filter(_.axisLineAddedLength + 1 >= LineOrder)
@@ -113,10 +114,10 @@ object LineDetector {
       case linesAxes =>
         val totalBallsBeingRemoved = 1 + linesAxes.map(_.axisLineAddedLength).sum
         val score = totalBallsBeingRemoved * 4 - 10
-        ??? //???? remove balls from board
+        println("?????? CONTINUE: remove line(s) balls")
         Some(score)
     }
-    println(s"scoreMove: result (any score ) = $result")
+    println(s"-scoreMove(... ballTo = $ballTo...).9 = $result")
     result
   }
 
