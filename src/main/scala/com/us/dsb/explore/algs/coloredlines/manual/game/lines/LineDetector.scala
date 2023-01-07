@@ -8,9 +8,9 @@ import com.us.dsb.explore.algs.coloredlines.manual.game._
 // leave external-client inteface same
 object LineDetector {
 
-  private[this] case class LineAxis(labelArray: String,
-                                    rowDelta  : Int, // -1 / 0 / 1 (Make refined type?)
-                                    colDelta  : Int)
+  private[lines] case class LineAxis(labelArray: String,
+                                     rowDelta  : Int, // -1 / 0 / 1 (Make refined type?)
+                                     colDelta  : Int)
 
   private[this] val lineAxes =
     List(
@@ -35,13 +35,13 @@ object LineDetector {
     haveMatch
   }
 
-  private[this] case class RelativeDirectionResult(excursionLength: Int)
+  private[lines] case class RelativeDirectionResult(excursionLength: Int)
 
-  private[this] def computeDirectionResult(moveBallColor    : BallKind,
-                                           board            : Board,
-                                           ballTo           : CellAddress,
-                                           lineDirectionAxis: LineAxis,
-                                           directionFactor  : Int): RelativeDirectionResult = {
+  private[lines] def computeDirectionResult(moveBallColor    : BallKind,
+                                            board            : Board,
+                                            ballTo           : CellAddress,
+                                            lineDirectionAxis: LineAxis,
+                                            directionFactor  : Int): RelativeDirectionResult = {
     val newBallRowIndex = ballTo.row.value.value
     val newBallColIndex = ballTo.column.value.value
     import lineDirectionAxis.{colDelta, rowDelta}
@@ -61,15 +61,14 @@ object LineDetector {
     RelativeDirectionResult(excursionLength)
   }
 
-  //??? maybe save axis vector (for use in ball deletion)
-  private[this] case class AxisResult(axis               : LineAxis,
-                                      axisLineAddedLength: Int, // length WITHOUT moved ball
-                                      directionDetails   : List[RelativeDirectionResult])
+  private[lines] case class AxisResult(axis               : LineAxis,
+                                       axisLineAddedLength: Int, // length WITHOUT moved ball
+                                       directionDetails   : List[RelativeDirectionResult])
 
-  private[this] def computeLineAxisResult(moveBallColor    : BallKind,
-                                          board            : Board,
-                                          ballTo           : CellAddress,
-                                          lineDirectionAxis: LineAxis): AxisResult = {
+  private[lines] def computeLineAxisResult(moveBallColor    : BallKind,
+                                           board            : Board,
+                                           ballTo           : CellAddress,
+                                           lineDirectionAxis: LineAxis): AxisResult = {
     println(s"+  computeLineAxisResult( axis = $lineDirectionAxis ).1")
     val directionsResults: List[RelativeDirectionResult] =
       relativeDirectionFactors.map { directionFactor =>
@@ -86,9 +85,9 @@ object LineDetector {
     result
   }
 
-  private[this] def removeCompletedLineBalls(ballTo                  : CellAddress,
-                                             preremovalBoard         : Board,
-                                             completedLineAxesResults: List[AxisResult]): Board = {
+  private[lines] def removeCompletedLineBalls(ballTo                  : CellAddress,
+                                              preremovalBoard         : Board,
+                                              completedLineAxesResults: List[AxisResult]): Board = {
     val newBallRemovedBoard = preremovalBoard.withNoBallAt(ballTo)
     val linesRemovedBoard =
       completedLineAxesResults.foldLeft(newBallRemovedBoard) { case (axisBoard, axisResult) =>
