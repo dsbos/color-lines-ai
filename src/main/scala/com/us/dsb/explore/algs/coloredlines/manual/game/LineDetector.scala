@@ -6,6 +6,9 @@ import scala.annotation.tailrec
 import scala.collection.mutable
 import scala.util.Random
 
+//???? TODO:  reduce repeated passing of board, etc.; maybe make LineDetector a
+// class, to be instantiated for each move; or make local class for passing (but
+// leave external-client inteface same
 object LineDetector {
 
   private[this] case class LineAxis(labelArray: String,
@@ -17,7 +20,7 @@ object LineDetector {
       LineAxis("↘", +1, +1),  // ↘ NW --> SE
       LineAxis("↓", +1,  0),  // ↓ N  --> S
       LineAxis("↙", +1, -1))  // ↙ NW --> SW
-  private val relativeDirectionFactors = List(1, -1) // use type of length 2 (refined List?, Tuple2?, some array?)
+  private[this] val relativeDirectionFactors = List(1, -1) // use type of length 2 (refined List?, Tuple2?, some array?)
 
   private[this] def haveMatchingBallAt(moveBallColor: BallKind,
                                        board: Board,
@@ -35,6 +38,32 @@ object LineDetector {
     haveMatch
   }
 
+  private[this] case class RelativeDirectionResult(excursionLength: Int)
+
+  private[this] def computeDirectionResult(moveBallColor: BallKind,
+                                           board: Board,
+                                           ballTo: CellAddress,
+                                           lineDirectionAxis: LineAxis,
+                                           directionFactor: Int): RelativeDirectionResult = {
+    val newBallRowIndex = ballTo.row.value.value
+    val newBallColIndex = ballTo.column.value.value
+    import lineDirectionAxis.{rowDelta, colDelta}
+    var excursionLength = 0
+    while ( {
+      val candidateExcursionLength = excursionLength + 1
+      val candidateRowIndex = newBallRowIndex + rowDelta * directionFactor * candidateExcursionLength
+      val candidateColIndex = newBallColIndex + colDelta * directionFactor * candidateExcursionLength
+      println(s"    ??.n.0: candidate address: ($candidateRowIndex / $candidateColIndex)")
+
+      val haveMatchingBall = haveMatchingBallAt(moveBallColor, board, candidateRowIndex, candidateColIndex)
+      if (haveMatchingBall) {
+        excursionLength = candidateExcursionLength
+      }
+      haveMatchingBall
+    }) {}
+    RelativeDirectionResult(excursionLength)
+  }
+
   /**
    * @return
    *   None if no line(s) completed; score increment otherwise
@@ -49,31 +78,6 @@ object LineDetector {
     val newBallRowIndex = ballTo.row.value.value
     val newBallColIndex = ballTo.column.value.value
 
-    case class RelativeDirectionResult(excursionLength: Int)
-
-    def computeDirectionResult(lineDirectionAxis: LineAxis,
-                               directionFactor: Int): RelativeDirectionResult = {
-      println(s"+    computeDirectionResult( axis: $lineDirectionAxis, dir: $directionFactor ).1" )
-
-      import lineDirectionAxis._
-      var excursionLength = 0
-      while ( {
-        val candidateExcursionLength = excursionLength + 1
-        val candidateRowIndex = newBallRowIndex + rowDelta * directionFactor * candidateExcursionLength
-        val candidateColIndex = newBallColIndex + colDelta * directionFactor * candidateExcursionLength
-        println(s"    ??.n.0: candidate address: ($candidateRowIndex / $candidateColIndex)")
-
-        val haveMatchingBall = haveMatchingBallAt(moveBallColor, board, candidateRowIndex, candidateColIndex)
-        if (haveMatchingBall) {
-          excursionLength = candidateExcursionLength
-        }
-        haveMatchingBall
-      }) {}
-      val result = RelativeDirectionResult(excursionLength)  //????
-      println(s"-    computeDirectionResult( axis: $lineDirectionAxis, dir: $directionFactor ).9 result = $result" )
-      result
-    }
-
     //??? maybe save axis vector (for use in ball deletion)
     case class AxisResult(axisLineAddedLength: Int,  // length WITHOUT moved ball
                           directionDetails: List[RelativeDirectionResult])
@@ -82,7 +86,10 @@ object LineDetector {
       println(s"+  computeLineAxisResult( axis = $lineDirectionAxis ).1")
       val directionsResults: List[RelativeDirectionResult] =
         relativeDirectionFactors.map { directionFactor =>
-          computeDirectionResult(lineDirectionAxis,
+          computeDirectionResult(moveBallColor,
+                                 board,
+                                 ballTo,
+                                 lineDirectionAxis,
                                  directionFactor)
         }
       val axisLineAddedLength = directionsResults.map(_.excursionLength).sum
