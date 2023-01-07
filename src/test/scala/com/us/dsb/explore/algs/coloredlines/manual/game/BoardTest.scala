@@ -19,7 +19,7 @@ class BoardTest extends AnyFunSpec {
     rowIndices.foldLeft(Board.empty) { (board, row) =>
       columnIndices.foldLeft(board){ (board, column) =>
         index = (index + 1) % BallKind.values.length
-        board.withCellHavingBall(CellAddress(row, column), BallKind.values(index))
+        board.withBallAt(CellAddress(row, column), BallKind.values(index))
       }
     }
   }
@@ -32,7 +32,7 @@ class BoardTest extends AnyFunSpec {
         }
         else {
           index = (index + 1) % BallKind.values.length
-          board.withCellHavingBall(CellAddress(row, column), BallKind.values(index))
+          board.withBallAt(CellAddress(row, column), BallKind.values(index))
         }
       }
     }

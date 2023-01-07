@@ -47,8 +47,8 @@ class GameLogicSupportTest extends AnyFunSpec {
       rowIndices.foreach { ballRow =>
         columnIndices.foreach { ballColumn =>
           val fromBallAddress = CellAddress(ballRow, ballColumn)
-          val board = board0.withCellHavingBall(fromBallAddress,
-                                                GameLogicSupport.pickRandomBallKind())
+          val board = board0.withBallAt(fromBallAddress,
+                                        GameLogicSupport.pickRandomBallKind())
           rowIndices.foreach { row =>
             columnIndices.foreach { column =>
               val toVacancyAddress = CellAddress(row, column)
@@ -67,7 +67,7 @@ class GameLogicSupportTest extends AnyFunSpec {
       val diagonalAddresses =
         rowIndices.zip(columnIndices).map { case (row, column) => CellAddress(row, column) }
       diagonalAddresses.foldLeft(board0) { case (board, address) =>
-        board.withCellHavingBall(address, GameLogicSupport.pickRandomBallKind())
+        board.withBallAt(address, GameLogicSupport.pickRandomBallKind())
       }
     }
 
@@ -75,7 +75,7 @@ class GameLogicSupportTest extends AnyFunSpec {
       val probeBall = GameLogicSupport.pickRandomBallKind()
       val diagonalBoard = makeDiagonallyDividedBoard
       val fromBallAddress = GameLogicSupport.pickRandomEmptyCell(diagonalBoard).get
-      val boardWithProbe = diagonalBoard.withCellHavingBall(fromBallAddress, probeBall)
+      val boardWithProbe = diagonalBoard.withBallAt(fromBallAddress, probeBall)
 
       // transpose ball coordinates to get cell across boundary
       val toVacancyAddress =

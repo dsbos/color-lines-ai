@@ -28,6 +28,11 @@ private[manual] class Board(private[this] val cellStates: Vector[CellBallState],
 
   // internal/support methods:
 
+  private[this] def copy(cellStates: Vector[CellBallState] = cellStates,
+                         onDeck: Iterable[BallKind] = onDeck,
+                         selectionAddress: Option[CellAddress] = selectionAddress) =
+    new Board(cellStates, onDeck, selectionAddress)
+
   /** Computes row-major cell-array index from row and column numbers. */
   private[this] def vectorIndex(address: CellAddress): Int =
     (address.row.value.value - 1) * BoardOrder + (address.column.value.value - 1)
@@ -36,7 +41,7 @@ private[manual] class Board(private[this] val cellStates: Vector[CellBallState],
   private[game] def getOnDeckBalls: Iterable[BallKind] = onDeck
 
   private[game] def withOnDeckBalls(newBalls: Iterable[BallKind]): Board =
-    new Board(cellStates, newBalls, selectionAddress)
+    copy(onDeck = newBalls)
 
   // grid balls:
 
@@ -57,19 +62,20 @@ private[manual] class Board(private[this] val cellStates: Vector[CellBallState],
 
   private def withCellBallState(address: CellAddress,
                                 newState: CellBallState): Board =
-    new Board(cellStates.updated(vectorIndex(address), newState), onDeck, selectionAddress)
+    copy(cellStates = cellStates.updated(vectorIndex(address), newState))
 
-  private[game] def withCellHavingBall(address: CellAddress,
-                                       ball: BallKind): Board =
+  private[game] def withBallAt(address: CellAddress,
+                               ball: BallKind): Board =
     withCellBallState(address, getCellBallStateAt(address).copy(ballState = Some(ball)))
 
-  private[game] def withCellHavingNoBall(address: CellAddress): Board =
+  private[game] def withNoBallAt(address: CellAddress): Board =
     withCellBallState(address, getCellBallStateAt(address).copy(ballState = None))
 
   private[game] def withCellSelected(address: CellAddress): Board =
-    new Board(cellStates, onDeck, Some(address))
+    copy(selectionAddress = Some(address))
 
-  private[game] def withNoSelection: Board = new Board(cellStates, onDeck, None)
+  private[game] def withNoSelection: Board =
+    copy(selectionAddress = None)
 
   private[manual] def getCellBallStateChar(state: CellBallState, isSelected: Boolean): String = {  //???? move out
     state.ballState match {

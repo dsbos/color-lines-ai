@@ -92,7 +92,7 @@ object LineDetector {
   private[this] def removeCompletedLineBalls(ballTo: CellAddress,
                                              preremovalBoard: Board,
                                              completedLineAxesResults: List[AxisResult]): Board = {
-    val newBallRemovedBoard = preremovalBoard.withCellHavingNoBall(ballTo)
+    val newBallRemovedBoard = preremovalBoard.withNoBallAt(ballTo)
     val linesRemovedBoard =
       completedLineAxesResults.foldLeft(newBallRemovedBoard){ case (axisBoard, axisResult) =>
         val fromOffset = - axisResult.directionDetails(1).excursionLength
@@ -104,7 +104,7 @@ object LineDetector {
             val rawColIndex = ballTo.column.value.value + colDelta * xxoffset
             val cellAddress = CellAddress(RowIndex(Index.unsafeFrom(rawRowIndex)),
                                           ColumnIndex(Index.unsafeFrom(rawColIndex)))
-            directionBoard.withCellHavingNoBall(cellAddress)
+            directionBoard.withNoBallAt(cellAddress)
           }
         lineRemovedBoard
       }
