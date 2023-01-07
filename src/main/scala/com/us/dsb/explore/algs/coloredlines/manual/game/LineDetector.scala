@@ -8,13 +8,13 @@ import scala.util.Random
 
 object LineDetector {
 
-
-  private[this] val axisBaseVectors =
+  private[this] val lineAxisVectors =
     List(
       ( 0, +1),  // W  --> E
       (+1, +1),  // NW --> SE
       (+1,  0),  // N  --> S
       (+1, -1))  // NW --> SW
+  private val directionFactors = List(1, -1) // use type of length 2 (refined List?, Tuple2?, some array?)
 
   //???? add removing in-line balls
   /**
@@ -26,76 +26,98 @@ object LineDetector {
                               ballTo: CellAddress
                              ): Option[Int] = {
     val moveBallColor = board.getBallStateAt(ballTo).get //????
-    println(s"scoreMove(...$ballTo...).1 scoring move")
+    println(s"scoreMove(... ballTo = $ballTo...).1")
 
-    var maxlineBallCount = 0
-    val someAxesResults =
-      axisBaseVectors.map { case (rowDelta, colDelta) =>
-        println()
-        println(s"scoreMove(...$ballTo...).2 scanning axis [$rowDelta, $colDelta]")
+    val newBallRowIndex = ballTo.row.value.value
+    val newBallColIndex = ballTo.column.value.value
 
-        var lineBallCount = 1 // the moved ball
+    //??? maybe save axis vector (for use in ball deletion)
+    case class xxAxisResult(axisLineAddedLength: Int,  // length WITHOUT moved ball
+                            directionDetails: List[xxDirectionResult])
+    case class xxDirectionResult(excursionLength: Int)
 
-        val directions = List(1, -1)
-        directions.foreach { direction =>   //?????? map?
-            println(s"scoreMove(...$ballTo...).3 direction = $direction")
+    def computeDirectionResult(axisRowDelta: Int,
+                               axisColDelta: Int,
+                               directionFactor: Int): xxDirectionResult = {
+      println(s"??? computeDirectionResult( axis: ($axisRowDelta / $axisColDelta), dir: $directionFactor).1" )
+      var excursionLength = 0
+      while ( {
+        val candidateExcursionLength = excursionLength + 1
+        val candidateRowIndex = newBallRowIndex + axisRowDelta * directionFactor * candidateExcursionLength
+        val candidateColIndex = newBallColIndex + axisColDelta * directionFactor * candidateExcursionLength
+        println(s"??.n.0: candidate address: ($candidateRowIndex / $candidateColIndex)")
 
-          var directionBallCount = 0
-          var currentRowIndex = ballTo.row.value.value
-          var currentColIndex = ballTo.column.value.value
-          while ({
-            val candidateRowIndex = currentRowIndex + rowDelta * direction //?????? direction
-            val candidateColIndex = currentColIndex + colDelta * direction
-            println(s"scoreMove(...$ballTo...).4 indices := ($candidateRowIndex, $candidateColIndex)")
-            val inRange =
-              1 <= candidateRowIndex && candidateRowIndex <= BoardOrder &&
-                  1 <= candidateColIndex && candidateColIndex <= BoardOrder
-            val continue: Boolean =
-              inRange match {
-                case false =>
-                  println(s"scoreMove(...$ballTo...).4.1 stop - index out of range / off board")
+        val inRange =
+          1 <= candidateRowIndex && candidateRowIndex <= BoardOrder &&
+              1 <= candidateColIndex && candidateColIndex <= BoardOrder
+        val haveMatchingBall =
+          inRange match {
+            case false =>
+              println("??.n.1: out of range")
+              false
+            case true =>
+              println("??.n.2: in range ...")
+              val candidateAddress = CellAddress(RowIndex(Index.unsafeFrom(candidateRowIndex)),
+                                                 ColumnIndex(Index.unsafeFrom(candidateColIndex)))
+              board.getBallStateAt(candidateAddress) match {
+                case None =>
+                  println("??.n.2.1: no ball")
                   false
-                case true =>
-                  val candidateAddress = CellAddress(RowIndex(Index.unsafeFrom(candidateRowIndex)),
-                                                     ColumnIndex(Index.unsafeFrom(candidateColIndex)))
-                  println(s"scoreMove(...$ballTo...).4.2 candidateAddress := "  + candidateAddress)
-                  board.getBallStateAt(candidateAddress) match {
-                    case None =>
-                      println(s"scoreMove(...$ballTo...).4.3 stop - empty")
+                case Some(candidateBallColor) =>
+                  println("??.n.2.2: ball ...")
+                  candidateBallColor == moveBallColor match {
+                    case false =>
+                      println("??.n.2.2.1: ball doesn't match")
                       false
-                    case Some(candidateBallColor) =>
-                      candidateBallColor == moveBallColor match {
-                        case false =>
-                          println(s"scoreMove(...$ballTo...).4.4 stop - different color")
-                          false
-                        case true =>
-                          println(s"scoreMove(...$ballTo...).4.5 match!")
-                          currentRowIndex = candidateRowIndex
-                          currentColIndex = candidateColIndex
-                          directionBallCount += 1
-                          lineBallCount += 1
-                          true
-                      }
+                    case true =>
+                      println("??.n.2.2.2: ball matches")
+                      true
                   }
               }
-            continue
-          })
-          {}
-
-          println(s"scoreMove(...$ballTo...).21 directionBallCount = $directionBallCount")
-          println()
+          }
+        if (haveMatchingBall) {
+          excursionLength = candidateExcursionLength
         }
-        println(s"scoreMove(...$ballTo...).22 lineBallCount = " + lineBallCount)
-        println()
+        haveMatchingBall
+      }) {}
+      val result = xxDirectionResult(excursionLength)  //????
+      println(s"??? computeDirectionResult( axis: ($axisRowDelta / $axisColDelta), dir: $directionFactor).2: result = " + result)
+      result
+    }
 
-        if (lineBallCount > maxlineBallCount) {
-          maxlineBallCount = lineBallCount
+    def computeLineAxisResult(axisRowDelta: Int, axisColDelta: Int): xxAxisResult = {
+      val directionsResults: List[xxDirectionResult] =
+        directionFactors.map { directionFactor =>
+          computeDirectionResult(axisRowDelta,
+                                 axisColDelta,
+                                 directionFactor)
         }
+      val axisLineAddedLength = directionsResults.map(_.excursionLength).sum
+
+      val result = xxAxisResult(axisLineAddedLength, directionsResults)  //????
+      println("??? computeLineAxisResult: result = " + result)
+      result
+    }
+
+    val newAxesResults: List[xxAxisResult] =
+      lineAxisVectors.map { case (axisRowDelta, axisColDelta) =>
+        computeLineAxisResult(axisRowDelta, axisColDelta)
+
       }
-    println(s"scoreMove(...$ballTo...).22 maxlineBallCount = " + maxlineBallCount)
-    println()
-      //???val moveScore = ballCount * 4 - 10
-    None  //????
+    println(s"??? newAxesResults = $newAxesResults")
+    val completedLineAxesResults = newAxesResults.filter(_.axisLineAddedLength + 1 >= LineOrder)
+    val result =
+    completedLineAxesResults match {
+      case Nil =>
+        None // return None for score (signal to place 3 more IF ball moved by user
+      case linesAxes =>
+        val totalBallsBeingRemoved = 1 + linesAxes.map(_.axisLineAddedLength).sum
+        val score = totalBallsBeingRemoved * 4 - 10
+        ??? //???? remove balls from board
+        Some(score)
+    }
+    println(s"scoreMove: result (any score ) = $result")
+    result
   }
 
 }

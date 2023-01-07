@@ -9,8 +9,8 @@ package object game {
 
   private[this] type BoardOrder = 4  //???? 9
   private[manual] val BoardOrder: BoardOrder = valueOf[BoardOrder]
-  private[this] type LineOrder = 2  //???? 5
-  private[this] val LineOrder: LineOrder = valueOf[LineOrder]
+  private[this] type LineOrder = 3  //???? 5
+  private[manual] val LineOrder: LineOrder = valueOf[LineOrder]
   private[this] type ColorOrder = 7  // original: blue.dark, blue.light, brown, green, purple, red, yellow
   private[this] val ColorOrder: ColorOrder = valueOf[ColorOrder]
 

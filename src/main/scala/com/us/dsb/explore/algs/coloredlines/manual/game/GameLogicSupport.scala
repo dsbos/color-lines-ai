@@ -193,7 +193,7 @@ object GameLogicSupport {
       case true =>
         val moveBallColor = board.getBallStateAt(from).get //????
         val postMoveBoard = board.withCellHavingNoBall(from).withCellHavingBall(to, moveBallColor)
-        println("doTryMoveBall.2: moved $moveBallColor ball from $from to $to")
+        println(s"doTryMoveBall.2: moved $moveBallColor ball from $from to $to")
 
         val ballMoveScore = LineDetector.scoreMove(postMoveBoard, from, to)
         println("-                              ballMoveScore " + ballMoveScore)
