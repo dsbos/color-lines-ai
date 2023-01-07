@@ -119,7 +119,7 @@ private[this] object ColoredLinesSomething extends App {
   //  trait XxCellPosition
 
   private[this] case class XxCellCoordinates(rowOrdinal: Int,
-                                           columnOrdinal: Int) //??????extends CellPosition;
+                                           columnOrdinal: Int) //??extends CellPosition;
 
 
 
