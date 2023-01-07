@@ -32,6 +32,8 @@ private[manual] class Board(private[this] val cellStates: Vector[CellBallState],
                             //???? move to game (low-level tap-UI) state:
                             private[this] val selectionAddress: Option[CellAddress]
                            ) {
+  //??? println("??? Board: " + this)
+  //??? print("")
 
   // internal/support methods:
 
@@ -107,7 +109,7 @@ private[manual] class Board(private[this] val cellStates: Vector[CellBallState],
     rowIndices.map { row =>
       columnIndices.map { column =>
         val addr = CellAddress(row, column)
-        getCellBallStateChar(getCellBallStateAt(addr), isSelectedAt(addr))
+        getCellBallStateAt(addr).ballState.fold("-")(_.initial)
       }.mkString("")
     }.mkString("<", "/", ">")
   }

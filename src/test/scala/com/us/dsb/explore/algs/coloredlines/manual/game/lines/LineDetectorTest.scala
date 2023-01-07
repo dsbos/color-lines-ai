@@ -50,15 +50,7 @@ class LineDetectorTest extends AnyFunSpec {
     }
   }
 
-  describe("RelativeDirectionResult") {
-    ignore/*it*/("TBD") {}
-  }
-
   describe("computeDirectionResult") {
-    ignore/*it*/("TBD") {}
-  }
-
-  describe("AxisResult") {
     ignore/*it*/("TBD") {}
   }
 

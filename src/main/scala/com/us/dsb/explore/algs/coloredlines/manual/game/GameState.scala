@@ -21,12 +21,12 @@ private[manual] object GameState {
   }
 
   private[this] def makeInitialState(implicit rng: Random): GameState = {
-    val board = GameLogicSupport.placeInitialBalls(Board.empty)
-    GameState(board, 0, None)
+    val nameThisResult = GameLogicSupport.placeInitialBalls(Board.empty)  //?????? clean
+    GameState(nameThisResult.board, nameThisResult.addedScore.getOrElse(0), None)
   }
 
-  private[game] def initial(seed: Long): GameState = makeInitialState(new Random(seed))
-  private[manual] def initial: GameState = makeInitialState(new Random())
+  private[manual/*game*/] def initial(seed: Long): GameState = makeInitialState(new Random(seed))
+  private[manual] def initial(): GameState = makeInitialState(new Random())
 }
 import GameState._
 

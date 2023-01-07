@@ -166,7 +166,7 @@ private[manual] object GameUI {
 
   def runGame(io: SegregatedTextIO): GameUIResult = {
     val initialState =
-      GameUIState(gameState     = GameState.initial,
+      GameUIState(gameState     = GameState.initial(),
                   cursorAddress = CellAddress.fromRaw(1, 1))
     getAndDoUiCommands(io, initialState)
   }

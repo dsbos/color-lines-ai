@@ -12,7 +12,7 @@ object GameLogicSupport {
 
   // (was "private[this]" before test calls:)
   private[game] def pickRandomBallKind()(implicit rng: Random): BallKind =
-    BallKind.values(rng.nextInt(BallKind.values.size))
+    BallKind.values(rng.nextInt(2 /*???BallKind.values.size*/))
 
   // (was "private[this]" before test calls:)
   @tailrec
@@ -33,15 +33,31 @@ object GameLogicSupport {
    * @param board
    *   expected to be empty //???? maybe refactor something?
    */
-  private[game] def placeInitialBalls(board: Board)(implicit rng: Random): Board = {
-    val newBoard1 =
-      (1 to 5).foldLeft(board) { //???? parameterize
-        case (curBoard, _) =>  //???? refactor?
+  private[game] def placeInitialBalls(board: Board)(implicit rng: Random): MoveResult = {
+    val postPlacementsResult =
+      //???? parameterize:
+      (1 to 5).foldLeft(MoveResult(board, None)) {
+        case (resultSoFar, _) => //?????? clean
           val address =
-            pickRandomEmptyCell(curBoard).getOrElse(scala.sys.error("Unexpectedly full board"))
-          curBoard.withBallAt(address, pickRandomBallKind())
+            pickRandomEmptyCell(resultSoFar.board).getOrElse(scala.sys.error("Unexpectedly full board"))
+          val postPlacementBoard = resultSoFar.board.withBallAt(address, pickRandomBallKind())
+          val placementHandlingResult1 = LineDetector.handleBallArrival(postPlacementBoard, address)
+          //???? clean (note: note typical for / flatmap->map case)
+          val netAddedScore: Option[Int] =
+            (resultSoFar.addedScore.getOrElse(0) +
+                placementHandlingResult1.addedScore.getOrElse(0)) match {
+              case 0 => None
+              case n => Some(n)
+            }
+            resultSoFar.addedScore.flatMap { prevIncr =>
+              placementHandlingResult1.addedScore.map { newIncr =>
+                prevIncr + newIncr
+              }
+            }
+          MoveResult(placementHandlingResult1.board, netAddedScore)
       }
-    newBoard1.withOnDeckBalls(List.fill(3)(pickRandomBallKind()))
+    //???? parameterize
+    postPlacementsResult.copy(board = postPlacementsResult.board.withOnDeckBalls(List.fill(3)(pickRandomBallKind())))
   }
 
   private[game] sealed trait Action
@@ -105,25 +121,35 @@ object GameLogicSupport {
     action
   }
 
-  private[this] def placeNextBalls(board: Board)(implicit rng: Random): Board = {
-    val newBoard =
+  private[this] def placeNextBalls(board: Board)(implicit rng: Random): MoveResult = {
+    val postPlacementResult =
       board.getOnDeckBalls
-        .foldLeft(board) {
-          case (curBoard, _) =>
-            pickRandomEmptyCell(curBoard) match {
-              case None => curBoard
+        .foldLeft(MoveResult(board, None)) {
+          case (curMoveResult, _) =>
+            pickRandomEmptyCell(curMoveResult.board) match {
+              case None => curMoveResult
               case Some(address) =>
-                curBoard.withBallAt(address, pickRandomBallKind())
+                val postPlacementBoard = curMoveResult.board.withBallAt(address, pickRandomBallKind())
+                LineDetector.handleBallArrival(postPlacementBoard, address)
             }
         }
-    newBoard.withOnDeckBalls(List.fill(3)(pickRandomBallKind()))
+    //???? parameterize?
+    //?????? check re duplicate on-deck code (look for other "fill(3)"
+    postPlacementResult.copy(board = postPlacementResult.board.withOnDeckBalls(List.fill(3)(pickRandomBallKind())))
   }
 
-  //????? decide where movability check is called and how/where tap state is udpated
+  //?????? rename?  isn't _user_ move result; is ball move/placement/arrival result
+  //?????? possibly change score delta to score; probably change to lower-level game (board balls + score) state,
+  // separate from in-progress--vs.--done part of Gamestate)
   case class MoveResult(board: Board, addedScore: Option[Int])
+  {
+    //??? println(s"??? ${this}")
+    //??? print("")
+  }
 
   private[game] def doPass(board: Board)(implicit rng: Random): MoveResult =
-    MoveResult(placeNextBalls(board), None)
+    placeNextBalls(board)
+
 
   //???: likely move core algorithm out; possibly move outer code into Board:
   /**
@@ -196,11 +222,11 @@ object GameLogicSupport {
         val postMoveBoard = board.withNoBallAt(from).withBallAt(to, moveBallColor)
         println(s"doTryMoveBall.2: moved $moveBallColor ball from $from to $to")
 
-        val (postHandlingBoard, ballMoveScore) = LineDetector.handleBallArrival(postMoveBoard, from, to)
+        val MoveResult(postHandlingBoard, ballMoveScore) = LineDetector.handleBallArrival(postMoveBoard, to)
         println("-                              ballMoveScore " + ballMoveScore)
         ballMoveScore match {
           case None =>
-            MoveResult(placeNextBalls(postHandlingBoard).withNoSelection, None)
+            MoveResult(placeNextBalls(postHandlingBoard).board.withNoSelection, ballMoveScore)
           case Some(increment) =>
             MoveResult(postHandlingBoard.withNoSelection, Some(increment))
         }

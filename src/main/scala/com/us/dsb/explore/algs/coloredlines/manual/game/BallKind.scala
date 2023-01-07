@@ -4,7 +4,7 @@ import enumeratum.{Enum, EnumEntry}
 
 import scala.io.AnsiColor
 
-private[game] sealed class BallKind(private[this] val initial: String,
+private[game] sealed class BallKind(private[game] val initial: String,
                                     private[this] val setFgColorSeq: String,
                                     private[this] val setBgColorSeq: String
                                    ) extends EnumEntry {
