@@ -120,7 +120,7 @@ object GameLogicSupport {
   }
 
   //????? decide where movability check is called and how/where tap state is udpated
-  case class MoveResult(newBoard: Board, addedScore: Option[Int])
+  case class MoveResult(board: Board, addedScore: Option[Int])
 
   private[game] def doPass(board: Board)(implicit rng: Random): MoveResult =
     MoveResult(placeNextBalls(board), None)

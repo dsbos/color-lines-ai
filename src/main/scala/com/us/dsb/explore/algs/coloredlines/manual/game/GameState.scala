@@ -71,16 +71,16 @@ private[manual] case class GameState(board: Board,
         case Pass        =>
           val passResult = GameLogicSupport.doPass(board)
           assert(passResult.addedScore.isEmpty)
-          passResult.copy(newBoard = passResult.newBoard.withNoSelection)
+          passResult.copy(board = passResult.board.withNoSelection)
       }
     val newScore = score + moveResult.addedScore.getOrElse(0)
 
     val nextState =
-      if (! moveResult.newBoard.isFull) {
-        GameState(moveResult.newBoard, newScore, gameResult).asRight
+      if (! moveResult.board.isFull) {
+        GameState(moveResult.board, newScore, gameResult).asRight
       }
       else {
-        GameState(moveResult.newBoard, newScore, Some(Done(newScore))).asRight
+        GameState(moveResult.board, newScore, Some(Done(newScore))).asRight
       }
     nextState
   }
