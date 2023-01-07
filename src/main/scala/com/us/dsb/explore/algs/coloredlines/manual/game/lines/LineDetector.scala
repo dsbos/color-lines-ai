@@ -20,10 +20,10 @@ object LineDetector {
       LineAxis("↙", +1, -1)) // ↙ NW --> SW
   private[this] val relativeDirectionFactors = List(1, -1) // use type of length 2 (refined List?, Tuple2?, some array?)
 
-  private[this] def haveMatchingBallAt(moveBallColor: BallKind,
-                                       board        : Board,
-                                       rawRowIndex  : Int,
-                                       rawColIndex  : Int): Boolean = {
+  private[lines] def haveMatchingBallAt(moveBallColor: BallKind,
+                                        board        : Board,
+                                        rawRowIndex  : Int,
+                                        rawColIndex  : Int): Boolean = {
     val inRange =
       1 <= rawRowIndex && rawRowIndex <= BoardOrder &&
           1 <= rawColIndex && rawColIndex <= BoardOrder
