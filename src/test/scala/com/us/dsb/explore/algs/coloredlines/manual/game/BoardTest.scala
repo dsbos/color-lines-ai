@@ -74,11 +74,11 @@ class BoardTest extends AnyFunSpec {
 
     describe("should compute indices in row-major order (chosen but ~isolated):") {
       it("- (IO 1) row 1 column 3 => (IO 0) vector index 2") {
-        val `row 1 column 3`  = CellAddress(rowIndices.head, columnIndices(3 - 1))
+        val `row 1 column 3` = CellAddress(rowIndices.head, columnIndices(3 - 1))
         Board.empty invokePrivate vectorIndex(`row 1 column 3`) shouldEqual 3 - 1
       }
       it("- (IO 1) row 3 column 1 => (IO 0) vector index 8") {
-        val `row 3 column 1`  = CellAddress(rowIndices(3 - 1), columnIndices.head)
+        val `row 3 column 1` = CellAddress(rowIndices(3 - 1), columnIndices.head)
         Board.empty invokePrivate vectorIndex(`row 3 column 1`) shouldEqual
             (3 - 1) * BoardOrder + (1 - 1)
       }
