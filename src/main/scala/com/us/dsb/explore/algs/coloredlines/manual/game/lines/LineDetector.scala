@@ -29,8 +29,7 @@ object LineDetector {
           1 <= rawColIndex && rawColIndex <= BoardOrder
     val haveMatch =
       inRange && {
-        val candidateAddress = CellAddress(RowIndex(Index.unsafeFrom(rawRowIndex)),
-                                           ColumnIndex(Index.unsafeFrom(rawColIndex)))
+        val candidateAddress = CellAddress.fromRaw(rawRowIndex, rawColIndex)
         board.getBallStateAt(candidateAddress).fold(false)(ball => ball == moveBallColor)
       }
     haveMatch
@@ -100,8 +99,7 @@ object LineDetector {
             import axisResult.axis.{colDelta, rowDelta}
             val rawRowIndex = ballTo.row.value.value + rowDelta * xxoffset
             val rawColIndex = ballTo.column.value.value + colDelta * xxoffset
-            val cellAddress = CellAddress(RowIndex(Index.unsafeFrom(rawRowIndex)),
-                                          ColumnIndex(Index.unsafeFrom(rawColIndex)))
+            val cellAddress = CellAddress.fromRaw(rawRowIndex, rawColIndex)
             directionBoard.withNoBallAt(cellAddress)
           }
         lineRemovedBoard
