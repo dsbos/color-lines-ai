@@ -23,24 +23,16 @@ object LineDetector {
                                        board: Board,
                                        rawRowIndex: Int,
                                        rawColIndex: Int): Boolean = {
-    println(s"+      haveMatchingBallAt( moveBallColor = $moveBallColor, ...,  rawRowIndex = $rawRowIndex, rawColIndex = $rawColIndex).1" )
     val inRange =
-      1 <= rawRowIndex && rawRowIndex <= BoardOrder &&
-          1 <= rawColIndex && rawColIndex <= BoardOrder
-    val haveMatchingBall =
+      1   <= rawRowIndex && rawRowIndex <= BoardOrder &&
+        1 <= rawColIndex && rawColIndex <= BoardOrder
+    val haveMatch =
       inRange && {
         val candidateAddress = CellAddress(RowIndex(Index.unsafeFrom(rawRowIndex)),
                                            ColumnIndex(Index.unsafeFrom(rawColIndex)))
-        board.getBallStateAt(candidateAddress).fold(
-          false
-          )(
-          ball => {
-            println(s"???  ball = $ball")
-            ball == moveBallColor
-          })
+        board.getBallStateAt(candidateAddress).fold(false)(ball => ball == moveBallColor)
       }
-    println(s"-      haveMatchingBallAt( moveBallColor = $moveBallColor, ...,  rawRowIndex = $rawRowIndex, rawColIndex = $rawColIndex).9 haveMatchingBall = $haveMatchingBall" )
-    haveMatchingBall
+    haveMatch
   }
 
   /**

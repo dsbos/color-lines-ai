@@ -8,6 +8,7 @@ private[manual] object Board {
     private[game] val empty: CellBallState = CellBallState(None)
   }
 
+  /** Valid (in-board) cell address */
   private[manual] case class CellAddress(row: RowIndex, column: ColumnIndex)
 
   private[game] def empty: Board =
