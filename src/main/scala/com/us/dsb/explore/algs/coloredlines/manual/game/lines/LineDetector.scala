@@ -3,7 +3,7 @@ package com.us.dsb.explore.algs.coloredlines.manual.game.lines
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.CellAddress
 import com.us.dsb.explore.algs.coloredlines.manual.game.GameLogicSupport.MoveResult
 import com.us.dsb.explore.algs.coloredlines.manual.game._
-import com.us.dsb.explore.algs.coloredlines.manual.game.board.{BallKind, Board, BoardOrder, LineOrder}
+import com.us.dsb.explore.algs.coloredlines.manual.game.board.{BallKind, BoardPlus, BoardOrder, LineOrder}
 
 //???? TODO:  reduce repeated passing of board, etc.; maybe make LineDetector a
 // class, to be instantiated for each move; or make local class for passing (but
@@ -23,7 +23,7 @@ object LineDetector {
   private[this] val relativeDirectionFactors = List(1, -1) // use type of length 2 (refined List?, Tuple2?, some array?)
 
   private[lines] def haveMatchingBallAt(moveBallColor: BallKind,
-                                        board        : Board,
+                                        board        : BoardPlus,
                                         rawRowIndex  : Int,
                                         rawColIndex  : Int): Boolean = {
     val inRange =
@@ -40,7 +40,7 @@ object LineDetector {
   private[lines] case class RelativeDirectionResult(excursionLength: Int)
 
   private[lines] def computeDirectionResult(moveBallColor    : BallKind,
-                                            board            : Board,
+                                            board            : BoardPlus,
                                             ballTo           : CellAddress,
                                             lineDirectionAxis: LineAxis,
                                             directionFactor  : Int): RelativeDirectionResult = {
@@ -68,7 +68,7 @@ object LineDetector {
                                        directionDetails   : List[RelativeDirectionResult])
 
   private[lines] def computeLineAxisResult(moveBallColor    : BallKind,
-                                           board            : Board,
+                                           board            : BoardPlus,
                                            ballTo           : CellAddress,
                                            lineDirectionAxis: LineAxis): AxisResult = {
     //??? println(s"+  computeLineAxisResult( axis = $lineDirectionAxis ).1")
@@ -88,8 +88,8 @@ object LineDetector {
   }
 
   private[lines] def removeCompletedLineBalls(ballTo                  : CellAddress,
-                                              preremovalBoard         : Board,
-                                              completedLineAxesResults: List[AxisResult]): Board = {
+                                              preremovalBoard         : BoardPlus,
+                                              completedLineAxesResults: List[AxisResult]): BoardPlus = {
     val newBallRemovedBoard = preremovalBoard.withNoBallAt(ballTo)
     val linesRemovedBoard =
       completedLineAxesResults.foldLeft(newBallRemovedBoard) { case (axisBoard, axisResult) =>
@@ -113,7 +113,7 @@ object LineDetector {
    * None if no line(s) completed; score increment otherwise
    */
   //???? rename?:  harvestAnyLines?
-  private[game] def handleBallArrival(board   : Board,
+  private[game] def handleBallArrival(board   : BoardPlus,
                                       ballTo  : CellAddress
                                      ): MoveResult = {
     //println(s"+handleBallArrival(... ballTo = $ballTo...).1")

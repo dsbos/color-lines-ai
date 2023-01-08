@@ -1,25 +1,25 @@
 package com.us.dsb.explore.algs.coloredlines.manual.game.board
 
-private[game] object Board {
+private[game] object BoardPlus {
 
   /** Empty or ball of some color. */
-  private[Board] case class CellBallState(ballState: Option[BallKind])
-  private[Board] object CellBallState {
-    private[Board] val empty: CellBallState = CellBallState(None)
+  private[BoardPlus] case class CellBallState(ballState: Option[BallKind])
+  private[BoardPlus] object CellBallState {
+    private[BoardPlus] val empty: CellBallState = CellBallState(None)
   }
 
-  private[game] def empty: Board =
-    new Board(Vector.fill[CellBallState](BoardOrder * BoardOrder)(CellBallState.empty), Nil, 0, None)
+  private[game] def empty: BoardPlus =
+    new BoardPlus(Vector.fill[CellBallState](BoardOrder * BoardOrder)(CellBallState.empty), Nil, 0, None)
 }
 
-import com.us.dsb.explore.algs.coloredlines.manual.game.board.Board._
+import com.us.dsb.explore.algs.coloredlines.manual.game.board.BoardPlus._
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.{BoardOrder, columnIndices, rowIndices}
 
 //???? move tap-UI selection state out of board
 /**
  * State of board (just cells; not other game state (e.g., score).)
  */
-private[game] class Board(private[this] val cellStates: Vector[CellBallState],  //????? grid?
+private[game] class BoardPlus(private[this] val cellStates: Vector[CellBallState],  //????? grid?
                           private[this] val onDeck: Iterable[BallKind],
                           //????? move score out to low-level game state once messed-up score assimilation is fixed
                           private[this] val score: Int,
@@ -35,7 +35,7 @@ private[game] class Board(private[this] val cellStates: Vector[CellBallState],  
                          onDeck: Iterable[BallKind]            = onDeck,
                          score: Int                            = score,
                          selectionAddress: Option[CellAddress] = selectionAddress) =
-    new Board(cellStates, onDeck, score, selectionAddress)
+    new BoardPlus(cellStates, onDeck, score, selectionAddress)
 
   /** Computes row-major cell-array index from row and column numbers. */
   private[this] def vectorIndex(address: CellAddress): Int =
@@ -44,7 +44,7 @@ private[game] class Board(private[this] val cellStates: Vector[CellBallState],  
   // on-deck balls:
   private[game] def getOnDeckBalls: Iterable[BallKind] = onDeck
 
-  private[game] def withOnDeckBalls(newBalls: Iterable[BallKind]): Board =
+  private[game] def withOnDeckBalls(newBalls: Iterable[BallKind]): BoardPlus =
     copy(onDeck = newBalls)
 
   // grid balls:
@@ -65,20 +65,20 @@ private[game] class Board(private[this] val cellStates: Vector[CellBallState],  
   //
 
   private def withCellBallState(address: CellAddress,
-                                newState: CellBallState): Board =
+                                newState: CellBallState): BoardPlus =
     copy(cellStates = cellStates.updated(vectorIndex(address), newState))
 
   private[game] def withBallAt(address: CellAddress,
-                               ball: BallKind): Board =
+                               ball: BallKind): BoardPlus =
     withCellBallState(address, getCellBallStateAt(address).copy(ballState = Some(ball)))
 
-  private[game] def withNoBallAt(address: CellAddress): Board =
+  private[game] def withNoBallAt(address: CellAddress): BoardPlus =
     withCellBallState(address, getCellBallStateAt(address).copy(ballState = None))
 
-  private[game] def withCellSelected(address: CellAddress): Board =
+  private[game] def withCellSelected(address: CellAddress): BoardPlus =
     copy(selectionAddress = Some(address))
 
-  private[game] def withNoSelection: Board =
+  private[game] def withNoSelection: BoardPlus =
     copy(selectionAddress = None)
 
   private[manual] def getCellBallStateChar(state: CellBallState, isSelected: Boolean): String = {  //???? move out
@@ -90,7 +90,7 @@ private[game] class Board(private[this] val cellStates: Vector[CellBallState],  
 
   // (running) score:
 
-  private[game] def withAddedScore(increment: Int): Board =
+  private[game] def withAddedScore(increment: Int): BoardPlus =
     copy(score = this.score + increment)
 
   private[manual] def getScore: Int = score

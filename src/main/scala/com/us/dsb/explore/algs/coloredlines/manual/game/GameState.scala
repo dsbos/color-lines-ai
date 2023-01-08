@@ -5,7 +5,7 @@ import cats.syntax.either._
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.CellAddress
 import com.us.dsb.explore.algs.coloredlines.manual.game.GameLogicSupport.MoveResult
 import com.us.dsb.explore.algs.coloredlines.manual.game.GameState.GameResult.Done
-import com.us.dsb.explore.algs.coloredlines.manual.game.board.{BallKind, Board}
+import com.us.dsb.explore.algs.coloredlines.manual.game.board.{BallKind, BoardPlus}
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.{ColumnIndex, RowIndex}
 
 import scala.util.Random
@@ -21,7 +21,7 @@ private[manual] object GameState {
   }
 
   private[this] def makeInitialState(implicit rng: Random): GameState = {
-    val initialPlacementResult = GameLogicSupport.placeInitialBalls(Board.empty)
+    val initialPlacementResult = GameLogicSupport.placeInitialBalls(BoardPlus.empty)
     //????? probably split GameState level from slightly lower game state
     //  carrying board plus score (probably modifying MoveResult for that)
     GameState(initialPlacementResult.board, None)
@@ -38,7 +38,7 @@ import GameState._
  * @constructor
  * @param gameResult  `None` means no win or draw yet
  */
-private[manual] case class GameState(board: Board,
+private[manual] case class GameState(board: BoardPlus,
                                      gameResult: Option[GameResult]
                                     )(implicit rng: Random) {
 
