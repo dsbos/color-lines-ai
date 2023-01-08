@@ -125,7 +125,6 @@ object GameLogicSupport {
                   curMoveResult.board.withOnDeckBalls(curMoveResult.board.getOnDeckBalls.tail)
                 val postPlacementBoard = postDeueueBoard.withBallAt(address, onDeckBall)
                 LineDetector.handleBallArrival(postPlacementBoard, address)
-                //?????? FIX: scores not merged
             }
         }
     //???? parameterize?
@@ -134,9 +133,6 @@ object GameLogicSupport {
   }
 
   //???? rename?  isn't _user_ move result; is ball move/placement/arrival result
-  //?????? possibly change score delta to score; probably change to lower-level game (board balls + score) state,
-  // separate from in-progress--vs.--done part of GameState)
-  // - maybe use explicit Boolean to indicate whether any lines were harvested
   case class MoveResult(board: Board,
                         //??? clarify re placing next three balls (re interpreting differently in different contexts
                         anyRemovals: Boolean)
@@ -213,17 +209,17 @@ object GameLogicSupport {
     val canMoveBall = pathExists(board, from, to)
     canMoveBall match {
       case false =>  // can't move--ignore (keep selection state)
-        MoveResult(board, false)  //??? ?
+        MoveResult(board, false)
       case true =>
         val deselectedBoard = board.withNoSelection
-        val moveBallColor = deselectedBoard.getBallStateAt(from).get //????
+        val moveBallColor = deselectedBoard.getBallStateAt(from).get  //????
         val postMoveBoard = deselectedBoard.withNoBallAt(from).withBallAt(to, moveBallColor)
 
         val postHandlingResult = LineDetector.handleBallArrival(postMoveBoard, to)
-        postHandlingResult.anyRemovals match {  //?????? if
-          case false            => placeNextBalls(postHandlingResult.board)
-          case true => postHandlingResult
-        }
+        if (! postHandlingResult.anyRemovals )
+          placeNextBalls(postHandlingResult.board)
+        else
+          postHandlingResult
     }
   }
 
