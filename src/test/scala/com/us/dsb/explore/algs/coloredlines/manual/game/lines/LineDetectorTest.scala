@@ -1,6 +1,6 @@
 package com.us.dsb.explore.algs.coloredlines.manual.game.lines
 
-import com.us.dsb.explore.algs.coloredlines.manual.game.board.Board.CellAddress
+import com.us.dsb.explore.algs.coloredlines.manual.game.board.CellAddress
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.{BallKind, Board}
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.BoardOrder
 import org.scalatest.funspec.AnyFunSpec

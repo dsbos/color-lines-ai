@@ -2,7 +2,7 @@ package com.us.dsb.explore.algs.coloredlines.manual.game
 
 import cats.syntax.option._
 import cats.syntax.either._
-import com.us.dsb.explore.algs.coloredlines.manual.game.board.Board.CellAddress
+import com.us.dsb.explore.algs.coloredlines.manual.game.board.CellAddress
 import com.us.dsb.explore.algs.coloredlines.manual.game.GameLogicSupport.MoveResult
 import com.us.dsb.explore.algs.coloredlines.manual.game.GameState.GameResult.Done
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.{BallKind, Board}

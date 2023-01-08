@@ -1,21 +1,11 @@
 package com.us.dsb.explore.algs.coloredlines.manual.game.board
 
-private[manual] object Board {
+private[game] object Board {
 
   /** Empty or ball of some color. */
-  private[game] case class CellBallState(ballState: Option[BallKind]) // ?????? move out of Board
-  private[game] object CellBallState {
-    private[game] val empty: CellBallState = CellBallState(None)
-  }
-
-  /** Valid (in-board) cell address */
-  private[manual] case class CellAddress(row: RowIndex, column: ColumnIndex)
-
-  private[manual] object CellAddress {  // ?????? move out of Board
-    /** (Indexes, not offsets) */
-    private[manual] def fromRaw(rawRowIndex: Int, rawColumnIndex: Int) =
-      CellAddress(RowIndex(Index.unsafeFrom(rawRowIndex)),
-                  ColumnIndex(Index.unsafeFrom(rawColumnIndex)))
+  private[Board] case class CellBallState(ballState: Option[BallKind])
+  private[Board] object CellBallState {
+    private[Board] val empty: CellBallState = CellBallState(None)
   }
 
   private[game] def empty: Board =
@@ -28,7 +18,7 @@ import com.us.dsb.explore.algs.coloredlines.manual.game.board.{BoardOrder, colum
 /**
  * State of board (just cells; not other game state (e.g., score).)
  */
-private[manual] class Board(private[this] val cellStates: Vector[CellBallState],  //????? grid?
+private[game] class Board(private[this] val cellStates: Vector[CellBallState],  //????? grid?
                             private[this] val onDeck: Iterable[BallKind],
                             //???? move to game (low-level tap-UI) state:
                             private[this] val selectionAddress: Option[CellAddress]

@@ -1,6 +1,6 @@
 package com.us.dsb.explore.algs.coloredlines.manual.ui
 
-import com.us.dsb.explore.algs.coloredlines.manual.game.board.Board.CellAddress
+import com.us.dsb.explore.algs.coloredlines.manual.game.board.CellAddress
 import com.us.dsb.explore.algs.coloredlines.manual.game._
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.{ColumnIndex, Index, RowIndex, columnIndices, rowIndices}
 
