@@ -124,13 +124,18 @@ object GameLogicSupport {
 
   private[this] def placeNextBalls(board: Board)(implicit rng: Random): MoveResult = {
     val postPlacementResult =
+      //???? for 1 to 3, consume on-deck ball from list, and then place (better for internal state view);;
+      // can replenish incrementally or later; later might show up better in internal state view
       board.getOnDeckBalls
         .foldLeft(MoveResult(board, None)) {
-          case (curMoveResult, _) =>
+          case (curMoveResult, onDeckBall) =>
             pickRandomEmptyCell(curMoveResult.board) match {
-              case None => curMoveResult
+              case None =>  // board full; break out early (game will become over)
+                curMoveResult
               case Some(address) =>
-                val postPlacementBoard = curMoveResult.board.withBallAt(address, pickRandomBallKind())
+                val postDeueueBoard =
+                  curMoveResult.board.withOnDeckBalls(curMoveResult.board.getOnDeckBalls.tail)
+                val postPlacementBoard = postDeueueBoard.withBallAt(address, onDeckBall)
                 LineDetector.handleBallArrival(postPlacementBoard, address)
             }
         }

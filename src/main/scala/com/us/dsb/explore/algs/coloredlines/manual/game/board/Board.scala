@@ -105,7 +105,7 @@ private[game] class Board(private[this] val cellStates: Vector[CellBallState],  
         getCellBallStateAt(addr).ballState.fold("-")(_.initial)
       }.mkString("")
     }.mkString("/") ++
-        " + " ++ onDeck.map(_.initial).mkString("(", ", ", ")") ++
+        " + " ++ getOnDeckBalls.map(_.initial).mkString("(", ", ", ")") ++
         ">"
   }
 
