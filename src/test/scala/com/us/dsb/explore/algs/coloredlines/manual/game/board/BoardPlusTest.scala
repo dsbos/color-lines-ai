@@ -12,20 +12,20 @@ import org.scalatest.matchers.should.Matchers._
 class BoardPlusTest extends AnyFunSpec {
 
   describe("BoardPlus$.empty should return board:") {
-    lazy val board = BoardPlus.empty
+    lazy val boardPlus = BoardPlus.empty
     it("- with empty board--empty grid cells") {
       rowIndices.foreach { row =>
         columnIndices.foreach { column =>
           val address = CellAddress(row, column)
-          assert(board.getBallStateAt(address).isEmpty)
+          assert(boardPlus.getBallStateAt(address).isEmpty)
         }
       }
     }
     it("- with empty board--empty on-deck list") {
-      assert(board.getOnDeckBalls.isEmpty)
+      assert(boardPlus.getOnDeckBalls.isEmpty)
     }
     it("- with no selection") {
-      assert(board.hasAnyCellSelected == false)
+      assert(boardPlus.hasAnyCellSelected == false)
     }
   }
 
@@ -33,39 +33,39 @@ class BoardPlusTest extends AnyFunSpec {
     //???? randomize?
     val someRow = rowIndices.head
     val someCol = columnIndices.head
-    val board0 = BoardPlus.empty
+    val boardPlus0 = BoardPlus.empty
     val address = CellAddress(someRow, someCol)
 
     describe("hasAnyCellSelected should:") {
       it("- return false for fresh, empty board") {
-        board0.hasAnyCellSelected shouldBe false
+        boardPlus0.hasAnyCellSelected shouldBe false
       }
       it("- return true for board with selection") {
-        val selectedBoard = board0.withCellSelected(address)
-        board0.hasAnyCellSelected shouldBe false
+        val selectedBoardPlus = boardPlus0.withCellSelected(address)
+        boardPlus0.hasAnyCellSelected shouldBe false
       }
     }
 
     describe("withCellSelected should") {
-      lazy val selectedBoard = board0.withCellSelected(address)
+      lazy val selectedBoardPlus = boardPlus0.withCellSelected(address)
 
       it("- select _something_") {
-        selectedBoard.hasAnyCellSelected shouldBe true
+        selectedBoardPlus.hasAnyCellSelected shouldBe true
       }
       it("- select _specified_ cell") {
-        selectedBoard.isSelectedAt(address) shouldBe true
+        selectedBoardPlus.isSelectedAt(address) shouldBe true
       }
     }
 
     describe("withNoSelection should:") {
-      lazy val selectedBoard = board0.withCellSelected(address)
-      lazy val deselectedBoard = selectedBoard.withNoSelection
+      lazy val selectedBoardPlus = boardPlus0.withCellSelected(address)
+      lazy val deselectedBoardPlus = selectedBoardPlus.withNoSelection
 
       it("- deselect (anything)") {
-        deselectedBoard.hasAnyCellSelected shouldBe false
+        deselectedBoardPlus.hasAnyCellSelected shouldBe false
       }
       it("- deselect selected cell") {
-        deselectedBoard.isSelectedAt(address) shouldBe false
+        deselectedBoardPlus.isSelectedAt(address) shouldBe false
       }
     }
     //???? test works when no selection anyway

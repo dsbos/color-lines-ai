@@ -24,7 +24,7 @@ private[manual] object GameState {
     val initialPlacementResult = GameLogicSupport.placeInitialBalls(BoardPlus.empty)
     //????? probably split GameState level from slightly lower game state
     //  carrying board plus score (probably modifying MoveResult for that)
-    GameState(initialPlacementResult.board, None)
+    GameState(initialPlacementResult.boardPlus, None)
   }
 
   private[manual/*game*/] def initial(seed: Long): GameState = makeInitialState(new Random(seed))
@@ -38,7 +38,7 @@ import GameState._
  * @constructor
  * @param gameResult  `None` means no win or draw yet
  */
-private[manual] case class GameState(board: BoardPlus,
+private[manual] case class GameState(boardPlus: BoardPlus,
                                      gameResult: Option[GameResult]
                                     )(implicit rng: Random) {
 
@@ -50,36 +50,36 @@ private[manual] case class GameState(board: BoardPlus,
   //  game history
   private[manual] def tryMoveAt(tapAddress: CellAddress): Either[String, GameState] = {
     import GameLogicSupport.Action._
-    val tapAction = GameLogicSupport.interpretTapLocationToTapAction(board, tapAddress)
+    val tapAction = GameLogicSupport.interpretTapLocationToTapAction(boardPlus, tapAddress)
     println("tryMoveAt: tapAction = " + tapAction)
     val moveResult: MoveResult =
       tapAction match {
         case SelectBall |
              SelectEmpty =>
-          MoveResult(board.withCellSelected(tapAddress), false)  //???? ?
+          MoveResult(boardPlus.withCellSelected(tapAddress), false)  //???? ?
         case Deselect    =>
-          MoveResult(board.withNoSelection, false)  //????
+          MoveResult(boardPlus.withNoSelection, false)  //????
         case TryMoveBall =>
           //???? should TryMoveBall carry coordinates?:
           //???? need to split logical moves/plays (e.g., move ball from source
           // to target from top-/selection-level ~UI (keep that separate from cursor-to-taps UI))
           val fromAddress =
-            board.getSelectionCoordinates.getOrElse(sys.error("Shouldn't be able to happen"))
-          GameLogicSupport.doTryMoveBall(board, fromAddress, tapAddress)
+            boardPlus.getSelectionCoordinates.getOrElse(sys.error("Shouldn't be able to happen"))
+          GameLogicSupport.doTryMoveBall(boardPlus, fromAddress, tapAddress)
           //???? try to move (conditional) .withNoSelection out of doTryMoveBall
           //  up to here; need additional could-move flag (addedScore None would be ambiguous)
 
         case Pass        =>
-          val passResult = GameLogicSupport.doPass(board)
-          passResult.copy(board = passResult.board.withNoSelection)
+          val passResult = GameLogicSupport.doPass(boardPlus)
+          passResult.copy(boardPlus = passResult.boardPlus.withNoSelection)
       }
 
     val nextState =
-      if (! moveResult.board.isFull) {
-        GameState(moveResult.board, gameResult).asRight
+      if (! moveResult.boardPlus.isFull) {
+        GameState(moveResult.boardPlus, gameResult).asRight
       }
       else {
-        GameState(moveResult.board, Some(Done(moveResult.board.getScore))).asRight
+        GameState(moveResult.boardPlus, Some(Done(moveResult.boardPlus.getScore))).asRight
       }
     nextState
   }

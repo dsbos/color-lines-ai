@@ -11,8 +11,8 @@ import com.us.dsb.explore.algs.coloredlines.manual.game.board.{BallKind, BoardPl
 object LineDetector {
 
   private[lines] case class LineAxis(labelArray: String,
-                                     rowDelta  : Int, // -1 / 0 / 1 (Make refined type?)
-                                     colDelta  : Int)
+                                     rowDelta: Int, // -1 / 0 / 1 (Make refined type?)
+                                     colDelta: Int)
 
   private[this] val lineAxes =
     List(
@@ -23,27 +23,27 @@ object LineDetector {
   private[this] val relativeDirectionFactors = List(1, -1) // use type of length 2 (refined List?, Tuple2?, some array?)
 
   private[lines] def haveMatchingBallAt(moveBallColor: BallKind,
-                                        board        : BoardPlus,
-                                        rawRowIndex  : Int,
-                                        rawColIndex  : Int): Boolean = {
+                                        boardPlus: BoardPlus,
+                                        rawRowIndex: Int,
+                                        rawColIndex: Int): Boolean = {
     val inRange =
       1 <= rawRowIndex && rawRowIndex <= BoardOrder &&
           1 <= rawColIndex && rawColIndex <= BoardOrder
     val haveMatch =
       inRange && {
         val candidateAddress = CellAddress.fromRaw(rawRowIndex, rawColIndex)
-        board.getBallStateAt(candidateAddress).fold(false)(ball => ball == moveBallColor)
+        boardPlus.getBallStateAt(candidateAddress).fold(false)(ball => ball == moveBallColor)
       }
     haveMatch
   }
 
   private[lines] case class RelativeDirectionResult(excursionLength: Int)
 
-  private[lines] def computeDirectionResult(moveBallColor    : BallKind,
-                                            board            : BoardPlus,
-                                            ballTo           : CellAddress,
+  private[lines] def computeDirectionResult(moveBallColor: BallKind,
+                                            boardPlus: BoardPlus,
+                                            ballTo: CellAddress,
                                             lineDirectionAxis: LineAxis,
-                                            directionFactor  : Int): RelativeDirectionResult = {
+                                            directionFactor: Int): RelativeDirectionResult = {
     val newBallRowIndex = ballTo.row.value.value
     val newBallColIndex = ballTo.column.value.value
     import lineDirectionAxis.{colDelta, rowDelta}
@@ -54,7 +54,7 @@ object LineDetector {
       val candidateColIndex = newBallColIndex + colDelta * directionFactor * candidateExcursionLength
       //??? println(s"    ??.n.0: candidate address: ($candidateRowIndex / $candidateColIndex)")
 
-      val haveMatchingBall = haveMatchingBallAt(moveBallColor, board, candidateRowIndex, candidateColIndex)
+      val haveMatchingBall = haveMatchingBallAt(moveBallColor, boardPlus, candidateRowIndex, candidateColIndex)
       if (haveMatchingBall) {
         excursionLength = candidateExcursionLength
       }
@@ -63,19 +63,19 @@ object LineDetector {
     RelativeDirectionResult(excursionLength)
   }
 
-  private[lines] case class AxisResult(axis               : LineAxis,
+  private[lines] case class AxisResult(axis: LineAxis,
                                        axisLineAddedLength: Int, // length WITHOUT moved ball
-                                       directionDetails   : List[RelativeDirectionResult])
+                                       directionDetails: List[RelativeDirectionResult])
 
-  private[lines] def computeLineAxisResult(moveBallColor    : BallKind,
-                                           board            : BoardPlus,
-                                           ballTo           : CellAddress,
+  private[lines] def computeLineAxisResult(moveBallColor: BallKind,
+                                           boardPlus: BoardPlus,
+                                           ballTo: CellAddress,
                                            lineDirectionAxis: LineAxis): AxisResult = {
     //??? println(s"+  computeLineAxisResult( axis = $lineDirectionAxis ).1")
     val directionsResults: List[RelativeDirectionResult] =
       relativeDirectionFactors.map { directionFactor =>
         computeDirectionResult(moveBallColor,
-                               board,
+                               boardPlus,
                                ballTo,
                                lineDirectionAxis,
                                directionFactor)
@@ -87,10 +87,10 @@ object LineDetector {
     result
   }
 
-  private[lines] def removeCompletedLineBalls(ballTo                  : CellAddress,
-                                              preremovalBoard         : BoardPlus,
+  private[lines] def removeCompletedLineBalls(ballTo: CellAddress,
+                                              preremovalBoardPlus: BoardPlus,
                                               completedLineAxesResults: List[AxisResult]): BoardPlus = {
-    val newBallRemovedBoard = preremovalBoard.withNoBallAt(ballTo)
+    val newBallRemovedBoard = preremovalBoardPlus.withNoBallAt(ballTo)
     val linesRemovedBoard =
       completedLineAxesResults.foldLeft(newBallRemovedBoard) { case (axisBoard, axisResult) =>
         val fromOffset = -axisResult.directionDetails(1).excursionLength
@@ -113,15 +113,15 @@ object LineDetector {
    * None if no line(s) completed; score increment otherwise
    */
   //???? rename?:  harvestAnyLines?
-  private[game] def handleBallArrival(board   : BoardPlus,
-                                      ballTo  : CellAddress
+  private[game] def handleBallArrival(boardPlus: BoardPlus,
+                                      ballTo: CellAddress
                                      ): MoveResult = {
     //println(s"+handleBallArrival(... ballTo = $ballTo...).1")
-    val moveBallColor = board.getBallStateAt(ballTo).get //????
+    val moveBallColor = boardPlus.getBallStateAt(ballTo).get //????
 
     val allAxesResults: List[AxisResult] =
       lineAxes.map { lineAxis =>
-        computeLineAxisResult(moveBallColor, board, ballTo, lineAxis)
+        computeLineAxisResult(moveBallColor, boardPlus, ballTo, lineAxis)
       }
     //??? println("??? allAxesResults:" + allAxesResults.mkString("\n- ", "\n- ", ""))
     val completedLineAxesResults = allAxesResults.filter(_.axisLineAddedLength + 1 >= LineOrder)
@@ -129,7 +129,7 @@ object LineDetector {
     val (boardResult, scoreResult) =
       completedLineAxesResults match {
         case Nil =>
-          (board, None) // return None for score (signal to place 3 more IF ball moved by user)
+          (boardPlus, None) // return None for score (signal to place 3 more IF ball moved by user)
         case linesAxes =>
           val totalBallsBeingRemoved = 1 + linesAxes.map(_.axisLineAddedLength).sum
           println(s" scoreMove(... ballTo = $ballTo...).x totalBallsBeingRemoved = $totalBallsBeingRemoved")
@@ -137,7 +137,7 @@ object LineDetector {
           // note original game scoring: score = totalBallsBeingRemoved * 4 - 10,
           //  which seems to be from 2 pts per ball in 5-ball line, but 4 for any extra balls in line
           val postLinesRemovalBoard = removeCompletedLineBalls(ballTo,
-                                                               board,
+                                                               boardPlus,
                                                                completedLineAxesResults)
           val ballPlacementScore = 2 * LineOrder + 4 * (totalBallsBeingRemoved - LineOrder)
           (postLinesRemovalBoard.withAddedScore(ballPlacementScore), Some(ballPlacementScore))
