@@ -2,6 +2,7 @@ package com.us.dsb.explore.algs.coloredlines.manual.game
 
 import org.scalatest.funspec.AnyFunSpec
 import cats.syntax.option._
+import com.us.dsb.explore.algs.coloredlines.manual.game.board.{ColumnIndex, Index, RowIndex}
 
 class XxGameStateTest extends AnyFunSpec {
 
@@ -9,7 +10,7 @@ class XxGameStateTest extends AnyFunSpec {
 //    import Player._
     import scala.language.implicitConversions
     implicit def intToRow(int: Int): RowIndex    = RowIndex(Index.unsafeFrom(int))
-    implicit def intToCol(int: Int): ColumnIndex =ColumnIndex(Index.unsafeFrom(int))
+    implicit def intToCol(int: Int): ColumnIndex = ColumnIndex(Index.unsafeFrom(int))
 
 
     ignore("marks cells") {

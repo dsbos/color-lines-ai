@@ -1,8 +1,9 @@
 package com.us.dsb.explore.algs.coloredlines.manual.game.lines
 
-import com.us.dsb.explore.algs.coloredlines.manual.game.Board.CellAddress
+import com.us.dsb.explore.algs.coloredlines.manual.game.board.Board.CellAddress
 import com.us.dsb.explore.algs.coloredlines.manual.game.GameLogicSupport.MoveResult
 import com.us.dsb.explore.algs.coloredlines.manual.game._
+import com.us.dsb.explore.algs.coloredlines.manual.game.board.{BallKind, Board, BoardOrder, LineOrder}
 
 //???? TODO:  reduce repeated passing of board, etc.; maybe make LineDetector a
 // class, to be instantiated for each move; or make local class for passing (but

@@ -1,9 +1,9 @@
-package com.us.dsb.explore.algs.coloredlines.manual.game
+package com.us.dsb.explore.algs.coloredlines.manual.game.board
 
 private[manual] object Board {
 
   /** Empty or ball of some color. */
-  private[game] case class CellBallState(ballState: Option[BallKind])
+  private[game] case class CellBallState(ballState: Option[BallKind]) // ?????? move out of Board
   private[game] object CellBallState {
     private[game] val empty: CellBallState = CellBallState(None)
   }
@@ -11,7 +11,7 @@ private[manual] object Board {
   /** Valid (in-board) cell address */
   private[manual] case class CellAddress(row: RowIndex, column: ColumnIndex)
 
-  private[manual] object CellAddress {
+  private[manual] object CellAddress {  // ?????? move out of Board
     /** (Indexes, not offsets) */
     private[manual] def fromRaw(rawRowIndex: Int, rawColumnIndex: Int) =
       CellAddress(RowIndex(Index.unsafeFrom(rawRowIndex)),
@@ -22,7 +22,8 @@ private[manual] object Board {
     new Board(Vector.fill[CellBallState](BoardOrder * BoardOrder)(CellBallState.empty), Nil, None)
 }
 
-import Board._
+import com.us.dsb.explore.algs.coloredlines.manual.game.board.Board._
+import com.us.dsb.explore.algs.coloredlines.manual.game.board.{BoardOrder, columnIndices, rowIndices}
 
 /**
  * State of board (just cells; not other game state (e.g., score).)

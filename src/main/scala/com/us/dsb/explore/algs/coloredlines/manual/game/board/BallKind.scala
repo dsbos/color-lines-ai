@@ -1,4 +1,4 @@
-package com.us.dsb.explore.algs.coloredlines.manual.game
+package com.us.dsb.explore.algs.coloredlines.manual.game.board
 
 import enumeratum.{Enum, EnumEntry}
 

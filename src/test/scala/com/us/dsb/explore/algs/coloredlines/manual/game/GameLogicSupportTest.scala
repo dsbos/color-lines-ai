@@ -1,10 +1,10 @@
 package com.us.dsb.explore.algs.coloredlines.manual.game
 
-import com.us.dsb.explore.algs.coloredlines.manual.game.Board.CellAddress
+import com.us.dsb.explore.algs.coloredlines.manual.game.board.Board.CellAddress
 import com.us.dsb.explore.algs.coloredlines.manual.game.GameLogicSupport.MoveResult
+import com.us.dsb.explore.algs.coloredlines.manual.game.board.{Board, ColumnIndex, RowIndex, columnIndices, rowIndices}
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers._
-
 
 import scala.util.Random
 

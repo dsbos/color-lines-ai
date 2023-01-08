@@ -1,8 +1,6 @@
-package com.us.dsb.explore.algs.coloredlines.manual.game
+package com.us.dsb.explore.algs.coloredlines.manual.game.board
 
-import cats.syntax.option._
-import com.us.dsb.explore.algs.coloredlines.manual.game.BallKind
-import com.us.dsb.explore.algs.coloredlines.manual.game.Board.CellAddress
+import com.us.dsb.explore.algs.coloredlines.manual.game.board.Board.CellAddress
 import org.scalatest.PrivateMethodTester
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers._
