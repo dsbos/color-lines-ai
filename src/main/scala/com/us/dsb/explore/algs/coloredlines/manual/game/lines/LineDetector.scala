@@ -7,7 +7,7 @@ import com.us.dsb.explore.algs.coloredlines.manual.game.board.{BallKind, Board, 
 
 //???? TODO:  reduce repeated passing of board, etc.; maybe make LineDetector a
 // class, to be instantiated for each move; or make local class for passing (but
-// leave external-client inteface same
+// leave external-client interface same
 object LineDetector {
 
   private[lines] case class LineAxis(labelArray: String,
@@ -139,7 +139,7 @@ object LineDetector {
           val score = 2 * LineOrder + 4 * (totalBallsBeingRemoved - LineOrder)
           val postLinesRemovalBoard = removeCompletedLineBalls(ballTo,
                                                                board,
-                                                               completedLineAxesResults);
+                                                               completedLineAxesResults)
           (postLinesRemovalBoard, Some(score))
       }
     println(s"-handleBallArrival(... ballTo = $ballTo...).9 = score result = $scoreResult")

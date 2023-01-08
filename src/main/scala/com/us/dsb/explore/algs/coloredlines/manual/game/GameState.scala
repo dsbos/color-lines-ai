@@ -21,8 +21,10 @@ private[manual] object GameState {
   }
 
   private[this] def makeInitialState(implicit rng: Random): GameState = {
-    val nameThisResult = GameLogicSupport.placeInitialBalls(Board.empty)  //?????? clean
-    GameState(nameThisResult.board, nameThisResult.addedScore.getOrElse(0), None)
+    val initialPlacementResult = GameLogicSupport.placeInitialBalls(Board.empty)
+    //????? probably split GameState level from slightly lower game state
+    //  carrying board plus score (probably modifying MoveResult for that)
+    GameState(initialPlacementResult.board, initialPlacementResult.addedScore.getOrElse(0), None)
   }
 
   private[manual/*game*/] def initial(seed: Long): GameState = makeInitialState(new Random(seed))
@@ -30,14 +32,11 @@ private[manual] object GameState {
 }
 import GameState._
 
-/**
- *  game state _and_ controller--should functions be separated or together?
- *
- * @param gameResult  `None` means no win or draw yet
- */
- //???? add random-data state
+//???? add random-data state
 
 /** Game state AND currently controller.
+ * @constructor
+ * @param gameResult  `None` means no win or draw yet
  */
 private[manual] case class GameState(board: Board,
                                      score: Int, //???? with Positive
@@ -68,6 +67,9 @@ private[manual] case class GameState(board: Board,
           val fromAddress =
             board.getSelectionCoordinates.getOrElse(sys.error("Shouldn't be able to happen"))
           GameLogicSupport.doTryMoveBall(board, fromAddress, tapAddress)
+          //???? try to move (conditional) .withNoSelection out of doTryMoveBall
+          //  up to here; need additional could-move flag (addedScore None would be ambiguous)
+
         case Pass        =>
           val passResult = GameLogicSupport.doPass(board)
           assert(passResult.addedScore.isEmpty)

@@ -134,7 +134,7 @@ class BoardTest extends AnyFunSpec {
         (1 to BoardOrder).map { _ =>
           columnIndices.map(_ => "-").mkString("")
         }
-            .mkString("<", "/", ">")
+            .mkString("<", "/", " + ()>")
       Board.empty.toString shouldBe expected
     }
     it("- board with grid balls") (pending)

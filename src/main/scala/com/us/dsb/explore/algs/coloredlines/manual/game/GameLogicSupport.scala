@@ -38,24 +38,24 @@ object GameLogicSupport {
     val postPlacementsResult =
       //???? parameterize:
       (1 to 5).foldLeft(MoveResult(board, None)) {
-        case (resultSoFar, _) => //?????? clean
+        case (resultSoFar, _) =>
           val address =
             pickRandomEmptyCell(resultSoFar.board).getOrElse(scala.sys.error("Unexpectedly full board"))
           val postPlacementBoard = resultSoFar.board.withBallAt(address, pickRandomBallKind())
-          val placementHandlingResult1 = LineDetector.handleBallArrival(postPlacementBoard, address)
+          val placementHandlingResult = LineDetector.handleBallArrival(postPlacementBoard, address)
           //???? clean (note: note typical for / flatmap->map case)
           val netAddedScore: Option[Int] =
             (resultSoFar.addedScore.getOrElse(0) +
-                placementHandlingResult1.addedScore.getOrElse(0)) match {
+                placementHandlingResult.addedScore.getOrElse(0)) match {
               case 0 => None
               case n => Some(n)
             }
             resultSoFar.addedScore.flatMap { prevIncr =>
-              placementHandlingResult1.addedScore.map { newIncr =>
+              placementHandlingResult.addedScore.map { newIncr =>
                 prevIncr + newIncr
               }
             }
-          MoveResult(placementHandlingResult1.board, netAddedScore)
+          MoveResult(placementHandlingResult.board, netAddedScore)
       }
     //???? parameterize
     postPlacementsResult.copy(board = postPlacementsResult.board.withOnDeckBalls(List.fill(3)(pickRandomBallKind())))
@@ -135,13 +135,14 @@ object GameLogicSupport {
             }
         }
     //???? parameterize?
-    //?????? check re duplicate on-deck code (look for other "fill(3)"
+    //????? check re duplicate on-deck code (look for other "fill(3)"
     postPlacementResult.copy(board = postPlacementResult.board.withOnDeckBalls(List.fill(3)(pickRandomBallKind())))
   }
 
-  //?????? rename?  isn't _user_ move result; is ball move/placement/arrival result
+  //???? rename?  isn't _user_ move result; is ball move/placement/arrival result
   //?????? possibly change score delta to score; probably change to lower-level game (board balls + score) state,
-  // separate from in-progress--vs.--done part of Gamestate)
+  // separate from in-progress--vs.--done part of GameState)
+  // - maybe use explicit Boolean to indicate whether any lines were harvested
   case class MoveResult(board: Board, addedScore: Option[Int])
   {
     //??? println(s"??? ${this}")
@@ -219,17 +220,14 @@ object GameLogicSupport {
       case false =>  // can't move--ignore (keep selection state)
         MoveResult(board, None)
       case true =>
-        val moveBallColor = board.getBallStateAt(from).get //????
-        val postMoveBoard = board.withNoBallAt(from).withBallAt(to, moveBallColor)
-        println(s"doTryMoveBall.2: moved $moveBallColor ball from $from to $to")
+        val deselectedBoard = board.withNoSelection
+        val moveBallColor = deselectedBoard.getBallStateAt(from).get //????
+        val postMoveBoard = deselectedBoard.withNoBallAt(from).withBallAt(to, moveBallColor)
 
-        val MoveResult(postHandlingBoard, ballMoveScore) = LineDetector.handleBallArrival(postMoveBoard, to)
-        println("-                              ballMoveScore " + ballMoveScore)
-        ballMoveScore match {
-          case None =>
-            MoveResult(placeNextBalls(postHandlingBoard).board.withNoSelection, ballMoveScore)
-          case Some(increment) =>
-            MoveResult(postHandlingBoard.withNoSelection, Some(increment))
+        val postHandlingResult = LineDetector.handleBallArrival(postMoveBoard, to)
+        postHandlingResult.addedScore match {
+          case None            => placeNextBalls(postHandlingResult.board)
+          case Some(increment) => postHandlingResult
         }
     }
   }

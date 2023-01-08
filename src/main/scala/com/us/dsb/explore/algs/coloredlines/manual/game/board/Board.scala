@@ -15,6 +15,7 @@ private[game] object Board {
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.Board._
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.{BoardOrder, columnIndices, rowIndices}
 
+//???? move tap-UI selection state out of board
 /**
  * State of board (just cells; not other game state (e.g., score).)
  */
@@ -97,12 +98,15 @@ private[game] class Board(private[this] val cellStates: Vector[CellBallState],  
 
   /** Makes compact single-line string like Xx"<X-O/-X-/O-X>". */
   override def toString: String = {
+    "<" ++
     rowIndices.map { row =>
       columnIndices.map { column =>
         val addr = CellAddress(row, column)
         getCellBallStateAt(addr).ballState.fold("-")(_.initial)
       }.mkString("")
-    }.mkString("<", "/", ">")
+    }.mkString("/") ++
+        " + " ++ onDeck.map(_.initial).mkString("(", ", ", ")") ++
+        ">"
   }
 
   private[this] def renderMultiline: String = {
