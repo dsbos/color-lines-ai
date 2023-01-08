@@ -2,78 +2,50 @@ package com.us.dsb.explore.algs.coloredlines.manual.game.board
 
 private[game] object BoardPlus {
 
-  /** Empty or ball of some color. */
-  private[BoardPlus] case class CellBallState(ballState: Option[BallKind])
-  private[BoardPlus] object CellBallState {
-    private[BoardPlus] val empty: CellBallState = CellBallState(None)
-  }
-
-  private[game] def empty: BoardPlus =
-    new BoardPlus(Vector.fill[CellBallState](BoardOrder * BoardOrder)(CellBallState.empty), Nil, 0, None)
+  private[game] def empty: BoardPlus = new BoardPlus(BoardState.empty,0, None)
 }
 
-import com.us.dsb.explore.algs.coloredlines.manual.game.board.BoardPlus._
-import com.us.dsb.explore.algs.coloredlines.manual.game.board.{BoardOrder, columnIndices, rowIndices}
-
-//???? move tap-UI selection state out of board
+//???? move tap-UI selection state out of this low-level game state
 /**
- * State of board (just cells; not other game state (e.g., score).)
+ * CURRENTLY:  Core board state (now wrapped), not score yet, tap-UI selection state
  */
-private[game] class BoardPlus(private[this] val cellStates: Vector[CellBallState],  //????? grid?
-                          private[this] val onDeck: Iterable[BallKind],
-                          //????? move score out to low-level game state once messed-up score assimilation is fixed
-                          private[this] val score: Int,
-                          //???? move to game (low-level tap-UI) state:
-                          private[this] val selectionAddress: Option[CellAddress]
-                         ) {
-  println("??? Board:     " + this)
+private[game] class BoardPlus(private[this] val boardState: BoardState,
+                              private[this] val score: Int,
+                              //???? move to (low-level) tap-UI state:
+                              private[this] val selectionAddress: Option[CellAddress]
+                             ) {
+  println("??? BoardPlus : " + this)
   //print("")
 
   // internal/support methods:
 
-  private[this] def copy(cellStates: Vector[CellBallState]     = cellStates,
-                         onDeck: Iterable[BallKind]            = onDeck,
+  private[this] def copy(boardState: BoardState                = boardState,
                          score: Int                            = score,
                          selectionAddress: Option[CellAddress] = selectionAddress) =
-    new BoardPlus(cellStates, onDeck, score, selectionAddress)
-
-  /** Computes row-major cell-array index from row and column numbers. */
-  private[this] def vectorIndex(address: CellAddress): Int =
-    (address.row.value.value - 1) * BoardOrder + (address.column.value.value - 1)
+    new BoardPlus(boardState, score, selectionAddress)
 
   // on-deck balls:
-  private[game] def getOnDeckBalls: Iterable[BallKind] = onDeck
+  private[game] def getOnDeckBalls: Iterable[BallKind] = boardState.getOnDeckBalls
 
   private[game] def withOnDeckBalls(newBalls: Iterable[BallKind]): BoardPlus =
-    copy(onDeck = newBalls)
+    copy(boardState.withOnDeckBalls(newBalls))
 
   // grid balls:
 
-  private[manual] def getCellBallStateAt(address: CellAddress): CellBallState = {
-    cellStates(vectorIndex(address))
-  }
+  private[game] def isFull: Boolean = boardState.isFull
 
-  private[game] def isFull: Boolean = ! cellStates.exists(_.ballState.isEmpty)
+  private[manual/*game*/] def getBallStateAt(address: CellAddress): Option[BallKind] =
+    boardState.getBallStateAt(address)
 
-  private[game] def getBallStateAt(address: CellAddress): Option[BallKind] = {
-    cellStates(vectorIndex(address)).ballState
-  }
   private[game] def hasABallAt(address: CellAddress): Boolean =
-    cellStates(vectorIndex(address)).ballState.isDefined
+    boardState.hasABallAt(address)
 
-
-  //
-
-  private def withCellBallState(address: CellAddress,
-                                newState: CellBallState): BoardPlus =
-    copy(cellStates = cellStates.updated(vectorIndex(address), newState))
-
-  private[game] def withBallAt(address: CellAddress,
-                               ball: BallKind): BoardPlus =
-    withCellBallState(address, getCellBallStateAt(address).copy(ballState = Some(ball)))
+  private[game] def withBallAt(address: CellAddress, ball: BallKind): BoardPlus =
+    copy(boardState = boardState.withBallAt(address, ball))
 
   private[game] def withNoBallAt(address: CellAddress): BoardPlus =
-    withCellBallState(address, getCellBallStateAt(address).copy(ballState = None))
+    copy(boardState = boardState.withNoBallAt(address))
+
 
   private[game] def withCellSelected(address: CellAddress): BoardPlus =
     copy(selectionAddress = Some(address))
@@ -81,8 +53,9 @@ private[game] class BoardPlus(private[this] val cellStates: Vector[CellBallState
   private[game] def withNoSelection: BoardPlus =
     copy(selectionAddress = None)
 
-  private[manual] def getCellBallStateChar(state: CellBallState, isSelected: Boolean): String = {  //???? move out
-    state.ballState match {
+  //???? move out?
+  private[manual] def getCellBallStateChar(ballState: Option[BallKind], isSelected: Boolean): String = {
+    ballState match {
       case Some(ball) => ball.getColoredCharSeq(isSelected)
       case None       => if (! isSelected) "-" else "@"
     }
@@ -106,19 +79,8 @@ private[game] class BoardPlus(private[this] val cellStates: Vector[CellBallState
 
   // renderings:
 
-  /** Makes compact single-line string like Xx"<X-O/-X-/O-X>". */
-  override def toString: String = {
-    "<" ++
-    rowIndices.map { row =>
-      columnIndices.map { column =>
-        val addr = CellAddress(row, column)
-        getCellBallStateAt(addr).ballState.fold("-")(_.initial)
-      }.mkString("")
-    }.mkString("/") +
-        " + " + getOnDeckBalls.map(_.initial).mkString("(", ", ", ")") +
-        "; " + score + " pts" +
-        ">"
-  }
+  /** Makes compact single-line string. */
+  override def toString: String = "< " + boardState.toString + "; " + score + " pts" + ">"
 
   private[this] def renderMultiline: String = {
     val cellWidth = " X ".length
@@ -131,7 +93,7 @@ private[game] class BoardPlus(private[this] val cellStates: Vector[CellBallState
     rowIndices.map { row =>
       columnIndices.map { column =>
         val addr = CellAddress(row, column)
-        "" + getCellBallStateChar(getCellBallStateAt(addr), isSelectedAt(addr)) + " "
+        "" + getCellBallStateChar(getBallStateAt(addr), isSelectedAt(addr)) + " "
       }.mkString(cellSeparator)  // make each row line
     }.mkString(rowSeparator)     // make whole-board multi-line string
   }
@@ -140,7 +102,7 @@ private[game] class BoardPlus(private[this] val cellStates: Vector[CellBallState
     rowIndices.map { row =>
       columnIndices.map { column =>
         val addr = CellAddress(row, column)
-        getCellBallStateChar(getCellBallStateAt(addr), isSelectedAt(addr))
+        getCellBallStateChar(getBallStateAt(addr), isSelectedAt(addr))
       }.mkString("|")  // make each row line
     }.mkString("\n")
   }

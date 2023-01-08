@@ -50,7 +50,7 @@ private[this] case class GameUIState(gameState: GameState,
       columnIndices.map { column =>
         val scanAddress = CellAddress(row, column)
         val cellStateStr =
-          gameState.board.getCellBallStateChar(gameState.board.getCellBallStateAt(scanAddress),
+          gameState.board.getCellBallStateChar(gameState.board.getBallStateAt(scanAddress),
                                                gameState.board.isSelectedAt(scanAddress))
         if (scanAddress == cursorAddress ) {
           "*" + cellStateStr + "*"

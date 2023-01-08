@@ -145,7 +145,7 @@ object GameLogicSupport {
     placeNextBalls(board)
 
 
-  //???: likely move core algorithm out; possibly move outer code into Board:
+  //???: likely move core algorithm out; possibly move outer code into BoardPlus/BoardState:
   /**
    * @param toTapCell - must be empty */
   // (was "private[this]" before test calls:)
