@@ -30,6 +30,15 @@ object GameLogicSupport {
     }
   }
 
+  //???? probably split into BoardState-level vs. level of BoardState + score
+  case class MoveResult(boardPlus: BoardPlus,
+                        //??? clarify re placing next three balls (re interpreting differently in different contexts
+                        anyRemovals: Boolean)
+  {
+    println(s"??? ${this}")
+    //??? print("")
+  }
+
   /**
    * @param board
    *   expected to be empty //???? maybe refactor something?
@@ -130,15 +139,6 @@ object GameLogicSupport {
     //???? parameterize?
     //????? check re duplicate on-deck code (look for other "fill(3)"
     postPlacementResult.copy(boardPlus = postPlacementResult.boardPlus.withOnDeckBalls(List.fill(3)(pickRandomBallKind())))
-  }
-
-  //???? rename?  isn't _user_ move result; is ball move/placement/arrival result
-  case class MoveResult(boardPlus: BoardPlus,
-                        //??? clarify re placing next three balls (re interpreting differently in different contexts
-                        anyRemovals: Boolean)
-  {
-    println(s"??? ${this}")
-    //??? print("")
   }
 
   private[game] def doPass(boardPlus: BoardPlus)(implicit rng: Random): MoveResult =
