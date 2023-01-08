@@ -116,7 +116,7 @@ object LineDetector {
   private[game] def handleBallArrival(board   : Board,
                                       ballTo  : CellAddress
                                      ): MoveResult = {
-    println(s"+handleBallArrival(... ballTo = $ballTo...).1")
+    //println(s"+handleBallArrival(... ballTo = $ballTo...).1")
     val moveBallColor = board.getBallStateAt(ballTo).get //????
 
     val allAxesResults: List[AxisResult] =
@@ -125,7 +125,7 @@ object LineDetector {
       }
     //??? println("??? allAxesResults:" + allAxesResults.mkString("\n- ", "\n- ", ""))
     val completedLineAxesResults = allAxesResults.filter(_.axisLineAddedLength + 1 >= LineOrder)
-    println("??? completedLineAxesResults:" + completedLineAxesResults.map("- " + _.toString).mkString("\n", "\n", "\n:end"))
+    //println("??? completedLineAxesResults:" + completedLineAxesResults.map("- " + _.toString).mkString("\n", "\n", "\n:end"))
     val (boardResult, scoreResult) =
       completedLineAxesResults match {
         case Nil =>
@@ -136,14 +136,14 @@ object LineDetector {
           //???? move?
           // note original game scoring: score = totalBallsBeingRemoved * 4 - 10,
           //  which seems to be from 2 pts per ball in 5-ball line, but 4 for any extra balls in line
-          val score = 2 * LineOrder + 4 * (totalBallsBeingRemoved - LineOrder)
           val postLinesRemovalBoard = removeCompletedLineBalls(ballTo,
                                                                board,
                                                                completedLineAxesResults)
-          (postLinesRemovalBoard, Some(score))
+          val ballPlacementScore = 2 * LineOrder + 4 * (totalBallsBeingRemoved - LineOrder)
+          (postLinesRemovalBoard.withAddedScore(ballPlacementScore), Some(ballPlacementScore))
       }
-    println(s"-handleBallArrival(... ballTo = $ballTo...).9 = score result = $scoreResult")
-    MoveResult(boardResult, scoreResult)
+    //println(s"-handleBallArrival(... ballTo = $ballTo...).9 = score result = $scoreResult")
+    MoveResult(boardResult, scoreResult.isDefined)
   }
 
 }

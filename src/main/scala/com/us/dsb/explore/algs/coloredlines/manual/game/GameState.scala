@@ -24,7 +24,7 @@ private[manual] object GameState {
     val initialPlacementResult = GameLogicSupport.placeInitialBalls(Board.empty)
     //????? probably split GameState level from slightly lower game state
     //  carrying board plus score (probably modifying MoveResult for that)
-    GameState(initialPlacementResult.board, initialPlacementResult.addedScore.getOrElse(0), None)
+    GameState(initialPlacementResult.board, None)
   }
 
   private[manual/*game*/] def initial(seed: Long): GameState = makeInitialState(new Random(seed))
@@ -39,7 +39,6 @@ import GameState._
  * @param gameResult  `None` means no win or draw yet
  */
 private[manual] case class GameState(board: Board,
-                                     score: Int, //???? with Positive
                                      gameResult: Option[GameResult]
                                     )(implicit rng: Random) {
 
@@ -57,9 +56,9 @@ private[manual] case class GameState(board: Board,
       tapAction match {
         case SelectBall |
              SelectEmpty =>
-          MoveResult(board.withCellSelected(tapAddress), None)
+          MoveResult(board.withCellSelected(tapAddress), false)  //???? ?
         case Deselect    =>
-          MoveResult(board.withNoSelection, None)
+          MoveResult(board.withNoSelection, false)  //????
         case TryMoveBall =>
           //???? should TryMoveBall carry coordinates?:
           //???? need to split logical moves/plays (e.g., move ball from source
@@ -72,17 +71,15 @@ private[manual] case class GameState(board: Board,
 
         case Pass        =>
           val passResult = GameLogicSupport.doPass(board)
-          assert(passResult.addedScore.isEmpty)
           passResult.copy(board = passResult.board.withNoSelection)
       }
-    val newScore = score + moveResult.addedScore.getOrElse(0)
 
     val nextState =
       if (! moveResult.board.isFull) {
-        GameState(moveResult.board, newScore, gameResult).asRight
+        GameState(moveResult.board, gameResult).asRight
       }
       else {
-        GameState(moveResult.board, newScore, Some(Done(newScore))).asRight
+        GameState(moveResult.board, Some(Done(moveResult.board.getScore))).asRight
       }
     nextState
   }

@@ -37,25 +37,13 @@ object GameLogicSupport {
   private[game] def placeInitialBalls(board: Board)(implicit rng: Random): MoveResult = {
     val postPlacementsResult =
       //???? parameterize:
-      (1 to 5).foldLeft(MoveResult(board, None)) {
+      (1 to 5).foldLeft(MoveResult(board, false)) {
         case (resultSoFar, _) =>
           val address =
             pickRandomEmptyCell(resultSoFar.board).getOrElse(scala.sys.error("Unexpectedly full board"))
           val postPlacementBoard = resultSoFar.board.withBallAt(address, pickRandomBallKind())
           val placementHandlingResult = LineDetector.handleBallArrival(postPlacementBoard, address)
-          //???? clean (note: note typical for / flatmap->map case)
-          val netAddedScore: Option[Int] =
-            (resultSoFar.addedScore.getOrElse(0) +
-                placementHandlingResult.addedScore.getOrElse(0)) match {
-              case 0 => None
-              case n => Some(n)
-            }
-            resultSoFar.addedScore.flatMap { prevIncr =>
-              placementHandlingResult.addedScore.map { newIncr =>
-                prevIncr + newIncr
-              }
-            }
-          MoveResult(placementHandlingResult.board, netAddedScore)
+          MoveResult(placementHandlingResult.board, placementHandlingResult.anyRemovals)
       }
     //???? parameterize
     postPlacementsResult.copy(board = postPlacementsResult.board.withOnDeckBalls(List.fill(3)(pickRandomBallKind())))
@@ -127,7 +115,7 @@ object GameLogicSupport {
       //???? for 1 to 3, consume on-deck ball from list, and then place (better for internal state view);;
       // can replenish incrementally or later; later might show up better in internal state view
       board.getOnDeckBalls
-        .foldLeft(MoveResult(board, None)) {
+        .foldLeft(MoveResult(board, false)) {
           case (curMoveResult, onDeckBall) =>
             pickRandomEmptyCell(curMoveResult.board) match {
               case None =>  // board full; break out early (game will become over)
@@ -137,6 +125,7 @@ object GameLogicSupport {
                   curMoveResult.board.withOnDeckBalls(curMoveResult.board.getOnDeckBalls.tail)
                 val postPlacementBoard = postDeueueBoard.withBallAt(address, onDeckBall)
                 LineDetector.handleBallArrival(postPlacementBoard, address)
+                //?????? FIX: scores not merged
             }
         }
     //???? parameterize?
@@ -148,9 +137,11 @@ object GameLogicSupport {
   //?????? possibly change score delta to score; probably change to lower-level game (board balls + score) state,
   // separate from in-progress--vs.--done part of GameState)
   // - maybe use explicit Boolean to indicate whether any lines were harvested
-  case class MoveResult(board: Board, addedScore: Option[Int])
+  case class MoveResult(board: Board,
+                        //??? clarify re placing next three balls (re interpreting differently in different contexts
+                        anyRemovals: Boolean)
   {
-    //??? println(s"??? ${this}")
+    println(s"??? ${this}")
     //??? print("")
   }
 
@@ -220,19 +211,18 @@ object GameLogicSupport {
                                   to: CellAddress
                                   )(implicit rng: Random): MoveResult = {
     val canMoveBall = pathExists(board, from, to)
-    println("doTryMoveBall.1: canMoveBall " + canMoveBall)
     canMoveBall match {
       case false =>  // can't move--ignore (keep selection state)
-        MoveResult(board, None)
+        MoveResult(board, false)  //??? ?
       case true =>
         val deselectedBoard = board.withNoSelection
         val moveBallColor = deselectedBoard.getBallStateAt(from).get //????
         val postMoveBoard = deselectedBoard.withNoBallAt(from).withBallAt(to, moveBallColor)
 
         val postHandlingResult = LineDetector.handleBallArrival(postMoveBoard, to)
-        postHandlingResult.addedScore match {
-          case None            => placeNextBalls(postHandlingResult.board)
-          case Some(increment) => postHandlingResult
+        postHandlingResult.anyRemovals match {  //?????? if
+          case false            => placeNextBalls(postHandlingResult.board)
+          case true => postHandlingResult
         }
     }
   }

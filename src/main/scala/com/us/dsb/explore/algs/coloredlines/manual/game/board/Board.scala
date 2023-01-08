@@ -9,7 +9,7 @@ private[game] object Board {
   }
 
   private[game] def empty: Board =
-    new Board(Vector.fill[CellBallState](BoardOrder * BoardOrder)(CellBallState.empty), Nil, None)
+    new Board(Vector.fill[CellBallState](BoardOrder * BoardOrder)(CellBallState.empty), Nil, 0, None)
 }
 
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.Board._
@@ -20,19 +20,22 @@ import com.us.dsb.explore.algs.coloredlines.manual.game.board.{BoardOrder, colum
  * State of board (just cells; not other game state (e.g., score).)
  */
 private[game] class Board(private[this] val cellStates: Vector[CellBallState],  //????? grid?
-                            private[this] val onDeck: Iterable[BallKind],
-                            //???? move to game (low-level tap-UI) state:
-                            private[this] val selectionAddress: Option[CellAddress]
-                           ) {
-  //??? println("??? Board: " + this)
-  //??? print("")
+                          private[this] val onDeck: Iterable[BallKind],
+                          //????? move score out to low-level game state once messed-up score assimilation is fixed
+                          private[this] val score: Int,
+                          //???? move to game (low-level tap-UI) state:
+                          private[this] val selectionAddress: Option[CellAddress]
+                         ) {
+  println("??? Board:     " + this)
+  //print("")
 
   // internal/support methods:
 
-  private[this] def copy(cellStates: Vector[CellBallState] = cellStates,
-                         onDeck: Iterable[BallKind] = onDeck,
+  private[this] def copy(cellStates: Vector[CellBallState]     = cellStates,
+                         onDeck: Iterable[BallKind]            = onDeck,
+                         score: Int                            = score,
                          selectionAddress: Option[CellAddress] = selectionAddress) =
-    new Board(cellStates, onDeck, selectionAddress)
+    new Board(cellStates, onDeck, score, selectionAddress)
 
   /** Computes row-major cell-array index from row and column numbers. */
   private[this] def vectorIndex(address: CellAddress): Int =
@@ -85,6 +88,13 @@ private[game] class Board(private[this] val cellStates: Vector[CellBallState],  
     }
   }
 
+  // (running) score:
+
+  private[game] def withAddedScore(increment: Int): Board =
+    copy(score = this.score + increment)
+
+  private[manual] def getScore: Int = score
+
   // top-UI selection:
 
   private[game] def hasAnyCellSelected: Boolean = selectionAddress.isDefined
@@ -104,8 +114,9 @@ private[game] class Board(private[this] val cellStates: Vector[CellBallState],  
         val addr = CellAddress(row, column)
         getCellBallStateAt(addr).ballState.fold("-")(_.initial)
       }.mkString("")
-    }.mkString("/") ++
-        " + " ++ getOnDeckBalls.map(_.initial).mkString("(", ", ", ")") ++
+    }.mkString("/") +
+        " + " + getOnDeckBalls.map(_.initial).mkString("(", ", ", ")") +
+        "; " + score + " pts" +
         ">"
   }
 
