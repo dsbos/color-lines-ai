@@ -35,8 +35,6 @@ private[this] case class GameUIState(gameState: UpperGameState,
     copy(cursorAddress = cursorAddress.copy(column = adjustedColumn))
   }
 
-  //?????? add on-deck balls
-
   private[this] def renderTableMultilineWithSelection: String = {
     val cellWidth = " X ".length
     val cellSeparator = "|"
