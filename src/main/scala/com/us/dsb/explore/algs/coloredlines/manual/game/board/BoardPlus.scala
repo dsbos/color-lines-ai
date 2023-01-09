@@ -9,7 +9,7 @@ private[game] object BoardPlus {
 /**
  * CURRENTLY:  Core board state (now wrapped), not score yet, tap-UI selection state
  */
-private[game] class BoardPlus(private[game] val boardState: BoardState,
+private[game] class BoardPlus(private[manual] val boardState: BoardState,
                               private[this] val score: Int,
                               //???? move to (low-level) tap-UI state:
                               private[this] val selectionAddress: Option[CellAddress]

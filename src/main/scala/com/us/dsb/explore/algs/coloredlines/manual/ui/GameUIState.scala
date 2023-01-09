@@ -64,9 +64,13 @@ private[this] case class GameUIState(gameState: UpperGameState,
   }
 
   private[ui] def toDisplayString: String = {
+    val onDeckList =
+      gameState.boardPlus.boardState.getOnDeckBalls.map(_.getColoredCharSeq(false)).mkString(", ")
+
     renderTableMultilineWithSelection + "\n" +
-    s"Score: ${gameState.boardPlus.getScore}  " +
-        s"Marking cursor: <row ${cursorAddress.row} / column ${cursorAddress.column}>"
+        s"Next: $onDeckList" +
+        s"  Score: ${gameState.boardPlus.getScore}" +
+        s"  Marking cursor: <row ${cursorAddress.row} / column ${cursorAddress.column}>"
   }
 
 }

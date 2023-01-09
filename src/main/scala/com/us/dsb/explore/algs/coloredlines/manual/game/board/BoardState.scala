@@ -36,7 +36,7 @@ private[game] class BoardState(private[this] val cellStates: Vector[CellBallStat
 
   // on-deck balls:
 
-  private[game] def getOnDeckBalls: Iterable[BallKind] = onDeck
+  private[manual] def getOnDeckBalls: Iterable[BallKind] = onDeck
 
   private[game] def withOnDeckBalls(newBalls: Iterable[BallKind]): BoardState =
     copy(onDeck = newBalls)

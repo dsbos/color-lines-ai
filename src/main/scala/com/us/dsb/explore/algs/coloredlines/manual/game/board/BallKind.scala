@@ -4,11 +4,11 @@ import enumeratum.{Enum, EnumEntry}
 
 import scala.io.AnsiColor
 
-private[game] sealed class BallKind(private[board] val initial: String,
+private[game] sealed class BallKind(private[manual] val initial: String,
                                     private[this] val setFgColorSeq: String,
                                     private[this] val setBgColorSeq: String
                                     ) extends EnumEntry {
-  private[board] def getColoredCharSeq(background: Boolean): String =
+  private[manual] def getColoredCharSeq(background: Boolean): String =
     (if (background) this.setBgColorSeq else this.setFgColorSeq) +
         initial +
         AnsiColor.RESET
