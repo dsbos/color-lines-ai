@@ -73,15 +73,15 @@ private[manual] case class UpperGameState(boardPlus: BoardPlus,
       tapAction match {
         case SelectBall |
              SelectEmpty =>
-          this.withCellSelected(tapAddress)
+          withCellSelected(tapAddress)
         case Deselect    =>
-          this.withNoSelection
+          withNoSelection
         case TryMoveBall =>
           //???? should TryMoveBall carry coordinates?:
           //???? need to split logical moves/plays (e.g., move ball from source
           // to target from top-/selection-level ~UI (keep that separate from cursor-to-taps UI))
           val fromAddress =
-            this.getSelectionCoordinates.getOrElse(sys.error("Shouldn't be able to happen"))
+            getSelectionCoordinates.getOrElse(sys.error("Shouldn't be able to happen"))
 
           val tryMoveResult =
             GameLogicSupport.doTryMoveBall(boardPlus, fromAddress, tapAddress)
@@ -89,14 +89,13 @@ private[manual] case class UpperGameState(boardPlus: BoardPlus,
           //?????? clean:
           val xxx =
             if (tryMoveResult.clearSelection)
-              this.withNoSelection
+              withNoSelection
             else
               this
           xxx.copy(boardPlus = tryMoveResult.boardPlus)
         case Pass        =>
           val passResult = GameLogicSupport.doPass(boardPlus)
-          //?????? clean the several "this."
-          this.copy(boardPlus = passResult.boardPlus)
+          copy(boardPlus = passResult.boardPlus)
               .withNoSelection
       }
 
