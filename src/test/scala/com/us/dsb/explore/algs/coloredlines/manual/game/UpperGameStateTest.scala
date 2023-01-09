@@ -4,7 +4,7 @@ import org.scalatest.funspec.AnyFunSpec
 import cats.syntax.option._
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.{ColumnIndex, Index, RowIndex}
 
-class XxGameStateTest extends AnyFunSpec {
+class UpperGameStateTest extends AnyFunSpec {
 
   describe("XxGameState$?. tryMoveAt") {
 //    import Player._

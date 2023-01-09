@@ -4,13 +4,12 @@ import cats.syntax.option._
 import cats.syntax.either._
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.CellAddress
 import com.us.dsb.explore.algs.coloredlines.manual.game.GameLogicSupport.MoveResult
-import com.us.dsb.explore.algs.coloredlines.manual.game.GameState.GameResult.Done
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.{BallKind, BoardPlus}
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.{ColumnIndex, RowIndex}
 
 import scala.util.Random
 
-private[manual] object GameState {
+private[manual] object UpperGameState {
 
   /**
    * Result of completed game.
@@ -20,17 +19,17 @@ private[manual] object GameState {
     private[manual] case class Done(score: Int) extends GameResult
   }
 
-  private[this] def makeInitialState(implicit rng: Random): GameState = {
+  private[this] def makeInitialState(implicit rng: Random): UpperGameState = {
     val initialPlacementResult = GameLogicSupport.placeInitialBalls(BoardPlus.empty)
     //????? probably split GameState level from slightly lower game state
     //  carrying board plus score (probably modifying MoveResult for that)
-    GameState(initialPlacementResult.boardPlus, None)
+    UpperGameState(initialPlacementResult.boardPlus, None)
   }
 
-  private[manual/*game*/] def initial(seed: Long): GameState = makeInitialState(new Random(seed))
-  private[manual] def initial(): GameState = makeInitialState(new Random())
+  private[manual/*game*/] def initial(seed: Long): UpperGameState = makeInitialState(new Random(seed))
+  private[manual] def initial(): UpperGameState = makeInitialState(new Random())
 }
-import GameState._
+import UpperGameState._
 
 //???? add random-data state
 
@@ -38,9 +37,9 @@ import GameState._
  * @constructor
  * @param gameResult  `None` means no win or draw yet
  */
-private[manual] case class GameState(boardPlus: BoardPlus,
-                                     gameResult: Option[GameResult]
-                                    )(implicit rng: Random) {
+private[manual] case class UpperGameState(boardPlus: BoardPlus,
+                                          gameResult: Option[GameResult]
+                                         )(implicit rng: Random) {
 
   //????? Probably move to GameLogicSupport
 
@@ -48,7 +47,7 @@ private[manual] case class GameState(boardPlus: BoardPlus,
   // Xx?? maybe add result of move (win/draw/other) with new state (so caller
   //  doesn't have to check state's gameResult; also, think about where I'd add
   //  game history
-  private[manual] def tryMoveAt(tapAddress: CellAddress): Either[String, GameState] = {
+  private[manual] def tryMoveAt(tapAddress: CellAddress): Either[String, UpperGameState] = {
     import GameLogicSupport.Action._
     val tapAction = GameLogicSupport.interpretTapLocationToTapAction(boardPlus, tapAddress)
     println("tryMoveAt: tapAction = " + tapAction)
@@ -76,10 +75,10 @@ private[manual] case class GameState(boardPlus: BoardPlus,
 
     val nextState =
       if (! moveResult.boardPlus.isFull) {
-        GameState(moveResult.boardPlus, gameResult).asRight
+        UpperGameState(moveResult.boardPlus, gameResult).asRight
       }
       else {
-        GameState(moveResult.boardPlus, Some(Done(moveResult.boardPlus.getScore))).asRight
+        UpperGameState(moveResult.boardPlus, Some(GameResult.Done(moveResult.boardPlus.getScore))).asRight
       }
     nextState
   }

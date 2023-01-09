@@ -2,7 +2,7 @@ package com.us.dsb.explore.algs.coloredlines.manual.ui
 
 import cats.syntax.option._
 import cats.syntax.either._
-import com.us.dsb.explore.algs.coloredlines.manual.game.GameState
+import com.us.dsb.explore.algs.coloredlines.manual.game.UpperGameState
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.{ColumnIndex, Index, RowIndex}
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.CellAddress
 import enumeratum.{Enum, EnumEntry}
@@ -124,7 +124,7 @@ private[manual] object GameUI {
           case None => // game not done yet (after valid _or_ invalid mark try)
             newState.asRight
           case Some(gameResult) =>
-            import GameState.GameResult._
+            import UpperGameState.GameResult._
             val resultText =
               gameResult match {
                 case result: Done => s"Done: $result"
@@ -167,7 +167,7 @@ private[manual] object GameUI {
 
   def runGame(io: SegregatedTextIO): GameUIResult = {
     val initialState =
-      GameUIState(gameState     = GameState.initial(),
+      GameUIState(gameState     = UpperGameState.initial(),
                   cursorAddress = CellAddress.fromRaw(1, 1))
     getAndDoUiCommands(io, initialState)
   }

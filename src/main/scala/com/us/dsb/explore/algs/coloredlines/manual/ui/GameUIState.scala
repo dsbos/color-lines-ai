@@ -5,7 +5,7 @@ import com.us.dsb.explore.algs.coloredlines.manual.game._
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.{ColumnIndex, Index, RowIndex, columnIndices, rowIndices}
 
 // ?? somewhere expand to allow for history (maybe via Semigroup or whatever has .compose?)
-private[this] case class GameUIState(gameState: GameState,
+private[this] case class GameUIState(gameState: UpperGameState,
                                      cursorAddress: CellAddress) {
 
   // ?? clean up that floorMod; I just want plain mathematical mod:
