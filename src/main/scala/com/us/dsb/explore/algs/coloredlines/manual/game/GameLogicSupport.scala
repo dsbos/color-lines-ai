@@ -12,7 +12,7 @@ object GameLogicSupport {
 
   // (was "private[this]" before test calls:)
   private[game] def pickRandomBallKind()(implicit rng: Random): BallKind =
-    BallKind.values(rng.nextInt(2 /*???BallKind.values.size*/))
+    BallKind.values(rng.nextInt(3 /*???BallKind.values.size*/))
 
   // (was "private[this]" before test calls:)
   @tailrec
@@ -233,13 +233,13 @@ object GameLogicSupport {
         val moveBallColor = boardPlus.getBallStateAt(from).get  //????
         val postMoveBoard = boardPlus.withNoBallAt(from).withBallAt(to, moveBallColor)
 
-        val postHandlingResult =
-          LineDetector.handleBallArrival(postMoveBoard, to)
-              .copy(clearSelection = true)
-        if (! postHandlingResult.anyRemovals )
-          placeNextBalls(postHandlingResult.boardPlus)
-        else
-          postHandlingResult
+        val postReapingResult = LineDetector.handleBallArrival(postMoveBoard, to)
+        val postPostReadingResult =
+          if (! postReapingResult.anyRemovals )
+            placeNextBalls(postReapingResult.boardPlus)
+          else
+            postReapingResult
+        postPostReadingResult.copy(clearSelection = true)
     }
   }
 
