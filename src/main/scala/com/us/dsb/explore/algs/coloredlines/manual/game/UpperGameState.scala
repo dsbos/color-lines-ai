@@ -102,8 +102,7 @@ private[manual] case class UpperGameState(boardPlus: BoardPlus,
 
     val nextState =
       if (! postMoveState.boardPlus.isFull) {
-        //?????? use .copy
-        UpperGameState(postMoveState.boardPlus, postMoveState.selectionAddress, gameResult).asRight
+        copy(boardPlus = postMoveState.boardPlus, selectionAddress = postMoveState.selectionAddress).asRight
       }
       else {
         UpperGameState(postMoveState.boardPlus,
