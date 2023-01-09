@@ -32,7 +32,10 @@ object GameLogicSupport {
   //???? probably split into BoardState-level vs. level of BoardState + score
   case class MoveResult(boardPlus: BoardPlus,
                         //??? clarify re placing next three balls (re interpreting differently in different contexts
-                        anyRemovals: Boolean)
+                        anyRemovals: Boolean,
+                        //?????? clean this hack (used in only one case; re-plumb that case without this):
+                        clearSelection: Boolean
+                       )
   {
     println(s"???  $this")
     //??? print("")
@@ -49,13 +52,13 @@ object GameLogicSupport {
   private[game] def placeInitialBalls(boardPlus: BoardPlus)(implicit rng: Random): MoveResult = {
     val postPlacementsResult =
       //???? parameterize:
-      (1 to 5).foldLeft(MoveResult(boardPlus, false)) {
+      (1 to 5).foldLeft(MoveResult(boardPlus, false, false)) {
         case (resultSoFar, _) =>
           val address =
             pickRandomEmptyCell(resultSoFar.boardPlus).getOrElse(scala.sys.error("Unexpectedly full board"))
           val postPlacementBoardPlus = resultSoFar.boardPlus.withBallAt(address, pickRandomBallKind())
           val placementHandlingResult = LineDetector.handleBallArrival(postPlacementBoardPlus, address)
-          MoveResult(placementHandlingResult.boardPlus, placementHandlingResult.anyRemovals)
+          MoveResult(placementHandlingResult.boardPlus, placementHandlingResult.anyRemovals, false)
       }
 
     val replenishedOnDeckBoard = replenishOnDeckBalls(postPlacementsResult.boardPlus.boardState)
@@ -72,12 +75,12 @@ object GameLogicSupport {
   }
   import Action._
 
-  def interpretTapLocationToTapAction(boardPlus: BoardPlus,
+  def interpretTapLocationToTapAction(tapUiState: UpperGameState,
                                       address: CellAddress): Action =
-    tapAndStateToTapAction(onABall            = boardPlus.hasABallAt(address),
-                           isSelectedAt       = boardPlus.isSelectedAt(address),
-                           hasABallSelected   = boardPlus.hasABallSelected,
-                           hasAnyCellSelected = boardPlus.hasAnyCellSelected)
+    tapAndStateToTapAction(onABall            = tapUiState.boardPlus.hasABallAt(address),
+                           isSelectedAt       = tapUiState.isSelectedAt(address),
+                           hasABallSelected   = tapUiState.hasABallSelected,
+                           hasAnyCellSelected = tapUiState.hasAnyCellSelected)
 
   private def tapAndStateToTapAction(onABall: Boolean,
                                      isSelectedAt: Boolean,
@@ -128,7 +131,7 @@ object GameLogicSupport {
       //???? for 1 to 3, consume on-deck ball from list, and then place (better for internal state view);;
       // can replenish incrementally or later; later might show up better in internal state view
       boardPlus.boardState.getOnDeckBalls
-        .foldLeft(MoveResult(boardPlus, false)) {
+        .foldLeft(MoveResult(boardPlus, false, false)) {
           case (curMoveResult, onDeckBall) =>
             pickRandomEmptyCell(curMoveResult.boardPlus) match {
               case None =>  // board full; break out early (game will become over)
@@ -210,20 +213,29 @@ object GameLogicSupport {
   }
 
 
-  private[game] def doTryMoveBall(boardPlus: BoardPlus,  //???? change to game state to carry and update score?
+  private[game] def doTryMoveBall(boardPlus: BoardPlus,
                                   from: CellAddress,
                                   to: CellAddress
                                   )(implicit rng: Random): MoveResult = {
+    //?????? re-plumb returning indication of whether to clear selection
+    // - first, pull clear-selection flag out of (current) MoveResult; return
+    //   tuple or wrapper move-result adding flag
+    // - eventually, separate move-ball move validation from actually moving
+    //   (selection clearing depends on just validity of move, not on deleting
+    //   any lines)
+    //   - see note near some Option/etc. re encoding only valid moves at
+    //     that point in move-execution path
     val canMoveBall = pathExists(boardPlus, from, to)
     canMoveBall match {
       case false =>  // can't move--ignore (keep selection state)
-        MoveResult(boardPlus, false)
+        MoveResult(boardPlus, anyRemovals = false, clearSelection = false)
       case true =>
-        val deselectedBoardPlus = boardPlus.withNoSelection
-        val moveBallColor = deselectedBoardPlus.getBallStateAt(from).get  //????
-        val postMoveBoard = deselectedBoardPlus.withNoBallAt(from).withBallAt(to, moveBallColor)
+        val moveBallColor = boardPlus.getBallStateAt(from).get  //????
+        val postMoveBoard = boardPlus.withNoBallAt(from).withBallAt(to, moveBallColor)
 
-        val postHandlingResult = LineDetector.handleBallArrival(postMoveBoard, to)
+        val postHandlingResult =
+          LineDetector.handleBallArrival(postMoveBoard, to)
+              .copy(clearSelection = true)
         if (! postHandlingResult.anyRemovals )
           placeNextBalls(postHandlingResult.boardPlus)
         else

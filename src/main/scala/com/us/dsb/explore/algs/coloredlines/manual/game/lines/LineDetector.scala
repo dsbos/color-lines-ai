@@ -144,7 +144,7 @@ object LineDetector {  //????? adjust most from using BoardPlus to using just Bo
           (postLinesRemovalBoard.withAddedScore(ballPlacementScore), Some(ballPlacementScore))
       }
     //println(s"-handleBallArrival(... ballTo = $ballTo...).9 = score result = $scoreResult")
-    MoveResult(boardResult, scoreResult.isDefined)
+    MoveResult(boardResult, scoreResult.isDefined, false)
   }
 
 }

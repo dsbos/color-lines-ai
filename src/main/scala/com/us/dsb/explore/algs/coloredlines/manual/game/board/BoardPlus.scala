@@ -2,7 +2,7 @@ package com.us.dsb.explore.algs.coloredlines.manual.game.board
 
 private[game] object BoardPlus {
 
-  private[game] def empty: BoardPlus = new BoardPlus(BoardState.empty,0, None)
+  private[game] def empty: BoardPlus = new BoardPlus(BoardState.empty, 0)
 }
 
 //???? move tap-UI selection state out of this low-level game state
@@ -10,19 +10,16 @@ private[game] object BoardPlus {
  * CURRENTLY:  Core board state (now wrapped), not score yet, tap-UI selection state
  */
 private[game] class BoardPlus(private[manual] val boardState: BoardState,
-                              private[this] val score: Int,
-                              //???? move to (low-level) tap-UI state:
-                              private[this] val selectionAddress: Option[CellAddress]
+                              private[this] val score: Int
                              ) {
   println("??? BoardPlus : " + this)
   //print("")
 
   // internal/support methods:
 
-  private[this] def copy(boardState: BoardState                = boardState,
-                         score: Int                            = score,
-                         selectionAddress: Option[CellAddress] = selectionAddress) =
-    new BoardPlus(boardState, score, selectionAddress)
+  private[this] def copy(boardState: BoardState = boardState,
+                         score: Int             = score) =
+    new BoardPlus(boardState, score)
 
   // grid balls:
 
@@ -40,12 +37,6 @@ private[game] class BoardPlus(private[manual] val boardState: BoardState,
   private[game] def withNoBallAt(address: CellAddress): BoardPlus =
     copy(boardState = boardState.withNoBallAt(address))
 
-
-  private[game] def withCellSelected(address: CellAddress): BoardPlus =
-    copy(selectionAddress = Some(address))
-
-  private[game] def withNoSelection: BoardPlus =
-    copy(selectionAddress = None)
 
   //???? move out?
   private[manual] def getCellBallStateChar(ballState: Option[BallKind], isSelected: Boolean): String = {
@@ -67,21 +58,13 @@ private[game] class BoardPlus(private[manual] val boardState: BoardState,
 
   private[manual] def getScore: Int = score
 
-  // top-UI selection:
-
-  private[game] def hasAnyCellSelected: Boolean = selectionAddress.isDefined
-  private[game] def getSelectionCoordinates: Option[CellAddress] = selectionAddress
-  private[manual] def isSelectedAt(address: CellAddress): Boolean =
-    selectionAddress.fold(false)(_ == address)
-
-  private[game] def hasABallSelected: Boolean = selectionAddress.fold(false)(hasABallAt)
 
   // renderings:
 
   /** Makes compact single-line string. */
   override def toString: String = "< " + boardState.toString + "; " + score + " pts" + ">"
 
-  private[this] def renderMultiline: String = {
+  private[this] def renderMultiline(selectionAddress: Option[CellAddress]): String = {
     val cellWidth = " X ".length
     val cellSeparator = "|"
     val wholeWidth =
@@ -92,16 +75,18 @@ private[game] class BoardPlus(private[manual] val boardState: BoardState,
     rowIndices.map { row =>
       columnIndices.map { column =>
         val addr = CellAddress(row, column)
-        "" + getCellBallStateChar(getBallStateAt(addr), isSelectedAt(addr)) + " "
+        val isSelected = selectionAddress.fold(false)(_ == addr)
+        "" + getCellBallStateChar(getBallStateAt(addr), isSelected) + " "
       }.mkString(cellSeparator)  // make each row line
     }.mkString(rowSeparator)     // make whole-board multi-line string
   }
 
-  private[this] def renderCompactMultiline: String = {
+  private[this] def renderCompactMultiline(selectionAddress: Option[CellAddress]): String = {
     rowIndices.map { row =>
       columnIndices.map { column =>
         val addr = CellAddress(row, column)
-        getCellBallStateChar(getBallStateAt(addr), isSelectedAt(addr))
+        val isSelected = selectionAddress.fold(false)(_ == addr)
+        getCellBallStateChar(getBallStateAt(addr), isSelected)
       }.mkString("|")  // make each row line
     }.mkString("\n")
   }

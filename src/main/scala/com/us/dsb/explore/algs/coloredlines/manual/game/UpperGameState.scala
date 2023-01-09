@@ -14,7 +14,7 @@ private[manual] object UpperGameState {
   /**
    * Result of completed game.
    */
-  private[manual] sealed trait GameResult //???? change to final score (and maybe stats?)
+  private[manual] sealed trait GameResult
   private[manual] object GameResult {
     private[manual] case class Done(score: Int) extends GameResult
   }
@@ -23,7 +23,7 @@ private[manual] object UpperGameState {
     val initialPlacementResult = GameLogicSupport.placeInitialBalls(BoardPlus.empty)
     //????? probably split GameState level from slightly lower game state
     //  carrying board plus score (probably modifying MoveResult for that)
-    UpperGameState(initialPlacementResult.boardPlus, None)
+    UpperGameState(initialPlacementResult.boardPlus, None, None)
   }
 
   private[manual/*game*/] def initial(seed: Long): UpperGameState = makeInitialState(new Random(seed))
@@ -35,11 +35,29 @@ import UpperGameState._
 
 /** Game state AND currently controller.
  * @constructor
- * @param gameResult  `None` means no win or draw yet
+ * @param gameResult
+ *   `None` means not ended yet
  */
 private[manual] case class UpperGameState(boardPlus: BoardPlus,
+                                          selectionAddress: Option[CellAddress],
                                           gameResult: Option[GameResult]
                                          )(implicit rng: Random) {
+
+  // top-UI selection:
+
+  private[manual /*game*/ ] def withCellSelected(address: CellAddress): UpperGameState =
+    copy(selectionAddress = Some(address))
+
+  private[manual/*game*/] def withNoSelection: UpperGameState =
+    copy(selectionAddress = None)
+
+  private[manual/*game*/] def hasAnyCellSelected: Boolean = selectionAddress.isDefined
+  private[manual/*game*/] def getSelectionCoordinates: Option[CellAddress] = selectionAddress
+  private[manual] def isSelectedAt(address: CellAddress): Boolean =
+    selectionAddress.fold(false)(_ == address)
+
+  private[game] def hasABallSelected: Boolean =
+    selectionAddress.fold(false)(boardPlus.hasABallAt(_))
 
   //????? Probably move to GameLogicSupport
 
@@ -49,36 +67,49 @@ private[manual] case class UpperGameState(boardPlus: BoardPlus,
   //  game history
   private[manual] def tryMoveAt(tapAddress: CellAddress): Either[String, UpperGameState] = {
     import GameLogicSupport.Action._
-    val tapAction = GameLogicSupport.interpretTapLocationToTapAction(boardPlus, tapAddress)
+    val tapAction = GameLogicSupport.interpretTapLocationToTapAction(this, tapAddress)
     println("tryMoveAt: tapAction = " + tapAction)
-    val moveResult: MoveResult =
+    val postMoveState: UpperGameState =
       tapAction match {
         case SelectBall |
              SelectEmpty =>
-          MoveResult(boardPlus.withCellSelected(tapAddress), false)  //???? ?
+          this.withCellSelected(tapAddress)
         case Deselect    =>
-          MoveResult(boardPlus.withNoSelection, false)  //????
+          this.withNoSelection
         case TryMoveBall =>
           //???? should TryMoveBall carry coordinates?:
           //???? need to split logical moves/plays (e.g., move ball from source
           // to target from top-/selection-level ~UI (keep that separate from cursor-to-taps UI))
           val fromAddress =
-            boardPlus.getSelectionCoordinates.getOrElse(sys.error("Shouldn't be able to happen"))
-          GameLogicSupport.doTryMoveBall(boardPlus, fromAddress, tapAddress)
-          //???? try to move (conditional) .withNoSelection out of doTryMoveBall
-          //  up to here; need additional could-move flag (addedScore None would be ambiguous)
+            this.getSelectionCoordinates.getOrElse(sys.error("Shouldn't be able to happen"))
 
+          val tryMoveResult =
+            GameLogicSupport.doTryMoveBall(boardPlus, fromAddress, tapAddress)
+
+          //?????? clean:
+          val xxx =
+            if (tryMoveResult.clearSelection)
+              this.withNoSelection
+            else
+              this
+          xxx.copy(boardPlus = tryMoveResult.boardPlus)
         case Pass        =>
           val passResult = GameLogicSupport.doPass(boardPlus)
-          passResult.copy(boardPlus = passResult.boardPlus.withNoSelection)
+          //?????? clean the several "this."
+          this.copy(boardPlus = passResult.boardPlus)
+              .withNoSelection
       }
 
     val nextState =
-      if (! moveResult.boardPlus.isFull) {
-        UpperGameState(moveResult.boardPlus, gameResult).asRight
+      if (! postMoveState.boardPlus.isFull) {
+        //?????? use .copy
+        UpperGameState(postMoveState.boardPlus, postMoveState.selectionAddress, gameResult).asRight
       }
       else {
-        UpperGameState(moveResult.boardPlus, Some(GameResult.Done(moveResult.boardPlus.getScore))).asRight
+        UpperGameState(postMoveState.boardPlus,
+                       postMoveState.selectionAddress,
+                       Some(GameResult.Done(postMoveState.boardPlus.getScore))
+                       ).asRight
       }
     nextState
   }
