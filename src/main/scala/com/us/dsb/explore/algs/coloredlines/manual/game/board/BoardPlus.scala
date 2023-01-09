@@ -9,7 +9,7 @@ private[game] object BoardPlus {
 /**
  * CURRENTLY:  Core board state (now wrapped), not score yet, tap-UI selection state
  */
-private[game] class BoardPlus(private[this] val boardState: BoardState,
+private[game] class BoardPlus(private[game] val boardState: BoardState,
                               private[this] val score: Int,
                               //???? move to (low-level) tap-UI state:
                               private[this] val selectionAddress: Option[CellAddress]
@@ -23,12 +23,6 @@ private[game] class BoardPlus(private[this] val boardState: BoardState,
                          score: Int                            = score,
                          selectionAddress: Option[CellAddress] = selectionAddress) =
     new BoardPlus(boardState, score, selectionAddress)
-
-  // on-deck balls:
-  private[game] def getOnDeckBalls: Iterable[BallKind] = boardState.getOnDeckBalls
-
-  private[game] def withOnDeckBalls(newBalls: Iterable[BallKind]): BoardPlus =
-    copy(boardState.withOnDeckBalls(newBalls))
 
   // grid balls:
 
@@ -60,6 +54,11 @@ private[game] class BoardPlus(private[this] val boardState: BoardState,
       case None       => if (! isSelected) "-" else "@"
     }
   }
+
+  // (lower-level) board state
+
+  private[game] def withBoardState(boardState: BoardState): BoardPlus =
+    copy(boardState = boardState)
 
   // (running) score:
 

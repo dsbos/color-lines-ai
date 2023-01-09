@@ -22,7 +22,7 @@ class BoardPlusTest extends AnyFunSpec {
       }
     }
     it("- with empty board--empty on-deck list") {
-      assert(boardPlus.getOnDeckBalls.isEmpty)
+      assert(boardPlus.boardState.getOnDeckBalls.isEmpty)
     }
     it("- with no selection") {
       assert(boardPlus.hasAnyCellSelected == false)

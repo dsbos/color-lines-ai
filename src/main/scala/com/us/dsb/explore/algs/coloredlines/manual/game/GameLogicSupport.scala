@@ -1,7 +1,6 @@
 package com.us.dsb.explore.algs.coloredlines.manual.game
 
-import com.us.dsb.explore.algs.coloredlines.manual.game.board.CellAddress
-import com.us.dsb.explore.algs.coloredlines.manual.game.board.{BallKind, BoardPlus, BoardOrder, columnIndices, rowIndices}
+import com.us.dsb.explore.algs.coloredlines.manual.game.board.{BallKind, BoardOrder, BoardPlus, BoardState, CellAddress, columnIndices, rowIndices}
 import com.us.dsb.explore.algs.coloredlines.manual.game.lines.LineDetector
 
 import java.util
@@ -35,12 +34,16 @@ object GameLogicSupport {
                         //??? clarify re placing next three balls (re interpreting differently in different contexts
                         anyRemovals: Boolean)
   {
-    println(s"??? ${this}")
+    println(s"???  $this")
     //??? print("")
   }
 
+  //???? parameterize
+  private[this] def replenishOnDeckBalls(board: BoardState)(implicit rng: Random): BoardState =
+    board.withOnDeckBalls(List.fill(3)(pickRandomBallKind()))
+
   /**
-   * @param board
+   * @param boardPlus
    *   expected to be empty //???? maybe refactor something?
    */
   private[game] def placeInitialBalls(boardPlus: BoardPlus)(implicit rng: Random): MoveResult = {
@@ -50,12 +53,13 @@ object GameLogicSupport {
         case (resultSoFar, _) =>
           val address =
             pickRandomEmptyCell(resultSoFar.boardPlus).getOrElse(scala.sys.error("Unexpectedly full board"))
-          val postPlacementBoard = resultSoFar.boardPlus.withBallAt(address, pickRandomBallKind())
-          val placementHandlingResult = LineDetector.handleBallArrival(postPlacementBoard, address)
+          val postPlacementBoardPlus = resultSoFar.boardPlus.withBallAt(address, pickRandomBallKind())
+          val placementHandlingResult = LineDetector.handleBallArrival(postPlacementBoardPlus, address)
           MoveResult(placementHandlingResult.boardPlus, placementHandlingResult.anyRemovals)
       }
-    //???? parameterize
-    postPlacementsResult.copy(boardPlus = postPlacementsResult.boardPlus.withOnDeckBalls(List.fill(3)(pickRandomBallKind())))
+
+    val replenishedOnDeckBoard = replenishOnDeckBalls(postPlacementsResult.boardPlus.boardState)
+    postPlacementsResult.copy(boardPlus = postPlacementsResult.boardPlus.withBoardState(replenishedOnDeckBoard))
   }
 
   private[game] sealed trait Action
@@ -123,27 +127,31 @@ object GameLogicSupport {
     val postPlacementResult =
       //???? for 1 to 3, consume on-deck ball from list, and then place (better for internal state view);;
       // can replenish incrementally or later; later might show up better in internal state view
-      boardPlus.getOnDeckBalls
+      boardPlus.boardState.getOnDeckBalls
         .foldLeft(MoveResult(boardPlus, false)) {
           case (curMoveResult, onDeckBall) =>
             pickRandomEmptyCell(curMoveResult.boardPlus) match {
               case None =>  // board full; break out early (game will become over)
                 curMoveResult
               case Some(address) =>
-                val postDeueueBoardPlus =
-                  curMoveResult.boardPlus.withOnDeckBalls(curMoveResult.boardPlus.getOnDeckBalls.tail)
-                val postPlacementBoard = postDeueueBoardPlus.withBallAt(address, onDeckBall)
-                LineDetector.handleBallArrival(postPlacementBoard, address)
+                val postPlacementBoardPlus = {
+                  val curBoardState = curMoveResult.boardPlus.boardState
+                  val postDeueueBoard =
+                    curBoardState
+                        .withOnDeckBalls(curBoardState.getOnDeckBalls.tail)
+                        .withBallAt(address, onDeckBall)
+                  val postDeueueBoardPlus = curMoveResult.boardPlus.withBoardState(postDeueueBoard)
+                  postDeueueBoardPlus
+                }
+                LineDetector.handleBallArrival(postPlacementBoardPlus, address)
             }
         }
-    //???? parameterize?
-    //????? check re duplicate on-deck code (look for other "fill(3)"
-    postPlacementResult.copy(boardPlus = postPlacementResult.boardPlus.withOnDeckBalls(List.fill(3)(pickRandomBallKind())))
-  }
+
+    val replenishedOnDeckBoard = replenishOnDeckBalls(postPlacementResult.boardPlus.boardState)
+    postPlacementResult.copy(boardPlus = postPlacementResult.boardPlus.withBoardState(replenishedOnDeckBoard))}
 
   private[game] def doPass(boardPlus: BoardPlus)(implicit rng: Random): MoveResult =
     placeNextBalls(boardPlus)
-
 
   //???: likely move core algorithm out; possibly move outer code into BoardPlus/BoardState:
   /**
