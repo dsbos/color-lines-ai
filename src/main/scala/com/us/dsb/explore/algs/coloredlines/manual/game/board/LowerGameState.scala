@@ -20,15 +20,23 @@ private[game] class LowerGameState(private[manual] val board: Board,
                          score: Int   = score) =
     new LowerGameState(board, score)
 
+  // board state:
+
+  private[game] def withBoard(board: Board): LowerGameState =
+    copy(board = board)
+
+  // (running/total) score:
+
+  private[game] def withAddedScore(increment: Int): LowerGameState =
+    copy(score = this.score + increment)
+
+  private[manual] def getScore: Int = score
+
+
+
   // grid balls:
 
-  private[game] def isFull: Boolean = board.isFull
-
-  private[manual/*game*/] def getBallStateAt(address: CellAddress): Option[BallKind] =
-    board.getBallStateAt(address)
-
-  private[game] def hasABallAt(address: CellAddress): Boolean =
-    board.hasABallAt(address)
+  //????? remove these mutation-support methods; have callers use withBoard
 
   private[game] def withBallAt(address: CellAddress, ball: BallKind): LowerGameState =
     copy(board = board.withBallAt(address, ball))
@@ -37,26 +45,13 @@ private[game] class LowerGameState(private[manual] val board: Board,
     copy(board = board.withNoBallAt(address))
 
 
-  //???? move out?
+  //???? move up?  (up to tap-UI state with selection? but now that getColoredCharSeq know a bit about selection
   private[manual] def getCellBallStateChar(ballState: Option[BallKind], isSelected: Boolean): String = {
     ballState match {
       case Some(ball) => ball.getColoredCharSeq(isSelected)
       case None       => if (! isSelected) "-" else "@"
     }
   }
-
-  // (lower-level) board state
-
-  private[game] def withBoard(board: Board): LowerGameState =
-    copy(board = board)
-
-  // (running) score:
-
-  private[game] def withAddedScore(increment: Int): LowerGameState =
-    copy(score = this.score + increment)
-
-  private[manual] def getScore: Int = score
-
 
   // renderings:
 
@@ -75,7 +70,7 @@ private[game] class LowerGameState(private[manual] val board: Board,
       columnIndices.map { column =>
         val addr = CellAddress(row, column)
         val isSelected = selectionAddress.fold(false)(_ == addr)
-        "" + getCellBallStateChar(getBallStateAt(addr), isSelected) + " "
+        "" + getCellBallStateChar(board.getBallStateAt(addr), isSelected) + " "
       }.mkString(cellSeparator)  // make each row line
     }.mkString(rowSeparator)     // make whole-board multi-line string
   }
@@ -85,7 +80,7 @@ private[game] class LowerGameState(private[manual] val board: Board,
       columnIndices.map { column =>
         val addr = CellAddress(row, column)
         val isSelected = selectionAddress.fold(false)(_ == addr)
-        getCellBallStateChar(getBallStateAt(addr), isSelected)
+        getCellBallStateChar(board.getBallStateAt(addr), isSelected)
       }.mkString("|")  // make each row line
     }.mkString("\n")
   }

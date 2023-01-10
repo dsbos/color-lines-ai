@@ -46,7 +46,7 @@ private[game] class Board(private[this] val cellStates: Vector[CellBallState],
   private[manual] def getCellBallStateAt(address: CellAddress): CellBallState =
     cellStates(vectorIndex(address))
 
-  private[game] def getBallStateAt(address: CellAddress): Option[BallKind] =
+  private[manual] def getBallStateAt(address: CellAddress): Option[BallKind] =
     cellStates(vectorIndex(address)).ballState
 
   private[game] def hasABallAt(address: CellAddress): Boolean =

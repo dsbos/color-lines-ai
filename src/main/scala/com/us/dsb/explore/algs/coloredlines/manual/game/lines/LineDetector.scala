@@ -7,7 +7,7 @@ import com.us.dsb.explore.algs.coloredlines.manual.game.board.{BallKind, LowerGa
 //???? TODO:  reduce repeated passing of board, etc.; maybe make LineDetector a
 // class, to be instantiated for each move; or make local class for passing (but
 // leave external-client interface same
-object LineDetector {  //????? adjust most from using LowerGameState to using just Board
+object LineDetector {  //?????? adjust most from using LowerGameState to using just Board
 
   private[lines] case class LineAxis(labelArray: String,
                                      rowDelta: Int, // -1 / 0 / 1 (Make refined type?)
@@ -32,7 +32,7 @@ object LineDetector {  //????? adjust most from using LowerGameState to using ju
     val haveMatch =
       inRange && {
         val candidateAddress = CellAddress.fromRaw(rawRowIndex, rawColIndex)
-        gameState.getBallStateAt(candidateAddress).fold(false)(ball => ball == moveBallColor)
+        gameState.board.getBallStateAt(candidateAddress).fold(false)(ball => ball == moveBallColor)
       }
     haveMatch
   }
@@ -118,7 +118,7 @@ object LineDetector {  //????? adjust most from using LowerGameState to using ju
                                       ballTo: CellAddress
                                      ): BallArrivalResult = {
     //println(s"+handleBallArrival(... ballTo = $ballTo...).1")
-    val moveBallColor = gameState.getBallStateAt(ballTo).get //????
+    val moveBallColor = gameState.board.getBallStateAt(ballTo).get //????
     println(s"??? * placed at $ballTo: $moveBallColor")
 
     val allAxesResults: List[AxisResult] =

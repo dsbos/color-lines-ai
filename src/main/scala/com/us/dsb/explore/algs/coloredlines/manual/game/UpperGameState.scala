@@ -54,7 +54,7 @@ private[manual] case class UpperGameState(gameState: LowerGameState,
     selectionAddress.fold(false)(_ == address)
 
   private[game] def hasABallSelected: Boolean =
-    selectionAddress.fold(false)(gameState.hasABallAt(_))
+    selectionAddress.fold(false)(gameState.board.hasABallAt(_))
 
   //????? Probably move to GameLogicSupport
 
@@ -95,7 +95,7 @@ private[manual] case class UpperGameState(gameState: LowerGameState,
       }
 
     val nextState =
-      if (! postMoveState.gameState.isFull) {
+      if (! postMoveState.gameState.board.isFull) {
         copy(gameState = postMoveState.gameState, selectionAddress = postMoveState.selectionAddress).asRight
       }
       else {

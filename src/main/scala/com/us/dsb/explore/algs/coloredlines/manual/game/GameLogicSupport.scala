@@ -18,12 +18,12 @@ object GameLogicSupport {
   // (was "private[this]" before test calls:)
   @tailrec
   private[game] def pickRandomEmptyCell(gameState: LowerGameState)(implicit rng: Random): Option[CellAddress] = {
-    if (gameState.isFull)
+    if (gameState.board.isFull)
       None
     else {
       val row = rowIndices(rng.nextInt(BoardOrder))
       val col = columnIndices(rng.nextInt(BoardOrder))
-      if (gameState.getBallStateAt(CellAddress(row, col)).isEmpty)
+      if (gameState.board.getBallStateAt(CellAddress(row, col)).isEmpty)
         Some(CellAddress(row, col))
       else
         pickRandomEmptyCell(gameState) // loop: try again
@@ -73,7 +73,7 @@ object GameLogicSupport {
 
   def interpretTapLocationToTapAction(tapUiState: UpperGameState,
                                       address: CellAddress): Action =
-    tapAndStateToTapAction(onABall            = tapUiState.gameState.hasABallAt(address),
+    tapAndStateToTapAction(onABall            = tapUiState.gameState.board.hasABallAt(address),
                            isSelectedAt       = tapUiState.isSelectedAt(address),
                            hasABallSelected   = tapUiState.hasABallSelected,
                            hasAnyCellSelected = tapUiState.hasAnyCellSelected)
@@ -167,7 +167,7 @@ object GameLogicSupport {
     val blockedAt: Array[Array[Boolean]] =
       rowIndices.map { row =>
           columnIndices.map { column =>
-            gameState.hasABallAt(CellAddress(row, column))
+            gameState.board.hasABallAt(CellAddress(row, column))
           }.toArray
       }.toArray
     val cellsToExpandFrom = mutable.Queue[CellAddress](fromBallCell)
@@ -227,7 +227,7 @@ object GameLogicSupport {
       case false =>  // can't move--ignore (keep tap-UI selection state)
         MoveBallResult(gameState, clearSelection = false)
       case true =>
-        val moveBallColor = gameState.getBallStateAt(from).get  //????
+        val moveBallColor = gameState.board.getBallStateAt(from).get  //????
         val postMoveBoard = gameState.withNoBallAt(from).withBallAt(to, moveBallColor)
 
         val postReapingResult = LineDetector.handleBallArrival(postMoveBoard, to)
