@@ -21,7 +21,7 @@ import BoardState._
 private[game] class BoardState(private[this] val cellStates: Vector[CellBallState],
                                private[this] val onDeck: Iterable[BallKind]
                               ) {
-  println("??? BoardState:   " + this)
+  //println("??? BoardState:   " + this)
   //print("")
 
   // internal/support methods:

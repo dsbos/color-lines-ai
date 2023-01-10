@@ -1,11 +1,8 @@
 package com.us.dsb.explore.algs.coloredlines.manual.game
 
-import cats.syntax.option._
 import cats.syntax.either._
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.CellAddress
-import com.us.dsb.explore.algs.coloredlines.manual.game.GameLogicSupport.MoveResult
-import com.us.dsb.explore.algs.coloredlines.manual.game.board.{BallKind, BoardPlus}
-import com.us.dsb.explore.algs.coloredlines.manual.game.board.{ColumnIndex, RowIndex}
+import com.us.dsb.explore.algs.coloredlines.manual.game.board.BoardPlus
 
 import scala.util.Random
 
@@ -85,14 +82,12 @@ private[manual] case class UpperGameState(boardPlus: BoardPlus,
 
           val tryMoveResult =
             GameLogicSupport.doTryMoveBall(boardPlus, fromAddress, tapAddress)
-
-          //?????? clean:
-          val xxx =
+          val selectionUpdatedState =
             if (tryMoveResult.clearSelection)
               withNoSelection
             else
               this
-          xxx.copy(boardPlus = tryMoveResult.boardPlus)
+          selectionUpdatedState.copy(boardPlus = tryMoveResult.boardPlus)
         case Pass        =>
           val passResult = GameLogicSupport.doPass(boardPlus)
           copy(boardPlus = passResult.boardPlus)

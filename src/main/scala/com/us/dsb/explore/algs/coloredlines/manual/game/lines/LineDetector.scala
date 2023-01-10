@@ -1,8 +1,7 @@
 package com.us.dsb.explore.algs.coloredlines.manual.game.lines
 
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.CellAddress
-import com.us.dsb.explore.algs.coloredlines.manual.game.GameLogicSupport.MoveResult
-import com.us.dsb.explore.algs.coloredlines.manual.game._
+import com.us.dsb.explore.algs.coloredlines.manual.game.GameLogicSupport.BallArrivalResult
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.{BallKind, BoardPlus, BoardOrder, LineOrder}
 
 //???? TODO:  reduce repeated passing of board, etc.; maybe make LineDetector a
@@ -113,12 +112,14 @@ object LineDetector {  //????? adjust most from using BoardPlus to using just Bo
    * @return
    * None if no line(s) completed; score increment otherwise
    */
-  //???? rename?:  harvestAnyLines?
+  //????? rename: doesn't handle everything: handles harvesting/reaping and
+  //  scoring, but not no-lines placement of three more balls
   private[game] def handleBallArrival(boardPlus: BoardPlus,
                                       ballTo: CellAddress
-                                     ): MoveResult = {
+                                     ): BallArrivalResult = {
     //println(s"+handleBallArrival(... ballTo = $ballTo...).1")
     val moveBallColor = boardPlus.getBallStateAt(ballTo).get //????
+    println(s"??? * placed at $ballTo: $moveBallColor")
 
     val allAxesResults: List[AxisResult] =
       lineAxes.map { lineAxis =>
@@ -133,7 +134,7 @@ object LineDetector {  //????? adjust most from using BoardPlus to using just Bo
           (boardPlus, None) // return None for score (signal to place 3 more IF ball moved by user)
         case linesAxes =>
           val totalBallsBeingRemoved = 1 + linesAxes.map(_.axisLineAddedLength).sum
-          println(s" scoreMove(... ballTo = $ballTo...).x totalBallsBeingRemoved = $totalBallsBeingRemoved")
+          println(s"??? * reaped at $ballTo: $totalBallsBeingRemoved $moveBallColor balls")
           //???? move?
           // note original game scoring: score = totalBallsBeingRemoved * 4 - 10,
           //  which seems to be from 2 pts per ball in 5-ball line, but 4 for any extra balls in line
@@ -144,7 +145,7 @@ object LineDetector {  //????? adjust most from using BoardPlus to using just Bo
           (postLinesRemovalBoard.withAddedScore(ballPlacementScore), Some(ballPlacementScore))
       }
     //println(s"-handleBallArrival(... ballTo = $ballTo...).9 = score result = $scoreResult")
-    MoveResult(boardResult, scoreResult.isDefined, false)
+    BallArrivalResult(boardResult, anyRemovals = scoreResult.isDefined)
   }
 
 }

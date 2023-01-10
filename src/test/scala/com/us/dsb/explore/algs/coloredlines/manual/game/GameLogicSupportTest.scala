@@ -1,7 +1,6 @@
 package com.us.dsb.explore.algs.coloredlines.manual.game
 
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.CellAddress
-import com.us.dsb.explore.algs.coloredlines.manual.game.GameLogicSupport.MoveResult
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.{BoardPlus, ColumnIndex, RowIndex, columnIndices, rowIndices}
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers._

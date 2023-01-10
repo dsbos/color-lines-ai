@@ -1,5 +1,6 @@
 package com.us.dsb.explore.algs.coloredlines.manual.game
 
+import cats.syntax.option._
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.{BallKind, BoardOrder, BoardPlus, BoardState, CellAddress, columnIndices, rowIndices}
 import com.us.dsb.explore.algs.coloredlines.manual.game.lines.LineDetector
 
@@ -12,7 +13,7 @@ object GameLogicSupport {
 
   // (was "private[this]" before test calls:)
   private[game] def pickRandomBallKind()(implicit rng: Random): BallKind =
-    BallKind.values(rng.nextInt(3 /*???BallKind.values.size*/))
+    BallKind.values(rng.nextInt(2 /*???BallKind.values.size*/))
 
   // (was "private[this]" before test calls:)
   @tailrec
@@ -29,16 +30,12 @@ object GameLogicSupport {
     }
   }
 
-  //???? probably split into BoardState-level vs. level of BoardState + score
-  case class MoveResult(boardPlus: BoardPlus,
-                        //??? clarify re placing next three balls (re interpreting differently in different contexts
-                        anyRemovals: Boolean,
-                        //?????? clean this hack (used in only one case; re-plumb that case without this):
-                        clearSelection: Boolean
-                       )
+  case class BallArrivalResult(boardPlus: BoardPlus,
+                               anyRemovals: Boolean
+                               //??? maybe score increment (for better notification)
+                              )
   {
     println(s"???  $this")
-    //??? print("")
   }
 
   //???? parameterize
@@ -49,16 +46,15 @@ object GameLogicSupport {
    * @param boardPlus
    *   expected to be empty //???? maybe refactor something?
    */
-  private[game] def placeInitialBalls(boardPlus: BoardPlus)(implicit rng: Random): MoveResult = {
+  private[game] def placeInitialBalls(boardPlus: BoardPlus)(implicit rng: Random): BallArrivalResult = {
     val postPlacementsResult =
       //???? parameterize:
-      (1 to 5).foldLeft(MoveResult(boardPlus, false, false)) {
+      (1 to 5).foldLeft(BallArrivalResult(boardPlus, false)) {
         case (resultSoFar, _) =>
           val address =
             pickRandomEmptyCell(resultSoFar.boardPlus).getOrElse(scala.sys.error("Unexpectedly full board"))
           val postPlacementBoardPlus = resultSoFar.boardPlus.withBallAt(address, pickRandomBallKind())
-          val placementHandlingResult = LineDetector.handleBallArrival(postPlacementBoardPlus, address)
-          MoveResult(placementHandlingResult.boardPlus, placementHandlingResult.anyRemovals, false)
+          LineDetector.handleBallArrival(postPlacementBoardPlus, address)
       }
 
     val replenishedOnDeckBoard = replenishOnDeckBalls(postPlacementsResult.boardPlus.boardState)
@@ -126,12 +122,12 @@ object GameLogicSupport {
     action
   }
 
-  private[this] def placeNextBalls(boardPlus: BoardPlus)(implicit rng: Random): MoveResult = {
+  private[this] def placeNextBalls(boardPlus: BoardPlus)(implicit rng: Random): BallArrivalResult = {
     val postPlacementResult =
       //???? for 1 to 3, consume on-deck ball from list, and then place (better for internal state view);;
       // can replenish incrementally or later; later might show up better in internal state view
       boardPlus.boardState.getOnDeckBalls
-        .foldLeft(MoveResult(boardPlus, false, false)) {
+        .foldLeft(BallArrivalResult(boardPlus, false)) {
           case (curMoveResult, onDeckBall) =>
             pickRandomEmptyCell(curMoveResult.boardPlus) match {
               case None =>  // board full; break out early (game will become over)
@@ -153,7 +149,7 @@ object GameLogicSupport {
     val replenishedOnDeckBoard = replenishOnDeckBalls(postPlacementResult.boardPlus.boardState)
     postPlacementResult.copy(boardPlus = postPlacementResult.boardPlus.withBoardState(replenishedOnDeckBoard))}
 
-  private[game] def doPass(boardPlus: BoardPlus)(implicit rng: Random): MoveResult =
+  private[game] def doPass(boardPlus: BoardPlus)(implicit rng: Random): BallArrivalResult =
     placeNextBalls(boardPlus)
 
   //???: likely move core algorithm out; possibly move outer code into BoardPlus/BoardState:
@@ -212,34 +208,35 @@ object GameLogicSupport {
     loop
   }
 
+  case class MoveBallResult(boardPlus: BoardPlus,
+                            clearSelection: Boolean)
+  {
+    println(s"???  $this")
+  }
 
   private[game] def doTryMoveBall(boardPlus: BoardPlus,
                                   from: CellAddress,
                                   to: CellAddress
-                                  )(implicit rng: Random): MoveResult = {
-    //?????? re-plumb returning indication of whether to clear selection
-    // - first, pull clear-selection flag out of (current) MoveResult; return
-    //   tuple or wrapper move-result adding flag
-    // - eventually, separate move-ball move validation from actually moving
-    //   (selection clearing depends on just validity of move, not on deleting
-    //   any lines)
+                                  )(implicit rng: Random): MoveBallResult = {
+    //???? separate move-ball move validation from actually moving (selection
+    //   clearing depends on just validity of move, not on deleting any lines)
     //   - see note near some Option/etc. re encoding only valid moves at
     //     that point in move-execution path
     val canMoveBall = pathExists(boardPlus, from, to)
     canMoveBall match {
-      case false =>  // can't move--ignore (keep selection state)
-        MoveResult(boardPlus, anyRemovals = false, clearSelection = false)
+      case false =>  // can't move--ignore (keep tap-UI selection state)
+        MoveBallResult(boardPlus, clearSelection = false)
       case true =>
         val moveBallColor = boardPlus.getBallStateAt(from).get  //????
         val postMoveBoard = boardPlus.withNoBallAt(from).withBallAt(to, moveBallColor)
 
         val postReapingResult = LineDetector.handleBallArrival(postMoveBoard, to)
         val postPostReadingResult =
-          if (! postReapingResult.anyRemovals )
+          if (! postReapingResult.anyRemovals)
             placeNextBalls(postReapingResult.boardPlus)
           else
             postReapingResult
-        postPostReadingResult.copy(clearSelection = true)
+        MoveBallResult(postPostReadingResult.boardPlus, clearSelection = true)
     }
   }
 
