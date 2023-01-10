@@ -32,10 +32,9 @@ object GameLogicSupport {
 
   case class BallArrivalResult(gameState: LowerGameState,
                                anyRemovals: Boolean
-                               //??? maybe score increment (for better notification)
                               )
   {
-    println(s"???  $this")
+    println(s"* $this")
   }
 
   //???? parameterize
@@ -211,7 +210,7 @@ object GameLogicSupport {
   case class MoveBallResult(gameState: LowerGameState,
                             clearSelection: Boolean)
   {
-    println(s"???  $this")
+    println(s"*  $this")
   }
 
   private[game] def doTryMoveBall(gameState: LowerGameState,

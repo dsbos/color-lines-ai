@@ -30,7 +30,8 @@ import UpperGameState._
 
 //???? add random-data state
 
-/** Game state AND currently controller.
+/** Virtual-tap--UI game state ane controller.
+ *
  * @constructor
  * @param gameResult
  *   `None` means not ended yet

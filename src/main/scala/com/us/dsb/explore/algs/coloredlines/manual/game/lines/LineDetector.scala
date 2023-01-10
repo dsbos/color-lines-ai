@@ -3,9 +3,9 @@ package com.us.dsb.explore.algs.coloredlines.manual.game.lines
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.{BallKind, Board, BoardOrder, CellAddress, LineOrder, LowerGameState}
 import com.us.dsb.explore.algs.coloredlines.manual.game.GameLogicSupport.BallArrivalResult
 
-//???? TODO:  reduce repeated passing of board, etc.; maybe make LineDetector a
-// class, to be instantiated for each move; or make local class for passing (but
-// leave external-client interface same
+//???? TODO:  reduce repeated passing of board, ball color, etc.; maybe make
+// LineDetector a class, to be instantiated for each move; or make local class
+// for passing (but leave external-client interface same)
 object LineDetector {
 
   private[lines] case class LineAxis(labelArray: String,
@@ -51,7 +51,6 @@ object LineDetector {
       val candidateExcursionLength = excursionLength + 1
       val candidateRowIndex = newBallRowIndex + rowDelta * directionFactor * candidateExcursionLength
       val candidateColIndex = newBallColIndex + colDelta * directionFactor * candidateExcursionLength
-      //??? println(s"    ??.n.0: candidate address: ($candidateRowIndex / $candidateColIndex)")
 
       val haveMatchingBall = haveMatchingBallAt(moveBallColor, board, candidateRowIndex, candidateColIndex)
       if (haveMatchingBall) {
@@ -70,7 +69,6 @@ object LineDetector {
                                            board: Board,
                                            ballTo: CellAddress,
                                            lineDirectionAxis: LineAxis): AxisResult = {
-    //??? println(s"+  computeLineAxisResult( axis = $lineDirectionAxis ).1")
     val directionsResults: List[RelativeDirectionResult] =
       relativeDirectionFactors.map { directionFactor =>
         computeDirectionResult(moveBallColor,
@@ -80,10 +78,7 @@ object LineDetector {
                                directionFactor)
       }
     val axisLineAddedLength = directionsResults.map(_.excursionLength).sum
-
-    val result = AxisResult(lineDirectionAxis, axisLineAddedLength, directionsResults) //????
-    //??? println(s"-  computeLineAxisResult( axis = $lineDirectionAxis ).9 result = $result")
-    result
+    AxisResult(lineDirectionAxis, axisLineAddedLength, directionsResults)
   }
 
   private[lines] def removeCompletedLineBalls(ballTo: CellAddress,
@@ -118,22 +113,22 @@ object LineDetector {
                                      ): BallArrivalResult = {
     //println(s"+handleBallArrival(... ballTo = $ballTo...).1")
     val moveBallColor = gameState.board.getBallStateAt(ballTo).get //????
-    println(s"??? * placed at $ballTo: $moveBallColor")
+    println(s"* * placed at $ballTo: $moveBallColor")
 
     val allAxesResults: List[AxisResult] =
       lineAxes.map { lineAxis =>
         computeLineAxisResult(moveBallColor, gameState.board, ballTo, lineAxis)
       }
-    //??? println("??? allAxesResults:" + allAxesResults.mkString("\n- ", "\n- ", ""))
+    // println("? allAxesResults:" + allAxesResults.mkString("\n- ", "\n- ", ""))
     val completedLineAxesResults = allAxesResults.filter(_.axisLineAddedLength + 1 >= LineOrder)
-    //println("??? completedLineAxesResults:" + completedLineAxesResults.map("- " + _.toString).mkString("\n", "\n", "\n:end"))
+    // println("? completedLineAxesResults:" + completedLineAxesResults.map("- " + _.toString).mkString("\n", "\n", "\n:end"))
     val (resultGameState, scoreResult) =
       completedLineAxesResults match {
         case Nil =>
           (gameState, None) // return None for score (signal to place 3 more IF ball moved by user)
         case linesAxes =>
           val totalBallsBeingRemoved = 1 + linesAxes.map(_.axisLineAddedLength).sum
-          println(s"??? * reaped at $ballTo: $totalBallsBeingRemoved $moveBallColor balls")
+          println(s"* * reaped at $ballTo: $totalBallsBeingRemoved $moveBallColor balls")
           //???? move?
           // note original game scoring: score = totalBallsBeingRemoved * 4 - 10,
           //  which seems to be from 2 pts per ball in 5-ball line, but 4 for any extra balls in line

@@ -8,8 +8,10 @@ package object board {
 
   private[this] type BoardOrder = 4 //???? 9
   private[game] val BoardOrder: BoardOrder = valueOf[BoardOrder]
+
   private[this] type LineOrder = 3 //???? 5
   private[game] val LineOrder: LineOrder = valueOf[LineOrder]
+
   private[this] type ColorOrder = 7 // original: blue.dark, blue.light, brown, green, purple, red, yellow
   private[this] val ColorOrder: ColorOrder = valueOf[ColorOrder]
 

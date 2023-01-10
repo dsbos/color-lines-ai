@@ -19,9 +19,9 @@ import Board._
  * Core state of board (just cells and on-deck balls; e.g.; no score, tap-UI selection).
  */
 private[game] class Board(private[this] val cellStates: Vector[CellBallState],
-                               private[this] val onDeck: Iterable[BallKind]
-                              ) {
-  //println("??? Board:   " + this)
+                          private[this] val onDeck: Iterable[BallKind]
+                         ) {
+  //println("* Board:   " + this)
   //print("")
 
   // internal/support methods:

@@ -11,7 +11,7 @@ private[game] object LowerGameState {
 private[game] class LowerGameState(private[manual] val board: Board,
                                    private[this] val score: Int
                                  ) {
-  println("??? LowerGameState : " + this)
+  println("* LowerGameState  : " + this)
   //print("")
 
   // internal/support methods:
@@ -36,7 +36,7 @@ private[game] class LowerGameState(private[manual] val board: Board,
 
   // grid balls:
 
-  //????? remove these mutation-support methods; have callers use withBoard
+  //?????? remove these mutation-support methods; have callers use withBoard
 
   private[game] def withBallAt(address: CellAddress, ball: BallKind): LowerGameState =
     copy(board = board.withBallAt(address, ball))
@@ -45,7 +45,7 @@ private[game] class LowerGameState(private[manual] val board: Board,
     copy(board = board.withNoBallAt(address))
 
 
-  //???? move up?  (up to tap-UI state with selection? but now that getColoredCharSeq know a bit about selection
+  //???? move up?  (up to tap-UI state with selection? but note that getColoredCharSeq know a bit about selection
   private[manual] def getCellBallStateChar(ballState: Option[BallKind], isSelected: Boolean): String = {
     ballState match {
       case Some(ball) => ball.getColoredCharSeq(isSelected)
