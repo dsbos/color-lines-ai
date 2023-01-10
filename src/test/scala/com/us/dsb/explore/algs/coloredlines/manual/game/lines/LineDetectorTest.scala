@@ -1,13 +1,10 @@
 package com.us.dsb.explore.algs.coloredlines.manual.game.lines
 
-import com.us.dsb.explore.algs.coloredlines.manual.game.board.CellAddress
-import com.us.dsb.explore.algs.coloredlines.manual.game.board.{BallKind, LowerGameState}
-import com.us.dsb.explore.algs.coloredlines.manual.game.board.BoardOrder
+import com.us.dsb.explore.algs.coloredlines.manual.game.board.{BallKind, Board, BoardOrder, CellAddress, LowerGameState}
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.PrivateMethodTester
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers._
-
 
 import scala.reflect.internal.util.TableDef.Column
 import scala.tools.nsc.doc.base.comment.Cell
@@ -26,7 +23,7 @@ class LineDetectorTest extends AnyFunSpec {
     lazy val `R1/C1-only color` = BallKind.values(0)
     lazy val `R2/C2-only color` = BallKind.values(1)
     lazy val sampleBoard =
-      LowerGameState.empty  //??????
+      Board.empty
           .withBallAt(CellAddress.fromRaw(1, 1), `R1/C1-only color`)
           .withBallAt(CellAddress.fromRaw(2, 2), `R2/C2-only color`)
     it("should return true for good match (valid index, non-empty cell, same ball color)") {

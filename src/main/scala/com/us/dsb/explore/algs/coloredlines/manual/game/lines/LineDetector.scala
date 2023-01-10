@@ -1,13 +1,12 @@
 package com.us.dsb.explore.algs.coloredlines.manual.game.lines
 
-import com.us.dsb.explore.algs.coloredlines.manual.game.board.CellAddress
+import com.us.dsb.explore.algs.coloredlines.manual.game.board.{BallKind, Board, BoardOrder, CellAddress, LineOrder, LowerGameState}
 import com.us.dsb.explore.algs.coloredlines.manual.game.GameLogicSupport.BallArrivalResult
-import com.us.dsb.explore.algs.coloredlines.manual.game.board.{BallKind, LowerGameState, BoardOrder, LineOrder}
 
 //???? TODO:  reduce repeated passing of board, etc.; maybe make LineDetector a
 // class, to be instantiated for each move; or make local class for passing (but
 // leave external-client interface same
-object LineDetector {  //?????? adjust most from using LowerGameState to using just Board
+object LineDetector {
 
   private[lines] case class LineAxis(labelArray: String,
                                      rowDelta: Int, // -1 / 0 / 1 (Make refined type?)
@@ -23,7 +22,7 @@ object LineDetector {  //?????? adjust most from using LowerGameState to using j
   private[this] val relativeDirectionFactors = List(1, -1) // use type of length 2 (refined List?, Tuple2?, some array?)
 
   private[lines] def haveMatchingBallAt(moveBallColor: BallKind,
-                                        gameState: LowerGameState,
+                                        board: Board,
                                         rawRowIndex: Int,
                                         rawColIndex: Int): Boolean = {
     val inRange =
@@ -32,7 +31,7 @@ object LineDetector {  //?????? adjust most from using LowerGameState to using j
     val haveMatch =
       inRange && {
         val candidateAddress = CellAddress.fromRaw(rawRowIndex, rawColIndex)
-        gameState.board.getBallStateAt(candidateAddress).fold(false)(ball => ball == moveBallColor)
+        board.getBallStateAt(candidateAddress).fold(false)(ball => ball == moveBallColor)
       }
     haveMatch
   }
@@ -40,7 +39,7 @@ object LineDetector {  //?????? adjust most from using LowerGameState to using j
   private[lines] case class RelativeDirectionResult(excursionLength: Int)
 
   private[lines] def computeDirectionResult(moveBallColor: BallKind,
-                                            gameState: LowerGameState,
+                                            board: Board,
                                             ballTo: CellAddress,
                                             lineDirectionAxis: LineAxis,
                                             directionFactor: Int): RelativeDirectionResult = {
@@ -54,7 +53,7 @@ object LineDetector {  //?????? adjust most from using LowerGameState to using j
       val candidateColIndex = newBallColIndex + colDelta * directionFactor * candidateExcursionLength
       //??? println(s"    ??.n.0: candidate address: ($candidateRowIndex / $candidateColIndex)")
 
-      val haveMatchingBall = haveMatchingBallAt(moveBallColor, gameState, candidateRowIndex, candidateColIndex)
+      val haveMatchingBall = haveMatchingBallAt(moveBallColor, board, candidateRowIndex, candidateColIndex)
       if (haveMatchingBall) {
         excursionLength = candidateExcursionLength
       }
@@ -68,14 +67,14 @@ object LineDetector {  //?????? adjust most from using LowerGameState to using j
                                        directionDetails: List[RelativeDirectionResult])
 
   private[lines] def computeLineAxisResult(moveBallColor: BallKind,
-                                           gameState: LowerGameState,
+                                           board: Board,
                                            ballTo: CellAddress,
                                            lineDirectionAxis: LineAxis): AxisResult = {
     //??? println(s"+  computeLineAxisResult( axis = $lineDirectionAxis ).1")
     val directionsResults: List[RelativeDirectionResult] =
       relativeDirectionFactors.map { directionFactor =>
         computeDirectionResult(moveBallColor,
-                               gameState,
+                               board,
                                ballTo,
                                lineDirectionAxis,
                                directionFactor)
@@ -91,11 +90,11 @@ object LineDetector {  //?????? adjust most from using LowerGameState to using j
                                               preremovalGameState: LowerGameState,
                                               completedLineAxesResults: List[AxisResult]): LowerGameState = {
     val newBallRemovedGameState = preremovalGameState.withNoBallAt(ballTo)
-    val linesRemovedBoard =
+    val linesRemovedGameState =
       completedLineAxesResults.foldLeft(newBallRemovedGameState) { case (axisBoard, axisResult) =>
         val fromOffset = -axisResult.directionDetails(1).excursionLength
         val toOffset = axisResult.directionDetails(0).excursionLength
-        val lineRemovedBoard =
+        val lineRemovedGameState =
           (fromOffset to toOffset).foldLeft(axisBoard) { case (directionBoard, offset) =>
             import axisResult.axis.{colDelta, rowDelta}
             val rawRowIndex = ballTo.row.value.value    + rowDelta * offset
@@ -103,9 +102,9 @@ object LineDetector {  //?????? adjust most from using LowerGameState to using j
             val cellAddress = CellAddress.fromRaw(rawRowIndex, rawColIndex)
             directionBoard.withNoBallAt(cellAddress)
           }
-        lineRemovedBoard
+        lineRemovedGameState
       }
-    linesRemovedBoard
+    linesRemovedGameState
   }
 
   /**
@@ -123,12 +122,12 @@ object LineDetector {  //?????? adjust most from using LowerGameState to using j
 
     val allAxesResults: List[AxisResult] =
       lineAxes.map { lineAxis =>
-        computeLineAxisResult(moveBallColor, gameState, ballTo, lineAxis)
+        computeLineAxisResult(moveBallColor, gameState.board, ballTo, lineAxis)
       }
     //??? println("??? allAxesResults:" + allAxesResults.mkString("\n- ", "\n- ", ""))
     val completedLineAxesResults = allAxesResults.filter(_.axisLineAddedLength + 1 >= LineOrder)
     //println("??? completedLineAxesResults:" + completedLineAxesResults.map("- " + _.toString).mkString("\n", "\n", "\n:end"))
-    val (boardResult, scoreResult) =
+    val (resultGameState, scoreResult) =
       completedLineAxesResults match {
         case Nil =>
           (gameState, None) // return None for score (signal to place 3 more IF ball moved by user)
@@ -138,14 +137,14 @@ object LineDetector {  //?????? adjust most from using LowerGameState to using j
           //???? move?
           // note original game scoring: score = totalBallsBeingRemoved * 4 - 10,
           //  which seems to be from 2 pts per ball in 5-ball line, but 4 for any extra balls in line
-          val postLinesRemovalBoard = removeCompletedLineBalls(ballTo,
-                                                               gameState,
-                                                               completedLineAxesResults)
+          val postLinesRemovalGameState = removeCompletedLineBalls(ballTo,
+                                                                   gameState,
+                                                                   completedLineAxesResults)
           val ballPlacementScore = 2 * LineOrder + 4 * (totalBallsBeingRemoved - LineOrder)
-          (postLinesRemovalBoard.withAddedScore(ballPlacementScore), Some(ballPlacementScore))
+          (postLinesRemovalGameState.withAddedScore(ballPlacementScore), Some(ballPlacementScore))
       }
     //println(s"-handleBallArrival(... ballTo = $ballTo...).9 = score result = $scoreResult")
-    BallArrivalResult(boardResult, anyRemovals = scoreResult.isDefined)
+    BallArrivalResult(resultGameState, anyRemovals = scoreResult.isDefined)
   }
 
 }
