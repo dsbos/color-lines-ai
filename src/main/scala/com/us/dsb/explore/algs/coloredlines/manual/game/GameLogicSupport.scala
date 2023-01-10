@@ -71,7 +71,7 @@ object GameLogicSupport {
   }
   import Action._
 
-  def interpretTapLocationToTapAction(tapUiState: UpperGameState,
+  def interpretTapLocationToTapAction(tapUiState: TapUiGameState,
                                       address: CellAddress): Action =
     tapAndStateToTapAction(onABall            = tapUiState.gameState.board.hasABallAt(address),
                            isSelectedAt       = tapUiState.isSelectedAt(address),

@@ -6,7 +6,7 @@ import com.us.dsb.explore.algs.coloredlines.manual.game.board.LowerGameState
 
 import scala.util.Random
 
-private[manual] object UpperGameState {
+private[manual] object TapUiGameState {
 
   /**
    * Result of completed game.
@@ -16,36 +16,30 @@ private[manual] object UpperGameState {
     private[manual] case class Done(score: Int) extends GameResult
   }
 
-  private[this] def makeInitialState(implicit rng: Random): UpperGameState = {
+  private[this] def makeInitialState(implicit rng: Random): TapUiGameState = {
     val initialPlacementResult = GameLogicSupport.placeInitialBalls(LowerGameState.empty)
-    //????? probably split GameState level from slightly lower game state
-    //  carrying board plus score (probably modifying MoveResult for that)
-    UpperGameState(initialPlacementResult.gameState, None)
+    TapUiGameState(initialPlacementResult.gameState, None)
   }
 
-  private[manual/*game*/] def initial(seed: Long): UpperGameState = makeInitialState(new Random(seed))
-  private[manual] def initial(): UpperGameState = makeInitialState(new Random())
+  private[manual] def initial(seed: Long): TapUiGameState = makeInitialState(new Random(seed))
+  private[manual] def initial(): TapUiGameState = makeInitialState(new Random())
 }
-import UpperGameState._
+import TapUiGameState._
 
 //???? add random-data state
 
-/** Virtual-tap--UI game state ane controller.
- *
- * @constructor
- * @param gameResult
- *   `None` means not ended yet
+/** Virtual-tap--UI game state and controller.
  */
-private[manual] case class UpperGameState(gameState: LowerGameState,
+private[manual] case class TapUiGameState(gameState: LowerGameState,
                                           selectionAddress: Option[CellAddress]
                                          )(implicit rng: Random) {
 
   // top-UI selection:
 
-  private[manual /*game*/ ] def withCellSelected(address: CellAddress): UpperGameState =
+  private[manual] def withCellSelected(address: CellAddress): TapUiGameState =
     copy(selectionAddress = Some(address))
 
-  private[manual/*game*/] def withNoSelection: UpperGameState =
+  private[manual] def withNoSelection: TapUiGameState =
     copy(selectionAddress = None)
 
   private[manual/*game*/] def hasAnyCellSelected: Boolean = selectionAddress.isDefined
@@ -62,11 +56,11 @@ private[manual] case class UpperGameState(gameState: LowerGameState,
   // Xx?? maybe add result of move (win/draw/other) with new state (so caller
   //  doesn't have to check state's gameResult; also, think about where I'd add
   //  game history
-  private[manual] def tryMoveAt(tapAddress: CellAddress): Either[String, UpperGameState] = {
+  private[manual] def tryMoveAt(tapAddress: CellAddress): Either[String, TapUiGameState] = {
     import GameLogicSupport.Action._
     val tapAction = GameLogicSupport.interpretTapLocationToTapAction(this, tapAddress)
     println("tryMoveAt: tapAction = " + tapAction)
-    val postMoveState: UpperGameState =
+    val postMoveState: TapUiGameState =
       tapAction match {
         case SelectBall |
              SelectEmpty =>
@@ -100,7 +94,7 @@ private[manual] case class UpperGameState(gameState: LowerGameState,
              selectionAddress = postMoveState.selectionAddress).asRight
       }
       else {
-        UpperGameState(postMoveState.gameState,
+        TapUiGameState(postMoveState.gameState,
                        postMoveState.selectionAddress).asRight
       }
     nextState

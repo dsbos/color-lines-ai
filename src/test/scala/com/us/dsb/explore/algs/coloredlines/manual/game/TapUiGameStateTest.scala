@@ -7,13 +7,13 @@ import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers._
 
 
-class UpperGameStateTest extends AnyFunSpec {
+class TapUiGameStateTest extends AnyFunSpec {
 
   describe("GameState selection:") {
     //???? randomize?
     lazy val someRow = rowIndices.head
     lazy val someCol = columnIndices.head
-    lazy val upperGameState0 = UpperGameState.initial()
+    lazy val upperGameState0 = TapUiGameState.initial()
     lazy val address = CellAddress(someRow, someCol)
 
     describe("hasAnyCellSelected should:") {
