@@ -52,7 +52,7 @@ private[game] class Board(private[this] val cellStates: Vector[CellBallState],
   private[game] def hasABallAt(address: CellAddress): Boolean =
     cellStates(vectorIndex(address)).ballState.isDefined
 
-  private[game] def isFull: Boolean = ! cellStates.exists(_.ballState.isEmpty)
+  private[manual] def isFull: Boolean = ! cellStates.exists(_.ballState.isEmpty)
 
   // grid balls, setting:
 

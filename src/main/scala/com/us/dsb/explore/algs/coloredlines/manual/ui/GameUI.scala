@@ -120,17 +120,10 @@ private[manual] object GameUI {
         //   winning/drawing)?) (hmm--similar question re GameState's tryMoveAt) )
         val newState = moveAtSelection(io, uiState)
         // Check whether move finished game:
-        newState.upperGameState.gameResult match {
-          case None => // game not done yet (after valid _or_ invalid mark try)
-            newState.asRight
-          case Some(gameResult) =>
-            import UpperGameState.GameResult._
-            val resultText =
-              gameResult match {
-                case result: Done => s"Done: $result"
-              }
-            GameUIResult(resultText).asLeft
-        }
+        if (! newState.upperGameState.gameState.board.isFull)
+          newState.asRight
+        else
+          GameUIResult("Score: " + newState.upperGameState.gameState.getScore).asLeft
     }
   }
 

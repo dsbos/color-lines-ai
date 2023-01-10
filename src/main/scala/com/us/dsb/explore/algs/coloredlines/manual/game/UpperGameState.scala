@@ -20,7 +20,7 @@ private[manual] object UpperGameState {
     val initialPlacementResult = GameLogicSupport.placeInitialBalls(LowerGameState.empty)
     //????? probably split GameState level from slightly lower game state
     //  carrying board plus score (probably modifying MoveResult for that)
-    UpperGameState(initialPlacementResult.gameState, None, None)
+    UpperGameState(initialPlacementResult.gameState, None)
   }
 
   private[manual/*game*/] def initial(seed: Long): UpperGameState = makeInitialState(new Random(seed))
@@ -37,8 +37,7 @@ import UpperGameState._
  *   `None` means not ended yet
  */
 private[manual] case class UpperGameState(gameState: LowerGameState,
-                                          selectionAddress: Option[CellAddress],
-                                          gameResult: Option[GameResult]
+                                          selectionAddress: Option[CellAddress]
                                          )(implicit rng: Random) {
 
   // top-UI selection:
@@ -97,13 +96,12 @@ private[manual] case class UpperGameState(gameState: LowerGameState,
 
     val nextState =
       if (! postMoveState.gameState.board.isFull) {
-        copy(gameState = postMoveState.gameState, selectionAddress = postMoveState.selectionAddress).asRight
+        copy(gameState = postMoveState.gameState,
+             selectionAddress = postMoveState.selectionAddress).asRight
       }
       else {
         UpperGameState(postMoveState.gameState,
-                       postMoveState.selectionAddress,
-                       Some(GameResult.Done(postMoveState.gameState.getScore))
-                       ).asRight
+                       postMoveState.selectionAddress).asRight
       }
     nextState
   }
