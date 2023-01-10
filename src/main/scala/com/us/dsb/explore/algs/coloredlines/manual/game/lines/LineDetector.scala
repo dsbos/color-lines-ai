@@ -84,7 +84,7 @@ object LineDetector {
   private[lines] def removeCompletedLineBalls(ballTo: CellAddress,
                                               preremovalGameState: LowerGameState,
                                               completedLineAxesResults: List[AxisResult]): LowerGameState = {
-    val newBallRemovedGameState = preremovalGameState.withNoBallAt(ballTo)
+    val newBallRemovedGameState = preremovalGameState.withBoardWithNoBallAt(ballTo)
     val linesRemovedGameState =
       completedLineAxesResults.foldLeft(newBallRemovedGameState) { case (axisBoard, axisResult) =>
         val fromOffset = -axisResult.directionDetails(1).excursionLength
@@ -95,7 +95,7 @@ object LineDetector {
             val rawRowIndex = ballTo.row.value.value    + rowDelta * offset
             val rawColIndex = ballTo.column.value.value + colDelta * offset
             val cellAddress = CellAddress.fromRaw(rawRowIndex, rawColIndex)
-            directionBoard.withNoBallAt(cellAddress)
+            directionBoard.withBoardWithNoBallAt(cellAddress)
           }
         lineRemovedGameState
       }

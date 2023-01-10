@@ -22,28 +22,18 @@ private[game] class LowerGameState(private[manual] val board: Board,
 
   // board state:
 
-  private[game] def withBoard(board: Board): LowerGameState =
-    copy(board = board)
+  private[game] def withBoard(board: Board): LowerGameState = copy(board = board)
 
+  private[game] def withBoardWithBallAt(address: CellAddress, ball: BallKind): LowerGameState =
+    copy(board = board.withBallAt(address, ball))
+  private[game] def withBoardWithNoBallAt(address: CellAddress): LowerGameState =
+    copy(board = board.withNoBallAt(address))
   // (running/total) score:
 
   private[game] def withAddedScore(increment: Int): LowerGameState =
     copy(score = this.score + increment)
 
   private[manual] def getScore: Int = score
-
-
-
-  // grid balls:
-
-  //?????? remove these mutation-support methods; have callers use withBoard
-
-  private[game] def withBallAt(address: CellAddress, ball: BallKind): LowerGameState =
-    copy(board = board.withBallAt(address, ball))
-
-  private[game] def withNoBallAt(address: CellAddress): LowerGameState =
-    copy(board = board.withNoBallAt(address))
-
 
   //???? move up?  (up to tap-UI state with selection? but note that getColoredCharSeq know a bit about selection
   private[manual] def getCellBallStateChar(ballState: Option[BallKind], isSelected: Boolean): String = {
