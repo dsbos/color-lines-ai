@@ -2,12 +2,12 @@ package com.us.dsb.explore.algs.coloredlines.manual.game.lines
 
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.CellAddress
 import com.us.dsb.explore.algs.coloredlines.manual.game.GameLogicSupport.BallArrivalResult
-import com.us.dsb.explore.algs.coloredlines.manual.game.board.{BallKind, BoardPlus, BoardOrder, LineOrder}
+import com.us.dsb.explore.algs.coloredlines.manual.game.board.{BallKind, LowerGameState, BoardOrder, LineOrder}
 
 //???? TODO:  reduce repeated passing of board, etc.; maybe make LineDetector a
 // class, to be instantiated for each move; or make local class for passing (but
 // leave external-client interface same
-object LineDetector {  //????? adjust most from using BoardPlus to using just BoardState
+object LineDetector {  //????? adjust most from using LowerGameState to using just BoardState
 
   private[lines] case class LineAxis(labelArray: String,
                                      rowDelta: Int, // -1 / 0 / 1 (Make refined type?)
@@ -23,7 +23,7 @@ object LineDetector {  //????? adjust most from using BoardPlus to using just Bo
   private[this] val relativeDirectionFactors = List(1, -1) // use type of length 2 (refined List?, Tuple2?, some array?)
 
   private[lines] def haveMatchingBallAt(moveBallColor: BallKind,
-                                        boardPlus: BoardPlus,
+                                        boardPlus: LowerGameState,
                                         rawRowIndex: Int,
                                         rawColIndex: Int): Boolean = {
     val inRange =
@@ -40,7 +40,7 @@ object LineDetector {  //????? adjust most from using BoardPlus to using just Bo
   private[lines] case class RelativeDirectionResult(excursionLength: Int)
 
   private[lines] def computeDirectionResult(moveBallColor: BallKind,
-                                            boardPlus: BoardPlus,
+                                            boardPlus: LowerGameState,
                                             ballTo: CellAddress,
                                             lineDirectionAxis: LineAxis,
                                             directionFactor: Int): RelativeDirectionResult = {
@@ -68,7 +68,7 @@ object LineDetector {  //????? adjust most from using BoardPlus to using just Bo
                                        directionDetails: List[RelativeDirectionResult])
 
   private[lines] def computeLineAxisResult(moveBallColor: BallKind,
-                                           boardPlus: BoardPlus,
+                                           boardPlus: LowerGameState,
                                            ballTo: CellAddress,
                                            lineDirectionAxis: LineAxis): AxisResult = {
     //??? println(s"+  computeLineAxisResult( axis = $lineDirectionAxis ).1")
@@ -88,8 +88,8 @@ object LineDetector {  //????? adjust most from using BoardPlus to using just Bo
   }
 
   private[lines] def removeCompletedLineBalls(ballTo: CellAddress,
-                                              preremovalBoardPlus: BoardPlus,
-                                              completedLineAxesResults: List[AxisResult]): BoardPlus = {
+                                              preremovalBoardPlus: LowerGameState,
+                                              completedLineAxesResults: List[AxisResult]): LowerGameState = {
     val newBallRemovedBoard = preremovalBoardPlus.withNoBallAt(ballTo)
     val linesRemovedBoard =
       completedLineAxesResults.foldLeft(newBallRemovedBoard) { case (axisBoard, axisResult) =>
@@ -114,7 +114,7 @@ object LineDetector {  //????? adjust most from using BoardPlus to using just Bo
    */
   //????? rename: doesn't handle everything: handles harvesting/reaping and
   //  scoring, but not no-lines placement of three more balls
-  private[game] def handleBallArrival(boardPlus: BoardPlus,
+  private[game] def handleBallArrival(boardPlus: LowerGameState,
                                       ballTo: CellAddress
                                      ): BallArrivalResult = {
     //println(s"+handleBallArrival(... ballTo = $ballTo...).1")

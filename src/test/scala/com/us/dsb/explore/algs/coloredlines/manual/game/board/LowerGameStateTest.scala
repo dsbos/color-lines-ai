@@ -5,14 +5,10 @@ import org.scalatest.PrivateMethodTester
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers._
 
+class LowerGameStateTest extends AnyFunSpec {
 
-//import org.scalatest.funspec._
-//import org.scalatest.matchers._
-
-class BoardPlusTest extends AnyFunSpec {
-
-  describe("BoardPlus$.empty should return board:") {
-    lazy val boardPlus = BoardPlus.empty
+  describe("LowerGameState$.empty should return board:") {
+    lazy val boardPlus = LowerGameState.empty
     it("- with empty board--empty grid cells") {
       rowIndices.foreach { row =>
         columnIndices.foreach { column =>
@@ -26,7 +22,7 @@ class BoardPlusTest extends AnyFunSpec {
     }
   }
 
-  describe("BoardPlus.toString should render:") {
+  describe("LowerGameState.toString should render:") {
 
     it("- empty board") {
       val expected =   // "<---------/---------/.../--------->"
@@ -34,19 +30,19 @@ class BoardPlusTest extends AnyFunSpec {
           columnIndices.map(_ => "-").mkString("")
         }
             .mkString("< <", "/", " + ()>; 0 pts>")
-      BoardPlus.empty.toString shouldBe expected
+      LowerGameState.empty.toString shouldBe expected
     }
     it("- board with grid balls") (pending)
     it("- board with on-deck balls") (pending)
   }
 
   // ("it" and "pending" to note without "!!! IGNORED !!!"
-  it("BoardPlus.renderMultiline") {
+  it("LowerGameState.renderMultiline") {
     pending
   }
 
   // ("it" and "cancel" to note without "!!! IGNORED !!!"
-  it("BoardPlus.renderCompactMultiline") {
+  it("LowerGameState.renderCompactMultiline") {
     pending
   }
 

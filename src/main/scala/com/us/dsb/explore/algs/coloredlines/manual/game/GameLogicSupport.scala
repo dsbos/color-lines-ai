@@ -1,7 +1,7 @@
 package com.us.dsb.explore.algs.coloredlines.manual.game
 
 import cats.syntax.option._
-import com.us.dsb.explore.algs.coloredlines.manual.game.board.{BallKind, BoardOrder, BoardPlus, BoardState, CellAddress, columnIndices, rowIndices}
+import com.us.dsb.explore.algs.coloredlines.manual.game.board.{BallKind, BoardOrder, LowerGameState, BoardState, CellAddress, columnIndices, rowIndices}
 import com.us.dsb.explore.algs.coloredlines.manual.game.lines.LineDetector
 
 import java.util
@@ -17,7 +17,7 @@ object GameLogicSupport {
 
   // (was "private[this]" before test calls:)
   @tailrec
-  private[game] def pickRandomEmptyCell(boardPlus: BoardPlus)(implicit rng: Random): Option[CellAddress] = {
+  private[game] def pickRandomEmptyCell(boardPlus: LowerGameState)(implicit rng: Random): Option[CellAddress] = {
     if (boardPlus.isFull)
       None
     else {
@@ -30,7 +30,7 @@ object GameLogicSupport {
     }
   }
 
-  case class BallArrivalResult(boardPlus: BoardPlus,
+  case class BallArrivalResult(boardPlus: LowerGameState,
                                anyRemovals: Boolean
                                //??? maybe score increment (for better notification)
                               )
@@ -46,7 +46,7 @@ object GameLogicSupport {
    * @param boardPlus
    *   expected to be empty //???? maybe refactor something?
    */
-  private[game] def placeInitialBalls(boardPlus: BoardPlus)(implicit rng: Random): BallArrivalResult = {
+  private[game] def placeInitialBalls(boardPlus: LowerGameState)(implicit rng: Random): BallArrivalResult = {
     val postPlacementsResult =
       //???? parameterize:
       (1 to 5).foldLeft(BallArrivalResult(boardPlus, false)) {
@@ -122,7 +122,7 @@ object GameLogicSupport {
     action
   }
 
-  private[this] def placeNextBalls(boardPlus: BoardPlus)(implicit rng: Random): BallArrivalResult = {
+  private[this] def placeNextBalls(boardPlus: LowerGameState)(implicit rng: Random): BallArrivalResult = {
     val postPlacementResult =
       //???? for 1 to 3, consume on-deck ball from list, and then place (better for internal state view);;
       // can replenish incrementally or later; later might show up better in internal state view
@@ -149,14 +149,14 @@ object GameLogicSupport {
     val replenishedOnDeckBoard = replenishOnDeckBalls(postPlacementResult.boardPlus.boardState)
     postPlacementResult.copy(boardPlus = postPlacementResult.boardPlus.withBoardState(replenishedOnDeckBoard))}
 
-  private[game] def doPass(boardPlus: BoardPlus)(implicit rng: Random): BallArrivalResult =
+  private[game] def doPass(boardPlus: LowerGameState)(implicit rng: Random): BallArrivalResult =
     placeNextBalls(boardPlus)
 
   //???: likely move core algorithm out; possibly move outer code into BoardPlus/BoardState:
   /**
    * @param toTapCell - must be empty */
   // (was "private[this]" before test calls:)
-  private[game] def pathExists(boardPlus: BoardPlus,
+  private[game] def pathExists(boardPlus: LowerGameState,
                                fromBallCell: CellAddress,
                                toTapCell: CellAddress): Boolean = {
     //???? CLEAN ALL THIS:
@@ -208,13 +208,13 @@ object GameLogicSupport {
     loop
   }
 
-  case class MoveBallResult(boardPlus: BoardPlus,
+  case class MoveBallResult(boardPlus: LowerGameState,
                             clearSelection: Boolean)
   {
     println(s"???  $this")
   }
 
-  private[game] def doTryMoveBall(boardPlus: BoardPlus,
+  private[game] def doTryMoveBall(boardPlus: LowerGameState,
                                   from: CellAddress,
                                   to: CellAddress
                                   )(implicit rng: Random): MoveBallResult = {

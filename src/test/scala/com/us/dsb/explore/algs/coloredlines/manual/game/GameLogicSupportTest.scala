@@ -1,7 +1,7 @@
 package com.us.dsb.explore.algs.coloredlines.manual.game
 
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.CellAddress
-import com.us.dsb.explore.algs.coloredlines.manual.game.board.{BoardPlus, ColumnIndex, RowIndex, columnIndices, rowIndices}
+import com.us.dsb.explore.algs.coloredlines.manual.game.board.{LowerGameState, ColumnIndex, RowIndex, columnIndices, rowIndices}
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers._
 
@@ -39,7 +39,7 @@ class GameLogicSupportTest extends AnyFunSpec {
 
   describe("pathExists:") {
     implicit val rng: Random = new Random()
-    lazy val boardPlus0 = BoardPlus.empty
+    lazy val boardPlus0 = LowerGameState.empty
 
     it("ball on one-ball board can move anywhere") {
       //?? factor out this frequent iteration pattern (set of cells, iterate, passing CellAddress
@@ -62,7 +62,7 @@ class GameLogicSupportTest extends AnyFunSpec {
     }
 
     // top left (1, 1) to bottom right (N, N)
-    def makeDiagonallyDividedBoard: BoardPlus = {
+    def makeDiagonallyDividedBoard: LowerGameState = {
       val diagonalAddresses =
         rowIndices.zip(columnIndices).map { case (row, column) => CellAddress(row, column) }
       diagonalAddresses.foldLeft(boardPlus0) { case (board, address) =>

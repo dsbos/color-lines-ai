@@ -1,25 +1,24 @@
 package com.us.dsb.explore.algs.coloredlines.manual.game.board
 
-private[game] object BoardPlus {
+private[game] object LowerGameState {
 
-  private[game] def empty: BoardPlus = new BoardPlus(BoardState.empty, 0)
+  private[game] def empty: LowerGameState = new LowerGameState(BoardState.empty, 0)
 }
 
-//???? move tap-UI selection state out of this low-level game state
 /**
- * CURRENTLY:  Core board state (now wrapped), not score yet, tap-UI selection state
+ * (Lower-level): game state:  board and score.  (No more tap-UI selection state.)
  */
-private[game] class BoardPlus(private[manual] val boardState: BoardState,
-                              private[this] val score: Int
-                             ) {
-  println("??? BoardPlus : " + this)
+private[game] class LowerGameState(private[manual] val boardState: BoardState,
+                                   private[this] val score: Int
+                                 ) {
+  println("??? LowerGameState : " + this)
   //print("")
 
   // internal/support methods:
 
   private[this] def copy(boardState: BoardState = boardState,
                          score: Int             = score) =
-    new BoardPlus(boardState, score)
+    new LowerGameState(boardState, score)
 
   // grid balls:
 
@@ -31,10 +30,10 @@ private[game] class BoardPlus(private[manual] val boardState: BoardState,
   private[game] def hasABallAt(address: CellAddress): Boolean =
     boardState.hasABallAt(address)
 
-  private[game] def withBallAt(address: CellAddress, ball: BallKind): BoardPlus =
+  private[game] def withBallAt(address: CellAddress, ball: BallKind): LowerGameState =
     copy(boardState = boardState.withBallAt(address, ball))
 
-  private[game] def withNoBallAt(address: CellAddress): BoardPlus =
+  private[game] def withNoBallAt(address: CellAddress): LowerGameState =
     copy(boardState = boardState.withNoBallAt(address))
 
 
@@ -48,12 +47,12 @@ private[game] class BoardPlus(private[manual] val boardState: BoardState,
 
   // (lower-level) board state
 
-  private[game] def withBoardState(boardState: BoardState): BoardPlus =
+  private[game] def withBoardState(boardState: BoardState): LowerGameState =
     copy(boardState = boardState)
 
   // (running) score:
 
-  private[game] def withAddedScore(increment: Int): BoardPlus =
+  private[game] def withAddedScore(increment: Int): LowerGameState =
     copy(score = this.score + increment)
 
   private[manual] def getScore: Int = score

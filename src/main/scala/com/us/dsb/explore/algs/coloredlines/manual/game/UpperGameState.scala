@@ -2,7 +2,7 @@ package com.us.dsb.explore.algs.coloredlines.manual.game
 
 import cats.syntax.either._
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.CellAddress
-import com.us.dsb.explore.algs.coloredlines.manual.game.board.BoardPlus
+import com.us.dsb.explore.algs.coloredlines.manual.game.board.LowerGameState
 
 import scala.util.Random
 
@@ -17,7 +17,7 @@ private[manual] object UpperGameState {
   }
 
   private[this] def makeInitialState(implicit rng: Random): UpperGameState = {
-    val initialPlacementResult = GameLogicSupport.placeInitialBalls(BoardPlus.empty)
+    val initialPlacementResult = GameLogicSupport.placeInitialBalls(LowerGameState.empty)
     //????? probably split GameState level from slightly lower game state
     //  carrying board plus score (probably modifying MoveResult for that)
     UpperGameState(initialPlacementResult.boardPlus, None, None)
@@ -35,7 +35,7 @@ import UpperGameState._
  * @param gameResult
  *   `None` means not ended yet
  */
-private[manual] case class UpperGameState(boardPlus: BoardPlus,
+private[manual] case class UpperGameState(boardPlus: LowerGameState,
                                           selectionAddress: Option[CellAddress],
                                           gameResult: Option[GameResult]
                                          )(implicit rng: Random) {
