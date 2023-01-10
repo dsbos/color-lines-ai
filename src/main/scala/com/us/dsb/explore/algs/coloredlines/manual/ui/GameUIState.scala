@@ -48,7 +48,7 @@ private[this] case class GameUIState(upperGameState: UpperGameState,
       columnIndices.map { column =>
         val scanAddress = CellAddress(row, column)
         val cellStateStr =
-          upperGameState.boardPlus.getCellBallStateChar(upperGameState.boardPlus.getBallStateAt(scanAddress),
+          upperGameState.gameState.getCellBallStateChar(upperGameState.gameState.getBallStateAt(scanAddress),
                                                         upperGameState.isSelectedAt(scanAddress))
         if (scanAddress == cursorAddress ) {
           "*" + cellStateStr + "*"
@@ -63,11 +63,11 @@ private[this] case class GameUIState(upperGameState: UpperGameState,
 
   private[ui] def toDisplayString: String = {
     val onDeckList =
-      upperGameState.boardPlus.boardState.getOnDeckBalls.map(_.getColoredCharSeq(false)).mkString(", ")
+      upperGameState.gameState.boardState.getOnDeckBalls.map(_.getColoredCharSeq(false)).mkString(", ")
 
     renderTableMultilineWithSelection + "\n" +
         s"Next: $onDeckList" +
-        s"  Score: ${upperGameState.boardPlus.getScore}" +
+        s"  Score: ${upperGameState.gameState.getScore}" +
         s"  Marking cursor: <row ${cursorAddress.row} / column ${cursorAddress.column}>"
   }
 

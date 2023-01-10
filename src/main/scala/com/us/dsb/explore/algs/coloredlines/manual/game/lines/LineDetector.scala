@@ -23,7 +23,7 @@ object LineDetector {  //????? adjust most from using LowerGameState to using ju
   private[this] val relativeDirectionFactors = List(1, -1) // use type of length 2 (refined List?, Tuple2?, some array?)
 
   private[lines] def haveMatchingBallAt(moveBallColor: BallKind,
-                                        boardPlus: LowerGameState,
+                                        gameState: LowerGameState,
                                         rawRowIndex: Int,
                                         rawColIndex: Int): Boolean = {
     val inRange =
@@ -32,7 +32,7 @@ object LineDetector {  //????? adjust most from using LowerGameState to using ju
     val haveMatch =
       inRange && {
         val candidateAddress = CellAddress.fromRaw(rawRowIndex, rawColIndex)
-        boardPlus.getBallStateAt(candidateAddress).fold(false)(ball => ball == moveBallColor)
+        gameState.getBallStateAt(candidateAddress).fold(false)(ball => ball == moveBallColor)
       }
     haveMatch
   }
@@ -40,7 +40,7 @@ object LineDetector {  //????? adjust most from using LowerGameState to using ju
   private[lines] case class RelativeDirectionResult(excursionLength: Int)
 
   private[lines] def computeDirectionResult(moveBallColor: BallKind,
-                                            boardPlus: LowerGameState,
+                                            gameState: LowerGameState,
                                             ballTo: CellAddress,
                                             lineDirectionAxis: LineAxis,
                                             directionFactor: Int): RelativeDirectionResult = {
@@ -54,7 +54,7 @@ object LineDetector {  //????? adjust most from using LowerGameState to using ju
       val candidateColIndex = newBallColIndex + colDelta * directionFactor * candidateExcursionLength
       //??? println(s"    ??.n.0: candidate address: ($candidateRowIndex / $candidateColIndex)")
 
-      val haveMatchingBall = haveMatchingBallAt(moveBallColor, boardPlus, candidateRowIndex, candidateColIndex)
+      val haveMatchingBall = haveMatchingBallAt(moveBallColor, gameState, candidateRowIndex, candidateColIndex)
       if (haveMatchingBall) {
         excursionLength = candidateExcursionLength
       }
@@ -68,14 +68,14 @@ object LineDetector {  //????? adjust most from using LowerGameState to using ju
                                        directionDetails: List[RelativeDirectionResult])
 
   private[lines] def computeLineAxisResult(moveBallColor: BallKind,
-                                           boardPlus: LowerGameState,
+                                           gameState: LowerGameState,
                                            ballTo: CellAddress,
                                            lineDirectionAxis: LineAxis): AxisResult = {
     //??? println(s"+  computeLineAxisResult( axis = $lineDirectionAxis ).1")
     val directionsResults: List[RelativeDirectionResult] =
       relativeDirectionFactors.map { directionFactor =>
         computeDirectionResult(moveBallColor,
-                               boardPlus,
+                               gameState,
                                ballTo,
                                lineDirectionAxis,
                                directionFactor)
@@ -88,11 +88,11 @@ object LineDetector {  //????? adjust most from using LowerGameState to using ju
   }
 
   private[lines] def removeCompletedLineBalls(ballTo: CellAddress,
-                                              preremovalBoardPlus: LowerGameState,
+                                              preremovalGameState: LowerGameState,
                                               completedLineAxesResults: List[AxisResult]): LowerGameState = {
-    val newBallRemovedBoard = preremovalBoardPlus.withNoBallAt(ballTo)
+    val newBallRemovedGameState = preremovalGameState.withNoBallAt(ballTo)
     val linesRemovedBoard =
-      completedLineAxesResults.foldLeft(newBallRemovedBoard) { case (axisBoard, axisResult) =>
+      completedLineAxesResults.foldLeft(newBallRemovedGameState) { case (axisBoard, axisResult) =>
         val fromOffset = -axisResult.directionDetails(1).excursionLength
         val toOffset = axisResult.directionDetails(0).excursionLength
         val lineRemovedBoard =
@@ -114,16 +114,16 @@ object LineDetector {  //????? adjust most from using LowerGameState to using ju
    */
   //????? rename: doesn't handle everything: handles harvesting/reaping and
   //  scoring, but not no-lines placement of three more balls
-  private[game] def handleBallArrival(boardPlus: LowerGameState,
+  private[game] def handleBallArrival(gameState: LowerGameState,
                                       ballTo: CellAddress
                                      ): BallArrivalResult = {
     //println(s"+handleBallArrival(... ballTo = $ballTo...).1")
-    val moveBallColor = boardPlus.getBallStateAt(ballTo).get //????
+    val moveBallColor = gameState.getBallStateAt(ballTo).get //????
     println(s"??? * placed at $ballTo: $moveBallColor")
 
     val allAxesResults: List[AxisResult] =
       lineAxes.map { lineAxis =>
-        computeLineAxisResult(moveBallColor, boardPlus, ballTo, lineAxis)
+        computeLineAxisResult(moveBallColor, gameState, ballTo, lineAxis)
       }
     //??? println("??? allAxesResults:" + allAxesResults.mkString("\n- ", "\n- ", ""))
     val completedLineAxesResults = allAxesResults.filter(_.axisLineAddedLength + 1 >= LineOrder)
@@ -131,7 +131,7 @@ object LineDetector {  //????? adjust most from using LowerGameState to using ju
     val (boardResult, scoreResult) =
       completedLineAxesResults match {
         case Nil =>
-          (boardPlus, None) // return None for score (signal to place 3 more IF ball moved by user)
+          (gameState, None) // return None for score (signal to place 3 more IF ball moved by user)
         case linesAxes =>
           val totalBallsBeingRemoved = 1 + linesAxes.map(_.axisLineAddedLength).sum
           println(s"??? * reaped at $ballTo: $totalBallsBeingRemoved $moveBallColor balls")
@@ -139,7 +139,7 @@ object LineDetector {  //????? adjust most from using LowerGameState to using ju
           // note original game scoring: score = totalBallsBeingRemoved * 4 - 10,
           //  which seems to be from 2 pts per ball in 5-ball line, but 4 for any extra balls in line
           val postLinesRemovalBoard = removeCompletedLineBalls(ballTo,
-                                                               boardPlus,
+                                                               gameState,
                                                                completedLineAxesResults)
           val ballPlacementScore = 2 * LineOrder + 4 * (totalBallsBeingRemoved - LineOrder)
           (postLinesRemovalBoard.withAddedScore(ballPlacementScore), Some(ballPlacementScore))

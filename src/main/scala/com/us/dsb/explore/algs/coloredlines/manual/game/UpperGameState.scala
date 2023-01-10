@@ -20,7 +20,7 @@ private[manual] object UpperGameState {
     val initialPlacementResult = GameLogicSupport.placeInitialBalls(LowerGameState.empty)
     //????? probably split GameState level from slightly lower game state
     //  carrying board plus score (probably modifying MoveResult for that)
-    UpperGameState(initialPlacementResult.boardPlus, None, None)
+    UpperGameState(initialPlacementResult.gameState, None, None)
   }
 
   private[manual/*game*/] def initial(seed: Long): UpperGameState = makeInitialState(new Random(seed))
@@ -35,7 +35,7 @@ import UpperGameState._
  * @param gameResult
  *   `None` means not ended yet
  */
-private[manual] case class UpperGameState(boardPlus: LowerGameState,
+private[manual] case class UpperGameState(gameState: LowerGameState,
                                           selectionAddress: Option[CellAddress],
                                           gameResult: Option[GameResult]
                                          )(implicit rng: Random) {
@@ -54,7 +54,7 @@ private[manual] case class UpperGameState(boardPlus: LowerGameState,
     selectionAddress.fold(false)(_ == address)
 
   private[game] def hasABallSelected: Boolean =
-    selectionAddress.fold(false)(boardPlus.hasABallAt(_))
+    selectionAddress.fold(false)(gameState.hasABallAt(_))
 
   //????? Probably move to GameLogicSupport
 
@@ -81,27 +81,27 @@ private[manual] case class UpperGameState(boardPlus: LowerGameState,
             getSelectionCoordinates.getOrElse(sys.error("Shouldn't be able to happen"))
 
           val tryMoveResult =
-            GameLogicSupport.doTryMoveBall(boardPlus, fromAddress, tapAddress)
+            GameLogicSupport.doTryMoveBall(gameState, fromAddress, tapAddress)
           val selectionUpdatedState =
             if (tryMoveResult.clearSelection)
               withNoSelection
             else
               this
-          selectionUpdatedState.copy(boardPlus = tryMoveResult.boardPlus)
+          selectionUpdatedState.copy(gameState = tryMoveResult.gameState)
         case Pass        =>
-          val passResult = GameLogicSupport.doPass(boardPlus)
-          copy(boardPlus = passResult.boardPlus)
+          val passResult = GameLogicSupport.doPass(gameState)
+          copy(gameState = passResult.gameState)
               .withNoSelection
       }
 
     val nextState =
-      if (! postMoveState.boardPlus.isFull) {
-        copy(boardPlus = postMoveState.boardPlus, selectionAddress = postMoveState.selectionAddress).asRight
+      if (! postMoveState.gameState.isFull) {
+        copy(gameState = postMoveState.gameState, selectionAddress = postMoveState.selectionAddress).asRight
       }
       else {
-        UpperGameState(postMoveState.boardPlus,
+        UpperGameState(postMoveState.gameState,
                        postMoveState.selectionAddress,
-                       Some(GameResult.Done(postMoveState.boardPlus.getScore))
+                       Some(GameResult.Done(postMoveState.gameState.getScore))
                        ).asRight
       }
     nextState
