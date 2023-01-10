@@ -1,34 +1,34 @@
 package com.us.dsb.explore.algs.coloredlines.manual.game.board
 
 
-private[game] object BoardState {
+private[game] object Board {
 
   /** Empty or ball of some color. */
-  private[BoardState] case class CellBallState(ballState: Option[BallKind])
-  private[BoardState] object CellBallState {
-    private[BoardState] val empty: CellBallState = CellBallState(None)
+  private[Board] case class CellBallState(ballState: Option[BallKind])
+  private[Board] object CellBallState {
+    private[Board] val empty: CellBallState = CellBallState(None)
   }
 
-  private[game] def empty: BoardState =
-    new BoardState(Vector.fill[CellBallState](BoardOrder * BoardOrder)(CellBallState.empty), Nil)
+  private[game] def empty: Board =
+    new Board(Vector.fill[CellBallState](BoardOrder * BoardOrder)(CellBallState.empty), Nil)
 }
-import BoardState._
+import Board._
 
 
 /**
  * Core state of board (just cells and on-deck balls; e.g.; no score, tap-UI selection).
  */
-private[game] class BoardState(private[this] val cellStates: Vector[CellBallState],
+private[game] class Board(private[this] val cellStates: Vector[CellBallState],
                                private[this] val onDeck: Iterable[BallKind]
                               ) {
-  //println("??? BoardState:   " + this)
+  //println("??? Board:   " + this)
   //print("")
 
   // internal/support methods:
 
   private[this] def copy(cellStates: Vector[CellBallState] = cellStates,
                          onDeck: Iterable[BallKind]        = onDeck) =
-    new BoardState(cellStates, onDeck)
+    new Board(cellStates, onDeck)
 
   /** Computes row-major cell-array index from row and column numbers. */
   private[this] def vectorIndex(address: CellAddress): Int =
@@ -38,7 +38,7 @@ private[game] class BoardState(private[this] val cellStates: Vector[CellBallStat
 
   private[manual] def getOnDeckBalls: Iterable[BallKind] = onDeck
 
-  private[game] def withOnDeckBalls(newBalls: Iterable[BallKind]): BoardState =
+  private[game] def withOnDeckBalls(newBalls: Iterable[BallKind]): Board =
     copy(onDeck = newBalls)
 
   // grid balls, getting:
@@ -57,14 +57,14 @@ private[game] class BoardState(private[this] val cellStates: Vector[CellBallStat
   // grid balls, setting:
 
   private def withCellBallState(address: CellAddress,
-                                newState: CellBallState): BoardState =
+                                newState: CellBallState): Board =
     copy(cellStates = cellStates.updated(vectorIndex(address), newState))
 
   private[game] def withBallAt(address: CellAddress,
-                               ball: BallKind): BoardState =
+                               ball: BallKind): Board =
     withCellBallState(address, getCellBallStateAt(address).copy(ballState = Some(ball)))
 
-  private[game] def withNoBallAt(address: CellAddress): BoardState =
+  private[game] def withNoBallAt(address: CellAddress): Board =
     withCellBallState(address, getCellBallStateAt(address).copy(ballState = None))
 
   /** Makes compact single-line string like"<rgb------/---------/.../---------; (bgr) >". */

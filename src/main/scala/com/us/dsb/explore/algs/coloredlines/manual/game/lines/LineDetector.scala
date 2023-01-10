@@ -7,7 +7,7 @@ import com.us.dsb.explore.algs.coloredlines.manual.game.board.{BallKind, LowerGa
 //???? TODO:  reduce repeated passing of board, etc.; maybe make LineDetector a
 // class, to be instantiated for each move; or make local class for passing (but
 // leave external-client interface same
-object LineDetector {  //????? adjust most from using LowerGameState to using just BoardState
+object LineDetector {  //????? adjust most from using LowerGameState to using just Board
 
   private[lines] case class LineAxis(labelArray: String,
                                      rowDelta: Int, // -1 / 0 / 1 (Make refined type?)

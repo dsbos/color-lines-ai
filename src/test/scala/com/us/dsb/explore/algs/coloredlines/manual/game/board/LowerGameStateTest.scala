@@ -8,17 +8,17 @@ import org.scalatest.matchers.should.Matchers._
 class LowerGameStateTest extends AnyFunSpec {
 
   describe("LowerGameState$.empty should return board:") {
-    lazy val boardPlus = LowerGameState.empty
+    lazy val board = LowerGameState.empty
     it("- with empty board--empty grid cells") {
       rowIndices.foreach { row =>
         columnIndices.foreach { column =>
           val address = CellAddress(row, column)
-          assert(boardPlus.getBallStateAt(address).isEmpty)
+          assert(board.getBallStateAt(address).isEmpty)
         }
       }
     }
     it("- with empty board--empty on-deck list") {
-      assert(boardPlus.boardState.getOnDeckBalls.isEmpty)
+      assert(board.board.getOnDeckBalls.isEmpty)
     }
   }
 

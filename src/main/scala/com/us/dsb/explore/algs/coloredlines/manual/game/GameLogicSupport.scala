@@ -1,7 +1,7 @@
 package com.us.dsb.explore.algs.coloredlines.manual.game
 
 import cats.syntax.option._
-import com.us.dsb.explore.algs.coloredlines.manual.game.board.{BallKind, BoardOrder, LowerGameState, BoardState, CellAddress, columnIndices, rowIndices}
+import com.us.dsb.explore.algs.coloredlines.manual.game.board.{BallKind, BoardOrder, LowerGameState, Board, CellAddress, columnIndices, rowIndices}
 import com.us.dsb.explore.algs.coloredlines.manual.game.lines.LineDetector
 
 import java.util
@@ -39,7 +39,7 @@ object GameLogicSupport {
   }
 
   //???? parameterize
-  private[this] def replenishOnDeckBalls(board: BoardState)(implicit rng: Random): BoardState =
+  private[this] def replenishOnDeckBalls(board: Board)(implicit rng: Random): Board =
     board.withOnDeckBalls(List.fill(3)(pickRandomBallKind()))
 
   /**
@@ -57,8 +57,8 @@ object GameLogicSupport {
           LineDetector.handleBallArrival(postPlacementGameState, address)
       }
 
-    val replenishedOnDeckBoard = replenishOnDeckBalls(postPlacementsResult.gameState.boardState)
-    postPlacementsResult.copy(gameState = postPlacementsResult.gameState.withBoardState(replenishedOnDeckBoard))
+    val replenishedOnDeckBoard = replenishOnDeckBalls(postPlacementsResult.gameState.board)
+    postPlacementsResult.copy(gameState = postPlacementsResult.gameState.withBoard(replenishedOnDeckBoard))
   }
 
   private[game] sealed trait Action
@@ -126,7 +126,7 @@ object GameLogicSupport {
     val postPlacementResult =
       //???? for 1 to 3, consume on-deck ball from list, and then place (better for internal state view);;
       // can replenish incrementally or later; later might show up better in internal state view
-      gameState.boardState.getOnDeckBalls
+      gameState.board.getOnDeckBalls
         .foldLeft(BallArrivalResult(gameState, false)) {
           case (curMoveResult, onDeckBall) =>
             pickRandomEmptyCell(curMoveResult.gameState) match {
@@ -134,25 +134,25 @@ object GameLogicSupport {
                 curMoveResult
               case Some(address) =>
                 val postPlacementGameState = {
-                  val curBoardState = curMoveResult.gameState.boardState
+                  val curBoard = curMoveResult.gameState.board
                   val postDeueueBoard =
-                    curBoardState
-                        .withOnDeckBalls(curBoardState.getOnDeckBalls.tail)
+                    curBoard
+                        .withOnDeckBalls(curBoard.getOnDeckBalls.tail)
                         .withBallAt(address, onDeckBall)
-                  val postDeueueGameState = curMoveResult.gameState.withBoardState(postDeueueBoard)
+                  val postDeueueGameState = curMoveResult.gameState.withBoard(postDeueueBoard)
                   postDeueueGameState
                 }
                 LineDetector.handleBallArrival(postPlacementGameState, address)
             }
         }
 
-    val replenishedOnDeckBoard = replenishOnDeckBalls(postPlacementResult.gameState.boardState)
-    postPlacementResult.copy(gameState = postPlacementResult.gameState.withBoardState(replenishedOnDeckBoard))}
+    val replenishedOnDeckBoard = replenishOnDeckBalls(postPlacementResult.gameState.board)
+    postPlacementResult.copy(gameState = postPlacementResult.gameState.withBoard(replenishedOnDeckBoard))}
 
   private[game] def doPass(gameState: LowerGameState)(implicit rng: Random): BallArrivalResult =
     placeNextBalls(gameState)
 
-  //???: likely move core algorithm out; possibly move outer code into LowerGameState/BoardState:
+  //???: likely move core algorithm out; possibly move outer code into LowerGameState/Board:
   /**
    * @param toTapCell - must be empty */
   // (was "private[this]" before test calls:)

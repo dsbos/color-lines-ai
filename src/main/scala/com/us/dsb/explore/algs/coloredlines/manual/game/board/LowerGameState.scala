@@ -2,13 +2,13 @@ package com.us.dsb.explore.algs.coloredlines.manual.game.board
 
 private[game] object LowerGameState {
 
-  private[game] def empty: LowerGameState = new LowerGameState(BoardState.empty, 0)
+  private[game] def empty: LowerGameState = new LowerGameState(Board.empty, 0)
 }
 
 /**
  * (Lower-level): game state:  board and score.  (No more tap-UI selection state.)
  */
-private[game] class LowerGameState(private[manual] val boardState: BoardState,
+private[game] class LowerGameState(private[manual] val board: Board,
                                    private[this] val score: Int
                                  ) {
   println("??? LowerGameState : " + this)
@@ -16,25 +16,25 @@ private[game] class LowerGameState(private[manual] val boardState: BoardState,
 
   // internal/support methods:
 
-  private[this] def copy(boardState: BoardState = boardState,
-                         score: Int             = score) =
-    new LowerGameState(boardState, score)
+  private[this] def copy(board: Board = board,
+                         score: Int   = score) =
+    new LowerGameState(board, score)
 
   // grid balls:
 
-  private[game] def isFull: Boolean = boardState.isFull
+  private[game] def isFull: Boolean = board.isFull
 
   private[manual/*game*/] def getBallStateAt(address: CellAddress): Option[BallKind] =
-    boardState.getBallStateAt(address)
+    board.getBallStateAt(address)
 
   private[game] def hasABallAt(address: CellAddress): Boolean =
-    boardState.hasABallAt(address)
+    board.hasABallAt(address)
 
   private[game] def withBallAt(address: CellAddress, ball: BallKind): LowerGameState =
-    copy(boardState = boardState.withBallAt(address, ball))
+    copy(board = board.withBallAt(address, ball))
 
   private[game] def withNoBallAt(address: CellAddress): LowerGameState =
-    copy(boardState = boardState.withNoBallAt(address))
+    copy(board = board.withNoBallAt(address))
 
 
   //???? move out?
@@ -47,8 +47,8 @@ private[game] class LowerGameState(private[manual] val boardState: BoardState,
 
   // (lower-level) board state
 
-  private[game] def withBoardState(boardState: BoardState): LowerGameState =
-    copy(boardState = boardState)
+  private[game] def withBoard(board: Board): LowerGameState =
+    copy(board = board)
 
   // (running) score:
 
@@ -61,7 +61,7 @@ private[game] class LowerGameState(private[manual] val boardState: BoardState,
   // renderings:
 
   /** Makes compact single-line string. */
-  override def toString: String = "< " + boardState.toString + "; " + score + " pts" + ">"
+  override def toString: String = "< " + board.toString + "; " + score + " pts" + ">"
 
   private[this] def renderMultiline(selectionAddress: Option[CellAddress]): String = {
     val cellWidth = " X ".length

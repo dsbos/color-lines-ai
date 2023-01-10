@@ -39,19 +39,19 @@ class GameLogicSupportTest extends AnyFunSpec {
 
   describe("pathExists:") {
     implicit val rng: Random = new Random()
-    lazy val boardPlus0 = LowerGameState.empty
+    lazy val gameState0 = LowerGameState.empty  //????? just Board?
 
     it("ball on one-ball board can move anywhere") {
       //?? factor out this frequent iteration pattern (set of cells, iterate, passing CellAddress
       rowIndices.foreach { ballRow =>
         columnIndices.foreach { ballColumn =>
           val fromBallAddress = CellAddress(ballRow, ballColumn)
-          val boardPlus = boardPlus0.withBallAt(fromBallAddress,
-                                        GameLogicSupport.pickRandomBallKind())
+          val gameState = gameState0.withBallAt(fromBallAddress,
+                                                GameLogicSupport.pickRandomBallKind())
           rowIndices.foreach { row =>
             columnIndices.foreach { column =>
               val toVacancyAddress = CellAddress(row, column)
-              val pathExists = GameLogicSupport.pathExists(boardPlus, fromBallAddress, toVacancyAddress)
+              val pathExists = GameLogicSupport.pathExists(gameState, fromBallAddress, toVacancyAddress)
               withClue( s"from $fromBallAddress to $toVacancyAddress") {
                 pathExists shouldBe true
               }
@@ -62,19 +62,19 @@ class GameLogicSupportTest extends AnyFunSpec {
     }
 
     // top left (1, 1) to bottom right (N, N)
-    def makeDiagonallyDividedBoard: LowerGameState = {
+    def makeDiagonallyDividedBoardGameState: LowerGameState = {  //????? just Board?
       val diagonalAddresses =
         rowIndices.zip(columnIndices).map { case (row, column) => CellAddress(row, column) }
-      diagonalAddresses.foldLeft(boardPlus0) { case (board, address) =>
+      diagonalAddresses.foldLeft(gameState0) { case (board, address) =>
         board.withBallAt(address, GameLogicSupport.pickRandomBallKind())
       }
     }
 
     it("ball can't move across block (complete diagonal; random probe ball location)") {
       val probeBall = GameLogicSupport.pickRandomBallKind()
-      val diagonalBoardPlus = makeDiagonallyDividedBoard
-      val fromBallAddress = GameLogicSupport.pickRandomEmptyCell(diagonalBoardPlus).get
-      val boardWithProbe = diagonalBoardPlus.withBallAt(fromBallAddress, probeBall)
+      val diagonalGameState = makeDiagonallyDividedBoardGameState  //????? just Board?
+      val fromBallAddress = GameLogicSupport.pickRandomEmptyCell(diagonalGameState).get
+      val boardWithProbe = diagonalGameState.withBallAt(fromBallAddress, probeBall)
 
       // transpose ball coordinates to get cell across boundary
       val toVacancyAddress =
