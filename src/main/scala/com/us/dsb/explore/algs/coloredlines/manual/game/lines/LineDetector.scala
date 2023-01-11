@@ -102,15 +102,12 @@ object LineDetector {
     linesRemovedGameState
   }
 
-  /**
-   * @return
+  /** Reaps any complete lines from just-placed ball.
    * None if no line(s) completed; score increment otherwise
    */
-  //???? rename: doesn't handle everything: handles harvesting/reaping and
-  //  scoring, but not no-lines placement of three more balls
-  private[game] def handleBallArrival(gameState: LowerGameState,
-                                      ballTo: CellAddress
-                                     ): BallArrivalResult = {
+  private[game] def reapAnyLines(gameState: LowerGameState,
+                                 ballTo: CellAddress
+                                ): BallArrivalResult = {
     //println(s"+handleBallArrival(... ballTo = $ballTo...).1")
     val moveBallColor = gameState.board.getBallStateAt(ballTo).get //????
     println(s"* * placed at $ballTo: $moveBallColor")

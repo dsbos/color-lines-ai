@@ -53,7 +53,7 @@ object GameLogicSupport {
             pickRandomEmptyCell(resultSoFar.gameState).getOrElse(scala.sys.error("Unexpectedly full board"))
           val postPlacementGameState =
             resultSoFar.gameState.withBoardWithBallAt(address, pickRandomBallKind())
-          LineDetector.handleBallArrival(postPlacementGameState, address)
+          LineDetector.reapAnyLines(postPlacementGameState, address)
       }
 
     val replenishedOnDeckBoard = replenishOnDeckBalls(postPlacementsResult.gameState.board)
@@ -141,7 +141,7 @@ object GameLogicSupport {
                   val postDeueueGameState = curMoveResult.gameState.withBoard(postDequeueBoard)
                   postDeueueGameState
                 }
-                LineDetector.handleBallArrival(postPlacementGameState, address)
+                LineDetector.reapAnyLines(postPlacementGameState, address)
             }
         }
 
@@ -230,7 +230,7 @@ object GameLogicSupport {
         val postMoveBoard =
           gameState.withBoardWithNoBallAt(from).withBoardWithBallAt(to, moveBallColor)
 
-        val postReapingResult = LineDetector.handleBallArrival(postMoveBoard, to)
+        val postReapingResult = LineDetector.reapAnyLines(postMoveBoard, to)
         val postPostReadingResult =
           if (! postReapingResult.anyRemovals)
             placeNextBalls(postReapingResult.gameState)
