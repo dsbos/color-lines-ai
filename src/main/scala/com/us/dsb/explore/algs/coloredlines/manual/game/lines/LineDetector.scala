@@ -124,6 +124,7 @@ object LineDetector {
         case Nil =>
           (gameState, None) // return None for score (signal to place 3 more IF ball moved by user)
         case linesAxes =>
+          //????? test
           val totalBallsBeingRemoved = 1 + linesAxes.map(_.axisLineAddedLength).sum
           println(s"* * reaped at $ballTo: $totalBallsBeingRemoved $moveBallColor balls")
           //???? move?

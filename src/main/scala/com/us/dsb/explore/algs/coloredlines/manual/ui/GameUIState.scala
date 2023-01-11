@@ -10,6 +10,7 @@ private[this] case class GameUIState(upperGameState: TapUiGameState,
 
   // ?? clean up that floorMod; I just want plain mathematical mod:
   private[this] def adjustAndWrapToRange(unincremented: Index, delta: Int): Index = {
+    //????? test (at least callers)
     // ?? maybe enable auto-wrapping and -unwrapping around math
     val indexOrigin = Index.MinValue.value
     val rangeSize = Index.MaxValue.value - Index.MinValue.value + 1

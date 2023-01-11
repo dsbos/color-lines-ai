@@ -25,6 +25,7 @@ private[manual] object GameUI {
     // (Q: Why doesn't UICommand's "sealed" obviate the following one (for
     //   exhaustive-match checks)?
     private[ui] sealed trait UIMoveCommand extends UICommand
+    //????? test (use (drive with) commands)
     private[ui] case object Up    extends UIMoveCommand
     private[ui] case object Down  extends UIMoveCommand
     private[ui] case object Left  extends UIMoveCommand
@@ -62,6 +63,7 @@ private[manual] object GameUI {
     parseCommand(cmdLineOpt) match {
       case Right(cmd) => cmd
       case Left(msg) =>
+        //????? test?
         io.printError(msg)
         getCommand(io)  // loop
     }
@@ -70,6 +72,7 @@ private[manual] object GameUI {
   private[this] def moveSelection(uiState: GameUIState,
                                   moveCommand: UICommand.UIMoveCommand
                                  ): GameUIState = {
+    //????? test
     import UICommand._
     moveCommand match {
       case Up    => uiState.withRowAdjustedBy(-1)
@@ -82,6 +85,7 @@ private[manual] object GameUI {
   private[this] def moveAtSelection(io: SegregatedTextIO,
                                     uiState: GameUIState
                                    ): GameUIState = {
+    //????? test
     val moveResult = uiState.upperGameState.tryMoveAt(uiState.cursorAddress)
     moveResult match {
       case Right(newGameState) =>
@@ -113,6 +117,7 @@ private[manual] object GameUI {
       case move: UIMoveCommand => // any move-selection command
         moveSelection(uiState, move).asRight
       case Move =>
+        //????? test
         // Xx?? should following win/draw logic be 1) in moveAtSelection (with
         //   other Move impl. logic), 2) in here, or 3) out in separate method
         //   first calling moveAtSelection? (what level is moveAtSelection for:
@@ -144,6 +149,7 @@ private[manual] object GameUI {
 
     doCommand(io, uiState, command) match {
       case Right(nextState) =>
+        //????? test
         getAndDoUiCommands(io, nextState) // "recurse" to loop
       case Left(uiResult)  =>
         io.printResult(uiResult)
