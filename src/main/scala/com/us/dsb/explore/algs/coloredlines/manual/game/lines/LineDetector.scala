@@ -106,7 +106,7 @@ object LineDetector {
    * @return
    * None if no line(s) completed; score increment otherwise
    */
-  //????? rename: doesn't handle everything: handles harvesting/reaping and
+  //???? rename: doesn't handle everything: handles harvesting/reaping and
   //  scoring, but not no-lines placement of three more balls
   private[game] def handleBallArrival(gameState: LowerGameState,
                                       ballTo: CellAddress

@@ -6,7 +6,7 @@ package com.us.dsb.explore.algs.coloredlines
 private[this] object ColoredLinesSomething extends App {
 
 
-  private[this] trait XxNeuralStructure
+  private[this] trait NeuralStructure
   // - defines structure:
   //   - number and IDs/labels of input and output neurons
   //   - number of hidden-layer neurons
@@ -31,52 +31,52 @@ private[this] object ColoredLinesSomething extends App {
   def sigmoid(x: Double): Double = 1 / (1 + math.exp(-x))
 
 
-  private[this] case class XxActivation(v: Double = 0.5f) extends AnyVal
-  private[this] case class XxWeight(v: Double) extends AnyVal
-  private[this] case class XxBias(v: Double) extends AnyVal
+  private[this] case class Activation(v: Double = 0.5f) extends AnyVal
+  private[this] case class Weight(v: Double) extends AnyVal
+  private[this] case class Bias(v: Double) extends AnyVal
 
-  type XxNeuronRef = Int
-  private[this] case class XxEdge1(weight: XxWeight, sourceRef: XxNeuronRef)
-  private[this] case class XxNeuron(bias1: XxWeight, edges: Vector[XxEdge1])
+  type NeuronRef = Int
+  private[this] case class Edge1(weight: Weight, sourceRef: NeuronRef)
+  private[this] case class Neuron(bias1: Weight, edges: Vector[Edge1])
 
-  private[this] trait XxNeuron2 {
-    def getActivation: XxActivation
+  private[this] trait Neuron2 {
+    def getActivation: Activation
   }
-  private[this] trait XxInputNeuron2 extends XxNeuron2 {
-    def setActivation(activation: XxActivation): Unit
+  private[this] trait InputNeuron2 extends Neuron2 {
+    def setActivation(activation: Activation): Unit
   }
-  private[this] trait XxNoninputNeuron2 extends XxNeuron2 {
-    def getBias: XxBias
-    def getInputEdges: Seq[XxEdge2]
+  private[this] trait NoninputNeuron2 extends Neuron2 {
+    def getBias: Bias
+    def getInputEdges: Seq[Edge2]
   }
-  private[this] trait XxEdge2 {
-    def getSource: XxNeuron2
-    def getWeight: XxWeight
+  private[this] trait Edge2 {
+    def getSource: Neuron2
+    def getWeight: Weight
     def getWeightedActivation: Double  //????
   }
 
-  private[this] class XxInputNeuron2Impl() extends XxInputNeuron2 {
-    var activation: XxActivation = _
-    override def setActivation(activation: XxActivation): Unit = {
+  private[this] class InputNeuron2Impl() extends InputNeuron2 {
+    var activation: Activation = _
+    override def setActivation(activation: Activation): Unit = {
       this.activation = activation
     }
-    override def getActivation: XxActivation = activation
+    override def getActivation: Activation = activation
   }
 
-  private[this] class XxEdge2Impl(source: XxNeuron2, weight: XxWeight) extends XxEdge2 {
-    override def getSource: XxNeuron2 = source
-    override def getWeight: XxWeight = weight
+  private[this] class Edge2Impl(source: Neuron2, weight: Weight) extends Edge2 {
+    override def getSource: Neuron2 = source
+    override def getWeight: Weight = weight
     override def getWeightedActivation: Double = {
       source.getActivation.v * weight.v
     }
   }
 
-  private[this] class XxNoninputNeuron2Impl(bias: XxBias, inputEdges: Seq[XxEdge2]) extends XxNoninputNeuron2 {
-    override def getBias: XxBias = bias
+  private[this] class NoninputNeuron2Impl(bias: Bias, inputEdges: Seq[Edge2]) extends NoninputNeuron2 {
+    override def getBias: Bias = bias
 
-    override def getInputEdges: Seq[XxEdge2] = inputEdges
+    override def getInputEdges: Seq[Edge2] = inputEdges
 
-    override def getActivation: XxActivation = {
+    override def getActivation: Activation = {
       val rawSum =
         getBias.v +
             getInputEdges
@@ -84,19 +84,19 @@ private[this] object ColoredLinesSomething extends App {
                 .fold(0d)(_ + _)
 
       val coreResult = sigmoid(rawSum)
-      XxActivation(coreResult)
+      Activation(coreResult)
     }
   }
 
-  private[this] val in1 = new XxInputNeuron2Impl()
-  private[this] val in2 = new XxInputNeuron2Impl()
+  private[this] val in1 = new InputNeuron2Impl()
+  private[this] val in2 = new InputNeuron2Impl()
 
-  private[this] val e1 = new XxEdge2Impl(in1, XxWeight(1))
-  private[this] val e2 = new XxEdge2Impl(in2, XxWeight(-1))
-  private[this] val xn1 = new XxNoninputNeuron2Impl(XxBias(0), Vector(e1, e2))
+  private[this] val e1 = new Edge2Impl(in1, Weight(1))
+  private[this] val e2 = new Edge2Impl(in2, Weight(-1))
+  private[this] val xn1 = new NoninputNeuron2Impl(Bias(0), Vector(e1, e2))
 
-  in1.setActivation(XxActivation(0.2))
-  in2.setActivation(XxActivation(0.1))
+  in1.setActivation(Activation(0.2))
+  in2.setActivation(Activation(0.1))
 
   println(s"in1.getActivation = ${in1.getActivation}")
   println(s"in2.getActivation = ${in2.getActivation}")
@@ -116,34 +116,34 @@ private[this] object ColoredLinesSomething extends App {
 
 
 
-  //  trait XxCellPosition
+  //  trait CellPosition
 
-  private[this] case class XxCellCoordinates(rowOrdinal: Int,
+  private[this] case class CellCoordinates(rowOrdinal: Int,
                                            columnOrdinal: Int) //??extends CellPosition;
 
 
 
 /*
-  sealed trait XxCellState { }
-  case object XxEmpty extends CellState
-  trait XxMarked extends CellState
-  case object XxMarkedX extends Marked
-  case object XxMarkedO extends Marked
+  sealed trait CellState { }
+  case object Empty extends CellState
+  trait Marked extends CellState
+  case object MarkedX extends Marked
+  case object MarkedO extends Marked
 
-  case class XxCell( state: CellState )
+  case class Cell( state: CellState )
 
-  case class XxBoardRepr1(
+  case class BoardRepr1(
                            cells: Tuple9[CellState, CellState, CellState, CellState, CellState, CellState, CellState, CellState, CellState]
                            = (Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty));
-  case class XxBoardRepr2(cells:
+  case class BoardRepr2(cells:
                         (
                             (CellState, CellState, CellState),
                                 (CellState, CellState, CellState),
                                 (CellState, CellState, CellState))
                         = ((Empty, Empty, Empty), (Empty, Empty, Empty), (Empty, Empty, Empty)))
-  case class XxCellNumber(ordinal: Int) extends CellPosition;
+  case class CellNumber(ordinal: Int) extends CellPosition;
   val Size = 3
-  case class XxBoardRepr3(cells:  Map[CellPosition, CellState]
+  case class BoardRepr3(cells:  Map[CellPosition, CellState]
                        = 1.to(3 * 3).map(p => CellNumber(p) -> Empty).toMap)
 
 

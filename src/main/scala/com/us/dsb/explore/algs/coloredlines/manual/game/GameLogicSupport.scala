@@ -31,8 +31,7 @@ object GameLogicSupport {
   }
 
   case class BallArrivalResult(gameState: LowerGameState,
-                               anyRemovals: Boolean
-                              )
+                               anyRemovals: Boolean)
   {
     println(s"* $this")
   }
@@ -48,7 +47,7 @@ object GameLogicSupport {
   private[game] def placeInitialBalls(gameState: LowerGameState)(implicit rng: Random): BallArrivalResult = {
     val postPlacementsResult =
       //???? parameterize:
-      (1 to 5).foldLeft(BallArrivalResult(gameState, false)) {
+      (1 to 5).foldLeft(BallArrivalResult(gameState, anyRemovals = false)) {
         case (resultSoFar, _) =>
           val address =
             pickRandomEmptyCell(resultSoFar.gameState).getOrElse(scala.sys.error("Unexpectedly full board"))
@@ -127,7 +126,7 @@ object GameLogicSupport {
       //???? for 1 to 3, consume on-deck ball from list, and then place (better for internal state view);;
       // can replenish incrementally or later; later might show up better in internal state view
       gameState.board.getOnDeckBalls
-        .foldLeft(BallArrivalResult(gameState, false)) {
+        .foldLeft(BallArrivalResult(gameState, anyRemovals = false)) {
           case (curMoveResult, onDeckBall) =>
             pickRandomEmptyCell(curMoveResult.gameState) match {
               case None =>  // board full; break out early (game will become over)
@@ -135,11 +134,11 @@ object GameLogicSupport {
               case Some(address) =>
                 val postPlacementGameState = {
                   val curBoard = curMoveResult.gameState.board
-                  val postDeueueBoard =
+                  val postDequeueBoard =
                     curBoard
                         .withOnDeckBalls(curBoard.getOnDeckBalls.tail)
                         .withBallAt(address, onDeckBall)
-                  val postDeueueGameState = curMoveResult.gameState.withBoard(postDeueueBoard)
+                  val postDeueueGameState = curMoveResult.gameState.withBoard(postDequeueBoard)
                   postDeueueGameState
                 }
                 LineDetector.handleBallArrival(postPlacementGameState, address)
