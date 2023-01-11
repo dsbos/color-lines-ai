@@ -15,14 +15,15 @@ private[game] sealed class BallKind(private[manual] val initial: String,
 }
 
 private[game] object BallKind extends Enum[BallKind] {
+  import AnsiColor._
   // original: blue.dark, blue.light, brown, green, purple, red, yellow
-  private[this] case object Blue    extends BallKind("b",  AnsiColor.BLUE,    AnsiColor.BLUE_B)
-  private[this] case object Cyan    extends BallKind("c",  AnsiColor.CYAN,    AnsiColor.CYAN_B)
-  private[this] case object Black   extends BallKind("k",  AnsiColor.BLACK,   AnsiColor.BLACK_B)
-  private[this] case object Green   extends BallKind("g",  AnsiColor.GREEN,   AnsiColor.GREEN_B)
-  private[this] case object Magenta extends BallKind("m",  AnsiColor.MAGENTA, AnsiColor.MAGENTA_B)
-  private[this] case object Red     extends BallKind("r",  AnsiColor.RED,     AnsiColor.RED_B)
-  private[this] case object Yellow  extends BallKind("y",  AnsiColor.YELLOW,  AnsiColor.YELLOW_B)
+  private[this] case object Blue    extends BallKind("b",  BLUE,    BLUE_B)
+  private[this] case object Cyan    extends BallKind("c",  CYAN,    CYAN_B)
+  private[this] case object Black   extends BallKind("k",  BLACK,   BLACK_B)
+  private[this] case object Green   extends BallKind("g",  GREEN,   GREEN_B)
+  private[this] case object Magenta extends BallKind("m",  MAGENTA, MAGENTA_B)
+  private[this] case object Red     extends BallKind("r",  RED,     RED_B)
+  private[this] case object Yellow  extends BallKind("y",  YELLOW,  YELLOW_B)
 
   override val values: IndexedSeq[BallKind] = findValues
 }
