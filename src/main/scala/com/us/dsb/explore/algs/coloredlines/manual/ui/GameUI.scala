@@ -86,10 +86,10 @@ private[manual] object GameUI {
                                     uiState: GameUIState
                                    ): GameUIState = {
     //????? test
-    val moveResult = uiState.upperGameState.tryMoveAt(uiState.cursorAddress)
+    val moveResult = uiState.tapUiGameState.tryMoveAt(uiState.cursorAddress)
     moveResult match {
       case Right(newGameState) =>
-        uiState.copy(upperGameState = newGameState)
+        uiState.copy(tapUiGameState = newGameState)
       case Left(errorMsg) =>
         // ??? probably change return value to carry state plus any message
         //   (or possibly Either, with caller displaying)
@@ -125,10 +125,10 @@ private[manual] object GameUI {
         //   winning/drawing)?) (hmm--similar question re GameState's tryMoveAt) )
         val newState = moveAtSelection(io, uiState)
         // Check whether move finished game:
-        if (! newState.upperGameState.gameState.board.isFull)
+        if (! newState.tapUiGameState.gameState.board.isFull)
           newState.asRight
         else
-          GameUIResult("Score: " + newState.upperGameState.gameState.getScore).asLeft
+          GameUIResult("Score: " + newState.tapUiGameState.gameState.getScore).asLeft
     }
   }
 
@@ -166,7 +166,7 @@ private[manual] object GameUI {
 
   def runGame(io: SegregatedTextIO): GameUIResult = {
     val initialState =
-      GameUIState(upperGameState = TapUiGameState.initial(),
+      GameUIState(tapUiGameState = TapUiGameState.initial(),
                   cursorAddress  = CellAddress.fromRaw(1, 1))
     getAndDoUiCommands(io, initialState)
   }

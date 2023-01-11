@@ -13,21 +13,21 @@ class TapUiGameStateTest extends AnyFunSpec {
     //???? randomize?
     lazy val someRow = rowIndices.head
     lazy val someCol = columnIndices.head
-    lazy val upperGameState0 = TapUiGameState.initial()
+    lazy val tapUiGameState0 = TapUiGameState.initial()
     lazy val address = CellAddress(someRow, someCol)
 
     describe("hasAnyCellSelected should:") {
       it("- return false for fresh, initial game state") {
-        upperGameState0.hasAnyCellSelected shouldBe false
+        tapUiGameState0.hasAnyCellSelected shouldBe false
       }
       it("- return true for game state with selection") {
-        val selectedGameState = upperGameState0.withCellSelected(address)
+        val selectedGameState = tapUiGameState0.withCellSelected(address)
         selectedGameState.hasAnyCellSelected shouldBe true
       }
     }
 
     describe("withCellSelected should") {
-      lazy val selectedGameState = upperGameState0.withCellSelected(address)
+      lazy val selectedGameState = tapUiGameState0.withCellSelected(address)
 
       it("- select _something_") {
         selectedGameState.hasAnyCellSelected shouldBe true
@@ -38,7 +38,7 @@ class TapUiGameStateTest extends AnyFunSpec {
     }
 
     describe("withNoSelection should:") {
-      lazy val selectedGameState = upperGameState0.withCellSelected(address)
+      lazy val selectedGameState = tapUiGameState0.withCellSelected(address)
       lazy val deselectedGameState = selectedGameState.withNoSelection
 
       it("- deselect (anything)") {

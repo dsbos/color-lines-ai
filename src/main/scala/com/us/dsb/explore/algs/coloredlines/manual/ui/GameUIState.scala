@@ -5,7 +5,7 @@ import com.us.dsb.explore.algs.coloredlines.manual.game._
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.{ColumnIndex, Index, RowIndex, columnIndices, rowIndices}
 
 // ?? somewhere expand to allow for history (maybe via Semigroup or whatever has .compose?)
-private[this] case class GameUIState(upperGameState: TapUiGameState,
+private[this] case class GameUIState(tapUiGameState: TapUiGameState,
                                      cursorAddress: CellAddress) {
 
   // ?? clean up that floorMod; I just want plain mathematical mod:
@@ -49,8 +49,8 @@ private[this] case class GameUIState(upperGameState: TapUiGameState,
       columnIndices.map { column =>
         val scanAddress = CellAddress(row, column)
         val cellStateStr =
-          upperGameState.gameState.getCellBallStateChar(upperGameState.gameState.board.getBallStateAt(scanAddress),
-                                                        upperGameState.isSelectedAt(scanAddress))
+          tapUiGameState.gameState.getCellBallStateChar(tapUiGameState.gameState.board.getBallStateAt(scanAddress),
+                                                        tapUiGameState.isSelectedAt(scanAddress))
         if (scanAddress == cursorAddress ) {
           "*" + cellStateStr + "*"
         }
@@ -64,11 +64,11 @@ private[this] case class GameUIState(upperGameState: TapUiGameState,
 
   private[ui] def toDisplayString: String = {
     val onDeckList =
-      upperGameState.gameState.board.getOnDeckBalls.map(_.getColoredCharSeq(false)).mkString(", ")
+      tapUiGameState.gameState.board.getOnDeckBalls.map(_.getColoredCharSeq(false)).mkString(", ")
 
     renderTableMultilineWithSelection + "\n" +
         s"Next: $onDeckList" +
-        s"  Score: ${upperGameState.gameState.getScore}" +
+        s"  Score: ${tapUiGameState.gameState.getScore}" +
         s"  Marking cursor: <row ${cursorAddress.row} / column ${cursorAddress.column}>"
   }
 
