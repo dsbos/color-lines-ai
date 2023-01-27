@@ -52,7 +52,7 @@ class XxTextIOTest extends AnyFunSpec {
 
         consoleIODouble.getPrintedStrings
       }
-      it("Xxinclude given text") {
+      it("include given text") {
         printedStrings.loneElement should include ("text")
       }
       it("Xxnot include color/decoration escape sequences") {
