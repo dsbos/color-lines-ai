@@ -5,7 +5,7 @@ private[manual] case class CellAddress(row: RowIndex, column: ColumnIndex)
 
 private[manual] object CellAddress {
 
-  /** (Indexes, not offsets) */
+  /** Constructs cell address from raw index integers (not offsets). */
   private[manual] def fromRaw(rawRowIndex: Int, rawColumnIndex: Int) =
     CellAddress(RowIndex(Index.unsafeFrom(rawRowIndex)),
                 ColumnIndex(Index.unsafeFrom(rawColumnIndex)))
