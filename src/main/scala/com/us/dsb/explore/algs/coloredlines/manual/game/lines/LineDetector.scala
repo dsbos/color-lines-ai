@@ -1,15 +1,16 @@
 package com.us.dsb.explore.algs.coloredlines.manual.game.lines
 
-import com.us.dsb.explore.algs.coloredlines.manual.game.board.{BallColor, Board, BoardOrder, CellAddress, LineOrder, LowerGameState}
-import com.us.dsb.explore.algs.coloredlines.manual.game.GameLogicSupport.BallArrivalResult
+import com.us.dsb.explore.algs.coloredlines.manual.game.board.{
+  BallColor, Board, BoardOrder, CellAddress, LineOrder, LowerGameState}
 
-//???? TODO:  reduce repeated passing of board, ball color, etc.; maybe make
+// ?? TODO:  reduce repeated passing of board, ball color, etc.; maybe make
 // LineDetector a class, to be instantiated for each move; or make local class
 // for passing (but leave external-client interface same)
-object LineDetector {
+private[game] object LineDetector {
 
+  // ?? TODO:  Maybe make refined type for deltas? (check use w/relativeDirectionFactors):
   private[lines] case class LineAxis(labelArray: String,
-                                     rowDelta: Int, // -1 / 0 / 1 (Make refined type?)
+                                     rowDelta: Int, // -1 / 0 / 1
                                      colDelta: Int)
 
   private[this] val lineAxes =
@@ -100,6 +101,18 @@ object LineDetector {
         lineRemovedGameState
       }
     linesRemovedGameState
+  }
+
+  /**
+   * @param gameState
+   *   updated game state
+   * @param anyRemovals
+   *   whether any lines reaped (re placing on-deck balls)
+   */
+  private[game] case class BallArrivalResult(gameState: LowerGameState,
+                                             anyRemovals: Boolean)
+  {
+    println(s"* $this")
   }
 
   /** Reaps any complete lines from just-placed ball.

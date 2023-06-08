@@ -1,8 +1,9 @@
 package com.us.dsb.explore.algs.coloredlines.manual.game
 
 import cats.syntax.option._
-import com.us.dsb.explore.algs.coloredlines.manual.game.board.{BallColor, BoardOrder, LowerGameState, Board, CellAddress, columnIndices, rowIndices}
+import com.us.dsb.explore.algs.coloredlines.manual.game.board.{BallColor, Board, BoardOrder, CellAddress, LowerGameState, columnIndices, rowIndices}
 import com.us.dsb.explore.algs.coloredlines.manual.game.lines.LineDetector
+import com.us.dsb.explore.algs.coloredlines.manual.game.lines.LineDetector.BallArrivalResult
 
 import java.util
 import scala.annotation.tailrec
@@ -31,12 +32,6 @@ object GameLogicSupport {
       else
         pickRandomEmptyCell(gameState) // loop: try again
     }
-  }
-
-  case class BallArrivalResult(gameState: LowerGameState,
-                               anyRemovals: Boolean)
-  {
-    println(s"* $this")
   }
 
   private[this] def replenishOnDeckBalls(board: Board)(implicit rng: Random): Board =
