@@ -19,7 +19,7 @@ import Board._
  * Core state of board (just cells and on-deck balls; e.g.; no score, tap-UI selection).
  */
 private[game] class Board(private[this] val cellStates: Vector[CellBallState],
-                          private[this] val onDeck: Iterable[BallColor]
+                          private[this] val onDeckBalls: Iterable[BallColor]
                          ) {
   //println("* Board:   " + this)
   //print("")
@@ -27,8 +27,8 @@ private[game] class Board(private[this] val cellStates: Vector[CellBallState],
   // internal/support methods:
 
   private[this] def copy(cellStates: Vector[CellBallState] = cellStates,
-                         onDeck: Iterable[BallColor]       = onDeck) =
-    new Board(cellStates, onDeck)
+                         onDeckBalls: Iterable[BallColor]  = onDeckBalls) =
+    new Board(cellStates, onDeckBalls)
 
   /** Computes row-major cell-array index from row and column numbers. */
   private[this] def vectorIndex(address: CellAddress): Int =
@@ -36,10 +36,10 @@ private[game] class Board(private[this] val cellStates: Vector[CellBallState],
 
   // on-deck balls:
 
-  private[manual] def getOnDeckBalls: Iterable[BallColor] = onDeck
+  private[manual] def getOnDeckBalls: Iterable[BallColor] = onDeckBalls
 
   private[game] def withOnDeckBalls(newBalls: Iterable[BallColor]): Board =
-    copy(onDeck = newBalls)
+    copy(onDeckBalls = newBalls)
 
   // grid balls, getting:
 

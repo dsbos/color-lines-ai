@@ -64,7 +64,9 @@ private[this] case class GameUIState(tapUiGameState: TapUiGameState,
 
   private[ui] def toDisplayString: String = {
     val onDeckList =
-      tapUiGameState.gameState.board.getOnDeckBalls.map(_.getColoredCharSeq(false)).mkString(", ")
+      tapUiGameState.gameState.board.getOnDeckBalls
+          .map(_.getColoredCharSeq(background = false))
+          .mkString(", ")
 
     renderTableMultilineWithSelection + "\n" +
         s"Next: $onDeckList" +
