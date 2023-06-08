@@ -58,7 +58,7 @@ private[manual] case class TapUiGameState(gameState: LowerGameState,
   //  game history
   private[manual] def tryMoveAt(tapAddress: CellAddress): Either[String, TapUiGameState] = {
     //????? test
-    import GameLogicSupport.Action._
+    import GameLogicSupport.TapAction._
     val tapAction = GameLogicSupport.interpretTapLocationToTapAction(this, tapAddress)
     println("tryMoveAt: tapAction = " + tapAction)
     val postMoveState: TapUiGameState =

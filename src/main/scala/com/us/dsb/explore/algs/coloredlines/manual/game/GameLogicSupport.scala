@@ -60,18 +60,30 @@ object GameLogicSupport {
     postPlacementsResult.copy(gameState = postPlacementsResult.gameState.withBoard(replenishedOnDeckBoard))
   }
 
-  private[game] sealed trait Action
-  private[game] object Action {
-    private[game] case object SelectBall  extends Action
-    private[game] case object SelectEmpty extends Action
-    private[game] case object Deselect    extends Action
-    private[game] case object TryMoveBall extends Action  //???? should this capture, carry coords?
-    private[game] case object Pass        extends Action
+  /** Interpreted meaning/command of a (virtual) tap on a board cell. */
+  private[game] sealed trait TapAction
+
+  private[game] object TapAction {
+
+    /** Select tapped-on cell that has ball. */
+    private[game] case object SelectBall  extends TapAction
+
+    /** Select tapped-on cell that is empty. */
+    private[game] case object SelectEmpty extends TapAction
+
+    /** Cancel selection. */
+    private[game] case object Deselect    extends TapAction
+
+    /** (Try to) move ball from selected cell to tapped-on empty cell (if open path). */
+    private[game] case object TryMoveBall extends TapAction  //???? should this capture, carry coords?
+
+    /** Pass (move nothing, get more balls placed). */
+    private[game] case object Pass        extends TapAction
   }
-  import Action._
+  import TapAction._
 
   def interpretTapLocationToTapAction(tapUiState: TapUiGameState,
-                                      address: CellAddress): Action =
+                                      address: CellAddress): TapAction =
     tapAndStateToTapAction(onABall            = tapUiState.gameState.board.hasABallAt(address),
                            isSelectedAt       = tapUiState.isSelectedAt(address),
                            hasABallSelected   = tapUiState.hasABallSelected,
@@ -81,7 +93,7 @@ object GameLogicSupport {
                                      isSelectedAt: Boolean,
                                      hasABallSelected: Boolean,
                                      hasAnyCellSelected: Boolean
-                                    ): Action = {
+                                    ): TapAction = {
     object RenameOrFlattenThis { // grouped/nested re debugger clutter
       sealed trait OnBallOrEmpty
       case object OnBall extends OnBallOrEmpty
@@ -106,7 +118,7 @@ object GameLogicSupport {
     val hadBallOrNot  = if (hasABallSelected)   HadBall else NoBall
     val hadSelOrNot   = if (hasAnyCellSelected) HadSel  else NoSel
 
-    val action: Action = {
+    val action: TapAction = {
       val conditions = (onBallOrEmpty, hadBallOrNot, onSelOrUnsel, hadSelOrNot)
       conditions match {
         case (OnBall,  _,       OnUnsel, _     ) => SelectBall  // - tap on ball  when unselected
