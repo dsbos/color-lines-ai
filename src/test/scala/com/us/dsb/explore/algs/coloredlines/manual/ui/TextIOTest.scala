@@ -15,7 +15,7 @@ class XxTextIOTest extends AnyFunSpec {
   }
 
   // Crude, manual stub and spy ConsoleIO.
-  class ConsoleIODouble(inputLines: String*) extends ConsoleIO {
+  class GenericConsoleIODouble(inputLines: String*) extends GenericConsoleIO {
     private[this] var remainingInputs = inputLines
     private[this] var printedStringsReversed: List[String] = Nil;
     def getPrintedStrings: List[String] = printedStringsReversed.reverse
@@ -37,7 +37,7 @@ class XxTextIOTest extends AnyFunSpec {
   describe("ColoredConsoleTextIO") {
     import org.scalatest.LoneElement._
 
-    def getUUT(consoleIODouble: ConsoleIO): SegregatedTextIO = {
+    def getUUT(consoleIODouble: GenericConsoleIO): SegregatedTextIO = {
       // Demo:  Try injecting "bad" UUT and see how failing conditions show up:
       new ColoredConsoleTextIO(consoleIODouble)
       //new PlainConsoleTextIO(consoleIODouble)
@@ -45,7 +45,7 @@ class XxTextIOTest extends AnyFunSpec {
 
     describe("XxprintStateText should print given text plainly; output should:") {
       lazy val printedStrings = {
-        val consoleIODouble = new ConsoleIODouble
+        val consoleIODouble = new GenericConsoleIODouble
         val uut = getUUT(consoleIODouble)
 
         uut.printStateText("text")
@@ -67,7 +67,7 @@ class XxTextIOTest extends AnyFunSpec {
     describe("XxprintError should print given text in red; output should:") {
       // Note:  "lazy" avoids executing during ScalaTest's registration phase.
       lazy val printedStrings = {
-        val consoleIODouble = new ConsoleIODouble
+        val consoleIODouble = new GenericConsoleIODouble
         val uut = getUUT(consoleIODouble)
 
         uut.printError("given text")
@@ -90,7 +90,7 @@ class XxTextIOTest extends AnyFunSpec {
 
     // Demo:  checking subconditions with "should ... and ..." (in one test):
     it("XxprintResult should print given text in bold (should ... and ...)") {
-      val consoleIODouble = new ConsoleIODouble
+      val consoleIODouble = new GenericConsoleIODouble
       val uut = getUUT(consoleIODouble)
 
       uut.printResult("given text")
@@ -107,7 +107,7 @@ class XxTextIOTest extends AnyFunSpec {
 
     describe("readPromptedLine should print given prompt value and get input") {
       lazy val (printedStrings, lineReadOpt) = {
-        val consoleIODouble = new ConsoleIODouble("given input")
+        val consoleIODouble = new GenericConsoleIODouble("given input")
         val uut = getUUT(consoleIODouble)
 
         val lineReadOpt = uut.readPromptedLine("given text")
