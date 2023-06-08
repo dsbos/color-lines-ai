@@ -58,7 +58,7 @@ private[manual] object GameUI {
   }
 
   @tailrec
-  private[this] def getCommand(io: SegregatedTextIO): UICommand = {
+  private[this] def getCommand(io: SegregatedConsoleIO): UICommand = {
     val cmdLineOpt = io.readPromptedLine(s"Command?: ")
     parseCommand(cmdLineOpt) match {
       case Right(cmd) => cmd
@@ -82,7 +82,7 @@ private[manual] object GameUI {
     }
   }
 
-  private[this] def moveAtSelection(io: SegregatedTextIO,
+  private[this] def moveAtSelection(io: SegregatedConsoleIO,
                                     uiState: GameUIState
                                    ): GameUIState = {
     //????? test
@@ -106,7 +106,7 @@ private[manual] object GameUI {
    *
    * @return next state (`Right`) or disposition of game (`Left`)
    */
-  private[this] def doCommand(io: SegregatedTextIO,
+  private[this] def doCommand(io: SegregatedConsoleIO,
                               uiState: GameUIState,
                               command: UICommand
                              ): Either[GameUIResult, GameUIState] = {
@@ -140,7 +140,7 @@ private[manual] object GameUI {
    * game over or quit.
    */
   @tailrec
-  private[this] def getAndDoUiCommands(io: SegregatedTextIO,
+  private[this] def getAndDoUiCommands(io: SegregatedConsoleIO,
                                        uiState: GameUIState
                                       ): GameUIResult = {
     io.printStateText("")
@@ -152,7 +152,7 @@ private[manual] object GameUI {
         //????? test
         getAndDoUiCommands(io, nextState) // "recurse" to loop
       case Left(uiResult)  =>
-        io.printResult(uiResult)
+        io.printResult(uiResult.text)
         uiResult
     }
   }
@@ -161,10 +161,10 @@ private[manual] object GameUI {
   //   all around); but think about currently pure methods vs. using IO member)
 
   // ??? add more GameUI tests:
-  // - 1:  driving from outside to normal insides--do more: checking SegregatedTextIO output
+  // - 1:  driving from outside to normal insides--do more: checking SegregatedConsoleIO output
   // - 2:  driving from outside to special GameState (inject; test double; spy/reporter/?)
 
-  def runGame(io: SegregatedTextIO): GameUIResult = {
+  def runGame(io: SegregatedConsoleIO): GameUIResult = {
     val initialState =
       GameUIState(tapUiGameState = TapUiGameState.initial(),
                   cursorAddress  = CellAddress.fromRaw(1, 1))

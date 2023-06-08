@@ -37,9 +37,9 @@ class XxTextIOTest extends AnyFunSpec {
   describe("ColoredConsoleTextIO") {
     import org.scalatest.LoneElement._
 
-    def getUUT(consoleIODouble: GenericConsoleIO): SegregatedTextIO = {
+    def getUUT(consoleIODouble: GenericConsoleIO): SegregatedConsoleIO = {
       // Demo:  Try injecting "bad" UUT and see how failing conditions show up:
-      new ColoredConsoleTextIO(consoleIODouble)
+      new ColoredSegregatedConsoleIO(consoleIODouble)
       //new PlainConsoleTextIO(consoleIODouble)
     }
 

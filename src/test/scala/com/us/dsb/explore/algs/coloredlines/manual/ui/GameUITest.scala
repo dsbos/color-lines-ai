@@ -8,7 +8,7 @@ import org.scalatest.matchers.should.Matchers._
 class GameUITest extends AnyFunSpec {
 
   // Crude, manual stub and spy SegregatedTextIO.
-  class SegregatedTextIODouble(inputLines: String*) extends SegregatedTextIO {
+  class SegregatedConsoleIODouble(inputLines: String*) extends SegregatedConsoleIO {
     private[this] var remainingInputs = inputLines
     private[this] var printedStringsReversed: List[String] = Nil
     // (no tracking of via which method wrote string)
@@ -87,7 +87,7 @@ class GameUITest extends AnyFunSpec {
 
   describe("runGame, just end to end (commands to game result):") {
     def runViaStrings(inputs: String*): String =
-      GameUI.runGame(new SegregatedTextIODouble(inputs: _*)).text
+      GameUI.runGame(new SegregatedConsoleIODouble(inputs: _*)).text
     def runViaChars(inputChars: String): String =
       runViaStrings(inputChars.map("" + _): _*)
 
