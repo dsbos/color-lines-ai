@@ -18,7 +18,7 @@ class LowerGameStateTest extends AnyFunSpec {
       }
     }
     it("- with empty board--empty on-deck list") {
-      assert(gameState.board.getOnDeckBalls.isEmpty)
+      assert(gameState.board.getOndeckBalls.isEmpty)
     }
   }
 

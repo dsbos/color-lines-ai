@@ -129,11 +129,11 @@ object GameLogicSupport {
     action
   }
 
-  private[this] def placeNextBalls(gameState: LowerGameState)(implicit rng: Random): BallArrivalResult = {
+  private[this] def placeOndeckBalls(gameState: LowerGameState)(implicit rng: Random): BallArrivalResult = {
     val postPlacementResult =
       //???? for 1 to 3, consume on-deck ball from list, and then place (better for internal state view);;
       // can replenish incrementally or later; later might show up better in internal state view
-      gameState.board.getOnDeckBalls
+      gameState.board.getOndeckBalls
         .foldLeft(BallArrivalResult(gameState, anyRemovals = false)) {
           case (curMoveResult, onDeckBall) =>
             pickRandomEmptyCell(curMoveResult.gameState) match {
@@ -144,7 +144,7 @@ object GameLogicSupport {
                   val curBoard = curMoveResult.gameState.board
                   val postDequeueBoard =
                     curBoard
-                        .withOnDeckBalls(curBoard.getOnDeckBalls.tail)
+                        .withOnDeckBalls(curBoard.getOndeckBalls.tail)
                         .withBallAt(address, onDeckBall)
                   val postDeueueGameState = curMoveResult.gameState.withBoard(postDequeueBoard)
                   postDeueueGameState
@@ -157,7 +157,7 @@ object GameLogicSupport {
     postPlacementResult.copy(gameState = postPlacementResult.gameState.withBoard(replenishedOnDeckBoard))}
 
   private[game] def doPass(gameState: LowerGameState)(implicit rng: Random): BallArrivalResult =
-    placeNextBalls(gameState)
+    placeOndeckBalls(gameState)
 
   //???: likely move core algorithm out; possibly move outer code into LowerGameState/Board:
   /**
@@ -241,7 +241,7 @@ object GameLogicSupport {
         val postReapingResult = LineDetector.reapAnyLines(postMoveBoard, to)
         val postPostReadingResult =
           if (! postReapingResult.anyRemovals)
-            placeNextBalls(postReapingResult.gameState)
+            placeOndeckBalls(postReapingResult.gameState)
           else
             postReapingResult
         MoveBallResult(postPostReadingResult.gameState, clearSelection = true)

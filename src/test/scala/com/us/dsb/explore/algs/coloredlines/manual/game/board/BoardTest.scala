@@ -41,7 +41,7 @@ class BoardTest extends AnyFunSpec {
       }
     }
     it("- with empty on-deck list") {
-      assert(board.getOnDeckBalls.isEmpty)
+      assert(board.getOndeckBalls.isEmpty)
     }
   }
 

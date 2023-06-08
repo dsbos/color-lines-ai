@@ -19,7 +19,7 @@ import Board._
  * Core state of board (just cells and on-deck balls; e.g.; no score, tap-UI selection).
  */
 private[game] class Board(private[this] val cellStates: Vector[CellBallState],
-                          private[this] val onDeckBalls: Iterable[BallColor]
+                          private[this] val ondeckBalls: Iterable[BallColor]
                          ) {
   //println("* Board:   " + this)
   //print("")
@@ -27,8 +27,8 @@ private[game] class Board(private[this] val cellStates: Vector[CellBallState],
   // internal/support methods:
 
   private[this] def copy(cellStates: Vector[CellBallState] = cellStates,
-                         onDeckBalls: Iterable[BallColor]  = onDeckBalls) =
-    new Board(cellStates, onDeckBalls)
+                         ondeckBalls: Iterable[BallColor]  = ondeckBalls) =
+    new Board(cellStates, ondeckBalls)
 
   /** Computes row-major cell-array index from row and column numbers. */
   private[this] def vectorIndex(address: CellAddress): Int =
@@ -36,10 +36,10 @@ private[game] class Board(private[this] val cellStates: Vector[CellBallState],
 
   // on-deck balls:
 
-  private[manual] def getOnDeckBalls: Iterable[BallColor] = onDeckBalls
+  private[manual] def getOndeckBalls: Iterable[BallColor] = ondeckBalls
 
   private[game] def withOnDeckBalls(newBalls: Iterable[BallColor]): Board =
-    copy(onDeckBalls = newBalls)
+    copy(ondeckBalls = newBalls)
 
   // grid balls, getting:
 
@@ -76,7 +76,7 @@ private[game] class Board(private[this] val cellStates: Vector[CellBallState],
             getCellBallStateAt(addr).ballState.fold("-")(_.initial)
           }.mkString("")
         }.mkString("/") +
-        " + " + getOnDeckBalls.map(_.initial).mkString("(", ", ", ")") +
+        " + " + getOndeckBalls.map(_.initial).mkString("(", ", ", ")") +
         ">"
   }
 

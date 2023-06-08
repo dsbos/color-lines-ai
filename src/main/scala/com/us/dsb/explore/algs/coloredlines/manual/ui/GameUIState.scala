@@ -63,13 +63,13 @@ private[this] case class GameUIState(tapUiGameState: TapUiGameState,
   }
 
   private[ui] def toDisplayString: String = {
-    val onDeckList =
-      tapUiGameState.gameState.board.getOnDeckBalls
+    val ondeckList =
+      tapUiGameState.gameState.board.getOndeckBalls
           .map(_.getColoredCharSeq(background = false))
           .mkString(", ")
 
     renderTableMultilineWithSelection + "\n" +
-        s"Next: $onDeckList" +
+        s"Next: $ondeckList" +
         s"  Score: ${tapUiGameState.gameState.getScore}" +
         s"  Marking cursor: <row ${cursorAddress.row} / column ${cursorAddress.column}>"
   }
