@@ -1,3 +1,5 @@
+// ?????? TODO:  Move out of package "game" (for abstract game) to UI package,
+// OR at least move selectionAddress address part out:
 package com.us.dsb.explore.algs.coloredlines.manual.game
 
 import cats.syntax.either._
@@ -6,8 +8,11 @@ import com.us.dsb.explore.algs.coloredlines.manual.game.board.LowerGameState
 
 import scala.util.Random
 
+// ??????? TODO: Possibly name with "virtual"/"net"/"abstract"/etc.
+
 private[manual] object TapUiGameState {
 
+  // ?????? TODO:  Probably purge. (Not used used.):
   /**
    * Result of completed game.
    */
@@ -42,22 +47,25 @@ private[manual] case class TapUiGameState(gameState: LowerGameState,
   private[manual] def withNoSelection: TapUiGameState =
     copy(selectionAddress = None)
 
-  private[manual/*game*/] def hasAnyCellSelected: Boolean = selectionAddress.isDefined
-  private[manual/*game*/] def getSelectionCoordinates: Option[CellAddress] = selectionAddress
+  private[manual/*game*/] def hasAnyCellSelected: Boolean =
+    selectionAddress.isDefined
+
+  private[manual/*game*/] def getSelectionCoordinates: Option[CellAddress] =
+    selectionAddress
+
   private[manual] def isSelectedAt(address: CellAddress): Boolean =
     selectionAddress.fold(false)(_ == address)
 
   private[game] def hasABallSelected: Boolean =
     selectionAddress.fold(false)(gameState.board.hasABallAt(_))
 
-  //????? Probably move to GameLogicSupport
-
   // ?? later refine from Either[String, ...] to "fancier" error type
   // Xx?? maybe add result of move (win/draw/other) with new state (so caller
   //  doesn't have to check state's gameResult; also, think about where I'd add
   //  game history
+  // ?????? TODO: Rename; maybe "move" to "... tap move ..."?
   private[manual] def tryMoveAt(tapAddress: CellAddress): Either[String, TapUiGameState] = {
-    //????? test
+    //???? test
     import GameLogicSupport.TapAction._
     val tapAction = GameLogicSupport.interpretTapLocationToTapAction(this, tapAddress)
     println("tryMoveAt: tapAction = " + tapAction)

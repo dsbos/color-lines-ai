@@ -1,9 +1,11 @@
 package com.us.dsb.explore.algs.coloredlines.manual.game.board
 
 
+// ?? TODO:  Revisit having companion object before class:
 private[game] object Board {
 
-  /** Empty or ball of some color. */
+  // ???? TODO:  Maybe collapse possibly excessive layer/wrapping here:
+  /** State of a cell--empty or ball of some color. */
   private[Board] case class CellBallState(ballState: Option[BallColor])
   private[Board] object CellBallState {
     private[Board] val empty: CellBallState = CellBallState(None)
@@ -43,11 +45,11 @@ private[game] class Board(private[this] val cellStates: Vector[CellBallState],
 
   // grid balls, getting:
 
+  // ???? TODO:  Maybe collapse possibly excessive layer/wrapping here:
   private[manual] def getCellBallStateAt(address: CellAddress): CellBallState =
     cellStates(vectorIndex(address))
-
   private[manual] def getBallStateAt(address: CellAddress): Option[BallColor] =
-    cellStates(vectorIndex(address)).ballState
+    getCellBallStateAt(address).ballState
 
   private[game] def hasABallAt(address: CellAddress): Boolean =
     cellStates(vectorIndex(address)).ballState.isDefined

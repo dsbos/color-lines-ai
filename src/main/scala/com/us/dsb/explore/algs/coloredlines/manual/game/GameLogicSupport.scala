@@ -1,7 +1,8 @@
 package com.us.dsb.explore.algs.coloredlines.manual.game
 
 import cats.syntax.option._
-import com.us.dsb.explore.algs.coloredlines.manual.game.board.{BallColor, Board, BoardOrder, CellAddress, LowerGameState, columnIndices, rowIndices}
+import com.us.dsb.explore.algs.coloredlines.manual.game.board.{
+  BallColor, Board, BoardOrder, CellAddress, LowerGameState, columnIndices, rowIndices}
 import com.us.dsb.explore.algs.coloredlines.manual.game.lines.LineDetector
 import com.us.dsb.explore.algs.coloredlines.manual.game.lines.LineDetector.BallArrivalResult
 
@@ -19,9 +20,11 @@ object GameLogicSupport {
   private[game] def pickRandomBallColor()(implicit rng: Random): BallColor =
     BallColor.values(rng.nextInt(2 /*???BallKind.values.size*/))
 
+  /** Selects an empty cell randomly (if any). */
   // (was "private[this]" before test calls:)
   @tailrec
-  private[game] def pickRandomEmptyCell(gameState: LowerGameState)(implicit rng: Random): Option[CellAddress] = {
+  private[game] def pickRandomEmptyCell(gameState: LowerGameState)
+                                       (implicit rng: Random): Option[CellAddress] = {
     if (gameState.board.isFull)
       None
     else {
@@ -41,7 +44,8 @@ object GameLogicSupport {
    * @param gameState
    *   expected to be empty //???? maybe refactor something?
    */
-  private[game] def placeInitialBalls(gameState: LowerGameState)(implicit rng: Random): BallArrivalResult = {
+  private[game] def placeInitialBalls(gameState: LowerGameState)
+                                       (implicit rng: Random): BallArrivalResult = {
     val postPlacementsResult =
       (1 to InitialBallCount).foldLeft(BallArrivalResult(gameState, anyRemovals = false)) {
         case (resultSoFar, _) =>
@@ -55,6 +59,9 @@ object GameLogicSupport {
     val replenishedOnDeckBoard = replenishOnDeckBalls(postPlacementsResult.gameState.board)
     postPlacementsResult.copy(gameState = postPlacementsResult.gameState.withBoard(replenishedOnDeckBoard))
   }
+
+  // ?????? TODO:  Clean: Separate tap-IO--level code from general GameLogicSupport.
+  //  NOTE anything with selection (core actions are just moving ball or passing)
 
   /** Interpreted meaning/command of a (virtual) tap on a board cell. */
   private[game] sealed trait TapAction
@@ -92,20 +99,20 @@ object GameLogicSupport {
                                     ): TapAction = {
     object RenameOrFlattenThis { // grouped/nested re debugger clutter
       sealed trait OnBallOrEmpty
-      case object OnBall extends OnBallOrEmpty
+      case object OnBall  extends OnBallOrEmpty
       case object OnEmpty extends OnBallOrEmpty
 
       sealed trait OnSelOrUnsel
-      case object OnSel extends OnSelOrUnsel
+      case object OnSel   extends OnSelOrUnsel
       case object OnUnsel extends OnSelOrUnsel
 
       sealed trait HadBallOrNot
       case object HadBall extends HadBallOrNot
-      case object NoBall extends HadBallOrNot
+      case object NoBall  extends HadBallOrNot
 
       sealed trait HadSelOrNot
       case object HadSel extends HadSelOrNot
-      case object NoSel extends HadSelOrNot
+      case object NoSel  extends HadSelOrNot
     }
     import RenameOrFlattenThis._
 
@@ -129,7 +136,8 @@ object GameLogicSupport {
     action
   }
 
-  private[this] def placeOndeckBalls(gameState: LowerGameState)(implicit rng: Random): BallArrivalResult = {
+  private[this] def placeOndeckBalls(gameState: LowerGameState)
+                                    (implicit rng: Random): BallArrivalResult = {
     val postPlacementResult =
       //???? for 1 to 3, consume on-deck ball from list, and then place (better for internal state view);;
       // can replenish incrementally or later; later might show up better in internal state view
@@ -146,8 +154,8 @@ object GameLogicSupport {
                     curBoard
                         .withOnDeckBalls(curBoard.getOndeckBalls.tail)
                         .withBallAt(address, onDeckBall)
-                  val postDeueueGameState = curMoveResult.gameState.withBoard(postDequeueBoard)
-                  postDeueueGameState
+                  val postDequeueGameState = curMoveResult.gameState.withBoard(postDequeueBoard)
+                  postDequeueGameState
                 }
                 LineDetector.reapAnyLines(postPlacementGameState, address)
             }
@@ -156,7 +164,8 @@ object GameLogicSupport {
     val replenishedOnDeckBoard = replenishOnDeckBalls(postPlacementResult.gameState.board)
     postPlacementResult.copy(gameState = postPlacementResult.gameState.withBoard(replenishedOnDeckBoard))}
 
-  private[game] def doPass(gameState: LowerGameState)(implicit rng: Random): BallArrivalResult =
+  private[game] def doPass(gameState: LowerGameState)
+                          (implicit rng: Random): BallArrivalResult =
     placeOndeckBalls(gameState)
 
   //???: likely move core algorithm out; possibly move outer code into LowerGameState/Board:
@@ -215,6 +224,8 @@ object GameLogicSupport {
     loop
   }
 
+  // ?????? TODO:  move to (virtual) tap UI class/package:
+  // ???? TODO:  Maybe rename with "try"/"attempt":
   case class MoveBallResult(gameState: LowerGameState,
                             clearSelection: Boolean)
   {

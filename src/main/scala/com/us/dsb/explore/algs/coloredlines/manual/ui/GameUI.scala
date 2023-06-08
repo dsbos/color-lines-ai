@@ -1,3 +1,5 @@
+// ???? TODO:  Rename to reflect text control (and virtual tap level), probably
+//  (eventually) splitting virtual tap level vs. text-control level:
 package com.us.dsb.explore.algs.coloredlines.manual.ui
 
 import cats.syntax.option._
@@ -10,7 +12,8 @@ import enumeratum.{Enum, EnumEntry}
 import scala.annotation.tailrec
 import scala.util.chaining.scalaUtilChainingOps
 
-/** TTT UI controller. */
+// ???? TODO:  Rename to reflect text control (and virtual tap level):
+/** Lines game text-controlled virtual-tap UI controller. */
 private[manual] object GameUI {
 
   // ?? enhance; maybe just put clean strings in; maybe build on GameResult (plus quit case)
@@ -20,11 +23,15 @@ private[manual] object GameUI {
   // ("extends EnumEntry" gets .entryName, enables Enum; "extends Enum[...]"
   // enables (and requires) .values.
 
+  // ???? TODO:  Rename to reflect selection-based tap ~simulation (TextTapUiCommand?):
   private[ui] sealed trait UICommand
   private[ui] object UICommand {
     // (Q: Why doesn't UICommand's "sealed" obviate the following one (for
     //   exhaustive-match checks)?
+    // ?????? TODO:  Clarify moving _selection_, not _ball_:
     private[ui] sealed trait UIMoveCommand extends UICommand
+    // ?????? TODO:  Clean names (e.g., different "move" in UIMoveCommand vs. Move).
+    //  maybe GoUp/SelectUp/MoveSelectionUp/SelectUp/PrevRow; Move -> MoveBall?
     //????? test (use (drive with) commands)
     private[ui] case object Up    extends UIMoveCommand
     private[ui] case object Down  extends UIMoveCommand
@@ -82,6 +89,7 @@ private[manual] object GameUI {
     }
   }
 
+  // ?????? TODO: maybe "move ball at selection" (vs. "make move at ...")?
   private[this] def moveAtSelection(io: SegregatedConsoleIO,
                                     uiState: GameUIState
                                    ): GameUIState = {
@@ -157,7 +165,7 @@ private[manual] object GameUI {
     }
   }
 
-  // ??? soon, probably create class XxGameUI to hold NameThisIO (to avoid passing
+  // ??? soon, probably create class GameUI to hold NameThisIO (to avoid passing
   //   all around); but think about currently pure methods vs. using IO member)
 
   // ??? add more GameUI tests:

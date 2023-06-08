@@ -2,7 +2,11 @@ package com.us.dsb.explore.algs.coloredlines.manual.ui
 
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.CellAddress
 import com.us.dsb.explore.algs.coloredlines.manual.game._
-import com.us.dsb.explore.algs.coloredlines.manual.game.board.{ColumnIndex, Index, RowIndex, columnIndices, rowIndices}
+import com.us.dsb.explore.algs.coloredlines.manual.game.board.{
+  ColumnIndex, Index, RowIndex, columnIndices, rowIndices}
+
+// ??????? TODO: Clarify names (e.g., GameUIState vs. TapUiGameState)--
+//  virtual tap-level UI vs. text-controlled selection-based ~simulation of taps
 
 // ?? somewhere expand to allow for history (maybe via Semigroup or whatever has .compose?)
 private[this] case class GameUIState(tapUiGameState: TapUiGameState,
@@ -26,6 +30,7 @@ private[this] case class GameUIState(tapUiGameState: TapUiGameState,
   //   our cursor-based row/column specification; what would GUI use, just
   //   9 table-level IDs tied to GUI cells/buttons?);
 
+  // ???? TODO:  "adjusted"? "offset"?
   private[ui] def withRowAdjustedBy(delta: Int): GameUIState = {
     val adjustedRow = RowIndex(adjustAndWrapToRange(cursorAddress.row.value, delta))
     copy(cursorAddress = cursorAddress.copy(row = adjustedRow))
@@ -65,7 +70,7 @@ private[this] case class GameUIState(tapUiGameState: TapUiGameState,
   private[ui] def toDisplayString: String = {
     val ondeckList =
       tapUiGameState.gameState.board.getOndeckBalls
-          .map(_.getColoredCharSeq(background = false))
+          .map(_.getColoredCharSeq(forBackground = false))
           .mkString(", ")
 
     renderTableMultilineWithSelection + "\n" +

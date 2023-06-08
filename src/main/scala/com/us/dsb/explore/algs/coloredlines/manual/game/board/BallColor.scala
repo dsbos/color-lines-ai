@@ -4,12 +4,14 @@ import enumeratum.{Enum, EnumEntry}
 
 import scala.io.AnsiColor
 
+// ?? TODO: Clean?: mixes abstract ball color with UI-specific rendering:
+/** Ball color. */
 private[game] sealed class BallColor(private[manual] val initial: String,
                                      private[this] val setFgColorSeq: String,
                                      private[this] val setBgColorSeq: String
                                      ) extends EnumEntry {
-  private[manual] def getColoredCharSeq(background: Boolean): String =
-    (if (background) this.setBgColorSeq else this.setFgColorSeq) +
+  private[manual] def getColoredCharSeq(forBackground: Boolean): String =
+    (if (forBackground) this.setBgColorSeq else this.setFgColorSeq) +
         initial +
         AnsiColor.RESET
 }

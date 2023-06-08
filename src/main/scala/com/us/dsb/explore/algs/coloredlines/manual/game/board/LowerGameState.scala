@@ -2,7 +2,10 @@ package com.us.dsb.explore.algs.coloredlines.manual.game.board
 
 private[game] object LowerGameState {
 
-  private[game] def empty: LowerGameState = new LowerGameState(Board.empty, 0)
+  // ?????? TODO:  Probably rename "empty" -> "initial" (zero score isn't "empty")
+  //  (BUT check "just board?" comments):
+  private[game] def empty: LowerGameState =
+    new LowerGameState(Board.empty, score = 0)
 }
 
 /**
@@ -28,6 +31,7 @@ private[game] class LowerGameState(private[manual] val board: Board,
     copy(board = board.withBallAt(address, ball))
   private[game] def withBoardWithNoBallAt(address: CellAddress): LowerGameState =
     copy(board = board.withNoBallAt(address))
+
   // (running/total) score:
 
   private[game] def withAddedScore(increment: Int): LowerGameState =
