@@ -11,6 +11,9 @@ import scala.util.Random
 
 object GameLogicSupport {
 
+  private[game] val InitialBallCount: Int = 5
+  private[game] val OnDeckBallCount: Int = 3
+
   // (was "private[this]" before test calls:)
   private[game] def pickRandomBallColor()(implicit rng: Random): BallColor =
     BallColor.values(rng.nextInt(2 /*???BallKind.values.size*/))
@@ -36,9 +39,8 @@ object GameLogicSupport {
     println(s"* $this")
   }
 
-  //???? parameterize
   private[this] def replenishOnDeckBalls(board: Board)(implicit rng: Random): Board =
-    board.withOnDeckBalls(List.fill(3)(pickRandomBallColor()))
+    board.withOnDeckBalls(List.fill(OnDeckBallCount)(pickRandomBallColor()))
 
   /**
    * @param gameState
@@ -46,8 +48,7 @@ object GameLogicSupport {
    */
   private[game] def placeInitialBalls(gameState: LowerGameState)(implicit rng: Random): BallArrivalResult = {
     val postPlacementsResult =
-      //???? parameterize:
-      (1 to 5).foldLeft(BallArrivalResult(gameState, anyRemovals = false)) {
+      (1 to InitialBallCount).foldLeft(BallArrivalResult(gameState, anyRemovals = false)) {
         case (resultSoFar, _) =>
           val address =
             pickRandomEmptyCell(resultSoFar.gameState).getOrElse(scala.sys.error("Unexpectedly full board"))
