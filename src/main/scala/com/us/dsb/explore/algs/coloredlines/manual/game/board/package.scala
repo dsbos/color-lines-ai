@@ -6,6 +6,7 @@ import io.estatico.newtype.macros.newtype
 
 package object board {
 
+  /** Order (linear size) of board. */
   private[this] type BoardOrder = 4 //???? 9
   private[game] val BoardOrder: BoardOrder = valueOf[BoardOrder]
 
@@ -15,7 +16,7 @@ package object board {
   private[this] type ColorOrder = 7 // original: blue.dark, blue.light, brown, green, purple, red, yellow
   private[this] val ColorOrder: ColorOrder = valueOf[ColorOrder]
 
-  /** board row or column index integer; 1-based; top row, left column row are #1. */
+  /** Board row or column index integer; 1-based; top row, left column row are #1. */
   private[manual] type Index = Int Refined Closed[1, BoardOrder]
 
   private[manual] object Index extends RefinedTypeOps.Numeric[Index, Int]

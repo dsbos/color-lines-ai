@@ -1,6 +1,6 @@
 package com.us.dsb.explore.algs.coloredlines.manual.game.lines
 
-import com.us.dsb.explore.algs.coloredlines.manual.game.board.{BallKind, Board, BoardOrder, CellAddress, LowerGameState}
+import com.us.dsb.explore.algs.coloredlines.manual.game.board.{BallColor, Board, BoardOrder, CellAddress, LowerGameState}
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.PrivateMethodTester
 import org.scalatest.funspec.AnyFunSpec
@@ -20,8 +20,8 @@ class LineDetectorTest extends AnyFunSpec {
   }
 
   describe("haveMatchingBallAt:") {
-    lazy val `R1/C1-only color` = BallKind.values(0)
-    lazy val `R2/C2-only color` = BallKind.values(1)
+    lazy val `R1/C1-only color` = BallColor.values(0)
+    lazy val `R2/C2-only color` = BallColor.values(1)
     lazy val sampleBoard =
       Board.empty
           .withBallAt(CellAddress.fromRaw(1, 1), `R1/C1-only color`)

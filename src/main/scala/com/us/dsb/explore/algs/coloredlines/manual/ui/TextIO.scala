@@ -6,7 +6,7 @@ import com.us.dsb.explore.algs.coloredlines.manual.ui.GameUI.GameUIResult
 // testing, ZIO, etc.
 private[ui] trait ConsoleIO {
   def println(lineOrLines: String): Unit
-  /** EOF -> None (instead of null) */
+  /** ; EOF returns None (instead of null) */
   def readLine(prompt: String): Option[String]
 }
 private[this] object LiveConsoleIO extends ConsoleIO {

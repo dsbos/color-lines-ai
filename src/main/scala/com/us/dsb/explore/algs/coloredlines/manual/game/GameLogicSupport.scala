@@ -1,7 +1,7 @@
 package com.us.dsb.explore.algs.coloredlines.manual.game
 
 import cats.syntax.option._
-import com.us.dsb.explore.algs.coloredlines.manual.game.board.{BallKind, BoardOrder, LowerGameState, Board, CellAddress, columnIndices, rowIndices}
+import com.us.dsb.explore.algs.coloredlines.manual.game.board.{BallColor, BoardOrder, LowerGameState, Board, CellAddress, columnIndices, rowIndices}
 import com.us.dsb.explore.algs.coloredlines.manual.game.lines.LineDetector
 
 import java.util
@@ -12,8 +12,8 @@ import scala.util.Random
 object GameLogicSupport {
 
   // (was "private[this]" before test calls:)
-  private[game] def pickRandomBallKind()(implicit rng: Random): BallKind =
-    BallKind.values(rng.nextInt(2 /*???BallKind.values.size*/))
+  private[game] def pickRandomBallColor()(implicit rng: Random): BallColor =
+    BallColor.values(rng.nextInt(2 /*???BallKind.values.size*/))
 
   // (was "private[this]" before test calls:)
   @tailrec
@@ -38,7 +38,7 @@ object GameLogicSupport {
 
   //???? parameterize
   private[this] def replenishOnDeckBalls(board: Board)(implicit rng: Random): Board =
-    board.withOnDeckBalls(List.fill(3)(pickRandomBallKind()))
+    board.withOnDeckBalls(List.fill(3)(pickRandomBallColor()))
 
   /**
    * @param gameState
@@ -52,7 +52,7 @@ object GameLogicSupport {
           val address =
             pickRandomEmptyCell(resultSoFar.gameState).getOrElse(scala.sys.error("Unexpectedly full board"))
           val postPlacementGameState =
-            resultSoFar.gameState.withBoardWithBallAt(address, pickRandomBallKind())
+            resultSoFar.gameState.withBoardWithBallAt(address, pickRandomBallColor())
           LineDetector.reapAnyLines(postPlacementGameState, address)
       }
 

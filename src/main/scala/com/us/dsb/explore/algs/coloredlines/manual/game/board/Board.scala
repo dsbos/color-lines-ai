@@ -4,7 +4,7 @@ package com.us.dsb.explore.algs.coloredlines.manual.game.board
 private[game] object Board {
 
   /** Empty or ball of some color. */
-  private[Board] case class CellBallState(ballState: Option[BallKind])
+  private[Board] case class CellBallState(ballState: Option[BallColor])
   private[Board] object CellBallState {
     private[Board] val empty: CellBallState = CellBallState(None)
   }
@@ -19,7 +19,7 @@ import Board._
  * Core state of board (just cells and on-deck balls; e.g.; no score, tap-UI selection).
  */
 private[game] class Board(private[this] val cellStates: Vector[CellBallState],
-                          private[this] val onDeck: Iterable[BallKind]
+                          private[this] val onDeck: Iterable[BallColor]
                          ) {
   //println("* Board:   " + this)
   //print("")
@@ -27,7 +27,7 @@ private[game] class Board(private[this] val cellStates: Vector[CellBallState],
   // internal/support methods:
 
   private[this] def copy(cellStates: Vector[CellBallState] = cellStates,
-                         onDeck: Iterable[BallKind]        = onDeck) =
+                         onDeck: Iterable[BallColor]       = onDeck) =
     new Board(cellStates, onDeck)
 
   /** Computes row-major cell-array index from row and column numbers. */
@@ -36,9 +36,9 @@ private[game] class Board(private[this] val cellStates: Vector[CellBallState],
 
   // on-deck balls:
 
-  private[manual] def getOnDeckBalls: Iterable[BallKind] = onDeck
+  private[manual] def getOnDeckBalls: Iterable[BallColor] = onDeck
 
-  private[game] def withOnDeckBalls(newBalls: Iterable[BallKind]): Board =
+  private[game] def withOnDeckBalls(newBalls: Iterable[BallColor]): Board =
     copy(onDeck = newBalls)
 
   // grid balls, getting:
@@ -46,7 +46,7 @@ private[game] class Board(private[this] val cellStates: Vector[CellBallState],
   private[manual] def getCellBallStateAt(address: CellAddress): CellBallState =
     cellStates(vectorIndex(address))
 
-  private[manual] def getBallStateAt(address: CellAddress): Option[BallKind] =
+  private[manual] def getBallStateAt(address: CellAddress): Option[BallColor] =
     cellStates(vectorIndex(address)).ballState
 
   private[game] def hasABallAt(address: CellAddress): Boolean =
@@ -61,7 +61,7 @@ private[game] class Board(private[this] val cellStates: Vector[CellBallState],
     copy(cellStates = cellStates.updated(vectorIndex(address), newState))
 
   private[game] def withBallAt(address: CellAddress,
-                               ball: BallKind): Board =
+                               ball: BallColor): Board =
     withCellBallState(address, getCellBallStateAt(address).copy(ballState = Some(ball)))
 
   private[game] def withNoBallAt(address: CellAddress): Board =

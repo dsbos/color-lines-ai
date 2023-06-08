@@ -24,7 +24,7 @@ private[game] class LowerGameState(private[manual] val board: Board,
 
   private[game] def withBoard(board: Board): LowerGameState = copy(board = board)
 
-  private[game] def withBoardWithBallAt(address: CellAddress, ball: BallKind): LowerGameState =
+  private[game] def withBoardWithBallAt(address: CellAddress, ball: BallColor): LowerGameState =
     copy(board = board.withBallAt(address, ball))
   private[game] def withBoardWithNoBallAt(address: CellAddress): LowerGameState =
     copy(board = board.withNoBallAt(address))
@@ -36,7 +36,7 @@ private[game] class LowerGameState(private[manual] val board: Board,
   private[manual] def getScore: Int = score
 
   //???? move up?  (up to tap-UI state with selection? but note that getColoredCharSeq know a bit about selection
-  private[manual] def getCellBallStateChar(ballState: Option[BallKind], isSelected: Boolean): String = {
+  private[manual] def getCellBallStateChar(ballState: Option[BallColor], isSelected: Boolean): String = {
     ballState match {
       case Some(ball) => ball.getColoredCharSeq(isSelected)
       case None       => if (! isSelected) "-" else "@"

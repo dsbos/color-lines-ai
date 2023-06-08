@@ -1,6 +1,6 @@
 package com.us.dsb.explore.algs.coloredlines.manual.game.lines
 
-import com.us.dsb.explore.algs.coloredlines.manual.game.board.{BallKind, Board, BoardOrder, CellAddress, LineOrder, LowerGameState}
+import com.us.dsb.explore.algs.coloredlines.manual.game.board.{BallColor, Board, BoardOrder, CellAddress, LineOrder, LowerGameState}
 import com.us.dsb.explore.algs.coloredlines.manual.game.GameLogicSupport.BallArrivalResult
 
 //???? TODO:  reduce repeated passing of board, ball color, etc.; maybe make
@@ -21,7 +21,7 @@ object LineDetector {
 
   private[this] val relativeDirectionFactors = List(1, -1) // use type of length 2 (refined List?, Tuple2?, some array?)
 
-  private[lines] def haveMatchingBallAt(moveBallColor: BallKind,
+  private[lines] def haveMatchingBallAt(moveBallColor: BallColor,
                                         board: Board,
                                         rawRowIndex: Int,
                                         rawColIndex: Int): Boolean = {
@@ -38,7 +38,7 @@ object LineDetector {
 
   private[lines] case class RelativeDirectionResult(excursionLength: Int)
 
-  private[lines] def computeDirectionResult(moveBallColor: BallKind,
+  private[lines] def computeDirectionResult(moveBallColor: BallColor,
                                             board: Board,
                                             ballTo: CellAddress,
                                             lineDirectionAxis: LineAxis,
@@ -65,7 +65,7 @@ object LineDetector {
                                        axisLineAddedLength: Int, // length WITHOUT moved ball
                                        directionDetails: List[RelativeDirectionResult])
 
-  private[lines] def computeLineAxisResult(moveBallColor: BallKind,
+  private[lines] def computeLineAxisResult(moveBallColor: BallColor,
                                            board: Board,
                                            ballTo: CellAddress,
                                            lineDirectionAxis: LineAxis): AxisResult = {
@@ -103,7 +103,8 @@ object LineDetector {
   }
 
   /** Reaps any complete lines from just-placed ball.
-   * None if no line(s) completed; score increment otherwise
+   * @return
+   *   Updated board and score if any completed lines; input state if no lines.
    */
   private[game] def reapAnyLines(gameState: LowerGameState,
                                  ballTo: CellAddress

@@ -10,8 +10,8 @@ class BoardTest extends AnyFunSpec {
     var index = 0
     rowIndices.foldLeft(Board.empty) { (board, row) =>
       columnIndices.foldLeft(board){ (board, column) =>
-        index = (index + 1) % BallKind.values.length
-        board.withBallAt(CellAddress(row, column), BallKind.values(index))
+        index = (index + 1) % BallColor.values.length
+        board.withBallAt(CellAddress(row, column), BallColor.values(index))
       }
     }
   }
@@ -23,8 +23,8 @@ class BoardTest extends AnyFunSpec {
           board
         }
         else {
-          index = (index + 1) % BallKind.values.length
-          board.withBallAt(CellAddress(row, column), BallKind.values(index))
+          index = (index + 1) % BallColor.values.length
+          board.withBallAt(CellAddress(row, column), BallColor.values(index))
         }
       }
     }
