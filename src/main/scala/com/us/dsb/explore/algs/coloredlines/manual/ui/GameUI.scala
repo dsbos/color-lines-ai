@@ -12,7 +12,7 @@ import enumeratum.{Enum, EnumEntry}
 import scala.annotation.tailrec
 import scala.util.chaining.scalaUtilChainingOps
 
-// ???? TODO:  Rename to reflect text control (and virtual tap level):
+// ???? TODO:  Rename to reflect text control (and virtual tap level); "TextTapUI"?:
 /** Lines game text-controlled virtual-tap UI controller. */
 private[manual] object GameUI {
 

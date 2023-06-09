@@ -11,15 +11,15 @@ import scala.util.Random
 
 // ??????? TODO: Possibly name with "virtual"/"net"/"abstract"/etc.
 
-private[ui/*manual*//*????????*/] object TapUiGameState {
+private[ui] object TapUiGameState {
 
   // ?????? TODO:  Probably purge. (Not used used.):
   /**
    * Result of completed game.
    */
-  private[ui/*manual*//*????????*/] sealed trait GameResult
-  private[ui/*manual*//*????????*/] object GameResult {
-    private[ui/*manual*//*????????*/] case class Done(score: Int) extends GameResult
+  private[ui] sealed trait GameResult
+  private[ui] object GameResult {
+    private[ui] case class Done(score: Int) extends GameResult
   }
 
   private[this] def makeInitialState(implicit rng: Random): TapUiGameState = {
@@ -27,8 +27,8 @@ private[ui/*manual*//*????????*/] object TapUiGameState {
     TapUiGameState(initialPlacementResult.gameState, None)
   }
 
-  private[ui/*manual*//*????????*/] def initial(seed: Long): TapUiGameState = makeInitialState(new Random(seed))
-  private[ui/*manual*//*????????*/] def initial(): TapUiGameState = makeInitialState(new Random())
+  private[ui] def initial(seed: Long): TapUiGameState = makeInitialState(new Random(seed))
+  private[ui] def initial(): TapUiGameState = makeInitialState(new Random())
 }
 import TapUiGameState._
 
@@ -36,22 +36,22 @@ import TapUiGameState._
 
 /** Virtual-tap--UI game state and controller.
  */
-private[manual/*ui*/] case class TapUiGameState(gameState: LowerGameState,
+private[ui] case class TapUiGameState(gameState: LowerGameState,
                                           selectionAddress: Option[CellAddress]
                                          )(implicit rng: Random) {
 
   // top-UI selection:
 
-  private[ui/*manual*//*????????*/] def withCellSelected(address: CellAddress): TapUiGameState =
+  private[ui] def withCellSelected(address: CellAddress): TapUiGameState =
     copy(selectionAddress = Some(address))
 
-  private[ui/*manual*//*????????*/] def withNoSelection: TapUiGameState =
+  private[ui] def withNoSelection: TapUiGameState =
     copy(selectionAddress = None)
 
-  private[manual] def hasAnyCellSelected: Boolean =
+  private[ui] def hasAnyCellSelected: Boolean =
     selectionAddress.isDefined
 
-  private[ui/*manual*//*????????*//*game*/] def getSelectionCoordinates: Option[CellAddress] =
+  private[ui] def getSelectionCoordinates: Option[CellAddress] =
     selectionAddress
 
   private[manual] def isSelectedAt(address: CellAddress): Boolean =
@@ -61,14 +61,14 @@ private[manual/*ui*/] case class TapUiGameState(gameState: LowerGameState,
     selectionAddress.fold(false)(gameState.board.hasABallAt(_))
 
   // ?? later refine from Either[String, ...] to "fancier" error type
-  // Xx?? maybe add result of move (win/draw/other) with new state (so caller
+  // ?? maybe add result of move (win/draw/other) with new state (so caller
   //  doesn't have to check state's gameResult; also, think about where I'd add
   //  game history
   // ?????? TODO: Rename; maybe "move" to "... tap move ..."?
-  private[ui/*manual*//*????????*/] def tryMoveAt(tapAddress: CellAddress): Either[String, TapUiGameState] = {
+  private[ui] def tryMoveAt(tapAddress: CellAddress): Either[String, TapUiGameState] = {
     //???? test
-    import GameLogicSupport.TapAction._
-    val tapAction = GameLogicSupport.interpretTapLocationToTapAction(this, tapAddress)
+    import TapUiSupport.TapAction._
+    val tapAction = TapUiSupport.interpretTapLocationToTapAction(this, tapAddress)
     println("tryMoveAt: tapAction = " + tapAction)
     val postMoveState: TapUiGameState =
       tapAction match {
@@ -79,7 +79,7 @@ private[manual/*ui*/] case class TapUiGameState(gameState: LowerGameState,
           withNoSelection
         case TryMoveBall =>
           //???? should TryMoveBall carry coordinates?:
-          //???? need to split logical moves/plays (e.g., move ball from source
+          //?????? need to split logical moves/plays (e.g., move ball from source
           // to target from top-/selection-level ~UI (keep that separate from cursor-to-taps UI))
           val fromAddress =
             getSelectionCoordinates.getOrElse(sys.error("Shouldn't be able to happen"))
