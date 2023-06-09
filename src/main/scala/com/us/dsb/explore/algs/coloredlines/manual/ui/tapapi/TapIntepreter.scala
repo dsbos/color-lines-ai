@@ -1,22 +1,22 @@
-package com.us.dsb.explore.algs.coloredlines.manual.ui
+package com.us.dsb.explore.algs.coloredlines.manual.ui.tapapi
 
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.CellAddress
-import com.us.dsb.explore.algs.coloredlines.manual.ui.tapapi.TapAction
+import com.us.dsb.explore.algs.coloredlines.manual.ui.TapUiGameState
 
 object TapIntepreter {
 
   /** Interprets location of (virtual) tap, given tap API state (tap-level cell
    *  selection), to tap-API-level action ~code (tap state change or game action). */
   def interpretTapLocationToTapAction(tapUiState: TapUiGameState,
-                                      address: CellAddress): TapAction =
+                                      address   : CellAddress): TapAction =
     tapAndStateToTapAction(onABall            = tapUiState.gameState.board.hasABallAt(address),
                            isSelectedAt       = tapUiState.isSelectedAt(address),
                            hasABallSelected   = tapUiState.hasABallSelected,
                            hasAnyCellSelected = tapUiState.hasAnyCellSelected)
 
-  private def tapAndStateToTapAction(onABall: Boolean,
-                                     isSelectedAt: Boolean,
-                                     hasABallSelected: Boolean,
+  private def tapAndStateToTapAction(onABall           : Boolean,
+                                     isSelectedAt      : Boolean,
+                                     hasABallSelected  : Boolean,
                                      hasAnyCellSelected: Boolean
                                     ): TapAction = {
     object RenameOrFlattenThis { // grouped/nested re debugger clutter
@@ -47,13 +47,13 @@ object TapIntepreter {
       val conditions = (onBallOrEmpty, hadBallOrNot, onSelOrUnsel, hadSelOrNot)
       import TapAction._
       conditions match {
-        case (OnBall,  _,       OnUnsel, _     ) => SelectBall  // - tap on ball  when unselected
-        case (OnEmpty, HadBall, _,       _     ) => TryMoveBall // - tap on empty when ball selected
+        case (OnBall,  _,       OnUnsel, _     ) => SelectBall    // - tap on ball  when unselected
+        case (OnEmpty, HadBall, _,       _     ) => TryMoveBall   // - tap on empty when ball selected
 
-        case (OnEmpty, NoBall,  OnUnsel, NoSel ) => SelectEmpty // - tap on empty when no selection
-        case (OnEmpty, NoBall,  OnUnsel, HadSel) => Pass        // - tap on empty when selected
+        case (OnEmpty, NoBall, OnUnsel,  NoSel ) => SelectEmpty   // - tap on empty when no selection
+        case (OnEmpty, NoBall, OnUnsel,  HadSel) => Pass          // - tap on empty when selected
 
-        case (_,       _,       OnSel,   _     ) => Deselect    // - tap on either when selected
+        case (_,       _,      OnSel,    _     ) => Deselect      // - tap on either when selected
       }
     }
     action

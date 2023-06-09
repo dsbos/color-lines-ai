@@ -6,7 +6,7 @@ import cats.syntax.either._
 import com.us.dsb.explore.algs.coloredlines.manual.game.GameLogicSupport
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.CellAddress
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.LowerGameState
-import com.us.dsb.explore.algs.coloredlines.manual.ui.tapapi.TapAction
+import com.us.dsb.explore.algs.coloredlines.manual.ui.tapapi.{TapAction, TapIntepreter}
 
 import scala.util.Random
 
