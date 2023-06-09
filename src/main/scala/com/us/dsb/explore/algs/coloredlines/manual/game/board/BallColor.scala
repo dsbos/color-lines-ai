@@ -4,14 +4,19 @@ import enumeratum.{Enum, EnumEntry}
 
 import scala.io.AnsiColor
 
-// ?? TODO: Clean?: mixes abstract ball color with UI-specific rendering:
+// ?? TODO:  Separate UI-specific rendering from abstract ball color (at least
+//  ideally).  Maybe enable "ball.getColoredCharSeq" via extension method and/or
+//  type class.
 /** Ball color. */
-private[game] sealed class BallColor(private[manual] val initial: String,
-                                     private[this] val setFgColorSeq: String,
-                                     private[this] val setBgColorSeq: String
-                                     ) extends EnumEntry {
+private[manual] sealed class BallColor(private[manual] val initial: String,
+                                       private[this]   val setFgColorSeq: String,
+                                       private[this]   val setBgColorSeq: String
+                                       ) extends EnumEntry {
+
+  /** Gets full populated-cell--state string.  (For cell state plus tap-selection
+   * state; character wrapped in ANSI text color escape sequences.) */
   private[manual] def getColoredCharSeq(forBackground: Boolean): String =
-    (if (forBackground) this.setBgColorSeq else this.setFgColorSeq) +
+    (if (forBackground) setBgColorSeq else setFgColorSeq) +
         initial +
         AnsiColor.RESET
 }

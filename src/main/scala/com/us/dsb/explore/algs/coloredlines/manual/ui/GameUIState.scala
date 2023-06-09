@@ -1,9 +1,8 @@
 package com.us.dsb.explore.algs.coloredlines.manual.ui
 
-import com.us.dsb.explore.algs.coloredlines.manual.game.board.CellAddress
-import com.us.dsb.explore.algs.coloredlines.manual.game._
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.{
-  ColumnIndex, Index, RowIndex, columnIndices, rowIndices}
+  BallColor, CellAddress, ColumnIndex, Index, RowIndex, columnIndices, rowIndices}
+import com.us.dsb.explore.algs.coloredlines.manual.game._
 
 // ??????? TODO: Clarify names (e.g., GameUIState vs. TapUiGameState)--
 //  virtual tap-level UI vs. text-controlled selection-based ~simulation of taps
@@ -41,6 +40,16 @@ private[this] case class GameUIState(tapUiGameState: TapUiGameState,
     copy(cursorAddress = cursorAddress.copy(column = adjustedColumn))
   }
 
+  /** Gets full cell-state string.  (For cell state plus tap-selection state;
+   *  character wrapped in ANSI text color escape sequences.) */
+  private[manual] def getCellBallStateChar(ballState: Option[BallColor],
+                                           isSelected: Boolean): String = {
+    ballState match {
+      case Some(ball) => ball.getColoredCharSeq(isSelected)
+      case None       => if (! isSelected) "-" else "@"
+    }
+  }
+
   private[this] def renderTableMultilineWithSelection: String = {
     val cellWidth = " X ".length
     val cellSeparator = "|"
@@ -53,18 +62,30 @@ private[this] case class GameUIState(tapUiGameState: TapUiGameState,
     rowIndices.map { row =>
       columnIndices.map { column =>
         val scanAddress = CellAddress(row, column)
-        val cellStateStr =
-          tapUiGameState.gameState.getCellBallStateChar(tapUiGameState.gameState.board.getBallStateAt(scanAddress),
-                                                        tapUiGameState.isSelectedAt(scanAddress))
-        if (scanAddress == cursorAddress ) {
-          "*" + cellStateStr + "*"
-        }
-        else {
-          " " + cellStateStr + " "
-        }
+        val tapCellStateStr =
+          getCellBallStateChar(tapUiGameState.gameState.board.getBallStateAt(scanAddress),
+                               tapUiGameState.isSelectedAt(scanAddress))
+        val fullCellStateStr =
+          if (scanAddress == cursorAddress ) {
+            "*" + tapCellStateStr + "*"
+          }
+          else {
+            " " + tapCellStateStr + " "
+          }
+        fullCellStateStr
       }.mkString(cellSeparator)  // make each row line
     }.mkString(rowSeparator)     // make whole-board multi-line string
+  }
 
+  // ?? Unused as of 2023-06-08; previously in LowerGameState.
+  private[this] def renderCompactTableMultilineWithSelection(selectionAddress: Option[CellAddress]): String = {
+    rowIndices.map { row =>
+      columnIndices.map { column =>
+        val addr = CellAddress(row, column)
+        val isSelected = selectionAddress.fold(false)(_ == addr)
+        getCellBallStateChar(tapUiGameState.gameState.board.getBallStateAt(addr), isSelected)
+      }.mkString("|")  // make each row line
+    }.mkString("\n")   // make whole-board multi-line string
   }
 
   private[ui] def toDisplayString: String = {
