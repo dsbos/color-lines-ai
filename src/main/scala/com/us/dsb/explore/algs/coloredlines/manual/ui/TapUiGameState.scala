@@ -6,7 +6,7 @@ import cats.syntax.either._
 import com.us.dsb.explore.algs.coloredlines.manual.game.GameLogicSupport
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.CellAddress
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.LowerGameState
-import com.us.dsb.explore.algs.coloredlines.manual.ui.tapapi.{TapAction, TapIntepreter}
+import com.us.dsb.explore.algs.coloredlines.manual.ui.tapapi.{TapCase, TapIntepreter}
 
 import scala.util.Random
 
@@ -68,20 +68,17 @@ private[ui] case class TapUiGameState(gameState: LowerGameState,
   // ?????? TODO: Rename; maybe "move" to "... tap move ..."?
   private[ui] def tryMoveAt(tapAddress: CellAddress): Either[String, TapUiGameState] = {
     //???? test
-    import TapAction._
-    val tapAction = TapIntepreter.interpretTapLocationToTapAction(this, tapAddress)
-    println("tryMoveAt: tapAction = " + tapAction)
+    import TapCase._
+    val tapCase = TapIntepreter.interpretTapLocationToTapCase(this, tapAddress)
+    println("tryMoveAt: tapCase = " + tapCase)
     val postMoveState: TapUiGameState =
-      tapAction match {
+      tapCase match {
         case SelectBallTap |
              SelectEmptyTap =>
           withCellSelected(tapAddress)
         case DeselectTap    =>
           withNoSelection
         case TryMoveBallTap =>
-          //???? should TryMoveBall carry coordinates?:
-          //?????? need to split logical moves/plays (e.g., move ball from source
-          // to target from top-/selection-level ~UI (keep that separate from cursor-to-taps UI))
           val fromAddress =
             getSelectionCoordinates.getOrElse(sys.error("Shouldn't be able to happen"))
 
