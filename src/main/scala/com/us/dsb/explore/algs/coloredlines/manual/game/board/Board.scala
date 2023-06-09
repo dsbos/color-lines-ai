@@ -51,7 +51,7 @@ private[game] class Board(private[this] val cellStates: Vector[CellBallState],
   private[manual] def getBallStateAt(address: CellAddress): Option[BallColor] =
     getCellBallStateAt(address).ballState
 
-  private[game] def hasABallAt(address: CellAddress): Boolean =
+  private[manual] def hasABallAt(address: CellAddress): Boolean =
     cellStates(vectorIndex(address)).ballState.isDefined
 
   private[manual] def isFull: Boolean = ! cellStates.exists(_.ballState.isEmpty)

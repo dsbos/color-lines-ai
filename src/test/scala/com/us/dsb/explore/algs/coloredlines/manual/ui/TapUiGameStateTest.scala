@@ -1,7 +1,7 @@
-package com.us.dsb.explore.algs.coloredlines.manual.game
+package com.us.dsb.explore.algs.coloredlines.manual.ui
 
 import com.us.dsb.explore.algs.coloredlines.manual.game.board._
-
+import com.us.dsb.explore.algs.coloredlines.manual.ui.TapUiGameState
 import org.scalatest.PrivateMethodTester
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers._

@@ -5,6 +5,7 @@ import com.us.dsb.explore.algs.coloredlines.manual.game.board.{
   BallColor, Board, BoardOrder, CellAddress, LowerGameState, columnIndices, rowIndices}
 import com.us.dsb.explore.algs.coloredlines.manual.game.lines.LineDetector
 import com.us.dsb.explore.algs.coloredlines.manual.game.lines.LineDetector.BallArrivalResult
+import com.us.dsb.explore.algs.coloredlines.manual.ui.TapUiGameState
 
 import java.util
 import scala.annotation.tailrec
@@ -44,7 +45,7 @@ object GameLogicSupport {
    * @param gameState
    *   expected to be empty //???? maybe refactor something?
    */
-  private[game] def placeInitialBalls(gameState: LowerGameState)
+  private[manual] def placeInitialBalls(gameState: LowerGameState)
                                        (implicit rng: Random): BallArrivalResult = {
     val postPlacementsResult =
       (1 to InitialBallCount).foldLeft(BallArrivalResult(gameState, anyRemovals = false)) {
@@ -66,22 +67,22 @@ object GameLogicSupport {
   /** Interpreted meaning/command of a (virtual) tap on a board cell. */
   private[game] sealed trait TapAction
 
-  private[game] object TapAction {
+  private[manual/*ui(?)*/] object TapAction {
 
     /** Select tapped-on cell that has ball. */
-    private[game] case object SelectBall  extends TapAction
+    private[manual/*(?)ui*/] case object SelectBall  extends TapAction
 
     /** Select tapped-on cell that is empty. */
-    private[game] case object SelectEmpty extends TapAction
+    private[manual/*(?)ui*/] case object SelectEmpty extends TapAction
 
     /** Cancel selection. */
-    private[game] case object Deselect    extends TapAction
+    private[manual/*(?)ui*/] case object Deselect    extends TapAction
 
     /** (Try to) move ball from selected cell to tapped-on empty cell (if open path). */
-    private[game] case object TryMoveBall extends TapAction  //???? should this capture, carry coords?
+    private[manual/*ui(?)*/] case object TryMoveBall extends TapAction  //???? should this capture, carry coords?
 
     /** Pass (move nothing, get more balls placed). */
-    private[game] case object Pass        extends TapAction
+    private[manual/*ui(?)*/] case object Pass        extends TapAction
   }
   import TapAction._
 
@@ -164,8 +165,8 @@ object GameLogicSupport {
     val replenishedOnDeckBoard = replenishOnDeckBalls(postPlacementResult.gameState.board)
     postPlacementResult.copy(gameState = postPlacementResult.gameState.withBoard(replenishedOnDeckBoard))}
 
-  private[game] def doPass(gameState: LowerGameState)
-                          (implicit rng: Random): BallArrivalResult =
+  private[manual] def doPass(gameState: LowerGameState)
+                            (implicit rng: Random): BallArrivalResult =
     placeOndeckBalls(gameState)
 
   //???: likely move core algorithm out; possibly move outer code into LowerGameState/Board:
@@ -232,10 +233,10 @@ object GameLogicSupport {
     println(s"*  $this")
   }
 
-  private[game] def doTryMoveBall(gameState: LowerGameState,
-                                  from: CellAddress,
-                                  to: CellAddress
-                                  )(implicit rng: Random): MoveBallResult = {
+  private[manual] def doTryMoveBall(gameState: LowerGameState,
+                                    from: CellAddress,
+                                    to: CellAddress
+                                    )(implicit rng: Random): MoveBallResult = {
     //???? separate move-ball move validation from actually moving (selection
     //   clearing depends on just validity of move, not on deleting any lines)
     //   - see note near some Option/etc. re encoding only valid moves at

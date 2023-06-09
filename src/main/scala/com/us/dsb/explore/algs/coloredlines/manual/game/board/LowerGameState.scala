@@ -1,20 +1,20 @@
 package com.us.dsb.explore.algs.coloredlines.manual.game.board
 
-private[game] object LowerGameState {
+private[manual] object LowerGameState {
 
   // ?? TODO:  Maybe rename:
   //   - "initial"?  but isn't state after initial-ball placement and before first move
   //   - "ground"? (from "ground state"--poor)
-  private[game] def empty: LowerGameState =
+  private[manual] def empty: LowerGameState =
     new LowerGameState(Board.empty, score = 0)
 }
 
 /**
  * (Lower-level): game state:  board and score.  (No more tap-UI selection state.)
  */
-private[game] class LowerGameState(private[manual] val board: Board,
-                                   private[this] val score: Int
-                                 ) {
+private[manual] class LowerGameState(private[manual] val board: Board,
+                                     private[this] val score: Int
+                                    ) {
   println("* LowerGameState  : " + this)
   //print("")
 

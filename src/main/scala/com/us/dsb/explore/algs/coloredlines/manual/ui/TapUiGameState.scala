@@ -1,8 +1,9 @@
 // ?????? TODO:  Move out of package "game" (for abstract game) to UI package,
 // OR at least move selectionAddress address part out:
-package com.us.dsb.explore.algs.coloredlines.manual.game
+package com.us.dsb.explore.algs.coloredlines.manual.ui
 
 import cats.syntax.either._
+import com.us.dsb.explore.algs.coloredlines.manual.game.GameLogicSupport
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.CellAddress
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.LowerGameState
 
@@ -10,15 +11,15 @@ import scala.util.Random
 
 // ??????? TODO: Possibly name with "virtual"/"net"/"abstract"/etc.
 
-private[manual] object TapUiGameState {
+private[ui/*manual*//*????????*/] object TapUiGameState {
 
   // ?????? TODO:  Probably purge. (Not used used.):
   /**
    * Result of completed game.
    */
-  private[manual] sealed trait GameResult
-  private[manual] object GameResult {
-    private[manual] case class Done(score: Int) extends GameResult
+  private[ui/*manual*//*????????*/] sealed trait GameResult
+  private[ui/*manual*//*????????*/] object GameResult {
+    private[ui/*manual*//*????????*/] case class Done(score: Int) extends GameResult
   }
 
   private[this] def makeInitialState(implicit rng: Random): TapUiGameState = {
@@ -26,8 +27,8 @@ private[manual] object TapUiGameState {
     TapUiGameState(initialPlacementResult.gameState, None)
   }
 
-  private[manual] def initial(seed: Long): TapUiGameState = makeInitialState(new Random(seed))
-  private[manual] def initial(): TapUiGameState = makeInitialState(new Random())
+  private[ui/*manual*//*????????*/] def initial(seed: Long): TapUiGameState = makeInitialState(new Random(seed))
+  private[ui/*manual*//*????????*/] def initial(): TapUiGameState = makeInitialState(new Random())
 }
 import TapUiGameState._
 
@@ -35,28 +36,28 @@ import TapUiGameState._
 
 /** Virtual-tap--UI game state and controller.
  */
-private[manual] case class TapUiGameState(gameState: LowerGameState,
+private[manual/*ui*/] case class TapUiGameState(gameState: LowerGameState,
                                           selectionAddress: Option[CellAddress]
                                          )(implicit rng: Random) {
 
   // top-UI selection:
 
-  private[manual] def withCellSelected(address: CellAddress): TapUiGameState =
+  private[ui/*manual*//*????????*/] def withCellSelected(address: CellAddress): TapUiGameState =
     copy(selectionAddress = Some(address))
 
-  private[manual] def withNoSelection: TapUiGameState =
+  private[ui/*manual*//*????????*/] def withNoSelection: TapUiGameState =
     copy(selectionAddress = None)
 
-  private[manual/*game*/] def hasAnyCellSelected: Boolean =
+  private[manual] def hasAnyCellSelected: Boolean =
     selectionAddress.isDefined
 
-  private[manual/*game*/] def getSelectionCoordinates: Option[CellAddress] =
+  private[ui/*manual*//*????????*//*game*/] def getSelectionCoordinates: Option[CellAddress] =
     selectionAddress
 
   private[manual] def isSelectedAt(address: CellAddress): Boolean =
     selectionAddress.fold(false)(_ == address)
 
-  private[game] def hasABallSelected: Boolean =
+  private[manual] def hasABallSelected: Boolean =
     selectionAddress.fold(false)(gameState.board.hasABallAt(_))
 
   // ?? later refine from Either[String, ...] to "fancier" error type
@@ -64,7 +65,7 @@ private[manual] case class TapUiGameState(gameState: LowerGameState,
   //  doesn't have to check state's gameResult; also, think about where I'd add
   //  game history
   // ?????? TODO: Rename; maybe "move" to "... tap move ..."?
-  private[manual] def tryMoveAt(tapAddress: CellAddress): Either[String, TapUiGameState] = {
+  private[ui/*manual*//*????????*/] def tryMoveAt(tapAddress: CellAddress): Either[String, TapUiGameState] = {
     //???? test
     import GameLogicSupport.TapAction._
     val tapAction = GameLogicSupport.interpretTapLocationToTapAction(this, tapAddress)

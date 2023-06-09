@@ -4,9 +4,9 @@ package com.us.dsb.explore.algs.coloredlines.manual.ui
 
 import cats.syntax.option._
 import cats.syntax.either._
-import com.us.dsb.explore.algs.coloredlines.manual.game.TapUiGameState
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.{ColumnIndex, Index, RowIndex}
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.CellAddress
+import com.us.dsb.explore.algs.coloredlines.manual.ui.TapUiGameState
 import enumeratum.{Enum, EnumEntry}
 
 import scala.annotation.tailrec
