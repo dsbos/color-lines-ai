@@ -6,6 +6,7 @@ import cats.syntax.either._
 import com.us.dsb.explore.algs.coloredlines.manual.game.GameLogicSupport
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.CellAddress
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.LowerGameState
+import com.us.dsb.explore.algs.coloredlines.manual.ui.tapapi.TapAction
 
 import scala.util.Random
 
@@ -67,7 +68,7 @@ private[ui] case class TapUiGameState(gameState: LowerGameState,
   // ?????? TODO: Rename; maybe "move" to "... tap move ..."?
   private[ui] def tryMoveAt(tapAddress: CellAddress): Either[String, TapUiGameState] = {
     //???? test
-    import TapUiSupport.TapAction._
+    import TapAction._
     val tapAction = TapUiSupport.interpretTapLocationToTapAction(this, tapAddress)
     println("tryMoveAt: tapAction = " + tapAction)
     val postMoveState: TapUiGameState =
