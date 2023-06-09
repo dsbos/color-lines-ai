@@ -73,12 +73,12 @@ private[ui] case class TapUiGameState(gameState: LowerGameState,
     println("tryMoveAt: tapAction = " + tapAction)
     val postMoveState: TapUiGameState =
       tapAction match {
-        case SelectBall |
-             SelectEmpty =>
+        case SelectBallTap |
+             SelectEmptyTap =>
           withCellSelected(tapAddress)
-        case Deselect    =>
+        case DeselectTap    =>
           withNoSelection
-        case TryMoveBall =>
+        case TryMoveBallTap =>
           //???? should TryMoveBall carry coordinates?:
           //?????? need to split logical moves/plays (e.g., move ball from source
           // to target from top-/selection-level ~UI (keep that separate from cursor-to-taps UI))
@@ -93,7 +93,7 @@ private[ui] case class TapUiGameState(gameState: LowerGameState,
             else
               this
           selectionUpdatedState.copy(gameState = tryMoveResult.gameState)
-        case Pass        =>
+        case PassTap        =>
           val passResult = GameLogicSupport.doPass(gameState)
           copy(gameState = passResult.gameState)
               .withNoSelection

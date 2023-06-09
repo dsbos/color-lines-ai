@@ -47,13 +47,13 @@ object TapIntepreter {
       val conditions = (onBallOrEmpty, hadBallOrNot, onSelOrUnsel, hadSelOrNot)
       import TapAction._
       conditions match {
-        case (OnBall,  _,       OnUnsel, _     ) => SelectBall    // - tap on ball  when unselected
-        case (OnEmpty, HadBall, _,       _     ) => TryMoveBall   // - tap on empty when ball selected
+        case (OnBall,  _,       OnUnsel, _     ) => SelectBallTap    // - tap on ball  when unselected
+        case (OnEmpty, HadBall, _,       _     ) => TryMoveBallTap   // - tap on empty when ball selected
 
-        case (OnEmpty, NoBall, OnUnsel,  NoSel ) => SelectEmpty   // - tap on empty when no selection
-        case (OnEmpty, NoBall, OnUnsel,  HadSel) => Pass          // - tap on empty when selected
+        case (OnEmpty, NoBall,  OnUnsel, NoSel ) => SelectEmptyTap   // - tap on empty when no selection
+        case (OnEmpty, NoBall,  OnUnsel, HadSel) => PassTap          // - tap on empty when other empty selected
 
-        case (_,       _,      OnSel,    _     ) => Deselect      // - tap on either when selected
+        case (_,       _,       OnSel,   _     ) => DeselectTap      // - tap on either when selected
       }
     }
     action
