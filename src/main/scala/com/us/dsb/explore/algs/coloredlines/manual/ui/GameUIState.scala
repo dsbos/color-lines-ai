@@ -4,7 +4,7 @@ import com.us.dsb.explore.algs.coloredlines.manual.game.board.{
   BallColor, CellAddress, ColumnIndex, Index, RowIndex, columnIndices, rowIndices}
 import com.us.dsb.explore.algs.coloredlines.manual.game._
 
-// ??????? TODO: Clarify names (e.g., GameUIState vs. TapUiGameState)--
+// ?????? TODO: Clarify names (e.g., GameUIState vs. TapUiGameState)--
 //  virtual tap-level UI vs. text-controlled selection-based ~simulation of taps
 
 // ?? somewhere expand to allow for history (maybe via Semigroup or whatever has .compose?)

@@ -10,7 +10,7 @@ import com.us.dsb.explore.algs.coloredlines.manual.ui.tapapi.TapAction
 
 import scala.util.Random
 
-// ??????? TODO: Possibly name with "virtual"/"net"/"abstract"/etc.
+// ?????? TODO: Possibly name with "virtual"/"net"/"abstract"/etc.
 
 private[ui] object TapUiGameState {
 
@@ -69,7 +69,7 @@ private[ui] case class TapUiGameState(gameState: LowerGameState,
   private[ui] def tryMoveAt(tapAddress: CellAddress): Either[String, TapUiGameState] = {
     //???? test
     import TapAction._
-    val tapAction = TapUiSupport.interpretTapLocationToTapAction(this, tapAddress)
+    val tapAction = TapIntepreter.interpretTapLocationToTapAction(this, tapAddress)
     println("tryMoveAt: tapAction = " + tapAction)
     val postMoveState: TapUiGameState =
       tapAction match {

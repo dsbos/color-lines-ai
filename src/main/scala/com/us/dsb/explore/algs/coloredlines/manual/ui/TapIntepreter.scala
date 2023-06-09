@@ -3,7 +3,7 @@ package com.us.dsb.explore.algs.coloredlines.manual.ui
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.CellAddress
 import com.us.dsb.explore.algs.coloredlines.manual.ui.tapapi.TapAction
 
-object TapUiSupport {
+object TapIntepreter {
 
   /** Interprets location of (virtual) tap, given tap API state (tap-level cell
    *  selection), to tap-API-level action ~code (tap state change or game action). */
