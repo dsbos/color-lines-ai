@@ -18,8 +18,9 @@ object GameLogicSupport {
   private[game] val OnDeckBallCount: Int = 3
 
   // (was "private[this]" before test calls:)
-  private[game] def pickRandomBallColor()(implicit rng: Random): BallColor =
-    BallColor.values(rng.nextInt(2 /*???BallKind.values.size*/))
+  private[game] def pickRandomBallColor()(implicit rng: Random): BallColor = {
+    BallColor.values(rng.nextInt(BallColor.values.size))
+  }
 
   /** Selects an empty cell randomly (if any). */
   // (was "private[this]" before test calls:)

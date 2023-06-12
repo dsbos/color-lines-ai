@@ -7,7 +7,7 @@ import io.estatico.newtype.macros.newtype
 package object board {
 
   /** Order (linear size) of board. */
-  private[this] type BoardOrder = 4 //??????TEMP  9
+  private[this] type BoardOrder = 9
   private[game] val BoardOrder: BoardOrder = valueOf[BoardOrder]
 
   // ???? TODO: Maybe move to package "lines" (with LineDetector) (level above
@@ -16,7 +16,7 @@ package object board {
   //  - Also, maybe  have regular vs. reduced versions, with redirecting version
   //    with single source-level switch between them.
   /** Order (length) of lines. */
-  private[this] type LineOrder = 3 //??????TEMP  5
+  private[this] type LineOrder = 5
   private[game] val LineOrder: LineOrder = valueOf[LineOrder]
 
   // ???? TODO:  Use this (tie to color enumeration) or remove.
