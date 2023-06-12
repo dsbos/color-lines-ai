@@ -62,10 +62,13 @@ object GameLogicSupport {
     postPlacementsResult.copy(gameState = postPlacementsResult.gameState.withBoard(replenishedOnDeckBoard))
   }
 
+  // ???? TODO:  Maybe handle board-full condition more cleanly (don't dequeue
+  //   unplaced balls, don't over-replenish).  Maybe fail fast, and don't depend
+  //   on (irregular) callers to check whether board becomes full.
   private[this] def placeOndeckBalls(gameState: LowerGameState)
                                     (implicit rng: Random): BallArrivalResult = {
     val postPlacementResult =
-      //???? for 1 to 3, consume on-deck ball from list, and then place (better for internal state view);;
+      //???? for 1 to 3, consume on-deck ball from list, and then place (better for internal state view);
       // can replenish incrementally or later; later might show up better in internal state view
       gameState.board.getOndeckBalls
         .foldLeft(BallArrivalResult(gameState, anyRemovals = false)) {
@@ -88,7 +91,8 @@ object GameLogicSupport {
         }
 
     val replenishedOnDeckBoard = replenishOnDeckBalls(postPlacementResult.gameState.board)
-    postPlacementResult.copy(gameState = postPlacementResult.gameState.withBoard(replenishedOnDeckBoard))}
+    postPlacementResult.copy(gameState = postPlacementResult.gameState.withBoard(replenishedOnDeckBoard))
+  }
 
   private[manual] def doPass(gameState: LowerGameState)
                             (implicit rng: Random): BallArrivalResult =

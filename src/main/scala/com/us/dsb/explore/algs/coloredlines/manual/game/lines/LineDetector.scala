@@ -6,7 +6,9 @@ import com.us.dsb.explore.algs.coloredlines.manual.game.board.{
 // ?? TODO:  reduce repeated passing of board, ball color, etc.; maybe make
 // LineDetector a class, to be instantiated for each move; or make local class
 // for passing (but leave external-client interface same)
-private[game] object LineDetector {
+// ?? TODO Revisit containment of BallArrivalResult inside; that's the reason
+//   LineDetector's "private[game]" was widened to "private[manual]"
+private[manual] object LineDetector {
 
   // ?? TODO:  Maybe make refined type for deltas? (check use w/relativeDirectionFactors):
   private[lines] case class LineAxis(labelArray: String,
@@ -109,13 +111,14 @@ private[game] object LineDetector {
     linesRemovedGameState
   }
 
+  // ?????? TODO:  Review uses (return type):  Which one don't need to report whether any removals?
   /**
    * @param gameState
    *   updated game state
    * @param anyRemovals
    *   whether any lines reaped (re placing on-deck balls)
    */
-  private[game] case class BallArrivalResult(gameState: LowerGameState,
+  private[manual] case class BallArrivalResult(gameState: LowerGameState,
                                              anyRemovals: Boolean)
   {
     println(s"* $this")
