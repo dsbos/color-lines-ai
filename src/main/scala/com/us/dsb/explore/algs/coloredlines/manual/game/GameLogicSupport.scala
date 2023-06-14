@@ -170,7 +170,7 @@ object GameLogicSupport {
     //   - see note near some Option/etc. re encoding only valid moves at
     //     that point in move-execution path
 
-    val canMoveBall =
+    val moveWasValid =
       if (! gameState.board.hasABallAt(from)) {
         false  // ?? TODO:  Expand to reporting no ball there
       }
@@ -183,22 +183,25 @@ object GameLogicSupport {
       else {
         true
       }
-    canMoveBall match {
-      case false =>  // can't move--ignore (keep tap-UI selection state)
-        MoveBallResult(gameState, moveWasValid = false)
-      case true =>
-        val moveBallColor = gameState.board.getBallStateAt(from).get  //????
-        val postMoveBoard =
-          gameState.withBoardWithNoBallAt(from).withBoardWithBallAt(to, moveBallColor)
+    val newGameState =
+      moveWasValid match {
+        case false =>  // can't move--ignore (keep tap-UI selection state)
+          gameState
+        case true =>
+          println("from = " + from)
+          val moveBallColor = gameState.board.getBallStateAt(from).get
+          val postMoveBoard =
+            gameState.withBoardWithNoBallAt(from).withBoardWithBallAt(to, moveBallColor)
 
-        val postReapingResult = LineDetector.reapAnyLines(postMoveBoard, to)
-        val postPostReadingResult =
-          if (! postReapingResult.anyRemovals)
-            placeOndeckBalls(postReapingResult.gameState)
-          else
-            postReapingResult
-        MoveBallResult(postPostReadingResult.gameState, moveWasValid = true)
-    }
+          val postReapingResult = LineDetector.reapAnyLines(postMoveBoard, to)
+          val postPostReadingResult =
+            if (! postReapingResult.anyRemovals)
+              placeOndeckBalls(postReapingResult.gameState)
+            else
+              postReapingResult
+          postPostReadingResult.gameState
+      }
+    MoveBallResult(newGameState, moveWasValid)
   }
 
 }

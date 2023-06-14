@@ -119,7 +119,7 @@ private[manual] object LineDetector {
    *   whether any lines reaped (re placing on-deck balls)
    */
   private[manual] case class BallArrivalResult(gameState: LowerGameState,
-                                             anyRemovals: Boolean)
+                                               anyRemovals: Boolean)
   {
     println(s"* $this")
   }
@@ -131,7 +131,7 @@ private[manual] object LineDetector {
   private[game] def reapAnyLines(gameState: LowerGameState,
                                  ballTo: CellAddress
                                 ): BallArrivalResult = {
-    //println(s"+handleBallArrival(... ballTo = $ballTo...).1")
+    //println(s"+reapAnyLines(... ballTo = $ballTo...).1")
     val moveBallColor = gameState.board.getBallStateAt(ballTo).get //????
     println(s"* * placed at $ballTo: $moveBallColor")
 
