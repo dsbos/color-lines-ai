@@ -86,7 +86,7 @@ private[ui] case class TapUiGameState(gameState: LowerGameState,
           val tryMoveResult =
             GameLogicSupport.doTryMoveBall(gameState, fromAddress, tapAddress)
           val selectionUpdatedState =
-            if (tryMoveResult.clearSelection)
+            if (tryMoveResult.moveWasValid)
               withNoSelection
             else
               this

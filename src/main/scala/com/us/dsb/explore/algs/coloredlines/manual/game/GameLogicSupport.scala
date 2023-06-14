@@ -157,7 +157,7 @@ object GameLogicSupport {
   // ?????? TODO:  move to (virtual) tap UI class/package:
   // ???? TODO:  Maybe rename with "try"/"attempt":
   case class MoveBallResult(gameState: LowerGameState,
-                            clearSelection: Boolean)
+                            moveWasValid: Boolean)
   {
     println(s"*  $this")
   }
@@ -173,7 +173,7 @@ object GameLogicSupport {
     val canMoveBall = pathExists(gameState, from, to)
     canMoveBall match {
       case false =>  // can't move--ignore (keep tap-UI selection state)
-        MoveBallResult(gameState, clearSelection = false)
+        MoveBallResult(gameState, moveWasValid = false)
       case true =>
         val moveBallColor = gameState.board.getBallStateAt(from).get  //????
         val postMoveBoard =
@@ -185,7 +185,7 @@ object GameLogicSupport {
             placeOndeckBalls(postReapingResult.gameState)
           else
             postReapingResult
-        MoveBallResult(postPostReadingResult.gameState, clearSelection = true)
+        MoveBallResult(postPostReadingResult.gameState, moveWasValid = true)
     }
   }
 
