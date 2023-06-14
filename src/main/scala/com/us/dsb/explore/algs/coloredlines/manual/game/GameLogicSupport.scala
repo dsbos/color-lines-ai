@@ -154,7 +154,6 @@ object GameLogicSupport {
     loop
   }
 
-  // ?????? TODO:  move to (virtual) tap UI class/package:
   // ???? TODO:  Maybe rename with "try"/"attempt":
   case class MoveBallResult(gameState: LowerGameState,
                             moveWasValid: Boolean)
@@ -170,7 +169,20 @@ object GameLogicSupport {
     //   clearing depends on just validity of move, not on deleting any lines)
     //   - see note near some Option/etc. re encoding only valid moves at
     //     that point in move-execution path
-    val canMoveBall = pathExists(gameState, from, to)
+
+    val canMoveBall =
+      if (! gameState.board.hasABallAt(from)) {
+        false  // ?? TODO:  Expand to reporting no ball there
+      }
+      else if (gameState.board.hasABallAt(to)) {
+        false  // ?? TODO:  Expand to report no vacancy there
+      }
+      else if (! pathExists(gameState, from, to)) {
+        false  // ?? TODO:  Expand to report no path
+      }
+      else {
+        true
+      }
     canMoveBall match {
       case false =>  // can't move--ignore (keep tap-UI selection state)
         MoveBallResult(gameState, moveWasValid = false)
