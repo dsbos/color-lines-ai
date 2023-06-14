@@ -10,7 +10,7 @@ import scala.util.Random
  * Initial, crude runner to play by just passing (not moving balls), playing
  * games until getting a non-zero score.
  */
-object PlayJustPassing extends App {
+object PlayJustPassingUntilNonzeroGame extends App {
   private implicit val rng = new Random
 
   var gameCount: Int = 0
