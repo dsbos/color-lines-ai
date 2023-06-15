@@ -105,6 +105,7 @@ object GameLogicSupport {
   private[game] def pathExists(gameState: LowerGameState,
                                fromBallCell: CellAddress,
                                toTapCell: CellAddress): Boolean = {
+    //??println(s"pathExists: fromBallCell = $fromBallCell, toTapCell = $toTapCell")
     //???? CLEAN ALL THIS:
     // - mutability (many eliminate, maybe keep for eventually wanted optimization
     // - looping/recursion and exiting (what is class/method that ~loops until flag return value?_
@@ -158,7 +159,7 @@ object GameLogicSupport {
   case class MoveBallResult(gameState: LowerGameState,
                             moveWasValid: Boolean)
   {
-    println(s"*  $this")
+    //??println(s"*  $this")
   }
 
   private[manual] def doTryMoveBall(gameState: LowerGameState,

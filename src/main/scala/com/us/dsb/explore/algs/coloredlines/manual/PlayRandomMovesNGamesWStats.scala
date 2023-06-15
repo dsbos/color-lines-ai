@@ -69,7 +69,7 @@ object PlayRandomMovesNGamesWStats extends App {
   }
   val averageScore = 1.0 * gameScoresSum / GameCount
   println(s"@@@@@ End:  $GameCount games" +
-              s", averageScore = $averageScore" +
+              f", averageScore = $averageScore%8.3f" +
               s", minPositiveScore = $minPositiveScore" +
               s", highestScore = $highestScore" +
               s", nonzeroGameCount = $nonzeroGameCount" +

@@ -21,19 +21,16 @@ object PlayJustPassingNGamesWStats extends App {
     var gameState: LowerGameState = initialPlacementResult.gameState
     while (! gameState.board.isFull) {
       val wholeResult: BallArrivalResult = GameLogicSupport.doPass(gameState)
-      wholeResult.anyRemovals
       gameState = wholeResult.gameState
     }
     gameState.getScore
   }
-
 
   var gameScoresSum = 0
   var firstNonzeroGameNumber = 0
   var nonzeroGameCount = 0
   var highestScore = 0
   var minPositiveScore = Int.MaxValue
-
 
   (1 to GameCount).foreach { gameNumber =>
     println()
@@ -50,16 +47,13 @@ object PlayJustPassingNGamesWStats extends App {
         firstNonzeroGameNumber = gameNumber
       }
     }
-
-
   }
+
   val averageScore = 1.0 * gameScoresSum / GameCount
   println(s"@@@@@ End:  $GameCount games" +
-              s", averageScore = $averageScore" +
+              f", averageScore = $averageScore%8.3f" +
               s", minPositiveScore = $minPositiveScore" +
               s", highestScore = $highestScore" +
               s", nonzeroGameCount = $nonzeroGameCount" +
               s", firstNonzeroGameNumber = $firstNonzeroGameNumber ")
-
-
 }

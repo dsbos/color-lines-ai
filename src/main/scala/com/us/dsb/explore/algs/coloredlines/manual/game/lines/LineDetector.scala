@@ -121,7 +121,7 @@ private[manual] object LineDetector {
   private[manual] case class BallArrivalResult(gameState: LowerGameState,
                                                anyRemovals: Boolean)
   {
-    println(s"* $this")
+    //??println(s"* $this")
   }
 
   /** Reaps any complete lines from just-placed ball.
