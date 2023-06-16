@@ -9,7 +9,7 @@ import scala.util.Random
  * Initial, crude runner to play by just passing (not moving balls), playing
  * N games, computing average score and other statistics
  */
-object PlayRandomMovesNorthwestBiasNGamesWStats extends App {
+object PlayMoveRandomlyNorthwestBiasNGamesWStats extends App {
   private val GameCount = 1000
 
   private implicit val rng = new Random
