@@ -166,19 +166,24 @@ object GameLogicSupport {
                                     from: CellAddress,
                                     to: CellAddress
                                     )(implicit rng: Random): MoveBallResult = {
+    //println(s"@@ doTryMoveBall: $from -> $to")
     //???? separate move-ball move validation from actually moving (selection
     //   clearing depends on just validity of move, not on deleting any lines)
     //   - see note near some Option/etc. re encoding only valid moves at
     //     that point in move-execution path
 
+    // ?? TODO:  Maybe add enumeration of invalid-move conditions:
     val moveWasValid =
       if (! gameState.board.hasABallAt(from)) {
+        //println(s"@ no ball at from address $from")
         false  // ?? TODO:  Expand to reporting no ball there
       }
       else if (gameState.board.hasABallAt(to)) {
+        //println(s"@ no vacancy at to address $from")
         false  // ?? TODO:  Expand to report no vacancy there
       }
       else if (! pathExists(gameState, from, to)) {
+        //println(s"@ no path from $from to $to")
         false  // ?? TODO:  Expand to report no path
       }
       else {
@@ -189,7 +194,6 @@ object GameLogicSupport {
         case false =>  // can't move--ignore (keep tap-UI selection state)
           gameState
         case true =>
-          println("from = " + from)
           val moveBallColor = gameState.board.getBallStateAt(from).get
           val postMoveBoard =
             gameState.withBoardWithNoBallAt(from).withBoardWithBallAt(to, moveBallColor)
