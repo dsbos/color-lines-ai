@@ -56,7 +56,7 @@ class BoardTest extends AnyFunSpec {
     }
 
     it("should compute array length - 1 for last row, last column") {
-      val address_n_n  = CellAddress(rowIndices.last, ColumnIndex(Index(4 /*????9*/)))  //????? use BoardOrder?
+      val address_n_n  = CellAddress(rowIndices.last, ColumnIndex(Index(9)))  //????? use BoardOrder?
       val index = Board.empty invokePrivate vectorIndex(address_n_n)
       index shouldEqual BoardOrder * BoardOrder - 1
     }
