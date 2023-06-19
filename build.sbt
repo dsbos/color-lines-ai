@@ -99,111 +99,19 @@ scalacOptions ++= Seq(
 
 
 libraryDependencies ++= Seq(
+  // Unit tests:
+  "org.scalatest" %% "scalatest" % "3.2.14" % Test,  // Currently used; UPDATE
+
   // Enumerations
-  "com.beachape" %% "enumeratum" % "1.7.0",
+  "com.beachape" %% "enumeratum" % "1.7.0",  // Currently used; UPDATE; TRY Scala 3 enums
 
-
-
-  "org.scala-lang.modules" %% "scala-swing" % "3.0.0",
-  //"org.scala-lang.modules" %% "scala-parser-combinators" % <version>
-  //"org.scala-lang.modules" %% "scala-parallel-collections" % "???",
-
-  "org.scalatest" %% "scalatest" % "3.2.14" % Test,
-  //"org.scalatest" %% "scalatest" % "3.2.14",  // Not just in src/test
-  //"org.scalactic" %% "scalactic" % "3.2.10"
-
-  "junit" % "junit" % "4.13.1" % Test,
-  "org.specs2" %% "specs2-junit" % "4.11.0" % Test,
-
-  //"org.specs2" %% "specs2-core_2.12" % "3.9.4" % Test,
-  //"org.specs2" %% "specs2-junit_2.12" % "3.9.4" % Test,
-
-
-  "org.json4s" %% "json4s-core"   % "3.6.11",  // 3.7.x?, 4.x?
-  "org.json4s" %% "json4s-native" % "3.6.11",  // 3.7.x?, 4.x?
-  "org.json4s" %% "json4s-jackson" % "3.6.11",  // 3.7.x?, 4.x?
-  //"org.json4s" %% "json4s-ast" % "3.6.11",  // 3.7.x?, 4.x?
-
-  "io.circe" %% "circe-core" % "0.14.1",
-  //("io.circe" %% "circe-derivation" % "0.14.1",)
-  "io.circe" %% "circe-generic" % "0.14.1",
-  //"io.circe" %% "circe-generic-extras" % "0.14.1",
-  "io.circe" %% "circe-literal" % "0.14.1",
-  "io.circe" %% "circe-jawn" % "0.14.1",
-  "io.circe" %% "circe-optics" % "0.14.1",
-  "io.circe" %% "circe-parser" % "0.14.1",
-
-
-  // NOTE:  Can't use both latest scalatest-argonaut (0.2.5) and
-  // diffx-scalatest-should, because 1) the former uses old and incompatible
-  // version 0.3.29 of diffx-core_2.13 and 2) diffx-scalatest-should doesn't
-  // have a version that uses diffx-core_2.13 < 0.6.0.
-  //
-  // SO, we can't (currently) get differences in the "<old value> -> <new value>"
-  // form for both JSON and regular objects.
-
-  "com.stephenn" %% "scalatest-circe" % "0.2.5" % Test,
-  "com.stephenn" %% "scalatest-json-jsonassert" % "0.2.5" % Test,
-  "com.stephenn" %% "scalatest-json4s" % "0.2.0" % Test,
-  "com.stephenn" %% "scalatest-play-json" % "0.2.5" % Test,
-  "com.stephenn" %% "scalatest-argonaut" % "0.2.5" % Test,
-  "com.stephenn" %% "scalatest-jsoniter-scala" % "0.2.5" % Test,
-
-  "com.softwaremill.diffx" %% "diffx-scalatest-should" % "0.7.0" % Test,
 
   // Stronger types:  newtypes and refine's refinement types
-  "io.estatico" %% "newtype"             % "0.4.3",
-  "eu.timepit"  %% "refined"                 % "0.10.1",
-  //"eu.timepit"  %% "refined"                 % "0.9.28",/
-  //"eu.timepit"  %% "refined-cats"            % "0.9.28", // optional
-  //"eu.timepit"  %% "refined-eval"            % "0.9.28", // optional, JVM-only
-  //"eu.timepit"  %% "refined-jsonpath"        % "0.9.28", // optional, JVM-only
-  //"eu.timepit"  %% "refined-pureconfig"      % "0.9.28", // optional, JVM-only
-  //"eu.timepit"  %% "refined-scalacheck"      % "0.9.28", // optional
-  //"eu.timepit"  %% "refined-scalaz"          % "0.9.28", // optional
-  //"eu.timepit"  %% "refined-scodec"          % "0.9.28", // optional
-  //"eu.timepit"  %% "refined-scopt"           % "0.9.28", // optional
-  //"eu.timepit"  %% "refined-shapeless"       % "0.9.28", // optional
-  // try circe ~adapter
+  "io.estatico" %% "newtype"     % "0.4.3", // Currently used; UPDATE; TRY Scala 3 opaque types
+  "eu.timepit"  %% "refined"     % "0.10.1", // Currently used; UPDATE
 
-  "org.typelevel"  %% "cats-core"           % "2.1.0",
-  "org.typelevel"  %% "cats-free"           % "2.9.0",
-  // "org.typelevel"  %% "cats-effect"         % "2.1.0",
-
-  "org.scalaz" %% "scalaz-core" % "7.3.5",
-
-
-  "com.github.cb372" %% "cats-retry" % "2.1.0",
-  // "org.typelevel"  %% "squants"  % "1.6.0",
-
-
-
-  "org.tpolecat" %% "doobie-core" % "0.13.4",
-  //"org.tpolecat" %% "doobie-postgres" % "0.13.4",
-  //"org.tpolecat" %% "doobie-hikari" % "0.13.4",
-
-
-  // https://github.com/typelevel/kind-projector:
-   /*compilerPlugin(
-     "org.typelevel" %% "kind-projector" % "0.13.2" cross CrossVersion.full
-   ),*/
-   /*compilerPlugin(
-     "org.augustjune" %% "context-applied" % "0.1.2"
-   ),*/
-  //"dev.profunktor" %% "console4cats"        % "0.8.1",
-  //"org.manatki"    %% "derevo-cats"         % "0.10.5",
-  //"org.manatki"    %% "derevo-cats-tagless" % "0.10.5",
-  //"co.fs2"         %% "fs2-core"            % "2.2.2",
-  //"com.olegpy"     %% "meow-mtl-core"       % "0.4.0",
-  //"com.olegpy"     %% "meow-mtl-effects"    % "0.4.0",
-  //"com.github.julien-truffaut" %% "monocle-core" % "2.0.1",
-  //"com.github.julien-truffaut" %% "monocle-macro" % "2.0.1",
-
-  //"org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.2"
-
-
-  //"org.jline" %% "jline" % "3.12.3",
-  //"org.scala-lang" % "jline" % "2.10.7",
+  // Other (Cats):
+  "org.typelevel"  %% "cats-core"           % "2.1.0", // Currently used; UPDATE
 
 )
 
