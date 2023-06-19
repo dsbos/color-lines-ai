@@ -1,15 +1,9 @@
-//name := "expl-scala"
 name := "color-lines-ai"
-
 version := "0.1"
 
-scalaVersion := "2.13.10"
-//???? Q: how to insert below in scala-parallel-collections, etc.?
+scalaVersion := "2.13.11"
 
- // https://medium.com/@awesomeorji/sbt-for-the-absolute-beginner-2-settings-and-tasks-6f3b00be1a81
-
-
- //“ThisBuild / scalaVersion := "2.13.0"
+// https://medium.com/@awesomeorji/sbt-for-the-absolute-beginner-2-settings-and-tasks-6f3b00be1a81
 
 
 // Re options, see:
@@ -114,5 +108,3 @@ libraryDependencies ++= Seq(
   "org.typelevel"  %% "cats-core"           % "2.1.0", // Currently used; UPDATE
 
 )
-
-
