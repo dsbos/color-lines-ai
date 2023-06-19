@@ -11,6 +11,8 @@ scalaVersion := "2.13.11"
 // - https://docs.scala-lang.org/overviews/compiler-options/index.html#Advanced_Settings?
 
 scalacOptions ++= Seq(
+  "-Xsource:3",
+
   "-deprecation",        // to get deprecation details
   "-feature",            // to get feature ~warning details
   "-unchecked",          // unclear; "where generated code depends on assumptions."
