@@ -1,5 +1,0 @@
-Selected to-do items:
-- add representative mocking-based _non_--end-to-end testing of GameUI (probably
-  first adjust to inject GameState, then inject test double for GameState)
-- research and try FP-style restructuring of GameUI, especially re reducing
-  mocking
