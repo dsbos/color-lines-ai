@@ -99,6 +99,11 @@ scalacOptions ++= Seq(
 
 
 libraryDependencies ++= Seq(
+  // Enumerations
+  "com.beachape" %% "enumeratum" % "1.7.0",
+
+
+
   "org.scala-lang.modules" %% "scala-swing" % "3.0.0",
   //"org.scala-lang.modules" %% "scala-parser-combinators" % <version>
   //"org.scala-lang.modules" %% "scala-parallel-collections" % "???",
@@ -203,10 +208,3 @@ libraryDependencies ++= Seq(
 )
 
 
-lazy val buildFirst = (project in file("buildFirst"))
-//    .settings(publishArtifact := false)
-
-
-lazy val root = (project in file("."))
-    .aggregate(buildFirst)
-    .dependsOn(buildFirst)
