@@ -21,7 +21,6 @@
 
 # from SBT:
 /project/target
-/project/build.properties
 
 # from IntelliJ? SBT?:
 /.bsp
