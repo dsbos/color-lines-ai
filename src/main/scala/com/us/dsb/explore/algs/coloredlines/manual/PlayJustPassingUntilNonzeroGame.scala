@@ -16,7 +16,8 @@ object PlayJustPassingUntilNonzeroGame extends App {
   var gameCount: Int = 0
   var lastGameScore = -1
   var nonzeroGame: Boolean = false
-  do {
+
+  while ({
     gameCount += 1
     println()
     println(s"@@@@ Game #$gameCount")
@@ -30,9 +31,10 @@ object PlayJustPassingUntilNonzeroGame extends App {
     lastGameScore = gameState.getScore
     if (0 != gameState.getScore) {
       nonzeroGame = true
-
     }
-  } while (! nonzeroGame)
+
+    ! nonzeroGame
+  }) ()
   println(s"At game #$gameCount, non-zero score of $lastGameScore")
 
 }
