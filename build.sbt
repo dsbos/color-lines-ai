@@ -96,17 +96,17 @@ scalacOptions ++= Seq(
 
 libraryDependencies ++= Seq(
   // Unit tests:
-  "org.scalatest" %% "scalatest" % "3.2.14" % Test,  // Currently used; UPDATE
+  "org.scalatest" %% "scalatest"  % "3.2.16" % Test,
 
   // Enumerations
-  "com.beachape" %% "enumeratum" % "1.7.0",  // Currently used; UPDATE; TRY Scala 3 enums
+  "com.beachape" %% "enumeratum"  % "1.7.2",  // ?? TODO: TRY Scala 3 enums
 
 
   // Stronger types:  newtypes and refine's refinement types
-  "io.estatico" %% "newtype"     % "0.4.3", // Currently used; UPDATE; TRY Scala 3 opaque types
-  "eu.timepit"  %% "refined"     % "0.10.1", // Currently used; UPDATE
+  "io.estatico" %% "newtype"      % "0.4.4",  // ?? TODO: TRY Scala 3 opaque types
+  "eu.timepit"  %% "refined"      % "0.11.0",
 
   // Other (Cats):
-  "org.typelevel"  %% "cats-core"           % "2.1.0", // Currently used; UPDATE
+  "org.typelevel"  %% "cats-core" % "2.9.0",
 
 )
