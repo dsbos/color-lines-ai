@@ -1,4 +1,5 @@
-name := "expl-scala"
+//name := "expl-scala"
+name := "color-lines-ai"
 
 version := "0.1"
 
