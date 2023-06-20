@@ -29,9 +29,8 @@ package object board {
 
   import scala.language.implicitConversions // suppress warning from @newtype
 
-  // ?? what exactly does "private" on a newtype affect?
-  @newtype private[board] case class RowIndex(value: Index)
-  @newtype private[board] case class ColumnIndex(value: Index)
+  @newtype case class RowIndex(value: Index)
+  @newtype case class ColumnIndex(value: Index)
 
   //???? add utility methods like withColumnAdjustedBy(delta: Int)? (see GameUIState)
 

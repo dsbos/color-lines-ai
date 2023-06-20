@@ -31,6 +31,13 @@ private[this] case class GameUIState(tapUiGameState: TapUiGameState,
 
   // ???? TODO:  "adjusted"? "offset"?
   private[ui] def withRowAdjustedBy(delta: Int): GameUIState = {
+
+    val x1 = com.us.dsb.explore.algs.coloredlines.manual.game.board.RowIndex
+    val x2: com.us.dsb.explore.algs.coloredlines.manual.game.board.RowIndex = null
+
+    val xxx = com.us.dsb.explore.algs.coloredlines.manual.game.board.RowIndex(adjustAndWrapToRange(cursorAddress.row.value, delta))
+
+
     val adjustedRow = RowIndex(adjustAndWrapToRange(cursorAddress.row.value, delta))
     copy(cursorAddress = cursorAddress.copy(row = adjustedRow))
   }

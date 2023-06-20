@@ -12,6 +12,7 @@ scalaVersion := "2.13.11"
 
 scalacOptions ++= Seq(
   "-Xsource:3",
+  "-source:3.0-migration",
 
   "-deprecation",        // to get deprecation details
   "-feature",            // to get feature ~warning details
@@ -23,11 +24,14 @@ scalacOptions ++= Seq(
 
   "-Wunused:nowarn",
   //"-Wunused:imports",
-  "-Wunused:patvars",
+  //??  "-Wunused:patvars",
+//"-help",
+"--verbose",
+"--explain",
   //"-Wunused:privates",
   //"-Wunused:locals",
   //"-Wunused:explicits", // explicit _parameters_
-  "-Wunused:implicits",   // explicit _parameters_
+//??  "-Wunused:implicits",   // explicit _parameters_
   //"-Wunused:params",    // -Wunused:explicits,implicits.
   //"-Wunused:linted",    // -Xlint:unused.
   //??: -Wunused:synthetics?
@@ -96,17 +100,26 @@ scalacOptions ++= Seq(
 
 libraryDependencies ++= Seq(
   // Unit tests:
-  "org.scalatest" %% "scalatest"  % "3.2.16" % Test,
+//??  "org.scalatest" %% "scalatest"  % "3.2.16" % Test,
+  ("org.scalatest" %% "scalatest"  % "3.2.16" % Test),
 
   // Enumerations
-  "com.beachape" %% "enumeratum"  % "1.7.2",  // ?? TODO: TRY Scala 3 enums
+//??  "com.beachape" %% "enumeratum"  % "1.7.2",  // ?? TODO: TRY Scala 3 enums
+  ("com.beachape" %% "enumeratum"  % "1.7.2"),  // ?? TODO: TRY Scala 3 enums
 
 
   // Stronger types:  newtypes and refine's refinement types
-  "io.estatico" %% "newtype"      % "0.4.4",  // ?? TODO: TRY Scala 3 opaque types
-  "eu.timepit"  %% "refined"      % "0.11.0",
+//??  "io.estatico" %% "newtype"      % "0.4.4",  // ?? TODO: TRY Scala 3 opaque types
+//??  "io.estatico" % "newtype"      % "0.4.4",  // ?? TODO: TRY Scala 3 opaque types
+//??  "io.estatico" % "newtype_3"      % "0.4.4",  // ?? TODO: TRY Scala 3 opaque types
+  ("io.estatico" %% "newtype" % "0.4.4").cross(CrossVersion.for3Use2_13),
+
+
+//??  "eu.timepit"  %% "refined"      % "0.11.0",
+  ("eu.timepit"  %% "refined"      % "0.11.0"),
 
   // Other (Cats):
-  "org.typelevel"  %% "cats-core" % "2.9.0",
+//??  "org.typelevel"  %% "cats-core" % "2.9.0",
+  ("org.typelevel"  %% "cats-core" % "2.9.0"),
 
 )
