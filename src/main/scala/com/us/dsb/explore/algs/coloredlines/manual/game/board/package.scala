@@ -25,6 +25,9 @@ package object board {
 
   /** Board row or column index integer; 1-based; top row, left column row are #1. */
   private[manual] type Index = Int Refined Closed[1, BoardOrder]
+
+  // ?? TODO 2->3 . refined:  Review refined_3 way to do following:
+  import scala.language.adhocExtensions  // re extending non-"open" (2.13) Numeric:
   private[manual] object Index extends RefinedTypeOps.Numeric[Index, Int]
 
   import scala.language.implicitConversions // suppress warning from @newtype
