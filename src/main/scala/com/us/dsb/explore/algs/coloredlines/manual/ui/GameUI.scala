@@ -46,7 +46,7 @@ private[manual] object GameUI {
   // parse function, but then (sub)layers wouldn't be separated.)
 
   // ?? revisit Either--use something fancier (MonadError)?
-  private[this] def parseCommand(rawCmdLine: Option[String]): Either[String, UICommand] = {
+  private def parseCommand(rawCmdLine: Option[String]): Either[String, UICommand] = {
     import UICommand.*
     rawCmdLine match {
       case None       => Quit.asRight
@@ -65,7 +65,7 @@ private[manual] object GameUI {
   }
 
   @tailrec
-  private[this] def getCommand(io: SegregatedConsoleIO): UICommand = {
+  private def getCommand(io: SegregatedConsoleIO): UICommand = {
     val cmdLineOpt = io.readPromptedLine(s"Command?: ")
     parseCommand(cmdLineOpt) match {
       case Right(cmd) => cmd
@@ -76,9 +76,9 @@ private[manual] object GameUI {
     }
   }
 
-  private[this] def moveSelection(uiState: GameUIState,
-                                  moveCommand: UICommand.UIMoveCommand
-                                 ): GameUIState = {
+  private def moveSelection(uiState: GameUIState,
+                            moveCommand: UICommand.UIMoveCommand
+                           ): GameUIState = {
     //????? test
     import UICommand.*
     moveCommand match {
@@ -90,9 +90,9 @@ private[manual] object GameUI {
   }
 
   // ?????? TODO: maybe "move ball at selection" (vs. "make move at ...")?
-  private[this] def moveAtSelection(io: SegregatedConsoleIO,
-                                    uiState: GameUIState
-                                   ): GameUIState = {
+  private def moveAtSelection(io: SegregatedConsoleIO,
+                              uiState: GameUIState
+                             ): GameUIState = {
     //????? test
     val moveResult = uiState.tapUiGameState.tryMoveAt(uiState.cursorAddress)
     moveResult match {
@@ -106,7 +106,7 @@ private[manual] object GameUI {
     }
   }
 
-  private[this] def doQuit: GameUIResult = {
+  private def doQuit: GameUIResult = {
     GameUIResult("Game was quit")
   }
 
@@ -114,10 +114,10 @@ private[manual] object GameUI {
    *
    * @return next state (`Right`) or disposition of game (`Left`)
    */
-  private[this] def doCommand(io: SegregatedConsoleIO,
-                              uiState: GameUIState,
-                              command: UICommand
-                             ): Either[GameUIResult, GameUIState] = {
+  private def doCommand(io: SegregatedConsoleIO,
+                        uiState: GameUIState,
+                        command: UICommand
+                       ): Either[GameUIResult, GameUIState] = {
     import UICommand.*
     command match {
       case Quit =>
@@ -148,9 +148,9 @@ private[manual] object GameUI {
    * game over or quit.
    */
   @tailrec
-  private[this] def getAndDoUiCommands(io: SegregatedConsoleIO,
-                                       uiState: GameUIState
-                                      ): GameUIResult = {
+  private def getAndDoUiCommands(io: SegregatedConsoleIO, 
+                                 uiState: GameUIState
+                                ): GameUIResult = {
     io.printStateText("")
     io.printStateText(uiState.toDisplayString)
     val command = getCommand(io)

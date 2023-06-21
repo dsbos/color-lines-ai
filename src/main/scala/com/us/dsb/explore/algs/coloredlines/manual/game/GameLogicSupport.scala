@@ -17,13 +17,13 @@ object GameLogicSupport {
   private[game] val InitialBallCount: Int = 5
   private[game] val OnDeckBallCount: Int = 3
 
-  // (was "private[this]" before test calls:)
+  // (was "private" before test calls:)
   private[game] def pickRandomBallColor()(implicit rng: Random): BallColor = {
     BallColor.values(rng.nextInt(BallColor.values.size))
   }
 
   /** Selects an empty cell randomly (if any). */
-  // (was "private[this]" before test calls:)
+  // (was "private" before test calls:)
   @tailrec
   private[game] def pickRandomEmptyCell(gameState: LowerGameState)
                                        (implicit rng: Random): Option[CellAddress] = {
@@ -39,7 +39,7 @@ object GameLogicSupport {
     }
   }
 
-  private[this] def replenishOnDeckBalls(board: Board)(implicit rng: Random): Board =
+  private def replenishOnDeckBalls(board: Board)(implicit rng: Random): Board =
     board.withOnDeckBalls(List.fill(OnDeckBallCount)(pickRandomBallColor()))
 
   /**
@@ -65,8 +65,8 @@ object GameLogicSupport {
   // ???? TODO:  Maybe handle board-full condition more cleanly (don't dequeue
   //   unplaced balls, don't over-replenish).  Maybe fail fast, and don't depend
   //   on (irregular) callers to check whether board becomes full.
-  private[this] def placeOndeckBalls(gameState: LowerGameState)
-                                    (implicit rng: Random): BallArrivalResult = {
+  private def placeOndeckBalls(gameState: LowerGameState)
+                              (implicit rng: Random): BallArrivalResult = {
     val postPlacementResult =
       //???? for 1 to 3, consume on-deck ball from list, and then place (better for internal state view);
       // can replenish incrementally or later; later might show up better in internal state view
@@ -101,7 +101,7 @@ object GameLogicSupport {
   //???: likely move core algorithm out; possibly move outer code into LowerGameState/Board:
   /**
    * @param toTapCell - must be empty */
-  // (was "private[this]" before test calls:)
+  // (was "private" before test calls:)
   private[game] def pathExists(gameState: LowerGameState,
                                fromBallCell: CellAddress,
                                toTapCell: CellAddress): Boolean = {

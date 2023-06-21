@@ -23,7 +23,7 @@ private[ui] object TapUiGameState {
     private[ui] case class Done(score: Int) extends GameResult
   }
 
-  private[this] def makeInitialState(implicit rng: Random): TapUiGameState = {
+  private def makeInitialState(implicit rng: Random): TapUiGameState = {
     // ???? TODO:  Move "GameLogicSupport.placeInitialBalls(LowerGameState.empty)" down into GameLogicSupport
     val initialPlacementResult = GameLogicSupport.placeInitialBalls(LowerGameState.empty)
     TapUiGameState(initialPlacementResult.gameState, None)

@@ -8,11 +8,11 @@ import com.us.dsb.explore.algs.coloredlines.manual.game.*
 //  virtual tap-level UI vs. text-controlled selection-based ~simulation of taps
 
 // ?? somewhere expand to allow for history (maybe via Semigroup or whatever has .compose?)
-private[this] case class GameUIState(tapUiGameState: TapUiGameState,
+private case class GameUIState(tapUiGameState: TapUiGameState,
                                      cursorAddress: CellAddress) {
 
   // ?? clean up that floorMod; I just want plain mathematical mod:
-  private[this] def adjustAndWrapToRange(unincremented: Index, delta: Int): Index = {
+  private def adjustAndWrapToRange(unincremented: Index, delta: Int): Index = {
     //????? test (at least callers)
     // ?? maybe enable auto-wrapping and -unwrapping around math
     val indexOrigin = Index.MinValue.value
@@ -50,7 +50,7 @@ private[this] case class GameUIState(tapUiGameState: TapUiGameState,
     }
   }
 
-  private[this] def renderTableMultilineWithSelection: String = {
+  private def renderTableMultilineWithSelection: String = {
     val cellWidth = " X ".length
     val cellSeparator = "|"
     // ?? use new Order or leave using indices declarations?
@@ -78,7 +78,7 @@ private[this] case class GameUIState(tapUiGameState: TapUiGameState,
   }
 
   // ?? Unused as of 2023-06-08; previously in LowerGameState.
-  private[this] def renderCompactTableMultilineWithSelection(selectionAddress: Option[CellAddress]): String = {
+  private def renderCompactTableMultilineWithSelection(selectionAddress: Option[CellAddress]): String = {
     rowIndices.map { row =>
       columnIndices.map { column =>
         val addr = CellAddress(row, column)

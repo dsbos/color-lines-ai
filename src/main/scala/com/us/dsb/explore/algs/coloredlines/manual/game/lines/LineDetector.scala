@@ -15,14 +15,14 @@ private[manual] object LineDetector {
                                      rowDelta: Int, // -1 / 0 / 1
                                      colDelta: Int)
 
-  private[this] val lineAxes =
+  private val lineAxes =
     List(
       LineAxis("→",  0, +1), // →  W -->  E
       LineAxis("↘", +1, +1), // ↘ NW --> SE
       LineAxis("↓", +1,  0), // ↓ N  --> S
       LineAxis("↙", +1, -1)) // ↙ NW --> SW
 
-  private[this] val relativeDirectionFactors = List(1, -1) // use type of length 2 (refined List?, Tuple2?, some array?)
+  private val relativeDirectionFactors = List(1, -1) // use type of length 2 (refined List?, Tuple2?, some array?)
 
   private[lines] def haveMatchingBallAt(moveBallColor: BallColor,
                                         board: Board,

@@ -13,15 +13,15 @@ private[manual] object LowerGameState {
  * (Lower-level): game state:  board and score.  (No more tap-UI selection state.)
  */
 private[manual] class LowerGameState(private[manual] val board: Board,
-                                     private[this] val score: Int
+                                     private         val score: Int
                                     ) {
   println("* LowerGameState  : " + this)
   //print("")
 
   // internal/support methods:
 
-  private[this] def copy(board: Board = board,
-                         score: Int   = score) =
+  private def copy(board: Board = board,
+                   score: Int   = score) =
     new LowerGameState(board, score)
 
   // board state:

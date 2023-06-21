@@ -9,8 +9,8 @@ class GameUITest extends AnyFunSpec {
 
   // Crude, manual stub and spy SegregatedTextIO.
   class SegregatedConsoleIODouble(inputLines: String*) extends SegregatedConsoleIO {
-    private[this] var remainingInputs = inputLines
-    private[this] var printedStringsReversed: List[String] = Nil
+    private var remainingInputs = inputLines
+    private var printedStringsReversed: List[String] = Nil
     // (no tracking of via which method wrote string)
     def getPrintedStrings: List[String] = printedStringsReversed.reverse
 

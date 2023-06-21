@@ -3,10 +3,10 @@ package com.us.dsb.explore.algs.coloredlines
 //import scala.tools.nsc.doc.html.HtmlTags.Input
 
 
-private[this] object ColoredLinesSomething extends App {
+private object ColoredLinesSomething extends App {
 
 
-  private[this] trait NeuralStructure
+  private trait NeuralStructure
   // - defines structure:
   //   - number and IDs/labels of input and output neurons
   //   - number of hidden-layer neurons
@@ -31,31 +31,31 @@ private[this] object ColoredLinesSomething extends App {
   def sigmoid(x: Double): Double = 1 / (1 + math.exp(-x))
 
 
-  private[this] case class Activation(v: Double = 0.5f) extends AnyVal
-  private[this] case class Weight(v: Double) extends AnyVal
-  private[this] case class Bias(v: Double) extends AnyVal
+  private case class Activation(v: Double = 0.5f) extends AnyVal
+  private case class Weight(v: Double) extends AnyVal
+  private case class Bias(v: Double) extends AnyVal
 
   type NeuronRef = Int
-  private[this] case class Edge1(weight: Weight, sourceRef: NeuronRef)
-  private[this] case class Neuron(bias1: Weight, edges: Vector[Edge1])
+  private case class Edge1(weight: Weight, sourceRef: NeuronRef)
+  private case class Neuron(bias1: Weight, edges: Vector[Edge1])
 
-  private[this] trait Neuron2 {
+  private trait Neuron2 {
     def getActivation: Activation
   }
-  private[this] trait InputNeuron2 extends Neuron2 {
+  private trait InputNeuron2 extends Neuron2 {
     def setActivation(activation: Activation): Unit
   }
-  private[this] trait NoninputNeuron2 extends Neuron2 {
+  private trait NoninputNeuron2 extends Neuron2 {
     def getBias: Bias
     def getInputEdges: Seq[Edge2]
   }
-  private[this] trait Edge2 {
+  private trait Edge2 {
     def getSource: Neuron2
     def getWeight: Weight
     def getWeightedActivation: Double  //????
   }
 
-  private[this] class InputNeuron2Impl() extends InputNeuron2 {
+  private class InputNeuron2Impl() extends InputNeuron2 {
     var activation: Activation = scala.compiletime.uninitialized
     override def setActivation(activation: Activation): Unit = {
       this.activation = activation
@@ -63,7 +63,7 @@ private[this] object ColoredLinesSomething extends App {
     override def getActivation: Activation = activation
   }
 
-  private[this] class Edge2Impl(source: Neuron2, weight: Weight) extends Edge2 {
+  private class Edge2Impl(source: Neuron2, weight: Weight) extends Edge2 {
     override def getSource: Neuron2 = source
     override def getWeight: Weight = weight
     override def getWeightedActivation: Double = {
@@ -71,7 +71,7 @@ private[this] object ColoredLinesSomething extends App {
     }
   }
 
-  private[this] class NoninputNeuron2Impl(bias: Bias, inputEdges: Seq[Edge2]) extends NoninputNeuron2 {
+  private class NoninputNeuron2Impl(bias: Bias, inputEdges: Seq[Edge2]) extends NoninputNeuron2 {
     override def getBias: Bias = bias
 
     override def getInputEdges: Seq[Edge2] = inputEdges
@@ -88,12 +88,12 @@ private[this] object ColoredLinesSomething extends App {
     }
   }
 
-  private[this] val in1 = new InputNeuron2Impl()
-  private[this] val in2 = new InputNeuron2Impl()
+  private val in1 = new InputNeuron2Impl()
+  private val in2 = new InputNeuron2Impl()
 
-  private[this] val e1 = new Edge2Impl(in1, Weight(1))
-  private[this] val e2 = new Edge2Impl(in2, Weight(-1))
-  private[this] val xn1 = new NoninputNeuron2Impl(Bias(0), Vector(e1, e2))
+  private val e1 = new Edge2Impl(in1, Weight(1))
+  private val e2 = new Edge2Impl(in2, Weight(-1))
+  private val xn1 = new NoninputNeuron2Impl(Bias(0), Vector(e1, e2))
 
   in1.setActivation(Activation(0.2))
   in2.setActivation(Activation(0.1))
@@ -103,7 +103,7 @@ private[this] object ColoredLinesSomething extends App {
   println(s"xn1.getActivation = ${xn1.getActivation}")
   println("---")
 
-  private[this] val lines = Vector(
+  private val lines = Vector(
     ( (1, 1), (1, 2), (1, 3) ),
     ( (2, 1), (2, 2), (2, 3) ),
     ( (3, 1), (3, 2), (3, 3) ),
@@ -118,8 +118,8 @@ private[this] object ColoredLinesSomething extends App {
 
   //  trait CellPosition
 
-  private[this] case class CellCoordinates(rowOrdinal: Int,
-                                           columnOrdinal: Int) //??extends CellPosition;
+  private case class CellCoordinates(rowOrdinal: Int,
+                                     columnOrdinal: Int) //??extends CellPosition;
 
 
 

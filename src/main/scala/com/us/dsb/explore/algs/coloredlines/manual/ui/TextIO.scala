@@ -14,7 +14,7 @@ private[ui] trait GenericConsoleIO {
   def readLine(prompt: String): Option[String]
 }
 
-private[this] object LiveGenericConsoleIO extends GenericConsoleIO {
+private object LiveGenericConsoleIO extends GenericConsoleIO {
   override def println(lineOrLines: String): Unit = Predef.println(lineOrLines)
   override def readLine(prompt: String): Option[String] = Option(scala.io.StdIn.readLine(prompt))
 }
@@ -37,9 +37,9 @@ private[ui] class BaseSegregatedConsoleIO(cio: GenericConsoleIO) extends Segrega
   private[ui] override def printResult(lineOrLines: String): Unit = cio.println(lineOrLines)
 }
 
-private[this] class PlainSegregatedConsoleIO(cio: GenericConsoleIO) extends BaseSegregatedConsoleIO(cio)
+private class PlainSegregatedConsoleIO(cio: GenericConsoleIO) extends BaseSegregatedConsoleIO(cio)
 
-private[this] object LivePlainSegregatedConsoleIO extends PlainSegregatedConsoleIO(LiveGenericConsoleIO)
+private object LivePlainSegregatedConsoleIO extends PlainSegregatedConsoleIO(LiveGenericConsoleIO)
 
 // (Expect to have test-double version in tests.)
 
