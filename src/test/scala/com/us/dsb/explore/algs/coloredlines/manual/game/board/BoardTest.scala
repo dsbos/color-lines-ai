@@ -52,25 +52,25 @@ class BoardTest extends AnyFunSpec {
     it("should compute 0 for first row, first column") {
       // ?? TODO 2->3 . refined:  Change Index.unsafeFrom back to Index once macros re-exist:
       val address_1_1  = CellAddress(RowIndex(Index.unsafeFrom(1)), columnIndices.head)
-      val index = Board.empty invokePrivate vectorIndex(address_1_1)
+      val index = Board.empty `invokePrivate` vectorIndex(address_1_1)
       index shouldEqual 0
     }
 
     it("should compute array length - 1 for last row, last column") {
       // ?? TODO 2->3 . refined:  Change Index.unsafeFrom back to Index once macros re-exist:
       val address_n_n  = CellAddress(rowIndices.last, ColumnIndex(Index.unsafeFrom(9)))  //????? use BoardOrder?
-      val index = Board.empty invokePrivate vectorIndex(address_n_n)
+      val index = Board.empty `invokePrivate` vectorIndex(address_n_n)
       index shouldEqual BoardOrder * BoardOrder - 1
     }
 
     describe("should compute indices in row-major order (chosen but ~isolated):") {
       it("- (IO 1) row 1 column 3 => (IO 0) vector index 2") {
         val `row 1 column 3` = CellAddress(rowIndices.head, columnIndices(3 - 1))
-        Board.empty invokePrivate vectorIndex(`row 1 column 3`) shouldEqual 3 - 1
+        Board.empty `invokePrivate` vectorIndex(`row 1 column 3`) shouldEqual 3 - 1
       }
       it("- (IO 1) row 3 column 1 => (IO 0) vector index 8") {  //????? adjust label?
         val `row 3 column 1` = CellAddress(rowIndices(3 - 1), columnIndices.head)
-        Board.empty invokePrivate vectorIndex(`row 3 column 1`) shouldEqual
+        Board.empty `invokePrivate` vectorIndex(`row 3 column 1`) shouldEqual
             (3 - 1) * BoardOrder + (1 - 1)
       }
     }
