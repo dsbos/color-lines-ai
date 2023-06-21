@@ -50,13 +50,15 @@ class BoardTest extends AnyFunSpec {
     val vectorIndex = PrivateMethod[Int](Symbol("vectorIndex"))
 
     it("should compute 0 for first row, first column") {
-      val address_1_1  = CellAddress(RowIndex(Index(1)), columnIndices.head)
+      // ?? TODO 2->3 . refined:  Change Index.unsafeFrom back to Index once macros re-exist:
+      val address_1_1  = CellAddress(RowIndex(Index.unsafeFrom(1)), columnIndices.head)
       val index = Board.empty invokePrivate vectorIndex(address_1_1)
       index shouldEqual 0
     }
 
     it("should compute array length - 1 for last row, last column") {
-      val address_n_n  = CellAddress(rowIndices.last, ColumnIndex(Index(9)))  //????? use BoardOrder?
+      // ?? TODO 2->3 . refined:  Change Index.unsafeFrom back to Index once macros re-exist:
+      val address_n_n  = CellAddress(rowIndices.last, ColumnIndex(Index.unsafeFrom(9)))  //????? use BoardOrder?
       val index = Board.empty invokePrivate vectorIndex(address_n_n)
       index shouldEqual BoardOrder * BoardOrder - 1
     }
