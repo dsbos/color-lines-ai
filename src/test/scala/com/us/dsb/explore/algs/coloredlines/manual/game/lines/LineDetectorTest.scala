@@ -7,8 +7,8 @@ import org.scalatest.PrivateMethodTester
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers._
 
-import scala.reflect.internal.util.TableDef.Column
-import scala.tools.nsc.doc.base.comment.Cell
+//??????import scala.reflect.internal.util.TableDef.Column
+//??????import scala.tools.nsc.doc.base.comment.Cell
 
 class LineDetectorTest extends AnyFunSpec {
 
