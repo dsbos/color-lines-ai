@@ -1,125 +1,72 @@
 name := "color-lines-ai"
 version := "0.1"
 
-scalaVersion := "2.13.11"
-
 // https://medium.com/@awesomeorji/sbt-for-the-absolute-beginner-2-settings-and-tasks-6f3b00be1a81
 
+scalaVersion := "3.3.0"
 
-// Re options, see:
-// - https://docs.scala-lang.org/overviews/compiler-options/index.html#Standard_Settings
-// - https://docs.scala-lang.org/overviews/compiler-options/index.html#Advanced_Settings?
+// Re 3.x options, see:
+// - https://docs.scala-lang.org/overviews/compiler-options/index.html
+// - https://docs.scala-lang.org/scala3/guides/migration/options-intro.html
+// - https://docs.scala-lang.org/scala3/guides/migration/options-new.html
+// - https://docs.scala-lang.org/scala3/guides/migration/options-lookup.html
+
+
+
+  /* Key/likely options (from "-help"; does't include -W/-X/etc. output):
+               -Wconf  Configure compiler warnings.
+              -Werror  Fail the compilation if there are any warnings.
+         -deprecation  Emit warning and location for usages of deprecated APIs.
+             -explain  Explain errors in more detail.
+             -feature  Emit warning and location for usages of features that
+                       should be imported explicitly.
+              -nowarn  Silence all warnings.
+         -print-lines  Show source code line numbers.
+              -source  source version
+                       Default 3.3
+                       Choices : 3.0-migration, 3.0, 3.1, 3.2-migration, 3.2,
+                       3.3-migration, 3.3, future-migration, future
+           -unchecked  Enable additional warnings where generated code depends
+                       on assumptions.
+             -verbose  Output messages about what the compiler is doing.
+             -version  Print product version and exit.
+ */
+  /*
+
+  */
+  /* Other likely options:
+    - ?? TODO:  See when dead-code checking is implemented in Scala 3
+    - ?? TODO:  Check other warnings/linting checks
+  */
 
 scalacOptions ++= Seq(
-  "-Xsource:3",
-  "-source:3.0-migration",
+  "-deprecation",  // "Emit warning and location for usages of deprecated APIs."
+  "-explain",      // "Explain errors in more detail."
+  "-feature",      // "Emit warning and location for usages of features that should be imported explicitly."
+  "-unchecked",    // "Enable additional warnings where generated code depends on assumptions."
 
-  "-deprecation",        // to get deprecation details
-  "-feature",            // to get feature ~warning details
-  "-unchecked",          // unclear; "where generated code depends on assumptions."
-  "-Ymacro-annotations", // for macros like "@newtype" (apparently)
-
-  "-Xlint:-unused,_",
-  // -Xlint:unused sets -Wunused:imports,privates,locals,implicits.
-
-  "-Wunused:nowarn",
-  //"-Wunused:imports",
-  //??  "-Wunused:patvars",
-//"-help",
-"--verbose",
-"--explain",
-  //"-Wunused:privates",
-  //"-Wunused:locals",
-  //"-Wunused:explicits", // explicit _parameters_
-//??  "-Wunused:implicits",   // explicit _parameters_
-  //"-Wunused:params",    // -Wunused:explicits,implicits.
-  //"-Wunused:linted",    // -Xlint:unused.
-  //??: -Wunused:synthetics?
-
-  //??: -Vimplicits?
-
-
+  // "-help",  // Print a synopsis of standard options.
+  // "-V",     // Print a synopsis of verbose options.
+  // "-W",     // Print a synopsis of warning options.
+  // "-X",     // Print a synopsis of advanced options.
+  // "-Y",     //  Print a synopsis of private options.
   )
-
-// -explaintypes?
-// -Werror / -Xfatal-warnings
-
-/*
--Xsource
-
-
--Wdead-code      or -Ywarn-dead-code
--Wextra-implicit or -Ywarn-extra-implicit
--Wvalue-discard  or -Ywarn-value-discard
--Wnumeric-widen or -Ywarn-numeric-widen
--Woctal-literal or -Ywarn-octal-literal
--Wself-implicit or -Ywarn-self-implicit
-
--Wunused:WARNING1,WARNING2 or -Ywarn-unused:WARNING1,WARNING2:
-  - imports   - Warn if an import selector is not referenced.
-  - patvars   - Warn if a variable bound in a pattern is unused.
-  - privates  - Warn if a private member is unused.
-  - locals    - Warn if a local definition is unused.
-  - explicits - Warn if an explicit parameter is unused.
-  - implicits - Warn if an implicit parameter is unused.
-  - params    - Enable -Wunused:explicits,implicits.
-  - linted    - "-Xlint:unused." huh?
-
-
--Xlint:WARNING1,WARNING2 ("-WARNING" suppresses, "_" enables all others?):
-  - adapted-args - Warn if an argument list is modified to match the receiver.
-  - nullary-unit - Warn when nullary methods return Unit.
-  - inaccessible - Warn about inaccessible types in method signatures.
-  - nullary-override - Warn when non-nullary def f() overrides nullary def f.
-  - infer-any - Warn when a type argument is inferred to be Any.
-  - missing-interpolator - A string literal appears to be missing an interpolator id.
-  - doc-detached - A Scaladoc comment appears to be detached from its element.
-  - private-shadow - A private field (or class parameter) shadows a superclass field.
-  - type-parameter-shadow - A local type parameter shadows a type already in scope.
-  - poly-implicit-overload - Parameterized overloaded implicit methods are not visible as view bounds.
-  - option-implicit - Option.apply used implicit view.
-  - delayedinit-select - Selecting member of DelayedInit.
-  - package-object-classes - Class or object defined in package object.
-  - stars-align - Pattern sequence wildcard must align with sequence component.
-  - constant - Evaluation of a constant arithmetic expression results in an error.
-  - unused - Enable -Wunused:imports,privates,locals,implicits.
-  - nonlocal-return - A return statement used an exception for flow control.
-  - implicit-not-found - Check @implicitNotFound and @implicitAmbiguous messages.
-  - serial - @SerialVersionUID on traits and non-serializable classes.
-  - valpattern - Enable pattern checks in val definitions.
-  - eta-zero - Warn on eta-expansion (rather than auto-application) of zero-ary method.
-  - eta-sam - Warn on eta-expansion to meet a Java-defined functional interface that is not explicitly annotated with @FunctionalInterface.
-  - deprecation - Enable linted deprecations.
-
-- e.g.: -Wconf:msg=match may not be exhaustive:i
-        -Wconf:cat=deprecation:ws,cat=feature:ws,cat=optimizer:ws
-        https://www.scala-lang.org/2021/01/12/configuring-and-suppressing-warnings.html
-
-*/
 
 
 libraryDependencies ++= Seq(
   // Unit tests:
-//??  "org.scalatest" %% "scalatest"  % "3.2.16" % Test,
-  ("org.scalatest" %% "scalatest"  % "3.2.16" % Test),
+  "org.scalatest" %% "scalatest"  % "3.2.16" % Test,
 
-  // Enumerations
-//??  "com.beachape" %% "enumeratum"  % "1.7.2",  // ?? TODO: TRY Scala 3 enums
-  ("com.beachape" %% "enumeratum"  % "1.7.2"),  // ?? TODO: TRY Scala 3 enums
+  // Enumerations:
+  // ?? TODO: TRY Scala 3 enums
+  "com.beachape" %% "enumeratum"  % "1.7.2",
 
-
-  // Stronger types:  newtypes and refine's refinement types
-//??  "io.estatico" %% "newtype"      % "0.4.4",  // ?? TODO: TRY Scala 3 opaque types
-//??  "io.estatico" % "newtype"      % "0.4.4",  // ?? TODO: TRY Scala 3 opaque types
-//??  "io.estatico" % "newtype_3"      % "0.4.4",  // ?? TODO: TRY Scala 3 opaque types
-  ("io.estatico" %% "newtype" % "0.4.4").cross(CrossVersion.for3Use2_13),
-
-
-//??  "eu.timepit"  %% "refined"      % "0.11.0",
-  ("eu.timepit"  %% "refined"      % "0.11.0"),
+  // Stronger types (newtypes and refine's refinement types):
+  // ?? TODO: TRY Scala 3 opaque types
+  ("io.estatico" %% "newtype"     % "0.4.4").cross(CrossVersion.for3Use2_13),
+  // ?? TODO:  See https://github.com/Iltotore/iron if refined doesn't re-add compile-time checks.
+  "eu.timepit"  %% "refined"      % "0.11.0",
 
   // Other (Cats):
-//??  "org.typelevel"  %% "cats-core" % "2.9.0",
-  ("org.typelevel"  %% "cats-core" % "2.9.0"),
-
+  "org.typelevel"  %% "cats-core" % "2.9.0",
 )
