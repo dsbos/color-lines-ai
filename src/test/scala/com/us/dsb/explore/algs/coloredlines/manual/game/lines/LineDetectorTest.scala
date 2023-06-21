@@ -5,7 +5,7 @@ import com.us.dsb.explore.algs.coloredlines.manual.game.board.{
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.PrivateMethodTester
 import org.scalatest.funspec.AnyFunSpec
-import org.scalatest.matchers.should.Matchers._
+import org.scalatest.matchers.should.Matchers.*
 
 
 class LineDetectorTest extends AnyFunSpec {

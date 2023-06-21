@@ -2,7 +2,7 @@ package com.us.dsb.explore.algs.coloredlines.manual.game.board
 
 import org.scalatest.PrivateMethodTester
 import org.scalatest.funspec.AnyFunSpec
-import org.scalatest.matchers.should.Matchers._
+import org.scalatest.matchers.should.Matchers.*
 
 class BoardTest extends AnyFunSpec {
 
@@ -46,7 +46,7 @@ class BoardTest extends AnyFunSpec {
   }
 
   describe("Board.vectorIndex (private method we want to test directly):") {
-    import PrivateMethodTester._
+    import PrivateMethodTester.*
     val vectorIndex = PrivateMethod[Int](Symbol("vectorIndex"))
 
     it("should compute 0 for first row, first column") {

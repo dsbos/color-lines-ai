@@ -14,7 +14,7 @@ private[game] object Board {
   private[game] def empty: Board =
     new Board(Vector.fill[CellBallState](BoardOrder * BoardOrder)(CellBallState.empty), Nil)
 }
-import Board._
+import Board.*
 
 
 /**

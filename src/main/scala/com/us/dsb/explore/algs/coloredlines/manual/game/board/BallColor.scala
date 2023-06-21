@@ -22,7 +22,7 @@ private[manual] sealed class BallColor(private[manual] val initial: String,
 }
 
 private[game] object BallColor extends Enum[BallColor] {
-  import AnsiColor._
+  import AnsiColor.*
   // original: blue.dark, blue.light, brown, green, purple, red, yellow
   private[this] case object Blue    extends BallColor("b",  BLUE,    BLUE_B)
   private[this] case object Cyan    extends BallColor("c",  CYAN,    CYAN_B)

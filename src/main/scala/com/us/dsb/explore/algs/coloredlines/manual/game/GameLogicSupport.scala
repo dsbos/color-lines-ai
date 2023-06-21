@@ -1,6 +1,6 @@
 package com.us.dsb.explore.algs.coloredlines.manual.game
 
-import cats.syntax.option._
+import cats.syntax.option.*
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.{
   BallColor, Board, BoardOrder, CellAddress, LowerGameState, columnIndices, rowIndices}
 import com.us.dsb.explore.algs.coloredlines.manual.game.lines.LineDetector

@@ -44,7 +44,7 @@ private[this] object LivePlainSegregatedConsoleIO extends PlainSegregatedConsole
 // (Expect to have test-double version in tests.)
 
 private[manual] class ColoredSegregatedConsoleIO(cio: GenericConsoleIO) extends BaseSegregatedConsoleIO(cio) {
-  import scala.io.AnsiColor._
+  import scala.io.AnsiColor.*
   private[ui] override def readPromptedLine(prompt: String): Option[String] =
     super.readPromptedLine(BLUE + prompt + RESET)
   private[ui] override def printError(fullLine: String): Unit =

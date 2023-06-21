@@ -1,9 +1,9 @@
 package com.us.dsb.explore.algs.coloredlines.manual.ui
 
 import com.us.dsb.explore.algs.coloredlines.manual.ui.GameUI.UICommand
-import org.scalatest.AppendedClues._
+import org.scalatest.AppendedClues.*
 import org.scalatest.funspec.AnyFunSpec
-import org.scalatest.matchers.should.Matchers._
+import org.scalatest.matchers.should.Matchers.*
 
 class GameUITest extends AnyFunSpec {
 
@@ -39,7 +39,7 @@ class GameUITest extends AnyFunSpec {
 
 
   describe("XxgetCommand:") {
-    import org.scalatest.PrivateMethodTester._
+    import org.scalatest.PrivateMethodTester.*
     val getCommand = PrivateMethod[UICommand](Symbol("getCommand"))
 
     describe("Xxfor some valid command:") {
@@ -47,7 +47,7 @@ class GameUITest extends AnyFunSpec {
 //        val ioDouble = new SegregatedTextIODouble("u")
 //        val callResult = XxGameUI invokePrivate getCommand(ioDouble, Player.X)
 //      }
-//      import LazyShared._
+//      import LazyShared.*
 //
 //      it("Xxshould return decoded command") {
 //        // Note: Can't break line line before withClue; "... . withClue(...)" and
@@ -66,7 +66,7 @@ class GameUITest extends AnyFunSpec {
 //        val ioDouble = new SegregatedTextIODouble("?", "u")
 //        val callResult = XxGameUI invokePrivate getCommand(ioDouble, Player.X)
 //      }
-//      import LazyShared._
+//      import LazyShared.*
 //
 //      it("Xxshould emit prompt, error, and second prompt line") {
 //        ioDouble.getPrintedStrings shouldBe

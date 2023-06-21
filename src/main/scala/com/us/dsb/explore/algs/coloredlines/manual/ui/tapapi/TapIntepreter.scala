@@ -36,7 +36,7 @@ object TapIntepreter {
       case object HadSel extends HadSelOrNot
       case object NoSel  extends HadSelOrNot
     }
-    import RenameOrFlattenThis._
+    import RenameOrFlattenThis.*
 
     val onBallOrEmpty = if (onABall)            OnBall  else OnEmpty
     val onSelOrUnsel  = if (isSelectedAt)       OnSel   else OnUnsel
@@ -45,7 +45,7 @@ object TapIntepreter {
 
     val tapCase: TapCase = {
       val conditions = (onBallOrEmpty, hadBallOrNot, onSelOrUnsel, hadSelOrNot)
-      import TapCase._
+      import TapCase.*
       conditions match {
         case (OnBall,  _,       OnUnsel, _     ) => SelectBallTap    // - tap on ball  when unselected
         case (OnEmpty, HadBall, _,       _     ) => TryMoveBallTap   // - tap on empty when ball selected

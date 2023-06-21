@@ -2,8 +2,8 @@
 //  (eventually) splitting virtual tap level vs. text-control level:
 package com.us.dsb.explore.algs.coloredlines.manual.ui
 
-import cats.syntax.option._
-import cats.syntax.either._
+import cats.syntax.option.*
+import cats.syntax.either.*
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.{ColumnIndex, Index, RowIndex}
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.CellAddress
 import com.us.dsb.explore.algs.coloredlines.manual.ui.TapUiGameState
@@ -47,7 +47,7 @@ private[manual] object GameUI {
 
   // ?? revisit Either--use something fancier (MonadError)?
   private[this] def parseCommand(rawCmdLine: Option[String]): Either[String, UICommand] = {
-    import UICommand._
+    import UICommand.*
     rawCmdLine match {
       case None       => Quit.asRight
       case Some(line) =>
@@ -80,7 +80,7 @@ private[manual] object GameUI {
                                   moveCommand: UICommand.UIMoveCommand
                                  ): GameUIState = {
     //????? test
-    import UICommand._
+    import UICommand.*
     moveCommand match {
       case Up    => uiState.withRowAdjustedBy(-1)
       case Down  => uiState.withRowAdjustedBy(1)
@@ -118,7 +118,7 @@ private[manual] object GameUI {
                               uiState: GameUIState,
                               command: UICommand
                              ): Either[GameUIResult, GameUIState] = {
-    import UICommand._
+    import UICommand.*
     command match {
       case Quit =>
         doQuit.asLeft

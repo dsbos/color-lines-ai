@@ -2,7 +2,7 @@ package com.us.dsb.explore.algs.coloredlines.manual.ui
 
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.{
   BallColor, CellAddress, ColumnIndex, Index, RowIndex, columnIndices, rowIndices}
-import com.us.dsb.explore.algs.coloredlines.manual.game._
+import com.us.dsb.explore.algs.coloredlines.manual.game.*
 
 // ?????? TODO: Clarify names (e.g., GameUIState vs. TapUiGameState)--
 //  virtual tap-level UI vs. text-controlled selection-based ~simulation of taps

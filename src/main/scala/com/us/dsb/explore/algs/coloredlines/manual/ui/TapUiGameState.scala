@@ -2,7 +2,7 @@
 // OR at least move selectionAddress address part out:
 package com.us.dsb.explore.algs.coloredlines.manual.ui
 
-import cats.syntax.either._
+import cats.syntax.either.*
 import com.us.dsb.explore.algs.coloredlines.manual.game.GameLogicSupport
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.CellAddress
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.LowerGameState
@@ -32,7 +32,7 @@ private[ui] object TapUiGameState {
   private[ui] def initial(seed: Long): TapUiGameState = makeInitialState(new Random(seed))
   private[ui] def initial(): TapUiGameState = makeInitialState(new Random())
 }
-import TapUiGameState._
+import TapUiGameState.*
 
 //???? add random-data state
 
@@ -69,7 +69,7 @@ private[ui] case class TapUiGameState(gameState: LowerGameState,
   // ?????? TODO: Rename; maybe "move" to "... tap move ..."?
   private[ui] def tryMoveAt(tapAddress: CellAddress): Either[String, TapUiGameState] = {
     //???? test
-    import TapCase._
+    import TapCase.*
     val tapCase = TapIntepreter.interpretTapLocationToTapCase(this, tapAddress)
     println("tryMoveAt: tapCase = " + tapCase)
     val postMoveState: TapUiGameState =

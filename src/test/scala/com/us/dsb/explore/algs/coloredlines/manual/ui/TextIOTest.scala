@@ -2,7 +2,7 @@ package com.us.dsb.explore.algs.coloredlines.manual.ui
 
 import org.scalatest.LoneElement
 import org.scalatest.funspec.AnyFunSpec
-import org.scalatest.matchers.should.Matchers._
+import org.scalatest.matchers.should.Matchers.*
 
 class XxTextIOTest extends AnyFunSpec {
 
@@ -35,7 +35,7 @@ class XxTextIOTest extends AnyFunSpec {
   }
 
   describe("ColoredConsoleTextIO") {
-    import org.scalatest.LoneElement._
+    import org.scalatest.LoneElement.*
 
     def getUUT(consoleIODouble: GenericConsoleIO): SegregatedConsoleIO = {
       // Demo:  Try injecting "bad" UUT and see how failing conditions show up:

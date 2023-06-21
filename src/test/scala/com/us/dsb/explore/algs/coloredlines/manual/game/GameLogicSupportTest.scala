@@ -4,7 +4,7 @@ import com.us.dsb.explore.algs.coloredlines.manual.game.board.CellAddress
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.{
   LowerGameState, ColumnIndex, RowIndex, columnIndices, rowIndices}
 import org.scalatest.funspec.AnyFunSpec
-import org.scalatest.matchers.should.Matchers._
+import org.scalatest.matchers.should.Matchers.*
 
 import scala.util.Random
 

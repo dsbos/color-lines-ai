@@ -1,10 +1,10 @@
 package com.us.dsb.explore.algs.coloredlines.manual.ui
 
-import com.us.dsb.explore.algs.coloredlines.manual.game.board._
+import com.us.dsb.explore.algs.coloredlines.manual.game.board.*
 import com.us.dsb.explore.algs.coloredlines.manual.ui.TapUiGameState
 import org.scalatest.PrivateMethodTester
 import org.scalatest.funspec.AnyFunSpec
-import org.scalatest.matchers.should.Matchers._
+import org.scalatest.matchers.should.Matchers.*
 
 
 class TapUiGameStateTest extends AnyFunSpec {
@@ -54,7 +54,7 @@ class TapUiGameStateTest extends AnyFunSpec {
   
   
   describe("XxGameState$?. tryMoveAt") {
-//    import Player._
+//    import Player.*
     import scala.language.implicitConversions
     implicit def intToRow(int: Int): RowIndex    = RowIndex(Index.unsafeFrom(int))
     implicit def intToCol(int: Int): ColumnIndex = ColumnIndex(Index.unsafeFrom(int))
