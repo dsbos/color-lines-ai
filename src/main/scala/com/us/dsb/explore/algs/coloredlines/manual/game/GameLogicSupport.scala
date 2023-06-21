@@ -107,7 +107,7 @@ object GameLogicSupport {
                                toTapCell: CellAddress): Boolean = {
     //??println(s"pathExists: fromBallCell = $fromBallCell, toTapCell = $toTapCell")
     //???? CLEAN ALL THIS:
-    // - mutability (many eliminate, maybe keep for eventually wanted optimization
+    // - mutability (many eliminate, maybe keep for eventually wanted optimization)
     // - looping/recursion and exiting (what is class/method that ~loops until flag return value?_
 
     // Blocked from (further) "reaching"--by ball or already reached in search.

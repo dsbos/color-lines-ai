@@ -104,6 +104,6 @@ class GameUITest extends AnyFunSpec {
   }
   ignore("try runGame, layer test with ~mocked GameState?") {
   }
-  ignore("no coverage: markAtSelection's error case") {
+  ignore("no coverage yet: markAtSelection's error case") {
   }
 }
