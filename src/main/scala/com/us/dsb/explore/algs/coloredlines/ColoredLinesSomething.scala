@@ -56,7 +56,7 @@ private[this] object ColoredLinesSomething extends App {
   }
 
   private[this] class InputNeuron2Impl() extends InputNeuron2 {
-    var activation: Activation = _
+    var activation: Activation = scala.compiletime.uninitialized
     override def setActivation(activation: Activation): Unit = {
       this.activation = activation
     }
