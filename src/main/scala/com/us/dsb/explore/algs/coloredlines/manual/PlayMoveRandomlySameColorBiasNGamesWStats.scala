@@ -13,7 +13,7 @@ import scala.util.Random
 object PlayMoveRandomlySameColorBiasNGamesWStats extends App {
   private val GameCount = 1000
 
-  private implicit val rng: Random = Random()
+  private given rng: Random = Random()
 
   /** @return ending score */
   def playAGame: Int = {
