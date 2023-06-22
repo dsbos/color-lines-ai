@@ -39,7 +39,7 @@ class GameLogicSupportTest extends AnyFunSpec {
   }
 
   describe("pathExists:") {
-    given rng: Random = Random()
+    given Random = Random()
     lazy val gameState0 = LowerGameState.empty  //????? just Board?
 
     it("ball on one-ball board can move anywhere") {
