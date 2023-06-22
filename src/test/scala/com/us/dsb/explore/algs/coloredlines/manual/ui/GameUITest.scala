@@ -87,9 +87,9 @@ class GameUITest extends AnyFunSpec {
 
   describe("runGame, just end to end (commands to game result):") {
     def runViaStrings(inputs: String*): String =
-      GameUI.runGame(new SegregatedConsoleIODouble(inputs: _*)).text
+      GameUI.runGame(new SegregatedConsoleIODouble(inputs*)).text
     def runViaChars(inputChars: String): String =
-      runViaStrings(inputChars.map("" + _): _*)
+      runViaStrings(inputChars.map("" + _)*)
 
     describe("'q' should quit (result in message mentioning \"quit\"):") {
       it("'q' as first command") {
