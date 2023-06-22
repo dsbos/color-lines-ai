@@ -29,8 +29,8 @@ private[ui] object TapUiGameState {
     TapUiGameState(initialPlacementResult.gameState, None)
   }
 
-  private[ui] def initial(seed: Long): TapUiGameState = makeInitialState(new Random(seed))
-  private[ui] def initial(): TapUiGameState = makeInitialState(new Random())
+  private[ui] def initial(seed: Long): TapUiGameState = makeInitialState(Random(seed))
+  private[ui] def initial(): TapUiGameState = makeInitialState(Random())
 }
 import TapUiGameState.*
 

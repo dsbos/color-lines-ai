@@ -44,7 +44,7 @@ class GameUITest extends AnyFunSpec {
 
     describe("Xxfor some valid command:") {
 //      object LazyShared {
-//        val ioDouble = new SegregatedTextIODouble("u")
+//        val ioDouble = SegregatedTextIODouble("u")
 //        val callResult = XxGameUI invokePrivate getCommand(ioDouble, Player.X)
 //      }
 //      import LazyShared.*
@@ -63,7 +63,7 @@ class GameUITest extends AnyFunSpec {
 
     describe("Xxfor invalid command(s) and then valid command:") {
 //      object LazyShared {
-//        val ioDouble = new SegregatedTextIODouble("?", "u")
+//        val ioDouble = SegregatedTextIODouble("?", "u")
 //        val callResult = XxGameUI invokePrivate getCommand(ioDouble, Player.X)
 //      }
 //      import LazyShared.*
@@ -87,7 +87,7 @@ class GameUITest extends AnyFunSpec {
 
   describe("runGame, just end to end (commands to game result):") {
     def runViaStrings(inputs: String*): String =
-      GameUI.runGame(new SegregatedConsoleIODouble(inputs*)).text
+      GameUI.runGame(SegregatedConsoleIODouble(inputs*)).text
     def runViaChars(inputChars: String): String =
       runViaStrings(inputChars.map("" + _)*)
 

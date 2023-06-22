@@ -11,7 +11,7 @@ import scala.util.Random
  * games until getting a non-zero score.
  */
 object PlayJustPassingUntilNonzeroGame extends App {
-  private implicit val rng: Random = new Random
+  private implicit val rng: Random = Random()
 
   var gameCount: Int = 0
   var lastGameScore = -1
@@ -22,7 +22,7 @@ object PlayJustPassingUntilNonzeroGame extends App {
     println()
     println(s"@@@@ Game #$gameCount")
 
-    val initialPlacementResult = GameLogicSupport.placeInitialBalls(LowerGameState.empty)(new Random)
+    val initialPlacementResult = GameLogicSupport.placeInitialBalls(LowerGameState.empty)(Random())
     var gameState: LowerGameState = initialPlacementResult.gameState
     while (! gameState.board.isFull) {
       val wholeResult: BallArrivalResult = GameLogicSupport.doPass(gameState)

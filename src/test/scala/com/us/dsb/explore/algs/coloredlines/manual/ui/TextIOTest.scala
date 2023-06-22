@@ -39,13 +39,13 @@ class XxTextIOTest extends AnyFunSpec {
 
     def getUUT(consoleIODouble: GenericConsoleIO): SegregatedConsoleIO = {
       // Demo:  Try injecting "bad" UUT and see how failing conditions show up:
-      new ColoredSegregatedConsoleIO(consoleIODouble)
-      //new PlainConsoleTextIO(consoleIODouble)
+      ColoredSegregatedConsoleIO(consoleIODouble)
+      //PlainConsoleTextIO(consoleIODouble)
     }
 
     describe("XxprintStateText should print given text plainly; output should:") {
       lazy val printedStrings = {
-        val consoleIODouble = new GenericConsoleIODouble
+        val consoleIODouble = GenericConsoleIODouble()
         val uut = getUUT(consoleIODouble)
 
         uut.printStateText("text")
@@ -67,7 +67,7 @@ class XxTextIOTest extends AnyFunSpec {
     describe("XxprintError should print given text in red; output should:") {
       // Note:  "lazy" avoids executing during ScalaTest's registration phase.
       lazy val printedStrings = {
-        val consoleIODouble = new GenericConsoleIODouble
+        val consoleIODouble = GenericConsoleIODouble()
         val uut = getUUT(consoleIODouble)
 
         uut.printError("given text")
@@ -90,7 +90,7 @@ class XxTextIOTest extends AnyFunSpec {
 
     // Demo:  checking subconditions with "should ... and ..." (in one test):
     it("XxprintResult should print given text in bold (should ... and ...)") {
-      val consoleIODouble = new GenericConsoleIODouble
+      val consoleIODouble = GenericConsoleIODouble()
       val uut = getUUT(consoleIODouble)
 
       uut.printResult("given text")
@@ -107,7 +107,7 @@ class XxTextIOTest extends AnyFunSpec {
 
     describe("readPromptedLine should print given prompt value and get input") {
       lazy val (printedStrings, lineReadOpt) = {
-        val consoleIODouble = new GenericConsoleIODouble("given input")
+        val consoleIODouble = GenericConsoleIODouble("given input")
         val uut = getUUT(consoleIODouble)
 
         val lineReadOpt = uut.readPromptedLine("given text")

@@ -6,7 +6,7 @@ private[manual] object LowerGameState {
   //   - "initial"?  but isn't state after initial-ball placement and before first move
   //   - "ground"? (from "ground state"--poor)
   private[manual] def empty: LowerGameState =
-    new LowerGameState(Board.empty, score = 0)
+    LowerGameState(Board.empty, score = 0)
 }
 
 /**
@@ -22,7 +22,7 @@ private[manual] class LowerGameState(private[manual] val board: Board,
 
   private def copy(board: Board = board,
                    score: Int   = score) =
-    new LowerGameState(board, score)
+    LowerGameState(board, score)
 
   // board state:
 

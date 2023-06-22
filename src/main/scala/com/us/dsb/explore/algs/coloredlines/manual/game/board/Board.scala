@@ -12,7 +12,7 @@ private[game] object Board {
   }
 
   private[game] def empty: Board =
-    new Board(Vector.fill[CellBallState](BoardOrder * BoardOrder)(CellBallState.empty), Nil)
+    Board(Vector.fill[CellBallState](BoardOrder * BoardOrder)(CellBallState.empty), Nil)
 }
 import Board.*
 
@@ -30,7 +30,7 @@ private[game] class Board(private val cellStates: Vector[CellBallState],
 
   private def copy(cellStates: Vector[CellBallState] = cellStates,
                    ondeckBalls: Iterable[BallColor]  = ondeckBalls) =
-    new Board(cellStates, ondeckBalls)
+    Board(cellStates, ondeckBalls)
 
   /** Computes row-major cell-array index from row and column numbers. */
   private def vectorIndex(address: CellAddress): Int =
