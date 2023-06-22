@@ -49,13 +49,15 @@ object GameLogicSupport {
   private[manual] def placeInitialBalls(gameState: LowerGameState)
                                        (using Random): BallArrivalResult = {
     val postPlacementsResult =
-      (1 to InitialBallCount).foldLeft(BallArrivalResult(gameState, anyRemovals = false)) {
-        case (resultSoFar, _) =>
-          val address =
-            pickRandomEmptyCell(resultSoFar.gameState).getOrElse(scala.sys.error("Unexpectedly full board"))
-          val postPlacementGameState =
-            resultSoFar.gameState.withBoardWithBallAt(address, pickRandomBallColor())
-          LineDetector.reapAnyLines(postPlacementGameState, address)
+      (1 to InitialBallCount)
+          .foldLeft(BallArrivalResult(gameState, anyRemovals = false)) {
+            (resultSoFar, _) =>
+              val address =
+                pickRandomEmptyCell(resultSoFar.gameState)
+                    .getOrElse(scala.sys.error("Unexpectedly full board"))
+              val postPlacementGameState =
+                resultSoFar.gameState.withBoardWithBallAt(address, pickRandomBallColor())
+              LineDetector.reapAnyLines(postPlacementGameState, address)
       }
 
     val replenishedOnDeckBoard = replenishOnDeckBalls(postPlacementsResult.gameState.board)
@@ -72,7 +74,7 @@ object GameLogicSupport {
       // can replenish incrementally or later; later might show up better in internal state view
       gameState.board.getOndeckBalls
         .foldLeft(BallArrivalResult(gameState, anyRemovals = false)) {
-          case (curMoveResult, onDeckBall) =>
+          (curMoveResult, onDeckBall) =>
             pickRandomEmptyCell(curMoveResult.gameState) match {
               case None =>  // board full; break out early (game will become over)
                 curMoveResult
@@ -133,7 +135,7 @@ object GameLogicSupport {
           else {
             // no path yet; queue up neighbors neither blocked nor already processed
             val neighborOffsets = List((+1, 0), (-1, 0), (0, +1), (0, -1))
-            neighborOffsets.foreach { case (rowInc, colInc) =>
+            neighborOffsets.foreach { (rowInc, colInc) =>
               val rowOffset: Int = reachedAddr.row.value.value    - 1 + rowInc
               val colOffset: Int = reachedAddr.column.value.value - 1 + colInc
               if (! (0 <= rowOffset && rowOffset < BoardOrder &&

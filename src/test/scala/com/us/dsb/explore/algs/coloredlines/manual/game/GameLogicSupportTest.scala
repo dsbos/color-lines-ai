@@ -66,8 +66,8 @@ class GameLogicSupportTest extends AnyFunSpec {
     // top left (1, 1) to bottom right (N, N)
     def makeDiagonallyDividedBoardGameState: LowerGameState = {  //????? just Board?
       val diagonalAddresses =
-        rowIndices.zip(columnIndices).map { case (row, column) => CellAddress(row, column) }
-      diagonalAddresses.foldLeft(gameState0) { case (board, address) =>
+        rowIndices.zip(columnIndices).map { (row, column) => CellAddress(row, column) }
+      diagonalAddresses.foldLeft(gameState0) { (board, address) =>
         board.withBoardWithBallAt(address, GameLogicSupport.pickRandomBallColor())
       }
     }

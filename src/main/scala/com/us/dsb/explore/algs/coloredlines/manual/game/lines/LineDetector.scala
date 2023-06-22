@@ -95,11 +95,11 @@ private[manual] object LineDetector {
                                                completedLineAxesResults: List[AxisResult]): LowerGameState = {
     val newBallRemovedGameState = preremovalGameState.withBoardWithNoBallAt(ballTo)
     val linesRemovedGameState =
-      completedLineAxesResults.foldLeft(newBallRemovedGameState) { case (axisBoard, axisResult) =>
+      completedLineAxesResults.foldLeft(newBallRemovedGameState) { (axisBoard, axisResult) =>
         val fromOffset = -axisResult.directionsResults(1).excursionLength
         val toOffset   =  axisResult.directionsResults(0).excursionLength
         val lineRemovedGameState =
-          (fromOffset to toOffset).foldLeft(axisBoard) { case (directionBoard, offset) =>
+          (fromOffset to toOffset).foldLeft(axisBoard) { (directionBoard, offset) =>
             import axisResult.axis.{colDelta, rowDelta}
             val rawRowIndex = ballTo.row.value.value    + rowDelta * offset
             val rawColIndex = ballTo.column.value.value + colDelta * offset
