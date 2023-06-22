@@ -93,7 +93,7 @@ class GameUITest extends AnyFunSpec {
 
     describe("'q' should quit (result in message mentioning \"quit\"):") {
       it("'q' as first command") {
-        runViaStrings("q") should include regex ("(?i)quit")
+        runViaStrings("q") should include regex "(?i)quit"
       }
     }
 

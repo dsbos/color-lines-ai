@@ -56,7 +56,7 @@ class XxTextIOTest extends AnyFunSpec {
         printedStrings.loneElement should include ("text")
       }
       it("Xxnot include color/decoration escape sequences") {
-        printedStrings.loneElement should not include (scala.io.AnsiColor.RED.take(1))
+        printedStrings.loneElement should not include scala.io.AnsiColor.RED.take(1)
       }
       it("Xxinclude only given text") {
         printedStrings.loneElement should be ("text")
@@ -84,7 +84,7 @@ class XxTextIOTest extends AnyFunSpec {
         printedStrings.loneElement should include (scala.io.AnsiColor.RESET)  // ?? in order too
       }
       it("Xxnot include only given text") {
-        printedStrings.loneElement should not be ("given text")
+        printedStrings.loneElement should not be "given text"
       }
     }
 
@@ -102,7 +102,7 @@ class XxTextIOTest extends AnyFunSpec {
           include ("given text") and
               include (scala.io.AnsiColor.BOLD) and
               include (scala.io.AnsiColor.RESET) and
-              not be ("given text"))
+              not be "given text")
     }
 
     describe("readPromptedLine should print given prompt value and get input") {
@@ -125,7 +125,7 @@ class XxTextIOTest extends AnyFunSpec {
           printedStrings.loneElement should include(scala.io.AnsiColor.RESET) // ?? in order too
         }
         it("not include only given text") {
-          printedStrings.loneElement should not be ("given text")
+          printedStrings.loneElement should not be "given text"
         }
       }
       it("should read input line text") {

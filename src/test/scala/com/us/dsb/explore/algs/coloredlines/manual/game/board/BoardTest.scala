@@ -95,7 +95,7 @@ class BoardTest extends AnyFunSpec {
       Board.empty.isFull shouldBe false
     }
     it ("should not detect one-space-left board as full") {
-      variedAllButFilledBoard.isFull shouldBe(false)
+      variedAllButFilledBoard.isFull shouldBe false
     }
     it("should detect full board as full") {
       regularFilledBoard.isFull shouldBe true
