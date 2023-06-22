@@ -18,7 +18,7 @@ object GameLogicSupport {
   private[game] val OnDeckBallCount: Int = 3
 
   // (was "private" before test calls:)
-  private[game] def pickRandomBallColor()(implicit rng: Random): BallColor = {
+  private[game] def pickRandomBallColor()(using rng: Random): BallColor = {
     BallColor.values(rng.nextInt(BallColor.values.size))
   }
 
@@ -26,7 +26,7 @@ object GameLogicSupport {
   // (was "private" before test calls:)
   @tailrec
   private[game] def pickRandomEmptyCell(gameState: LowerGameState)
-                                       (implicit rng: Random): Option[CellAddress] = {
+                                       (using rng: Random): Option[CellAddress] = {
     if (gameState.board.isFull)
       None
     else {
@@ -39,7 +39,7 @@ object GameLogicSupport {
     }
   }
 
-  private def replenishOnDeckBalls(board: Board)(implicit rng: Random): Board =
+  private def replenishOnDeckBalls(board: Board)(using rng: Random): Board =
     board.withOnDeckBalls(List.fill(OnDeckBallCount)(pickRandomBallColor()))
 
   /**
@@ -47,7 +47,7 @@ object GameLogicSupport {
    *   expected to be empty //???? maybe refactor something?
    */
   private[manual] def placeInitialBalls(gameState: LowerGameState)
-                                       (implicit rng: Random): BallArrivalResult = {
+                                       (using rng: Random): BallArrivalResult = {
     val postPlacementsResult =
       (1 to InitialBallCount).foldLeft(BallArrivalResult(gameState, anyRemovals = false)) {
         case (resultSoFar, _) =>
@@ -66,7 +66,7 @@ object GameLogicSupport {
   //   unplaced balls, don't over-replenish).  Maybe fail fast, and don't depend
   //   on (irregular) callers to check whether board becomes full.
   private def placeOndeckBalls(gameState: LowerGameState)
-                              (implicit rng: Random): BallArrivalResult = {
+                              (using rng: Random): BallArrivalResult = {
     val postPlacementResult =
       //???? for 1 to 3, consume on-deck ball from list, and then place (better for internal state view);
       // can replenish incrementally or later; later might show up better in internal state view
@@ -95,7 +95,7 @@ object GameLogicSupport {
   }
 
   private[manual] def doPass(gameState: LowerGameState)
-                            (implicit rng: Random): BallArrivalResult =
+                            (using rng: Random): BallArrivalResult =
     placeOndeckBalls(gameState)
 
   //???: likely move core algorithm out; possibly move outer code into LowerGameState/Board:
@@ -165,7 +165,7 @@ object GameLogicSupport {
   private[manual] def doTryMoveBall(gameState: LowerGameState,
                                     from: CellAddress,
                                     to: CellAddress
-                                    )(implicit rng: Random): MoveBallResult = {
+                                    )(using rng: Random): MoveBallResult = {
     //println(s"@@ doTryMoveBall: $from -> $to")
     //???? separate move-ball move validation from actually moving (selection
     //   clearing depends on just validity of move, not on deleting any lines)

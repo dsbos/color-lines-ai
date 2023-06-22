@@ -23,14 +23,14 @@ private[ui] object TapUiGameState {
     private[ui] case class Done(score: Int) extends GameResult
   }
 
-  private def makeInitialState(implicit rng: Random): TapUiGameState = {
+  private def makeInitialState(using rng: Random): TapUiGameState = {
     // ???? TODO:  Move "GameLogicSupport.placeInitialBalls(LowerGameState.empty)" down into GameLogicSupport
     val initialPlacementResult = GameLogicSupport.placeInitialBalls(LowerGameState.empty)
     TapUiGameState(initialPlacementResult.gameState, None)
   }
 
-  private[ui] def initial(seed: Long): TapUiGameState = makeInitialState(Random(seed))
-  private[ui] def initial(): TapUiGameState = makeInitialState(Random())
+  private[ui] def initial(seed: Long): TapUiGameState = makeInitialState(using Random(seed))
+  private[ui] def initial(): TapUiGameState = makeInitialState(using Random())
 }
 import TapUiGameState.*
 
@@ -40,7 +40,7 @@ import TapUiGameState.*
  */
 private[ui] case class TapUiGameState(gameState: LowerGameState,
                                           selectionAddress: Option[CellAddress]
-                                         )(implicit rng: Random) {
+                                         )(using rng: Random) {
 
   // top-UI selection:
 
