@@ -3,6 +3,7 @@ package com.us.dsb.explore.algs.coloredlines.manual
 import com.us.dsb.explore.algs.coloredlines.manual.game.GameLogicSupport
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.{CellAddress, LowerGameState, columnIndices, rowIndices}
 
+import scala.annotation.tailrec
 import scala.util.Random
 
 /**
@@ -29,7 +30,7 @@ object PlayMoveRandomlyNorthwestBiasNGamesWStats extends App {
       val from = CellAddress.fromRaw(fromRow, fromCol)
       val to = CellAddress.fromRaw(toRow, toCol)
 
-
+      @tailrec
       def pickLatestBallCell(curStart: Int = 9 * 9): CellAddress = {
         val row = (curStart - 1) / 9 + 1
         val col = (curStart - 1) % 9 + 1
@@ -42,6 +43,8 @@ object PlayMoveRandomlyNorthwestBiasNGamesWStats extends App {
           pickLatestBallCell(curStart - 1)
         }
       }
+
+      @tailrec
       def pickEarliestVacantCell(curStart: Int = 1): CellAddress = {
         val row = (curStart - 1) / 9 + 1
         val col = (curStart - 1) % 9 + 1

@@ -17,7 +17,7 @@ class XxTextIOTest extends AnyFunSpec {
   // Crude, manual stub and spy ConsoleIO.
   class GenericConsoleIODouble(inputLines: String*) extends GenericConsoleIO {
     private var remainingInputs = inputLines
-    private var printedStringsReversed: List[String] = Nil;
+    private var printedStringsReversed: List[String] = Nil
     def getPrintedStrings: List[String] = printedStringsReversed.reverse
 
     override def println(lineOrLines: String): Unit = {

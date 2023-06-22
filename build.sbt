@@ -13,7 +13,7 @@ scalaVersion := "3.3.0"
 
 
 
-  /* Key/likely options (from "-help"; does't include -W/-X/etc. output):
+  /* Key/likely options (from "-help"; doesn't include -W/-X/etc. output):
                -Wconf  Configure compiler warnings.
               -Werror  Fail the compilation if there are any warnings.
          -deprecation  Emit warning and location for usages of deprecated APIs.
