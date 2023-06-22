@@ -2,7 +2,7 @@ package com.us.dsb.explore.algs.coloredlines.manual.ui
 
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.{
   BallColor, CellAddress, ColumnIndex, Index, RowIndex, columnIndices, rowIndices}
-import com.us.dsb.explore.algs.coloredlines.manual.game.*
+import com.us.dsb.explore.algs.coloredlines.manual.game.board.BallColorRenderingExtensions
 
 // ?????? TODO: Clarify names (e.g., GameUIState vs. TapUiGameState)--
 //  virtual tap-level UI vs. text-controlled selection-based ~simulation of taps
@@ -44,6 +44,7 @@ private case class GameUIState(tapUiGameState: TapUiGameState,
    *  character wrapped in ANSI text color escape sequences.) */
   private[manual] def getCellBallStateChar(ballState: Option[BallColor],
                                            isSelected: Boolean): String = {
+    import BallColorRenderingExtensions.*
     ballState match {
       case Some(ball) => ball.getColoredCharSeq(isSelected)
       case None       => if (! isSelected) "-" else "@"
@@ -89,6 +90,7 @@ private case class GameUIState(tapUiGameState: TapUiGameState,
   }
 
   private[ui] def toDisplayString: String = {
+    import BallColorRenderingExtensions.*
     val ondeckList =
       tapUiGameState.gameState.board.getOndeckBalls
           .map(_.getColoredCharSeq(forBackground = false))

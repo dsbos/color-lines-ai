@@ -71,6 +71,7 @@ private[game] class Board(private val cellStates: Vector[CellBallState],
 
   /** Makes compact single-line string like"<rgb------/---------/.../---------; (bgr) >". */
   override def toString: String = {
+    import BallColorRenderingExtensions.*
     "<" ++
         rowIndices.map { row =>
           columnIndices.map { column =>

@@ -1,36 +1,51 @@
 package com.us.dsb.explore.algs.coloredlines.manual.game.board
 
-import enumeratum.{Enum, EnumEntry}
-
 import scala.io.AnsiColor
 
-// ?? TODO:  Separate UI-specific rendering from abstract ball color (at least
-//  ideally).  Maybe enable "ball.getColoredCharSeq" via extension method and/or
-//  type class.
-/** Ball color. */
-private[manual] sealed class BallColor(private[manual] val initial: String,
-                                       private         val setFgColorSeq: String,
-                                       private         val setBgColorSeq: String
-                                       ) extends EnumEntry {
-
-  /** Gets full populated-cell--state string.  (For cell state plus tap-selection
-   * state; character wrapped in ANSI text color escape sequences.) */
-  private[manual] def getColoredCharSeq(forBackground: Boolean): String =
-    (if (forBackground) setBgColorSeq else setFgColorSeq) +
-        initial +
-        AnsiColor.RESET
+/** Ball color/colors. */
+enum BallColor {
+  // original: blue.dark, blue.light, brown, green, purple, red, yellow
+  case Blue, Cyan, Black, Green, Magenta, Red, Yellow
 }
 
-private[game] object BallColor extends Enum[BallColor] {
-  import AnsiColor.*
-  // original: blue.dark, blue.light, brown, green, purple, red, yellow
-  private case object Blue    extends BallColor("b",  BLUE,    BLUE_B)
-  private case object Cyan    extends BallColor("c",  CYAN,    CYAN_B)
-  private case object Black   extends BallColor("k",  BLACK,   BLACK_B)
-  private case object Green   extends BallColor("g",  GREEN,   GREEN_B)
-  private case object Magenta extends BallColor("m",  MAGENTA, MAGENTA_B)
-  private case object Red     extends BallColor("r",  RED,     RED_B)
-  private case object Yellow  extends BallColor("y",  YELLOW,  YELLOW_B)
+// ?????? TODO:  Probably move to separate file.
+// ?????  TODO:  Probably split color-only rendering (for base dense rendering)
+//  from tap-state rendering (for tap UI).
+object BallColorRenderingExtensions {
 
-  override val values: IndexedSeq[BallColor] = findValues
+  private case class RenderingData(initial: String,
+                                   ansiSetFgColorSeq: String,
+                                   ansiSetBgColorSeq: String)
+
+  private val renderingData: Map[BallColor, RenderingData] = {
+    import BallColor.*
+    import AnsiColor.*
+    Map(
+      Blue    -> RenderingData("B", BLUE,    BLUE_B),
+      Cyan    -> RenderingData("C", CYAN,    CYAN_B),
+      Black   -> RenderingData("K", BLACK,   BLACK_B),
+      Green   -> RenderingData("G", GREEN,   GREEN_B),
+      Magenta -> RenderingData("M", MAGENTA, MAGENTA_B),
+      Red     -> RenderingData("R", RED,     RED_B),
+      Yellow  -> RenderingData("Y", YELLOW,  YELLOW_B),
+      )
+  }
+
+  extension (color: BallColor) {
+
+    /** Gets basic initial-character representation of ball color. */
+    def initial: String = renderingData(color).initial
+
+    /** Gets colored initial-character representation of ball color plus tap-UI
+     *  selection state. (Character wrapped with ANSI text color escape
+     *  sequences.) */
+    def getColoredCharSeq(forBackground: Boolean): String =
+      (if (forBackground)
+        renderingData(color).ansiSetBgColorSeq
+      else
+        renderingData(color).ansiSetFgColorSeq
+          )
+      + initial
+      + AnsiColor.RESET
+  }
 }
