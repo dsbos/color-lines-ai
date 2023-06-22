@@ -1,7 +1,7 @@
 package com.us.dsb.explore.algs.coloredlines.manual.ui.tapapi
 
 /** Interpreted meaning/command of a (virtual) tap on a board cell. */
-private[ui] sealed trait TapCase
+private[ui] sealed trait TapCase derives CanEqual
 
 private[ui] object TapCase {
 

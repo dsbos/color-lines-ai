@@ -23,7 +23,7 @@ private[manual] object GameUI {
   // enables (and requires) .values.
 
   // ???? TODO:  Rename to reflect selection-based tap ~simulation (TextTapUiCommand?):
-  private[ui] sealed trait UICommand
+  private[ui] sealed trait UICommand derives CanEqual
   private[ui] object UICommand {
     // (Q: Why doesn't UICommand's "sealed" obviate the following one (for
     //   exhaustive-match checks)?

@@ -20,19 +20,19 @@ object TapInterpreter {
                                    hasAnyCellSelected: Boolean
                                   ): TapCase = {
     object RenameOrFlattenThis { // grouped/nested re debugger clutter
-      sealed trait OnBallOrEmpty
+      sealed trait OnBallOrEmpty derives CanEqual
       case object OnBall  extends OnBallOrEmpty
       case object OnEmpty extends OnBallOrEmpty
 
-      sealed trait OnSelOrUnsel
+      sealed trait OnSelOrUnsel derives CanEqual
       case object OnSel   extends OnSelOrUnsel
       case object OnUnsel extends OnSelOrUnsel
 
-      sealed trait HadBallOrNot
+      sealed trait HadBallOrNot derives CanEqual
       case object HadBall extends HadBallOrNot
       case object NoBall  extends HadBallOrNot
 
-      sealed trait HadSelOrNot
+      sealed trait HadSelOrNot derives CanEqual
       case object HadSel extends HadSelOrNot
       case object NoSel  extends HadSelOrNot
     }
