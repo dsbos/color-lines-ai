@@ -11,7 +11,7 @@ import scala.util.Random
  * games until getting a non-zero score.
  */
 object PlayJustPassingUntilNonzeroGame extends App {
-  private given Random = Random()
+  private given Random()
 
   var gameCount: Int = 0
   var lastGameScore = -1

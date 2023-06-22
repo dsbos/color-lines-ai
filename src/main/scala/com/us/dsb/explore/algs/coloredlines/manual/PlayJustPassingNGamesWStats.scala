@@ -13,7 +13,7 @@ import scala.util.Random
 object PlayJustPassingNGamesWStats extends App {
   private val GameCount = 1000
 
-  private given Random = Random()
+  private given Random()
 
   /** @return ending score */
   def playAGame: Int = {
