@@ -40,6 +40,9 @@ scalaVersion := "3.3.0"
   */
 
 scalacOptions ++= Seq(
+  //"-source:future-migration", // (at 3.3.0:) warns for, e.g., old "_" in imports
+  "-source:future",             // (at 3.3.0:) rejects import "_"; warns re "private[this]"
+
   "-deprecation",  // "Emit warning and location for usages of deprecated APIs."
   "-explain",      // "Explain errors in more detail."
   "-feature",      // "Emit warning and location for usages of features that should be imported explicitly."
