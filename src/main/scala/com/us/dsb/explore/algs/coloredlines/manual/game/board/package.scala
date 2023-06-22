@@ -28,8 +28,6 @@ private[manual] type Index = Int Refined Closed[1, BoardOrder]
 import scala.language.adhocExtensions  // re extending non-"open" (2.13) Numeric:
 private[manual] object Index extends RefinedTypeOps.Numeric[Index, Int]
 
-import scala.language.implicitConversions // suppress warning from @newtype
-
 @newtype case class RowIndex(value: Index)
 @newtype case class ColumnIndex(value: Index)
 

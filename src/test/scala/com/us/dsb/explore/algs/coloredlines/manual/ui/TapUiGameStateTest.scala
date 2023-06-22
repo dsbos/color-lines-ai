@@ -55,10 +55,15 @@ class TapUiGameStateTest extends AnyFunSpec {
   
   describe("XxGameState$?. tryMoveAt") {
 //    import Player.*
-    import scala.language.implicitConversions
-    implicit def intToRow(int: Int): RowIndex    = RowIndex(Index.unsafeFrom(int))
-    implicit def intToCol(int: Int): ColumnIndex = ColumnIndex(Index.unsafeFrom(int))
 
+    // ???? TODO:  Which form do I want? (named or not; "with" vs. "= <function literal>":
+    // (see https://docs.scala-lang.org/scala3/book/ca-implicit-conversions.html,
+    // https://docs.scala-lang.org/scala3/reference/contextual/givens.html,
+    // https://stackoverflow.com/questions/70213042/scala3-as-and-with-keywords-used-with-given):
+    given Conversion[Int, RowIndex] with
+      def apply(int: Int): RowIndex = RowIndex(Index.unsafeFrom(int))
+    given Conversion[Int, ColumnIndex] = int => ColumnIndex(Index.unsafeFrom(int))
+    import scala.language.implicitConversions  // re warnings on _uses_
 
     ignore("marks cells") {
 
