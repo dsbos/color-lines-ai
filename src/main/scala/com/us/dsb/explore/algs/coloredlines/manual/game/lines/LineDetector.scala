@@ -1,7 +1,8 @@
 package com.us.dsb.explore.algs.coloredlines.manual.game.lines
 
+import com.us.dsb.colorlines.game.board.BallColor
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.{
-  BallColor, Board, BoardOrder, CellAddress, LineOrder, LowerGameState}
+  Board, BoardOrder, CellAddress, LineOrder, LowerGameState}
 
 // ?? TODO:  reduce repeated passing of board, ball color, etc.; maybe make
 // LineDetector a class, to be instantiated for each move; or make local class

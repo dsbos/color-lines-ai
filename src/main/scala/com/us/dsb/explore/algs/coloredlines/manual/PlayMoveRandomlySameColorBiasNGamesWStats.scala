@@ -1,8 +1,9 @@
 package com.us.dsb.explore.algs.coloredlines.manual
 
+import com.us.dsb.colorlines.game.board.BallColor
 import com.us.dsb.explore.algs.coloredlines.manual.game.GameLogicSupport
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.{
-  BallColor, CellAddress, LowerGameState, columnIndices, rowIndices}
+  CellAddress, LowerGameState, columnIndices, rowIndices}
 
 import scala.collection.immutable
 import scala.util.Random

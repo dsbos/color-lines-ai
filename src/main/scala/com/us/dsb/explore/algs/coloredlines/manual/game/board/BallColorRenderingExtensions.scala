@@ -1,16 +1,11 @@
 package com.us.dsb.explore.algs.coloredlines.manual.game.board
 
+import com.us.dsb.colorlines.game.board.BallColor
+
 import scala.io.AnsiColor
 
-/** Ball color/colors. */
-enum BallColor derives CanEqual {
-  // original: blue.dark, blue.light, brown, green, purple, red, yellow
-  case Blue, Cyan, Black, Green, Magenta, Red, Yellow
-}
-
-// ?????? TODO:  Probably move to separate file.
-// ?????  TODO:  Probably split color-only rendering (for base dense rendering)
-//  from tap-state rendering (for tap UI).
+// ???? TODO:  Probably split tap-state rendering (for tap UI) from ball-color-only
+//  rendering (for generic dense rendering).
 object BallColorRenderingExtensions {
 
   private case class RenderingData(initial: String,

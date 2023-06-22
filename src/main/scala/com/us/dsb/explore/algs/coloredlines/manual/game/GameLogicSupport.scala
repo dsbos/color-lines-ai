@@ -1,11 +1,13 @@
 package com.us.dsb.explore.algs.coloredlines.manual.game
 
-import cats.syntax.option.*
+import com.us.dsb.colorlines.game.board.BallColor
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.{
-  BallColor, Board, BoardOrder, CellAddress, LowerGameState, columnIndices, rowIndices}
+  Board, BoardOrder, CellAddress, LowerGameState, columnIndices, rowIndices}
 import com.us.dsb.explore.algs.coloredlines.manual.game.lines.LineDetector
 import com.us.dsb.explore.algs.coloredlines.manual.game.lines.LineDetector.BallArrivalResult
 import com.us.dsb.explore.algs.coloredlines.manual.ui.TapUiGameState
+
+import cats.syntax.option.*
 
 import java.util
 import scala.annotation.tailrec

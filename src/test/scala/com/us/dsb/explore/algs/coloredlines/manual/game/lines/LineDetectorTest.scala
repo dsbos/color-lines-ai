@@ -1,12 +1,13 @@
 package com.us.dsb.explore.algs.coloredlines.manual.game.lines
 
+import com.us.dsb.colorlines.game.board.BallColor
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.{
-  BallColor, Board, BoardOrder, CellAddress}
+  Board, BoardOrder, CellAddress}
+
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.PrivateMethodTester
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers.*
-
 
 class LineDetectorTest extends AnyFunSpec {
 

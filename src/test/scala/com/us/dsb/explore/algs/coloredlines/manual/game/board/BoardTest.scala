@@ -1,5 +1,7 @@
 package com.us.dsb.explore.algs.coloredlines.manual.game.board
 
+import com.us.dsb.colorlines.game.board.BallColor
+
 import org.scalatest.PrivateMethodTester
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers.*

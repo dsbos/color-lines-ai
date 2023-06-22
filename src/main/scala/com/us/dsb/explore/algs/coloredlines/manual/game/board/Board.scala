@@ -1,5 +1,6 @@
 package com.us.dsb.explore.algs.coloredlines.manual.game.board
 
+import com.us.dsb.colorlines.game.board.BallColor
 
 // ?? TODO:  Revisit having companion object before class:
 private[game] object Board {

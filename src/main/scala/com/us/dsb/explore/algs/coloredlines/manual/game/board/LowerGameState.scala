@@ -1,5 +1,7 @@
 package com.us.dsb.explore.algs.coloredlines.manual.game.board
 
+import com.us.dsb.colorlines.game.board.BallColor
+
 private[manual] object LowerGameState {
 
   // ?? TODO:  Maybe rename:
