@@ -1,7 +1,6 @@
 package com.us.dsb.explore.algs.coloredlines.manual
 
-import com.us.dsb.colorlines.game.board.{BallColor, IndexOrigin}
-import com.us.dsb.colorlines.game.board.{columnIndices, rowIndices}
+import com.us.dsb.colorlines.game.board.{BallColor, IndexOrigin, columnIndices, rowIndices}
 import com.us.dsb.explore.algs.coloredlines.manual.game.GameLogicSupport
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.{CellAddress, LowerGameState}
 

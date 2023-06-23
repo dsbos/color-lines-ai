@@ -1,7 +1,5 @@
 package com.us.dsb.explore.algs.coloredlines.manual.ui
 
-import com.us.dsb.explore.algs.coloredlines.manual.ui.GameUI.GameUIResult
-
 // ?? TODO:  Probably use separate files for GenericConsoleIO/etc. vs. SegregatedConsoleIO/etc.
 
 private[ui] trait GenericConsoleIO {

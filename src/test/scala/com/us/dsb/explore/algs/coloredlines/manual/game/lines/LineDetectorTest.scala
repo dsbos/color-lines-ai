@@ -4,8 +4,6 @@ import com.us.dsb.colorlines.game.board.{BallColor, BoardOrder, IndexOrigin}
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.{Board, CellAddress}
 
 import org.scalatest.funspec.AnyFunSpec
-import org.scalatest.PrivateMethodTester
-import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers.*
 
 class LineDetectorTest extends AnyFunSpec {

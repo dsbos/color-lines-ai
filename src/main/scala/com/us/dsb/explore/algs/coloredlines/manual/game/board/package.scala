@@ -1,11 +1,5 @@
 package com.us.dsb.explore.algs.coloredlines.manual.game.board
 
-import com.us.dsb.colorlines.game.board.BoardOrder
-import com.us.dsb.colorlines.game.board.{ColumnIndex, Index, IndexOrigin, RowIndex}
-
-import eu.timepit.refined.api.{Refined, RefinedTypeOps}
-import eu.timepit.refined.numeric.Interval.Closed
-import io.estatico.newtype.macros.newtype
 
 // ???? TODO: Maybe move to package "lines" (with LineDetector) (level above
 //  raw board state).

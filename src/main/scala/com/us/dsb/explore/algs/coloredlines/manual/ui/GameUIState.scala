@@ -1,10 +1,11 @@
 package com.us.dsb.explore.algs.coloredlines.manual.ui
 
 import com.us.dsb.colorlines.game.board.BallColor
-import com.us.dsb.colorlines.game.board.{ColumnIndex, Index, RowIndex}
-import com.us.dsb.colorlines.game.board.{columnIndices, rowIndices}
+import com.us.dsb.colorlines.game.board.{ColumnIndex, Index, RowIndex, columnIndices, rowIndices}
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.CellAddress
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.BallColorRenderingExtensions
+
+import scala.annotation.unused
 
 // ?????? TODO: Clarify names (e.g., GameUIState vs. TapUiGameState)--
 //  virtual tap-level UI vs. text-controlled selection-based ~simulation of taps
@@ -81,6 +82,7 @@ private case class GameUIState(tapUiGameState: TapUiGameState,
   }
 
   // ?? Unused as of 2023-06-08; previously in LowerGameState.
+  @unused
   private def renderCompactTableMultilineWithSelection(selectionAddress: Option[CellAddress]): String = {
     rowIndices.map { row =>
       columnIndices.map { column =>

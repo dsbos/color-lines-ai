@@ -1,9 +1,11 @@
 package com.us.dsb.explore.algs.coloredlines.manual.ui
 
 import com.us.dsb.explore.algs.coloredlines.manual.ui.GameUI.UICommand
-import org.scalatest.AppendedClues.*
+
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers.*
+
+import scala.annotation.unused
 
 class GameUITest extends AnyFunSpec {
 
@@ -40,6 +42,7 @@ class GameUITest extends AnyFunSpec {
 
   describe("XxgetCommand:") {
     import org.scalatest.PrivateMethodTester.*
+    @unused
     val getCommand = PrivateMethod[UICommand](Symbol("getCommand"))
 
     describe("Xxfor some valid command:") {
@@ -88,6 +91,7 @@ class GameUITest extends AnyFunSpec {
   describe("runGame, just end to end (commands to game result):") {
     def runViaStrings(inputs: String*): String =
       GameUI.runGame(SegregatedConsoleIODouble(inputs*)).text
+    @unused
     def runViaChars(inputChars: String): String =
       runViaStrings(inputChars.map("" + _)*)
 

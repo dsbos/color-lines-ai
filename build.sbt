@@ -45,6 +45,8 @@ scalacOptions ++= Seq(
   "-source:future",             // (at 3.3.0:) rejects import "_"; warns re "private[this]"
   "-language:strictEquality",
 
+  "-Wunused:all",
+
   // Reporting level:
   "-deprecation",  // "Emit warning and location for usages of deprecated APIs."
   "-explain",      // "Explain errors in more detail."
@@ -67,9 +69,7 @@ libraryDependencies ++= Seq(
   // ?? TODO: TRY Scala 3 enums
   "com.beachape" %% "enumeratum"  % "1.7.2",
 
-  // Stronger types (newtypes and refine's refinement types):
-  // ?? TODO: TRY Scala 3 opaque types
-  ("io.estatico" %% "newtype"     % "0.4.4").cross(CrossVersion.for3Use2_13),
+  // Stronger types (refine's refinement types):
   // ?? TODO:  See https://github.com/Iltotore/iron if refined doesn't re-add compile-time checks.
   "eu.timepit"  %% "refined"      % "0.11.0",
 

@@ -1,12 +1,9 @@
 package com.us.dsb.explore.algs.coloredlines.manual
 
-import com.us.dsb.colorlines.game.board.IndexOrigin
-import com.us.dsb.colorlines.game.board.{columnIndices, rowIndices}
+import com.us.dsb.colorlines.game.board.{IndexOrigin, columnIndices, rowIndices}
 import com.us.dsb.explore.algs.coloredlines.manual.game.GameLogicSupport
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.{CellAddress, LowerGameState}
-import com.us.dsb.explore.algs.coloredlines.manual.game.lines.LineDetector.BallArrivalResult
 
-import javax.swing.event.CellEditorListener
 import scala.util.Random
 
 /**

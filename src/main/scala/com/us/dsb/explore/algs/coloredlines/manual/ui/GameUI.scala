@@ -2,15 +2,13 @@
 //  (eventually) splitting virtual tap level vs. text-control level:
 package com.us.dsb.explore.algs.coloredlines.manual.ui
 
-import com.us.dsb.colorlines.game.board.{Index, IndexOrigin}
+import com.us.dsb.colorlines.game.board.IndexOrigin
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.CellAddress
-import com.us.dsb.explore.algs.coloredlines.manual.ui.TapUiGameState
 
 import cats.syntax.option.*
 import cats.syntax.either.*
 
 import scala.annotation.tailrec
-import scala.util.chaining.scalaUtilChainingOps
 
 // ???? TODO:  Rename to reflect text control (and virtual tap level); "TextTapUI"?:
 /** Lines game text-controlled virtual-tap UI controller. */

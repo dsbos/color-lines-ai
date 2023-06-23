@@ -2,7 +2,6 @@ package com.us.dsb.colorlines.game.board
 
 import eu.timepit.refined.api.{Refined, RefinedTypeOps}
 import eu.timepit.refined.numeric.Interval.Closed
-import io.estatico.newtype.macros.newtype
 
 // ???? TODO:  Review:  Should these be in package game.board, game, or split (e.g., board vs. lines)?
 // ???? TODO:  Review:  Should these be in package or specific object(s) (e.g., BoardIndexing)?
