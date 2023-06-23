@@ -2,11 +2,13 @@
 //  (eventually) splitting virtual tap level vs. text-control level:
 package com.us.dsb.explore.algs.coloredlines.manual.ui
 
-import cats.syntax.option.*
-import cats.syntax.either.*
-import com.us.dsb.explore.algs.coloredlines.manual.game.board.{ColumnIndex, Index, RowIndex}
+import com.us.dsb.colorlines.game.board.Index
+import com.us.dsb.explore.algs.coloredlines.manual.game.board.{ColumnIndex, RowIndex}
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.CellAddress
 import com.us.dsb.explore.algs.coloredlines.manual.ui.TapUiGameState
+
+import cats.syntax.option.*
+import cats.syntax.either.*
 
 import scala.annotation.tailrec
 import scala.util.chaining.scalaUtilChainingOps

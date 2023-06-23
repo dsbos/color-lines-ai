@@ -1,6 +1,7 @@
 package com.us.dsb.explore.algs.coloredlines.manual.game.board
 
 import com.us.dsb.colorlines.game.board.BoardOrder
+import com.us.dsb.colorlines.game.board.Index
 
 import eu.timepit.refined.api.{Refined, RefinedTypeOps}
 import eu.timepit.refined.numeric.Interval.Closed
@@ -18,13 +19,6 @@ private[game] val LineOrder: LineOrder = valueOf[LineOrder]
 // ???? TODO:  Use this (tie to color enumeration) or remove.
 private type ColorOrder = 7 // original: blue.dark, blue.light, brown, green, purple, red, yellow
 private val ColorOrder: ColorOrder = valueOf[ColorOrder]
-
-/** Board row or column index integer; 1-based; top row, left column row are #1. */
-private[manual] type Index = Int Refined Closed[1, BoardOrder]
-
-// ?? TODO 2->3 . refined:  Review refined_3 way to do following:
-import scala.language.adhocExtensions  // re extending non-"open" (2.13) Numeric:
-private[manual] object Index extends RefinedTypeOps.Numeric[Index, Int]
 
 @newtype case class RowIndex(value: Index)
 @newtype case class ColumnIndex(value: Index)
