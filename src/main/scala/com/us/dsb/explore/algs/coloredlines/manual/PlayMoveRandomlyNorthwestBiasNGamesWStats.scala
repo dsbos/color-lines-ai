@@ -30,34 +30,6 @@ object PlayMoveRandomlyNorthwestBiasNGamesWStats extends App {
       val from = CellAddress.fromRaw(fromRow, fromCol)
       val to = CellAddress.fromRaw(toRow, toCol)
 
-      @tailrec
-      def pickLatestBallCell(curStart: Int = 9 * 9): CellAddress = {
-        val row = (curStart - 1) / 9 + 1
-        val col = (curStart - 1) % 9 + 1
-        val from = CellAddress.fromRaw(row, col)
-        //println(s"curStart = $curStart, from = $from")
-        if (gameState.board.hasABallAt(from)) {
-          from
-        }
-        else {
-          pickLatestBallCell(curStart - 1)
-        }
-      }
-
-      @tailrec
-      def pickEarliestVacantCell(curStart: Int = 1): CellAddress = {
-        val row = (curStart - 1) / 9 + 1
-        val col = (curStart - 1) % 9 + 1
-        val to = CellAddress.fromRaw(row, col)
-        //println(s"curStart = $curStart, to = $to")
-        if (! gameState.board.hasABallAt(to)) {
-          to
-        }
-        else {
-          pickEarliestVacantCell(curStart + 1)
-        }
-      }
-
       val tryMoveResult = GameLogicSupport.doTryMoveBall(gameState, from, to)
 
       val validMove = tryMoveResult.moveWasValid

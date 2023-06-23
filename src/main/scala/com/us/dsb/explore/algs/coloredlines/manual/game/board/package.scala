@@ -1,7 +1,7 @@
 package com.us.dsb.explore.algs.coloredlines.manual.game.board
 
 import com.us.dsb.colorlines.game.board.BoardOrder
-import com.us.dsb.colorlines.game.board.{ColumnIndex, Index, RowIndex}
+import com.us.dsb.colorlines.game.board.{ColumnIndex, Index, IndexOrigin, RowIndex}
 
 import eu.timepit.refined.api.{Refined, RefinedTypeOps}
 import eu.timepit.refined.numeric.Interval.Closed
@@ -24,9 +24,9 @@ private val ColorOrder: ColorOrder = valueOf[ColorOrder]
 
 // (unsafeFrom that should be okay since based on BoardOrder:)
 private[manual] val rowIndices: IndexedSeq[RowIndex] =
-  (1 to BoardOrder).map(i => RowIndex(Index.unsafeFrom(i)))
+  (IndexOrigin to BoardOrder).map(i => RowIndex(Index.unsafeFrom(i)))
 private[manual] val columnIndices: IndexedSeq[ColumnIndex] =
-  (1 to BoardOrder).map(i => ColumnIndex(Index.unsafeFrom(i)))
+  (IndexOrigin to BoardOrder).map(i => ColumnIndex(Index.unsafeFrom(i)))
 
 //?? factor out frequent row-and-column iteration pattern (set of cells, iterate, passing CellAddress
 

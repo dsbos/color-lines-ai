@@ -1,6 +1,6 @@
 package com.us.dsb.explore.algs.coloredlines.manual.game.lines
 
-import com.us.dsb.colorlines.game.board.{BallColor, BoardOrder}
+import com.us.dsb.colorlines.game.board.{BallColor, BoardOrder, IndexOrigin}
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.{Board, CellAddress}
 
 import org.scalatest.funspec.AnyFunSpec
@@ -26,6 +26,7 @@ class LineDetectorTest extends AnyFunSpec {
           .withBallAt(CellAddress.fromRaw(1, 1), `R1/C1-only color`)
           .withBallAt(CellAddress.fromRaw(2, 2), `R2/C2-only color`)
     it("should return true for good match (valid index, non-empty cell, same ball color)") {
+      LineDetector.haveMatchingBallAt(`R1/C1-only color`, sampleBoard, IndexOrigin, IndexOrigin) shouldBe true
       LineDetector.haveMatchingBallAt(`R1/C1-only color`, sampleBoard, 1, 1) shouldBe true
       LineDetector.haveMatchingBallAt(`R2/C2-only color`, sampleBoard, 2, 2) shouldBe true
     }
@@ -40,10 +41,12 @@ class LineDetectorTest extends AnyFunSpec {
       LineDetector.haveMatchingBallAt(`R1/C1-only color`, sampleBoard, 3, 3) shouldBe false
     }
     it("should return false for bad coordinates") {
-      LineDetector.haveMatchingBallAt(`R1/C1-only color`, sampleBoard, -1,             1 ) shouldBe false
-      LineDetector.haveMatchingBallAt(`R1/C1-only color`, sampleBoard, 1,              -2) shouldBe false
-      LineDetector.haveMatchingBallAt(`R1/C1-only color`, sampleBoard, BoardOrder + 3, 1 ) shouldBe false
-      LineDetector.haveMatchingBallAt(`R1/C1-only color`, sampleBoard, 1,              BoardOrder + 1) shouldBe false
+      LineDetector.haveMatchingBallAt(`R1/C1-only color`, sampleBoard, -1,              1 ) shouldBe false
+      LineDetector.haveMatchingBallAt(`R1/C1-only color`, sampleBoard, 1,               -2) shouldBe false
+      LineDetector.haveMatchingBallAt(`R1/C1-only color`, sampleBoard, BoardOrder + 3,  1 ) shouldBe false
+      LineDetector.haveMatchingBallAt(`R1/C1-only color`, sampleBoard, 1,               BoardOrder + 1 ) shouldBe false
+      LineDetector.haveMatchingBallAt(`R1/C1-only color`, sampleBoard, IndexOrigin - 1, IndexOrigin    ) shouldBe false
+      LineDetector.haveMatchingBallAt(`R1/C1-only color`, sampleBoard, IndexOrigin,     IndexOrigin - 1) shouldBe false
     }
   }
 

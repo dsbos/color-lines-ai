@@ -1,6 +1,6 @@
 package com.us.dsb.explore.algs.coloredlines.manual.game.board
 
-import com.us.dsb.colorlines.game.board.{BallColor, BoardOrder}
+import com.us.dsb.colorlines.game.board.{BallColor, BoardOrder, Index, IndexOrigin}
 
 // ?? TODO:  Revisit having companion object before class:
 private[game] object Board {
@@ -35,7 +35,9 @@ private[game] class Board(private val cellStates: Vector[CellBallState],
 
   /** Computes row-major cell-array index from row and column numbers. */
   private def vectorIndex(address: CellAddress): Int =
-    (address.row.raw.value - 1) * BoardOrder + (address.column.raw.value - 1)
+    (address.row.raw.value - IndexOrigin) 
+        * BoardOrder 
+        + (address.column.raw.value - IndexOrigin)
 
   // on-deck balls:
 

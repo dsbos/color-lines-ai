@@ -1,6 +1,6 @@
 package com.us.dsb.explore.algs.coloredlines.manual.game
 
-import com.us.dsb.colorlines.game.board.{BallColor, BoardOrder}
+import com.us.dsb.colorlines.game.board.{BallColor, BoardOrder, IndexOrigin}
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.{
   Board, CellAddress, LowerGameState, columnIndices, rowIndices}
 import com.us.dsb.explore.algs.coloredlines.manual.game.lines.LineDetector
@@ -138,8 +138,8 @@ object GameLogicSupport {
             // no path yet; queue up neighbors neither blocked nor already processed
             val neighborOffsets = List((+1, 0), (-1, 0), (0, +1), (0, -1))
             neighborOffsets.foreach { (rowInc, colInc) =>
-              val rowOffset: Int = reachedAddr.row.raw.value    - 1 + rowInc
-              val colOffset: Int = reachedAddr.column.raw.value - 1 + colInc
+              val rowOffset: Int = reachedAddr.row.raw.value    - IndexOrigin + rowInc
+              val colOffset: Int = reachedAddr.column.raw.value - IndexOrigin + colInc
               if (! (0 <= rowOffset && rowOffset < BoardOrder &&
                   0 <= colOffset && colOffset < BoardOrder)) {
               } else if (blockedAt(rowOffset)(colOffset)) {

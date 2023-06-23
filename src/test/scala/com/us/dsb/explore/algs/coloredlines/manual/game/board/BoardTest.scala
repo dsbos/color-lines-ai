@@ -1,7 +1,7 @@
 package com.us.dsb.explore.algs.coloredlines.manual.game.board
 
 import com.us.dsb.colorlines.game.board.{BallColor, BoardOrder}
-import com.us.dsb.colorlines.game.board.{ColumnIndex, Index, RowIndex}
+import com.us.dsb.colorlines.game.board.{ColumnIndex, Index, IndexOrigin, RowIndex}
 
 import org.scalatest.PrivateMethodTester
 import org.scalatest.funspec.AnyFunSpec
@@ -54,7 +54,7 @@ class BoardTest extends AnyFunSpec {
 
     it("should compute 0 for first row, first column") {
       // ?? TODO 2->3 . refined:  Change Index.unsafeFrom back to Index once macros re-exist:
-      val address_1_1  = CellAddress(RowIndex(Index.unsafeFrom(1)), columnIndices.head)
+      val address_1_1  = CellAddress(RowIndex(Index.unsafeFrom(IndexOrigin)), columnIndices.head)
       val index = Board.empty `invokePrivate` vectorIndex(address_1_1)
       index shouldEqual 0
     }
@@ -68,13 +68,13 @@ class BoardTest extends AnyFunSpec {
 
     describe("should compute indices in row-major order (chosen but ~isolated):") {
       it("- (IO 1) row 1 column 3 => (IO 0) vector index 2") {
-        val `row 1 column 3` = CellAddress(rowIndices.head, columnIndices(3 - 1))
-        Board.empty `invokePrivate` vectorIndex(`row 1 column 3`) shouldEqual 3 - 1
+        val `row 1 column 3` = CellAddress(rowIndices.head, columnIndices(3 - IndexOrigin))
+        Board.empty `invokePrivate` vectorIndex(`row 1 column 3`) shouldEqual 3 - IndexOrigin
       }
       it("- (IO 1) row 3 column 1 => (IO 0) vector index 8") {  //????? adjust label?
-        val `row 3 column 1` = CellAddress(rowIndices(3 - 1), columnIndices.head)
+        val `row 3 column 1` = CellAddress(rowIndices(3 - IndexOrigin), columnIndices.head)
         Board.empty `invokePrivate` vectorIndex(`row 3 column 1`) shouldEqual
-            (3 - 1) * BoardOrder + (1 - 1)
+            (3 - IndexOrigin) * BoardOrder + (1 - IndexOrigin)
       }
     }
   }
@@ -83,7 +83,7 @@ class BoardTest extends AnyFunSpec {
 
     it("- empty board") {
       val expected =   // "<---------/---------/.../--------- + ()>"
-        (1 to BoardOrder).map { _ =>
+        (IndexOrigin to BoardOrder).map { _ =>
           columnIndices.map(_ => "-").mkString("")
         }
             .mkString("<", "/", " + ()>")

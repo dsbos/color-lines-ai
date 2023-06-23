@@ -8,15 +8,21 @@ import io.estatico.newtype.macros.newtype
 // ???? TODO:  Review:  Should these be in package or specific object(s) (e.g., BoardIndexing)?
 // ?????? TODO:  Assimilate parameterization of added-balls count, scoring, etc.
 
-/** Order (linear size) of board, as type for refined type. */
+/** Order (linear size) of board, as type for refined type [[Index]]. */
 type BoardOrder = 9
 
-/** Order (linear size) of board (as regular value). */
+/** Order (linear size) of board, as regular value. */
 val BoardOrder: BoardOrder = valueOf[BoardOrder]
 
+/** Index origin for row/column indexes, as type for refined type [[Index]]. */
+type IndexOrigin = 1
+
+/** Index origin for row/column indexes, as regular value. */
+val IndexOrigin: IndexOrigin = valueOf[IndexOrigin]
 
 /** Board row or column index integer; 1-based; top row, left column are #1. */
-type Index = Int Refined Closed[1, BoardOrder]
+// (Upper bound BoardOrder is lower bound 1 plus BoardOrder minus 1 re delta.)
+type Index = Int Refined Closed[IndexOrigin, BoardOrder]
 
 // ?? TODO 2->3 . refined:  Review refined_3 way to do following:
 // ?? TODO 2-?3 . refined:  Investigate Iron refined-types library:
