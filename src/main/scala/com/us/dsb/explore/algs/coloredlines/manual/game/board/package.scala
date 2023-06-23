@@ -1,12 +1,10 @@
 package com.us.dsb.explore.algs.coloredlines.manual.game.board
 
+import com.us.dsb.colorlines.game.board.BoardOrder
+
 import eu.timepit.refined.api.{Refined, RefinedTypeOps}
 import eu.timepit.refined.numeric.Interval.Closed
 import io.estatico.newtype.macros.newtype
-
-/** Order (linear size) of board. */
-private type BoardOrder = 9
-private[game] val BoardOrder: BoardOrder = valueOf[BoardOrder]
 
 // ???? TODO: Maybe move to package "lines" (with LineDetector) (level above
 //  raw board state).

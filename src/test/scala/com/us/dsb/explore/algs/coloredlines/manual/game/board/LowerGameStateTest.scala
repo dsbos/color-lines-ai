@@ -1,6 +1,8 @@
 package com.us.dsb.explore.algs.coloredlines.manual.game.board
 
+import com.us.dsb.colorlines.game.board.BoardOrder
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.CellAddress
+
 import org.scalatest.PrivateMethodTester
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers.*
