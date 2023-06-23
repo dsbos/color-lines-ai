@@ -20,7 +20,21 @@ private[game] val LineOrder: LineOrder = valueOf[LineOrder]
 private type ColorOrder = 7 // original: blue.dark, blue.light, brown, green, purple, red, yellow
 private val ColorOrder: ColorOrder = valueOf[ColorOrder]
 
-@newtype case class RowIndex(value: Index)
+/** Row index value. */
+opaque type RowIndex = Index
+object RowIndex {
+  def apply(raw: Index): RowIndex = raw
+  extension (rowIndex: RowIndex)
+    def raw: Index = rowIndex: Index
+}
+// ?? TOOD:  Investigate Refined and/or Scala bug:  Having extension method
+//   here (not in object RowIndex) using name "value" causes weird error at
+//   unwrapping call, even if differently-named extension method exists
+//   (at this level of in object RowIndex)and is used for unwrapping call:
+//extension (rowIndex: RowIndex)
+//  def value: Index = rowIndex: Index
+
+/** Columns index value. */
 @newtype case class ColumnIndex(value: Index)
 
 //???? add utility methods like withColumnAdjustedBy(delta: Int)? (see GameUIState)

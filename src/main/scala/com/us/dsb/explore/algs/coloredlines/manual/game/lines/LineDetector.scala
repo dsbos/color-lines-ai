@@ -50,7 +50,7 @@ private[manual] object LineDetector {
                                             lineDirectionAxis: LineAxis,
                                             lineDirectionFactor: Int): RelativeDirectionResult = {
     // ???? TODO: Revisit names (shorten, to shorten lines)?
-    val newBallRowIndex = ballTo.row.value.value
+    val newBallRowIndex = ballTo.row.raw.value
     val newBallColIndex = ballTo.column.value.value
     import lineDirectionAxis.{colDelta, rowDelta}
     var excursionLength = 0
@@ -102,7 +102,7 @@ private[manual] object LineDetector {
         val lineRemovedGameState =
           (fromOffset to toOffset).foldLeft(axisBoard) { (directionBoard, offset) =>
             import axisResult.axis.{colDelta, rowDelta}
-            val rawRowIndex = ballTo.row.value.value    + rowDelta * offset
+            val rawRowIndex = ballTo.row.raw.value      + rowDelta * offset
             val rawColIndex = ballTo.column.value.value + colDelta * offset
             val cellAddress = CellAddress.fromRaw(rawRowIndex, rawColIndex)
             directionBoard.withBoardWithNoBallAt(cellAddress)

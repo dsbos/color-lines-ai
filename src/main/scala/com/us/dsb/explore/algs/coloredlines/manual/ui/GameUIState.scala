@@ -33,7 +33,7 @@ private case class GameUIState(tapUiGameState: TapUiGameState,
 
   // ???? TODO:  "adjusted"? "offset"?
   private[ui] def withRowAdjustedBy(delta: Int): GameUIState = {
-    val adjustedRow = RowIndex(adjustAndWrapToRange(cursorAddress.row.value, delta))
+    val adjustedRow = RowIndex(adjustAndWrapToRange(cursorAddress.row.raw, delta))
     copy(cursorAddress = cursorAddress.copy(row = adjustedRow))
   }
 
