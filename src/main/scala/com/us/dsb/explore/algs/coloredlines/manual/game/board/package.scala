@@ -1,7 +1,7 @@
 package com.us.dsb.explore.algs.coloredlines.manual.game.board
 
 import com.us.dsb.colorlines.game.board.BoardOrder
-import com.us.dsb.colorlines.game.board.Index
+import com.us.dsb.colorlines.game.board.{ColumnIndex, Index, RowIndex}
 
 import eu.timepit.refined.api.{Refined, RefinedTypeOps}
 import eu.timepit.refined.numeric.Interval.Closed
@@ -19,29 +19,6 @@ private[game] val LineOrder: LineOrder = valueOf[LineOrder]
 // ???? TODO:  Use this (tie to color enumeration) or remove.
 private type ColorOrder = 7 // original: blue.dark, blue.light, brown, green, purple, red, yellow
 private val ColorOrder: ColorOrder = valueOf[ColorOrder]
-
-/** Row index value. */
-opaque type RowIndex = Index
-object RowIndex {
-  def apply(raw: Index): RowIndex = raw
-  extension (rowIndex: RowIndex)
-    def raw: Index = rowIndex: Index
-}
-
-/** Column index value. */
-opaque type ColumnIndex = Index
-object ColumnIndex {
-  def apply(raw: Index): ColumnIndex = raw
-  extension (columnIndex: ColumnIndex)
-    def raw: Index = columnIndex: Index
-}
-
-// ?? TOOD:  Investigate Refined and/or Scala bug:  Having extension method
-//   here (not in object RowIndex) using name "value" causes weird error at
-//   unwrapping call, even if differently-named extension method exists
-//   (at this level of in object RowIndex)and is used for unwrapping call:
-//extension (rowIndex: RowIndex)
-//  def value: Index = rowIndex: Index
 
 //???? add utility methods like withColumnAdjustedBy(delta: Int)? (see GameUIState)
 

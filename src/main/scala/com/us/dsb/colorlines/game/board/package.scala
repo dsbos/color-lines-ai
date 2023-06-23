@@ -23,3 +23,26 @@ type Index = Int Refined Closed[1, BoardOrder]
 import scala.language.adhocExtensions  // re extending non-"open" Numeric (_3:1.7.2):
 object Index extends RefinedTypeOps.Numeric[Index, Int]
 
+/** Row index value. */
+opaque type RowIndex = Index
+object RowIndex {
+  def apply(raw: Index): RowIndex = raw
+  extension (rowIndex: RowIndex)
+    def raw: Index = rowIndex: Index
+}
+
+/** Column index value. */
+opaque type ColumnIndex = Index
+object ColumnIndex {
+  def apply(raw: Index): ColumnIndex = raw
+  extension (columnIndex: ColumnIndex)
+    def raw: Index = columnIndex: Index
+}
+
+// ?? TOOD:  Investigate Refined and/or Scala bug:  Having extension method
+//   here (not in object RowIndex) using name "value" causes weird error at
+//   unwrapping call, even if differently-named extension method exists
+//   (at this level of in object RowIndex)and is used for unwrapping call:
+//extension (rowIndex: RowIndex)
+//  def value: Index = rowIndex: Index
+
