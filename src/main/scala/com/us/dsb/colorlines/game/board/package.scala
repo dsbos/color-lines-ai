@@ -4,9 +4,13 @@ import eu.timepit.refined.api.{Refined, RefinedTypeOps}
 import eu.timepit.refined.numeric.Interval.Closed
 import io.estatico.newtype.macros.newtype
 
-// ???? TODO:  Review:  Should these in package game.board, game, or split (e.g., board vs. lines)?
+// ???? TODO:  Review:  Should these be in package game.board, game, or split (e.g., board vs. lines)?
 // ???? TODO:  Review:  Should these be in package or specific object(s) (e.g., BoardIndexing)?
 // ?????? TODO:  Assimilate parameterization of added-balls count, scoring, etc.
+
+// ?????? TODO:  Move IndexOrigin to Index.Origin, probably moving BoardOrder to
+//   Index.Something.  (Or maybe move multiple top-level declarations into an
+//   indexing object or package, maybe making some private.)
 
 /** Order (linear size) of board, as type for refined type [[Index]]. */
 type BoardOrder = 9
@@ -27,7 +31,13 @@ type Index = Int Refined Closed[IndexOrigin, BoardOrder]
 // ?? TODO 2->3 . refined:  Review refined_3 way to do following:
 // ?? TODO 2-?3 . refined:  Investigate Iron refined-types library:
 import scala.language.adhocExtensions  // re extending non-"open" Numeric (_3:1.7.2):
-object Index extends RefinedTypeOps.Numeric[Index, Int]
+object Index extends RefinedTypeOps.Numeric[Index, Int] {
+  val values: IndexedSeq[Index] = (Index.MinValue.value to Index.MaxValue.value).map(Index.unsafeFrom(_))
+  // ???? TODO:  Review whether to add cardinality member (returning BoardOrder),
+  //   so code using Index.value use another Index.Xyz instead of separate
+  //   BoardOrder (any maybe val Board order can be hidden (by moving top-level
+  //   things into an Indexing object)).
+}
 
 /** Row index value. */
 opaque type RowIndex = Index

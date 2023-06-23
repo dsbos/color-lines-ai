@@ -22,13 +22,8 @@ private val ColorOrder: ColorOrder = valueOf[ColorOrder]
 
 //???? add utility methods like withColumnAdjustedBy(delta: Int)? (see GameUIState)
 
-// (unsafeFrom that should be okay since based on BoardOrder:)
-private[manual] val rowIndices: IndexedSeq[RowIndex] =
-  (IndexOrigin to BoardOrder).map(i => RowIndex(Index.unsafeFrom(i)))
-private[manual] val columnIndices: IndexedSeq[ColumnIndex] =
-  (IndexOrigin to BoardOrder).map(i => ColumnIndex(Index.unsafeFrom(i)))
 
-//?? factor out frequent row-and-column iteration pattern (set of cells, iterate, passing CellAddress
-
+private[manual] val rowIndices: IndexedSeq[RowIndex] = Index.values.map(RowIndex(_))
+private[manual] val columnIndices: IndexedSeq[ColumnIndex] = Index.values.map(ColumnIndex(_))
 
 

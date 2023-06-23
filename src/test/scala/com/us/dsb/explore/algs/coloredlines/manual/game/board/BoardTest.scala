@@ -10,24 +10,24 @@ import org.scalatest.matchers.should.Matchers.*
 class BoardTest extends AnyFunSpec {
 
   private lazy val regularFilledBoard = {
-    var index = 0
+    var colorIndex = 0
     rowIndices.foldLeft(Board.empty) { (board, row) =>
       columnIndices.foldLeft(board){ (board, column) =>
-        index = (index + 1) % BallColor.values.length
-        board.withBallAt(CellAddress(row, column), BallColor.values(index))
+        colorIndex = (colorIndex + 1) % BallColor.values.length
+        board.withBallAt(CellAddress(row, column), BallColor.values(colorIndex))
       }
     }
   }
   private lazy val variedAllButFilledBoard = {
-    var index = 0
+    var colorIndex = 0
     rowIndices.foldLeft(Board.empty) { (board, row) =>
       columnIndices.foldLeft(board){ (board, column) =>
         if (row.raw.value == 2 && column.raw.value == 2) { // skip one  //??? clear one from regularFilledBoard?
           board
         }
         else {
-          index = (index + 1) % BallColor.values.length
-          board.withBallAt(CellAddress(row, column), BallColor.values(index))
+          colorIndex = (colorIndex + 1) % BallColor.values.length
+          board.withBallAt(CellAddress(row, column), BallColor.values(colorIndex))
         }
       }
     }
@@ -83,7 +83,7 @@ class BoardTest extends AnyFunSpec {
 
     it("- empty board") {
       val expected =   // "<---------/---------/.../--------- + ()>"
-        (IndexOrigin to BoardOrder).map { _ =>
+        Index.values.map { _ =>
           columnIndices.map(_ => "-").mkString("")
         }
             .mkString("<", "/", " + ()>")

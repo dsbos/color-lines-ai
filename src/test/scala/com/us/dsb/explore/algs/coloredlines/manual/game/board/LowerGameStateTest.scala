@@ -1,7 +1,7 @@
 package com.us.dsb.explore.algs.coloredlines.manual.game.board
 
 import com.us.dsb.colorlines.game.board.BoardOrder
-import com.us.dsb.colorlines.game.board.IndexOrigin
+import com.us.dsb.colorlines.game.board.{Index, IndexOrigin}
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.CellAddress
 
 import org.scalatest.PrivateMethodTester

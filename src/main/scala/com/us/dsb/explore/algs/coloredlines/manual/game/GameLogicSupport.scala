@@ -32,8 +32,8 @@ object GameLogicSupport {
     if (gameState.board.isFull)
       None
     else {
-      val row = rowIndices(rng.nextInt(BoardOrder))
-      val col = columnIndices(rng.nextInt(BoardOrder))
+      val row = rowIndices(rng.nextInt(rowIndices.size))
+      val col = columnIndices(rng.nextInt(columnIndices.size))
       if (gameState.board.getBallStateAt(CellAddress(row, col)).isEmpty)
         Some(CellAddress(row, col))
       else
@@ -140,14 +140,18 @@ object GameLogicSupport {
             neighborOffsets.foreach { (rowInc, colInc) =>
               val rowOffset: Int = reachedAddr.row.raw.value    - IndexOrigin + rowInc
               val colOffset: Int = reachedAddr.column.raw.value - IndexOrigin + colInc
-              if (! (0 <= rowOffset && rowOffset < BoardOrder &&
-                  0 <= colOffset && colOffset < BoardOrder)) {
+              // ???? TODO:  Use Index.MinValue/.MaxValue, etc.?
+              if (! (   0 <= rowOffset && rowOffset < BoardOrder
+                     && 0 <= colOffset && colOffset < BoardOrder)) {
+                // off board
               } else if (blockedAt(rowOffset)(colOffset)) {
+                // blocked or traversed
               }
-              else            {
+              else {
+                // open; note traversed and try neighboring cells:
+                blockedAt(rowOffset).update(colOffset, true)
                 val neighborAddress = CellAddress(rowIndices(rowOffset),
                                                   columnIndices(colOffset))
-                blockedAt(rowOffset).update(colOffset, true)
                 cellsToExpandFrom.enqueue(neighborAddress)
               }
             }

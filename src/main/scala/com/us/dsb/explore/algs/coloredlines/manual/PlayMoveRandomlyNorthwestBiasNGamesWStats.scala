@@ -22,10 +22,10 @@ object PlayMoveRandomlyNorthwestBiasNGamesWStats extends App {
     var moveCount = 0
     var validMoveCount = 0
     while (! gameState.board.isFull) {
-      val fromRow: Int = math.sqrt(rng.nextInt(9 * 9)).toInt + 1
-      val fromCol: Int = math.sqrt(rng.nextInt(9 * 9)).toInt + 1
-      val toRow: Int = math.sqrt((9 * 9 - 1) - rng.nextInt(9 * 9)).toInt + 1
-      val toCol: Int = math.sqrt((9 * 9 - 1) - rng.nextInt(9 * 9)).toInt + 1
+      val fromRow: Int = math.sqrt(rng.nextInt(BoardOrder * BoardOrder)).toInt + IndexOrigin
+      val fromCol: Int = math.sqrt(rng.nextInt(BoardOrder * BoardOrder)).toInt + IndexOrigin
+      val toRow: Int = math.sqrt((BoardOrder * BoardOrder - IndexOrigin) - rng.nextInt(BoardOrder * BoardOrder)).toInt + IndexOrigin
+      val toCol: Int = math.sqrt((BoardOrder * BoardOrder - IndexOrigin) - rng.nextInt(BoardOrder * BoardOrder)).toInt + IndexOrigin
 
       val from = CellAddress.fromRaw(fromRow, fromCol)
       val to = CellAddress.fromRaw(toRow, toCol)

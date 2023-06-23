@@ -1,6 +1,6 @@
 package com.us.dsb.explore.algs.coloredlines.manual.game.lines
 
-import com.us.dsb.colorlines.game.board.{BallColor, BoardOrder, IndexOrigin}
+import com.us.dsb.colorlines.game.board.{BallColor, BoardOrder, Index, IndexOrigin}
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.{
   Board, CellAddress, LowerGameState, LineOrder}
 
@@ -30,8 +30,8 @@ private[manual] object LineDetector {
                                         rawRowIndex: Int,
                                         rawColIndex: Int): Boolean = {
     val inRange =
-      IndexOrigin <= rawRowIndex && rawRowIndex <= BoardOrder &&
-          IndexOrigin <= rawColIndex && rawColIndex <= BoardOrder
+      Index.MinValue.value <= rawRowIndex && rawRowIndex <= Index.MaxValue.value &&
+          Index.MinValue.value <= rawColIndex && rawColIndex <= Index.MaxValue.value
     val haveMatch =
       inRange && {
         val candidateAddress = CellAddress.fromRaw(rawRowIndex, rawColIndex)

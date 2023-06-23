@@ -34,9 +34,10 @@ private[game] class Board(private val cellStates: Vector[CellBallState],
     Board(cellStates, ondeckBalls)
 
   /** Computes row-major cell-array index from row and column numbers. */
+  // ???? TODO: Use BoardOrder and IndexOrigin? Index.MinValue/.MaxValue?  colIndices.size?
   private def vectorIndex(address: CellAddress): Int =
-    (address.row.raw.value - IndexOrigin) 
-        * BoardOrder 
+    (address.row.raw.value - IndexOrigin)
+        * BoardOrder
         + (address.column.raw.value - IndexOrigin)
 
   // on-deck balls:
