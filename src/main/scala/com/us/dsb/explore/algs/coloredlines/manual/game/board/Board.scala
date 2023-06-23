@@ -35,7 +35,7 @@ private[game] class Board(private val cellStates: Vector[CellBallState],
 
   /** Computes row-major cell-array index from row and column numbers. */
   private def vectorIndex(address: CellAddress): Int =
-    (address.row.raw.value - 1) * BoardOrder + (address.column.value.value - 1)
+    (address.row.raw.value - 1) * BoardOrder + (address.column.raw.value - 1)
 
   // on-deck balls:
 

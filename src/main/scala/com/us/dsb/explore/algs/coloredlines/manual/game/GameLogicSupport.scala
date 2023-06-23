@@ -138,8 +138,8 @@ object GameLogicSupport {
             // no path yet; queue up neighbors neither blocked nor already processed
             val neighborOffsets = List((+1, 0), (-1, 0), (0, +1), (0, -1))
             neighborOffsets.foreach { (rowInc, colInc) =>
-              val rowOffset: Int = reachedAddr.row.raw.value      - 1 + rowInc
-              val colOffset: Int = reachedAddr.column.value.value - 1 + colInc
+              val rowOffset: Int = reachedAddr.row.raw.value    - 1 + rowInc
+              val colOffset: Int = reachedAddr.column.raw.value - 1 + colInc
               if (! (0 <= rowOffset && rowOffset < BoardOrder &&
                   0 <= colOffset && colOffset < BoardOrder)) {
               } else if (blockedAt(rowOffset)(colOffset)) {

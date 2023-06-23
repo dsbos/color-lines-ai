@@ -38,7 +38,7 @@ private case class GameUIState(tapUiGameState: TapUiGameState,
   }
 
   private[ui] def withColumnAdjustedBy(delta: Int): GameUIState = {
-    val adjustedColumn = ColumnIndex(adjustAndWrapToRange(cursorAddress.column.value, delta))
+    val adjustedColumn = ColumnIndex(adjustAndWrapToRange(cursorAddress.column.raw, delta))
     copy(cursorAddress = cursorAddress.copy(column = adjustedColumn))
   }
 

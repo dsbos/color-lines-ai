@@ -22,7 +22,7 @@ class BoardTest extends AnyFunSpec {
     var index = 0
     rowIndices.foldLeft(Board.empty) { (board, row) =>
       columnIndices.foldLeft(board){ (board, column) =>
-        if (row.raw.value == 2 && column.value.value == 2) { // skip one  //??? clear one from regularFilledBoard?
+        if (row.raw.value == 2 && column.raw.value == 2) { // skip one  //??? clear one from regularFilledBoard?
           board
         }
         else {

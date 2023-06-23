@@ -80,7 +80,7 @@ class GameLogicSupportTest extends AnyFunSpec {
 
       // transpose ball coordinates to get cell across boundary
       val toVacancyAddress =
-        CellAddress(row    = RowIndex(fromBallAddress.column.value),
+        CellAddress(row    = RowIndex(fromBallAddress.column.raw),
                     column = ColumnIndex(fromBallAddress.row.raw))
 
       val pathExists = GameLogicSupport.pathExists(boardWithProbe, fromBallAddress, toVacancyAddress)
