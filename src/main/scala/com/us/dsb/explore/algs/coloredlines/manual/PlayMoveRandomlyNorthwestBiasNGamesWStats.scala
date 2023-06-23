@@ -1,7 +1,8 @@
 package com.us.dsb.explore.algs.coloredlines.manual
 
+import com.us.dsb.colorlines.game.board.{BoardOrder, IndexOrigin, rowIndices}
 import com.us.dsb.explore.algs.coloredlines.manual.game.GameLogicSupport
-import com.us.dsb.explore.algs.coloredlines.manual.game.board.{CellAddress, LowerGameState, columnIndices, rowIndices}
+import com.us.dsb.explore.algs.coloredlines.manual.game.board.{CellAddress, LowerGameState}
 
 import scala.annotation.tailrec
 import scala.util.Random

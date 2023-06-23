@@ -62,3 +62,5 @@ object ColumnIndex {
 //extension (rowIndex: RowIndex)
 //  def value: Index = rowIndex: Index
 
+val rowIndices: IndexedSeq[RowIndex] = Index.values.map(RowIndex(_))
+val columnIndices: IndexedSeq[ColumnIndex] = Index.values.map(ColumnIndex(_))

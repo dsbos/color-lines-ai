@@ -20,10 +20,3 @@ private[game] val LineOrder: LineOrder = valueOf[LineOrder]
 private type ColorOrder = 7 // original: blue.dark, blue.light, brown, green, purple, red, yellow
 private val ColorOrder: ColorOrder = valueOf[ColorOrder]
 
-//???? add utility methods like withColumnAdjustedBy(delta: Int)? (see GameUIState)
-
-
-private[manual] val rowIndices: IndexedSeq[RowIndex] = Index.values.map(RowIndex(_))
-private[manual] val columnIndices: IndexedSeq[ColumnIndex] = Index.values.map(ColumnIndex(_))
-
-

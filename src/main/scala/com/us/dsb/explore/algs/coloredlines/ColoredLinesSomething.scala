@@ -1,7 +1,5 @@
 package com.us.dsb.explore.algs.coloredlines
 
-//import scala.tools.nsc.doc.html.HtmlTags.Input
-
 
 private object ColoredLinesSomething extends App {
 

@@ -2,8 +2,8 @@ package com.us.dsb.explore.algs.coloredlines.manual.ui
 
 import com.us.dsb.colorlines.game.board.BallColor
 import com.us.dsb.colorlines.game.board.{ColumnIndex, Index, RowIndex}
-import com.us.dsb.explore.algs.coloredlines.manual.game.board.{
-  CellAddress, columnIndices, rowIndices}
+import com.us.dsb.colorlines.game.board.{columnIndices, rowIndices}
+import com.us.dsb.explore.algs.coloredlines.manual.game.board.CellAddress
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.BallColorRenderingExtensions
 
 // ?????? TODO: Clarify names (e.g., GameUIState vs. TapUiGameState)--

@@ -1,6 +1,7 @@
 package com.us.dsb.explore.algs.coloredlines.manual.game.board
 
 import com.us.dsb.colorlines.game.board.{BallColor, BoardOrder}
+import com.us.dsb.colorlines.game.board.{columnIndices, rowIndices}
 import com.us.dsb.colorlines.game.board.{ColumnIndex, Index, IndexOrigin, RowIndex}
 
 import org.scalatest.PrivateMethodTester

@@ -1,8 +1,8 @@
 package com.us.dsb.explore.algs.coloredlines.manual.game
 
 import com.us.dsb.colorlines.game.board.{BallColor, BoardOrder, IndexOrigin}
-import com.us.dsb.explore.algs.coloredlines.manual.game.board.{
-  Board, CellAddress, LowerGameState, columnIndices, rowIndices}
+import com.us.dsb.colorlines.game.board.{columnIndices, rowIndices}
+import com.us.dsb.explore.algs.coloredlines.manual.game.board.{Board, CellAddress, LowerGameState}
 import com.us.dsb.explore.algs.coloredlines.manual.game.lines.LineDetector
 import com.us.dsb.explore.algs.coloredlines.manual.game.lines.LineDetector.BallArrivalResult
 import com.us.dsb.explore.algs.coloredlines.manual.ui.TapUiGameState
