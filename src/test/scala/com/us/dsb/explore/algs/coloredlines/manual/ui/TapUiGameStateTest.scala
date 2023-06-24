@@ -1,12 +1,12 @@
 package com.us.dsb.explore.algs.coloredlines.manual.ui
 
-import com.us.dsb.colorlines.game.board.{ColumnIndex, Index, RowIndex}
 import com.us.dsb.colorlines.game.board.{ColumnIndex, Index, RowIndex, columnIndices, rowIndices}
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.*
 
-import org.scalatest.PrivateMethodTester
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers.*
+
+import scala.annotation.unused
 
 class TapUiGameStateTest extends AnyFunSpec {
 
@@ -63,6 +63,7 @@ class TapUiGameStateTest extends AnyFunSpec {
     // https://stackoverflow.com/questions/70213042/scala3-as-and-with-keywords-used-with-given):
     given Conversion[Int, RowIndex] with
       def apply(int: Int): RowIndex = RowIndex(Index.unsafeFrom(int))
+    @unused
     given Conversion[Int, ColumnIndex] = int => ColumnIndex(Index.unsafeFrom(int))
     import scala.language.implicitConversions  // re warnings on _uses_
 
