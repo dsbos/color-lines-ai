@@ -1,13 +1,31 @@
 package com.us.dsb.explore.algs.coloredlines.manual.game.board
 
-import com.us.dsb.colorlines.game.board.{ColumnIndex, Index, RowIndex}
+import com.us.dsb.colorlines.game.board.{ColumnIndex, Index, IndexOrigin, RowIndex, rowIndices, columnIndices}
 
-/** Valid (in-board) cell address */
-private[manual] case class CellAddress(row: RowIndex, column: ColumnIndex) derives CanEqual
+/** Valid (in-board) cell address.  (Re private constructor, see `CellAddress.apply`.) */
+private[manual] case class CellAddress private(row: RowIndex,
+                                               column: ColumnIndex) derives CanEqual {
+  /** Like normal `copy` method but returns re-used instances from `CellAddress.apply` */
+  def copy(row: RowIndex = this.row,
+           column: ColumnIndex = this.column): CellAddress = {
+    CellAddress(row, column)
+  }
+}
 
 private[manual] object CellAddress {
 
-  /** Constructs cell address from raw index integers (not offsets). */
+  private val instances: IndexedSeq[IndexedSeq[CellAddress]] =
+    rowIndices.map { rowIndex =>
+        columnIndices.map { colIndex =>
+          new CellAddress(rowIndex, colIndex)
+        }
+    }
+
+  /** Logical constructor but returns re-used instances. */
+  def apply(row: RowIndex, column: ColumnIndex): CellAddress =
+    instances(row.raw.value - IndexOrigin)(column.raw.value - IndexOrigin)
+
+  /** Constructs cell address from raw index Int values (not offsets). */
   private[manual] def fromRaw(rawRowIndex: Int, rawColumnIndex: Int) =
     CellAddress(RowIndex(Index.unsafeFrom(rawRowIndex)),
                 ColumnIndex(Index.unsafeFrom(rawColumnIndex)))
