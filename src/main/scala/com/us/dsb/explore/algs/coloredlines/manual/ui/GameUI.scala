@@ -2,8 +2,7 @@
 //  (eventually) splitting virtual tap level vs. text-control level:
 package com.us.dsb.explore.algs.coloredlines.manual.ui
 
-import com.us.dsb.colorlines.game.board.IndexOrigin
-import com.us.dsb.explore.algs.coloredlines.manual.game.board.CellAddress
+import com.us.dsb.colorlines.game.board.{CellAddress, IndexOrigin}
 
 import cats.syntax.option.*
 import cats.syntax.either.*

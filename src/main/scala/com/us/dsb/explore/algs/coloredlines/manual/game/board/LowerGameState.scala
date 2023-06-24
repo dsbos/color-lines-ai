@@ -1,6 +1,6 @@
 package com.us.dsb.explore.algs.coloredlines.manual.game.board
 
-import com.us.dsb.colorlines.game.board.BallColor
+import com.us.dsb.colorlines.game.board.{BallColor, CellAddress}
 
 private[manual] object LowerGameState {
 

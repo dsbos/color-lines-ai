@@ -2,12 +2,12 @@
 // OR at least move selectionAddress address part out:
 package com.us.dsb.explore.algs.coloredlines.manual.ui
 
-import cats.syntax.either.*
+import com.us.dsb.colorlines.game.board.CellAddress
 import com.us.dsb.explore.algs.coloredlines.manual.game.GameLogicSupport
-import com.us.dsb.explore.algs.coloredlines.manual.game.board.CellAddress
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.LowerGameState
 import com.us.dsb.explore.algs.coloredlines.manual.ui.tapapi.{TapCase, TapInterpreter}
 
+import cats.syntax.either.*
 import scala.util.Random
 
 // ?????? TODO: Possibly name with "virtual"/"net"/"abstract"/etc.

@@ -1,6 +1,7 @@
 package com.us.dsb.explore.algs.coloredlines.manual.ui
 
-import com.us.dsb.colorlines.game.board.{ColumnIndex, Index, RowIndex, columnIndices, rowIndices}
+import com.us.dsb.colorlines.game.board.{
+  CellAddress, ColumnIndex, Index, RowIndex, columnIndices, rowIndices}
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.*
 
 import org.scalatest.funspec.AnyFunSpec
