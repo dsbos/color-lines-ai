@@ -5,11 +5,22 @@ import com.us.dsb.colorlines.game.board.{BallColor, BoardOrder, IndexOrigin, col
 // ?? TODO:  Revisit having companion object before class:
 private[game] object Board {
 
+  // ?? TODO:  For eventual optimization (re Some instances), consider changing
+  //   BallColor to enumeration of cell states--empty plus ball colors.
+  //   Alternatively, change board matrix to avoid allocating multiple
+  //   Some[BallColor] instances:
+  //   - maybe preallocate Some[BallColor] instance for each color
+  //   - maybe use union type None | BallColor (but not problem in
+  //     https://users.scala-lang.org/t/how-to-select-union-type-branch-in-a-for-comprehension/9369/2)
+
   // ???? TODO:  Maybe collapse possibly excessive layer/wrapping here:
-  /** State of a cell--empty or ball of some color. */
-  private[Board] case class CellBallState(ballState: Option[BallColor])
+  /** State of a cell--empty or having ball of some color. */
+  private[Board] opaque type CellBallState = Option[BallColor]
   private[Board] object CellBallState {
-    private[Board] val empty: CellBallState = CellBallState(None)
+    private[Board] val empty: CellBallState = None
+    extension (cellBallState: CellBallState)
+      def ballState: Option[BallColor] = cellBallState
+      def copy(ballState: Option[BallColor]): CellBallState = ballState
   }
 
   private[game] def empty: Board =

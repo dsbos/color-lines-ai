@@ -199,7 +199,7 @@ object GameLogicSupport {
         case false =>  // can't move--ignore (keep tap-UI selection state)
           gameState
         case true =>
-          val moveBallColor = gameState.board.getBallStateAt(from).get
+          val moveBallColor = gameState.board.getBallStateAt(from).get  //????
           val postMoveBoard =
             gameState.withBoardWithNoBallAt(from).withBoardWithBallAt(to, moveBallColor)
 

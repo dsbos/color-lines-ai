@@ -6,4 +6,6 @@
 - main-method argument parsing (@main) - top-level appl. classes (using App)
 - (indentation syntax - which? where?)
 - union types - maybe move-result--vs.--bad-move-attempt-reason returns (Either uses)
+  - (eliminating Option, especially Option instances, in cell ball state didn't
+    work out well)
 - union types with literal types? -- legal-move strings?
