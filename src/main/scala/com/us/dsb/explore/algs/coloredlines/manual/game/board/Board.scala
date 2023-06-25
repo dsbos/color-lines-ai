@@ -1,7 +1,7 @@
 package com.us.dsb.explore.algs.coloredlines.manual.game.board
 
 import com.us.dsb.colorlines.game.board.{
-  BallColor, BoardOrder, CellAddress, ColumnIndex, IndexOrigin, RowIndex}
+  BallColor, BoardOrder, CellAddress, CellBallState, ColumnIndex, IndexOrigin, RowIndex}
 
 // ?? TODO:  Revisit having companion object before class:
 private[game] object Board {

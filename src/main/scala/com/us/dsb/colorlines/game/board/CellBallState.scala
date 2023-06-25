@@ -1,4 +1,4 @@
-package com.us.dsb.explore.algs.coloredlines.manual.game.board
+package com.us.dsb.colorlines.game.board
 
 import com.us.dsb.colorlines.game.board.BallColor
 
@@ -9,15 +9,16 @@ import com.us.dsb.colorlines.game.board.BallColor
 // ???? TODO:  Review Board and/or CellBallState re excessive layering/wrapping.  
 
 /** State of a cell--empty or having ball of some color. */
-private[board] opaque type CellBallState = Option[BallColor]
+opaque type CellBallState = Option[BallColor]
 
-private[board] object CellBallState {
+object CellBallState {
   private val ballColorValues: Array[Some[BallColor]] =
     BallColor.values.map { color => Some(color) }
 
-  val empty: CellBallState = None
+  /** Gets empty instance. */
+  def empty: CellBallState = None
 
-  /** ...; re-uses instances. */
+  /** Gets instance having given ball color. (Re-uses instances.) */
   def withBallOfColor(color: BallColor): CellBallState = ballColorValues(color.ordinal)
 
   extension (cellBallState: CellBallState)
