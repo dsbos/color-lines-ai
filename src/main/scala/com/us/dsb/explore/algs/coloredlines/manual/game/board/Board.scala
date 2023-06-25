@@ -5,25 +5,6 @@ import com.us.dsb.colorlines.game.board.{
 
 // ?? TODO:  Revisit having companion object before class:
 private[game] object Board {
-
-  // ?? TODO:  For eventual optimization (re Some instances), consider changing
-  //   BallColor to enumeration of cell states--empty plus ball colors.
-  //   Alternatively, change board matrix to avoid allocating multiple
-  //   Some[BallColor] instances:
-  //   - maybe preallocate Some[BallColor] instance for each color
-  //   - maybe use union type None | BallColor (but not problem in
-  //     https://users.scala-lang.org/t/how-to-select-union-type-branch-in-a-for-comprehension/9369/2)
-
-  // ???? TODO:  Maybe collapse possibly excessive layer/wrapping here:
-  /** State of a cell--empty or having ball of some color. */
-  private[Board] opaque type CellBallState = Option[BallColor]
-  private[Board] object CellBallState {
-    private[Board] val empty: CellBallState = None
-    extension (cellBallState: CellBallState)
-      def ballState: Option[BallColor] = cellBallState
-      def copy(ballState: Option[BallColor]): CellBallState = ballState
-  }
-
   private[game] def empty: Board =
     Board(Vector.fill[CellBallState](BoardOrder * BoardOrder)(CellBallState.empty), Nil)
 }
@@ -61,9 +42,12 @@ private[game] class Board(private val cellStates: Vector[CellBallState],
 
   // grid balls, getting:
 
-  // ???? TODO:  Maybe collapse possibly excessive layer/wrapping here:
+  // ???? TODO:  Review Board and/or CellBallState re excessive layering/wrapping:
+
   private[manual] def getCellBallStateAt(address: CellAddress): CellBallState =
     cellStates(vectorIndex(address))
+  // ?????? TODO:  Should caller just use ballState from CellBallState?  (And
+  //   should ballState be asOption?)
   private[manual] def getBallStateAt(address: CellAddress): Option[BallColor] =
     getCellBallStateAt(address).ballState
 
@@ -80,10 +64,10 @@ private[game] class Board(private val cellStates: Vector[CellBallState],
 
   private[game] def withBallAt(address: CellAddress,
                                ball: BallColor): Board =
-    withCellBallState(address, getCellBallStateAt(address).copy(ballState = Some(ball)))
+    withCellBallState(address, CellBallState.withBallOfColor(ball))
 
   private[game] def withNoBallAt(address: CellAddress): Board =
-    withCellBallState(address, getCellBallStateAt(address).copy(ballState = None))
+    withCellBallState(address, CellBallState.empty)
 
   /** Makes compact single-line string like"<rgb------/---------/.../---------; (bgr) >". */
   override def toString: String = {
