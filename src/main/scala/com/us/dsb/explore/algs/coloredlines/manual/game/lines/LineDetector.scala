@@ -44,6 +44,8 @@ private[manual] object LineDetector {
 
   private[lines] case class RelativeDirectionResult(excursionLength: Int)
 
+  // ????? TODO:  Probably get ball color via ballTo, rather than having clients
+  //   pass it down several levels:
   private[lines] def computeDirectionResult(moveBallColor: BallColor,
                                             board: Board,
                                             ballTo: CellAddress,
@@ -133,6 +135,11 @@ private[manual] object LineDetector {
                                  ballTo: CellAddress
                                 ): BallArrivalResult = {
     //println(s"+reapAnyLines(... ballTo = $ballTo...).1")
+    // ????? TODO:  Resolve following .get.
+    //   - Maybe use getOrElse with "Unexpected case".
+    //   - Maybe add BallColor parameter (pros and cans ...).
+    //   - Maybe eliminate passing BallColor down, having deeper method (re-)get
+    //     it via ballTo and board.
     val moveBallColor = gameState.board.getCellStateAt(ballTo).asOption.get //?????? pass in?  getOrElse?
     println(s"* * placed at $ballTo: $moveBallColor")
 

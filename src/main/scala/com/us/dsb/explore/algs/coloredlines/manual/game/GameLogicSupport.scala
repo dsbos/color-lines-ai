@@ -200,7 +200,8 @@ object GameLogicSupport {
         case false =>  // can't move--ignore (keep tap-UI selection state)
           gameState
         case true =>
-          val moveBallColor = gameState.board.getCellStateAt(from).asOption.get //?????? pass in?  getOrElse?
+          // ????? TODO:  Rework condition structures here and just above to eliminate this .get:
+          val moveBallColor = gameState.board.getCellStateAt(from).asOption.get //??
           val postMoveBoard =
             gameState.withBoardWithNoBallAt(from).withBoardWithBallAt(to, moveBallColor)
 
