@@ -43,8 +43,8 @@ private case class GameUIState(tapUiGameState: TapUiGameState,
 
   /** Gets full cell-state string.  (For cell state plus tap-selection state;
    *  character wrapped in ANSI text color escape sequences.) */
-  private[manual] def getCellBallStateChar(ballState: Option[BallColor],
-                                           isSelected: Boolean): String = {
+  private[manual] def getCellStateChar(ballState: Option[BallColor],
+                                       isSelected: Boolean): String = {
     import BallColorRenderingExtensions.*
     ballState match {
       case Some(ball) => ball.getColoredCharSeq(isSelected)
@@ -65,8 +65,8 @@ private case class GameUIState(tapUiGameState: TapUiGameState,
       ColumnIndex.values.map { column =>
         val scanAddress = CellAddress(row, column)
         val tapCellStateStr =
-          getCellBallStateChar(tapUiGameState.gameState.board.getBallStateAt(scanAddress),
-                               tapUiGameState.isSelectedAt(scanAddress))
+          getCellStateChar(tapUiGameState.gameState.board.getBallStateAt(scanAddress),
+                           tapUiGameState.isSelectedAt(scanAddress))
         val fullCellStateStr =
           if (scanAddress == cursorAddress ) {
             "*" + tapCellStateStr + "*"
@@ -86,7 +86,7 @@ private case class GameUIState(tapUiGameState: TapUiGameState,
       ColumnIndex.values.map { column =>
         val addr = CellAddress(row, column)
         val isSelected = selectionAddress.fold(false)(_ == addr)
-        getCellBallStateChar(tapUiGameState.gameState.board.getBallStateAt(addr), isSelected)
+        getCellStateChar(tapUiGameState.gameState.board.getBallStateAt(addr), isSelected)
       }.mkString("|")  // make each row line
     }.mkString("\n")   // make whole-board multi-line string
   }

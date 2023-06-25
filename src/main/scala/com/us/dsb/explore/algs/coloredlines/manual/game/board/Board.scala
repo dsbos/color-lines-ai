@@ -1,12 +1,12 @@
 package com.us.dsb.explore.algs.coloredlines.manual.game.board
 
 import com.us.dsb.colorlines.game.board.{
-  BallColor, BoardOrder, CellAddress, CellBallState, ColumnIndex, IndexOrigin, RowIndex}
+  BallColor, BoardOrder, CellAddress, CellState, ColumnIndex, IndexOrigin, RowIndex}
 
 // ?? TODO:  Revisit having companion object before class:
 private[game] object Board {
   private[game] def empty: Board =
-    Board(Vector.fill[CellBallState](BoardOrder * BoardOrder)(CellBallState.empty), Nil)
+    Board(Vector.fill[CellState](BoardOrder * BoardOrder)(CellState.empty), Nil)
 }
 import Board.*
 
@@ -14,7 +14,7 @@ import Board.*
 /**
  * Core state of board (just cells and on-deck balls; e.g.; no score, tap-UI selection).
  */
-private[game] class Board(private val cellStates: Vector[CellBallState],
+private[game] class Board(private val cellStates: Vector[CellState],
                           private val ondeckBalls: Iterable[BallColor]
                          ) {
   //println("* Board:   " + this)
@@ -22,7 +22,7 @@ private[game] class Board(private val cellStates: Vector[CellBallState],
 
   // internal/support methods:
 
-  private def copy(cellStates: Vector[CellBallState] = cellStates,
+  private def copy(cellStates: Vector[CellState] = cellStates,
                    ondeckBalls: Iterable[BallColor]  = ondeckBalls) =
     Board(cellStates, ondeckBalls)
 
@@ -42,14 +42,14 @@ private[game] class Board(private val cellStates: Vector[CellBallState],
 
   // grid balls, getting:
 
-  // ???? TODO:  Review Board and/or CellBallState re excessive layering/wrapping:
+  // ???? TODO:  Review Board and/or CellState re (previous?) excessive layering/wrapping:
 
-  private[manual] def getCellBallStateAt(address: CellAddress): CellBallState =
+  private[manual] def getCellStateAt(address: CellAddress): CellState =
     cellStates(vectorIndex(address))
-  // ?????? TODO:  Should caller just use ballState from CellBallState?  (And
+  // ?????? TODO:  Should caller just use ballState from CellState?  (And
   //   should ballState be asOption?)
   private[manual] def getBallStateAt(address: CellAddress): Option[BallColor] =
-    getCellBallStateAt(address).ballState
+    getCellStateAt(address).ballState
 
   private[manual] def hasABallAt(address: CellAddress): Boolean =
     cellStates(vectorIndex(address)).ballState.isDefined
@@ -58,16 +58,16 @@ private[game] class Board(private val cellStates: Vector[CellBallState],
 
   // grid balls, setting:
 
-  private def withCellBallState(address: CellAddress,
-                                newState: CellBallState): Board =
+  private def withCellState(address: CellAddress,
+                            newState: CellState): Board =
     copy(cellStates = cellStates.updated(vectorIndex(address), newState))
 
   private[game] def withBallAt(address: CellAddress,
                                ball: BallColor): Board =
-    withCellBallState(address, CellBallState.withBallOfColor(ball))
+    withCellState(address, CellState.withBallOfColor(ball))
 
   private[game] def withNoBallAt(address: CellAddress): Board =
-    withCellBallState(address, CellBallState.empty)
+    withCellState(address, CellState.empty)
 
   /** Makes compact single-line string like"<rgb------/---------/.../---------; (bgr) >". */
   override def toString: String = {
@@ -76,7 +76,7 @@ private[game] class Board(private val cellStates: Vector[CellBallState],
         RowIndex.values.map { row =>
           ColumnIndex.values.map { column =>
             val addr = CellAddress(row, column)
-            getCellBallStateAt(addr).ballState.fold("-")(_.initial)
+            getCellStateAt(addr).ballState.fold("-")(_.initial)
           }.mkString("")
         }.mkString("/") +
         " + " + getOndeckBalls.map(_.initial).mkString("(", ", ", ")") +

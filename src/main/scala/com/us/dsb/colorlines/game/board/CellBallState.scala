@@ -6,25 +6,25 @@ import com.us.dsb.colorlines.game.board.BallColor
 //  my
 //  https://users.scala-lang.org/t/how-to-select-union-type-branch-in-a-for-comprehension/9369/2).
 
-// ???? TODO:  Review Board and/or CellBallState re excessive layering/wrapping.  
+// ???? TODO:  Review Board and/or CellState re (previous) excessive layering/wrapping.
 
 /** State of a cell--empty or having ball of some color. */
-opaque type CellBallState = Option[BallColor]
+opaque type CellState = Option[BallColor]
 
-object CellBallState {
+object CellState {
   private val ballColorValues: Array[Some[BallColor]] =
     BallColor.values.map { color => Some(color) }
 
   /** Gets empty instance. */
-  def empty: CellBallState = None
+  def empty: CellState = None
 
   /** Gets instance having given ball color. (Re-uses instances.) */
-  def withBallOfColor(color: BallColor): CellBallState = ballColorValues(color.ordinal)
+  def withBallOfColor(color: BallColor): CellState = ballColorValues(color.ordinal)
 
-  extension (cellBallState: CellBallState)
+  extension (cellBallState: CellState)
     // ?????? TODO:  Revisit name:  "asOption":
     def ballState: Option[BallColor] = cellBallState
 
   // Note:  Opaque type can't have "derives CanEqual":
-  given CanEqual[CellBallState, CellBallState] = CanEqual.derived
+  given CanEqual[CellState, CellState] = CanEqual.derived
 }
