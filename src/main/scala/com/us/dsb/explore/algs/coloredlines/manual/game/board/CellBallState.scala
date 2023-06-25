@@ -12,9 +12,13 @@ import com.us.dsb.colorlines.game.board.BallColor
 private[board] opaque type CellBallState = Option[BallColor]
 
 private[board] object CellBallState {
+  private val ballColorValues: Array[Some[BallColor]] =
+    BallColor.values.map { color => Some(color) }
+
   val empty: CellBallState = None
 
-  def withBallOfColor(color: BallColor): CellBallState = Some(color)
+  /** ...; re-uses instances. */
+  def withBallOfColor(color: BallColor): CellBallState = ballColorValues(color.ordinal)
 
   extension (cellBallState: CellBallState)
     // ?????? TODO:  Revisit name:  "asOption":
