@@ -1,7 +1,7 @@
 package com.us.dsb.explore.algs.coloredlines.manual.game.board
 
 import com.us.dsb.colorlines.game.board.{
-  BoardOrder, CellAddress, IndexOrigin, columnIndices, RowIndex}
+  BoardOrder, CellAddress, IndexOrigin, ColumnIndex, RowIndex}
 
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers.*
@@ -12,7 +12,7 @@ class LowerGameStateTest extends AnyFunSpec {
     lazy val gameState = LowerGameState.empty
     it("- with empty board--empty grid cells") {
       RowIndex.values.foreach { row =>
-        columnIndices.foreach { column =>
+        ColumnIndex.values.foreach { column =>
           val address = CellAddress(row, column)
           assert(gameState.board.getBallStateAt(address).isEmpty)
         }
@@ -28,7 +28,7 @@ class LowerGameStateTest extends AnyFunSpec {
     it("- empty board") {
       val expected =   // "<---------/---------/.../--------->"
         (IndexOrigin to BoardOrder).map { _ =>
-          columnIndices.map(_ => "-").mkString("")
+          ColumnIndex.values.map(_ => "-").mkString("")
         }
             .mkString("< <", "/", " + ()>; 0 pts>")
       LowerGameState.empty.toString shouldBe expected

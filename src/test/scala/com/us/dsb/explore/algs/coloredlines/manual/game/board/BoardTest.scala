@@ -1,7 +1,7 @@
 package com.us.dsb.explore.algs.coloredlines.manual.game.board
 
 import com.us.dsb.colorlines.game.board.{
-  BallColor, BoardOrder, CellAddress, ColumnIndex, Index, IndexOrigin, RowIndex, columnIndices}
+  BallColor, BoardOrder, CellAddress, ColumnIndex, Index, IndexOrigin, RowIndex}
 
 import org.scalatest.PrivateMethodTester
 import org.scalatest.funspec.AnyFunSpec
@@ -12,7 +12,7 @@ class BoardTest extends AnyFunSpec {
   private lazy val regularFilledBoard = {
     var colorIndex = 0
     RowIndex.values.foldLeft(Board.empty) { (board, row) =>
-      columnIndices.foldLeft(board){ (board, column) =>
+      ColumnIndex.values.foldLeft(board){ (board, column) =>
         colorIndex = (colorIndex + 1) % BallColor.values.length
         board.withBallAt(CellAddress(row, column), BallColor.values(colorIndex))
       }
@@ -21,7 +21,7 @@ class BoardTest extends AnyFunSpec {
   private lazy val variedAllButFilledBoard = {
     var colorIndex = 0
     RowIndex.values.foldLeft(Board.empty) { (board, row) =>
-      columnIndices.foldLeft(board){ (board, column) =>
+      ColumnIndex.values.foldLeft(board){ (board, column) =>
         if (row.raw.value == 2 && column.raw.value == 2) { // skip one  //??? clear one from regularFilledBoard?
           board
         }
@@ -37,7 +37,7 @@ class BoardTest extends AnyFunSpec {
     lazy val board = Board.empty
     it("- with empty grid cells") {
       RowIndex.values.foreach { row =>
-        columnIndices.foreach { column =>
+        ColumnIndex.values.foreach { column =>
           val address = CellAddress(row, column)
           assert(board.getBallStateAt(address).isEmpty)
         }
@@ -54,7 +54,7 @@ class BoardTest extends AnyFunSpec {
 
     it("should compute 0 for first row, first column") {
       // ?? TODO 2->3 . refined:  Change Index.unsafeFrom back to Index once macros re-exist:
-      val address_1_1  = CellAddress(RowIndex(Index.unsafeFrom(IndexOrigin)), columnIndices.head)
+      val address_1_1  = CellAddress(RowIndex(Index.unsafeFrom(IndexOrigin)), ColumnIndex.values.head)
       val index = Board.empty `invokePrivate` vectorIndex(address_1_1)
       index shouldEqual 0
     }
@@ -68,11 +68,11 @@ class BoardTest extends AnyFunSpec {
 
     describe("should compute indices in row-major order (chosen but ~isolated):") {
       it("- (IO 1) row 1 column 3 => (IO 0) vector index 2") {
-        val `row 1 column 3` = CellAddress(RowIndex.values.head, columnIndices(3 - IndexOrigin))
+        val `row 1 column 3` = CellAddress(RowIndex.values.head, ColumnIndex.values(3 - IndexOrigin))
         Board.empty `invokePrivate` vectorIndex(`row 1 column 3`) shouldEqual 3 - IndexOrigin
       }
       it("- (IO 1) row 3 column 1 => (IO 0) vector index 8") {  //????? adjust label?
-        val `row 3 column 1` = CellAddress(RowIndex.values(3 - IndexOrigin), columnIndices.head)
+        val `row 3 column 1` = CellAddress(RowIndex.values(3 - IndexOrigin), ColumnIndex.values.head)
         Board.empty `invokePrivate` vectorIndex(`row 3 column 1`) shouldEqual
             (3 - IndexOrigin) * BoardOrder + (1 - IndexOrigin)
       }
@@ -84,7 +84,7 @@ class BoardTest extends AnyFunSpec {
     it("- empty board") {
       val expected =   // "<---------/---------/.../--------- + ()>"
         Index.values.map { _ =>
-          columnIndices.map(_ => "-").mkString("")
+          ColumnIndex.values.map(_ => "-").mkString("")
         }
             .mkString("<", "/", " + ()>")
       Board.empty.toString shouldBe expected

@@ -1,7 +1,6 @@
 package com.us.dsb.explore.algs.coloredlines.manual.game
 
-import com.us.dsb.colorlines.game.board.{
-  CellAddress, ColumnIndex, RowIndex, columnIndices}
+import com.us.dsb.colorlines.game.board.{CellAddress, ColumnIndex, RowIndex}
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.LowerGameState
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers.*
@@ -45,13 +44,13 @@ class GameLogicSupportTest extends AnyFunSpec {
     it("ball on one-ball board can move anywhere") {
       //?? factor out this frequent iteration pattern (set of cells, iterate, passing CellAddress
       RowIndex.values.foreach { ballRow =>
-        columnIndices.foreach { ballColumn =>
+        ColumnIndex.values.foreach { ballColumn =>
           val fromBallAddress = CellAddress(ballRow, ballColumn)
           val gameState =
             gameState0.withBoardWithBallAt(fromBallAddress,
                                            GameLogicSupport.pickRandomBallColor())
           RowIndex.values.foreach { row =>
-            columnIndices.foreach { column =>
+            ColumnIndex.values.foreach { column =>
               val toVacancyAddress = CellAddress(row, column)
               val pathExists = GameLogicSupport.pathExists(gameState, fromBallAddress, toVacancyAddress)
               withClue( s"from $fromBallAddress to $toVacancyAddress") {
@@ -66,7 +65,7 @@ class GameLogicSupportTest extends AnyFunSpec {
     // top left (1, 1) to bottom right (N, N)
     def makeDiagonallyDividedBoardGameState: LowerGameState = {  //????? just Board?
       val diagonalAddresses =
-        RowIndex.values.zip(columnIndices).map { (row, column) => CellAddress(row, column) }
+        RowIndex.values.zip(ColumnIndex.values).map { (row, column) => CellAddress(row, column) }
       diagonalAddresses.foldLeft(gameState0) { (board, address) =>
         board.withBoardWithBallAt(address, GameLogicSupport.pickRandomBallColor())
       }

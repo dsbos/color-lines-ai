@@ -1,7 +1,7 @@
 package com.us.dsb.explore.algs.coloredlines.manual.game.board
 
 import com.us.dsb.colorlines.game.board.{
-  BallColor, BoardOrder, CellAddress, IndexOrigin, columnIndices, RowIndex}
+  BallColor, BoardOrder, CellAddress, ColumnIndex, IndexOrigin, RowIndex}
 
 // ?? TODO:  Revisit having companion object before class:
 private[game] object Board {
@@ -90,7 +90,7 @@ private[game] class Board(private val cellStates: Vector[CellBallState],
     import BallColorRenderingExtensions.*
     "<" ++
         RowIndex.values.map { row =>
-          columnIndices.map { column =>
+          ColumnIndex.values.map { column =>
             val addr = CellAddress(row, column)
             getCellBallStateAt(addr).ballState.fold("-")(_.initial)
           }.mkString("")

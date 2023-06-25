@@ -1,7 +1,7 @@
 package com.us.dsb.explore.algs.coloredlines.manual.game
 
 import com.us.dsb.colorlines.game.board.{
-  BallColor, BoardOrder, CellAddress, IndexOrigin, columnIndices, RowIndex}
+  BallColor, BoardOrder, CellAddress, IndexOrigin, ColumnIndex, RowIndex}
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.{Board, LowerGameState}
 import com.us.dsb.explore.algs.coloredlines.manual.game.lines.LineDetector
 import com.us.dsb.explore.algs.coloredlines.manual.game.lines.LineDetector.BallArrivalResult
@@ -31,7 +31,7 @@ object GameLogicSupport {
       None
     else {
       val row = RowIndex.values(rng.nextInt(RowIndex.values.size))
-      val col = columnIndices(rng.nextInt(columnIndices.size))
+      val col = ColumnIndex.values(rng.nextInt(ColumnIndex.values.size))
       if (gameState.board.getBallStateAt(CellAddress(row, col)).isEmpty)
         Some(CellAddress(row, col))
       else
@@ -115,7 +115,7 @@ object GameLogicSupport {
     // Blocked from (further) "reaching"--by ball or already reached in search.
     val blockedAt: Array[Array[Boolean]] =
       RowIndex.values.map { row =>
-          columnIndices.map { column =>
+          ColumnIndex.values.map { column =>
             gameState.board.hasABallAt(CellAddress(row, column))
           }.toArray
       }.toArray
@@ -149,7 +149,7 @@ object GameLogicSupport {
                 // open; note traversed and try neighboring cells:
                 blockedAt(rowOffset).update(colOffset, true)
                 val neighborAddress = CellAddress(RowIndex.values(rowOffset),
-                                                  columnIndices(colOffset))
+                                                  ColumnIndex.values(colOffset))
                 cellsToExpandFrom.enqueue(neighborAddress)
               }
             }

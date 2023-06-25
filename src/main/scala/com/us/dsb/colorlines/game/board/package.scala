@@ -52,10 +52,14 @@ object RowIndex {
 
 /** Column index value. */
 opaque type ColumnIndex = Index
+
 object ColumnIndex {
   def apply(raw: Index): ColumnIndex = raw
+
   extension (columnIndex: ColumnIndex)
     def raw: Index = columnIndex: Index
+
+  val values: IndexedSeq[ColumnIndex] = Index.values.map(ColumnIndex(_))
 }
 
 // ?? TOOD:  Investigate Refined and/or Scala bug:  Having extension method
@@ -64,5 +68,3 @@ object ColumnIndex {
 //   (at this level of in object RowIndex)and is used for unwrapping call:
 //extension (rowIndex: RowIndex)
 //  def value: Index = rowIndex: Index
-
-val columnIndices: IndexedSeq[ColumnIndex] = Index.values.map(ColumnIndex(_))

@@ -1,7 +1,6 @@
 package com.us.dsb.explore.algs.coloredlines.manual.ui
 
-import com.us.dsb.colorlines.game.board.{
-  BallColor, CellAddress, ColumnIndex, Index, RowIndex, columnIndices}
+import com.us.dsb.colorlines.game.board.{BallColor, CellAddress, ColumnIndex, Index, RowIndex}
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.BallColorRenderingExtensions
 
 import scala.annotation.unused
@@ -58,12 +57,12 @@ private case class GameUIState(tapUiGameState: TapUiGameState,
     val cellSeparator = "|"
     // ?? use new Order or leave using indices declarations?
     val wholeWidth =
-      columnIndices.length * cellWidth +
-          (columnIndices.length - 1) * cellSeparator.length
+      ColumnIndex.values.size * cellWidth +
+          (ColumnIndex.values.size - 1) * cellSeparator.length
     val rowSeparator = "\n" + ("-" * wholeWidth) + "\n"
 
     RowIndex.values.map { row =>
-      columnIndices.map { column =>
+      ColumnIndex.values.map { column =>
         val scanAddress = CellAddress(row, column)
         val tapCellStateStr =
           getCellBallStateChar(tapUiGameState.gameState.board.getBallStateAt(scanAddress),
@@ -84,7 +83,7 @@ private case class GameUIState(tapUiGameState: TapUiGameState,
   @unused
   private def renderCompactTableMultilineWithSelection(selectionAddress: Option[CellAddress]): String = {
     RowIndex.values.map { row =>
-      columnIndices.map { column =>
+      ColumnIndex.values.map { column =>
         val addr = CellAddress(row, column)
         val isSelected = selectionAddress.fold(false)(_ == addr)
         getCellBallStateChar(tapUiGameState.gameState.board.getBallStateAt(addr), isSelected)
