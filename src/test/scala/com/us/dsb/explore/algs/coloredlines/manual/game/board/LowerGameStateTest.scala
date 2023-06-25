@@ -14,7 +14,7 @@ class LowerGameStateTest extends AnyFunSpec {
       RowIndex.values.foreach { row =>
         ColumnIndex.values.foreach { column =>
           val address = CellAddress(row, column)
-          assert(gameState.board.getBallStateAt(address).isEmpty)
+          assert(gameState.board.getCellStateAt(address).asOption.isEmpty)
         }
       }
     }

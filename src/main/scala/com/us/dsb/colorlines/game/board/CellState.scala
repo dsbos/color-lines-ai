@@ -22,8 +22,8 @@ object CellState {
   def withBallOfColor(color: BallColor): CellState = ballColorValues(color.ordinal)
 
   extension (cellBallState: CellState)
-    // ?????? TODO:  Revisit name:  "asOption":
-    def ballState: Option[BallColor] = cellBallState
+    /* ...; (no allocation). */
+    def asOption: Option[BallColor] = cellBallState
 
   // Note:  Opaque type can't have "derives CanEqual":
   given CanEqual[CellState, CellState] = CanEqual.derived

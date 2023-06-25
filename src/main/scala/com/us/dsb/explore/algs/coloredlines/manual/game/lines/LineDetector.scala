@@ -35,7 +35,7 @@ private[manual] object LineDetector {
     val haveMatch =
       inRange && {
         val candidateAddress = CellAddress.fromRaw(rawRowIndex, rawColIndex)
-        board.getBallStateAt(candidateAddress).fold(false)(ball => ball == moveBallColor)
+        board.getCellStateAt(candidateAddress).asOption.fold(false)(ball => ball == moveBallColor)
       }
     haveMatch
   }
@@ -133,7 +133,7 @@ private[manual] object LineDetector {
                                  ballTo: CellAddress
                                 ): BallArrivalResult = {
     //println(s"+reapAnyLines(... ballTo = $ballTo...).1")
-    val moveBallColor = gameState.board.getBallStateAt(ballTo).get //????
+    val moveBallColor = gameState.board.getCellStateAt(ballTo).asOption.get //?????? pass in?  getOrElse?
     println(s"* * placed at $ballTo: $moveBallColor")
 
     val allAxesResults: List[AxisResult] =

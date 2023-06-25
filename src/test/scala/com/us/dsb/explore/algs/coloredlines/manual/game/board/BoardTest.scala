@@ -39,7 +39,7 @@ class BoardTest extends AnyFunSpec {
       RowIndex.values.foreach { row =>
         ColumnIndex.values.foreach { column =>
           val address = CellAddress(row, column)
-          assert(board.getBallStateAt(address).isEmpty)
+          assert(board.getCellStateAt(address).asOption.isEmpty)
         }
       }
     }

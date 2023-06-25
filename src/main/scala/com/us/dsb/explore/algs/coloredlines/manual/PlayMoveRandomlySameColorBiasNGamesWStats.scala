@@ -30,7 +30,7 @@ object PlayMoveRandomlySameColorBiasNGamesWStats extends App {
           row <- RowIndex.values
           col <- ColumnIndex.values
           cellAddress = CellAddress(row, col)
-          ballColor <- gameState.board.getBallStateAt(cellAddress)
+          ballColor <- gameState.board.getCellStateAt(cellAddress).asOption
         } yield (ballColor, cellAddress)
       val x2: Map[BallColor, Iterable[(BallColor, CellAddress)]] = colorToCellTuples.groupBy(_._1)
       val colorToCellCountMap: Map[BallColor, Int] = x2.map(x => (x._1, x._2.size))

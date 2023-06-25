@@ -46,15 +46,11 @@ private[game] class Board(private val cellStates: Vector[CellState],
 
   private[manual] def getCellStateAt(address: CellAddress): CellState =
     cellStates(vectorIndex(address))
-  // ?????? TODO:  Should caller just use ballState from CellState?  (And
-  //   should ballState be asOption?)
-  private[manual] def getBallStateAt(address: CellAddress): Option[BallColor] =
-    getCellStateAt(address).ballState
 
   private[manual] def hasABallAt(address: CellAddress): Boolean =
-    cellStates(vectorIndex(address)).ballState.isDefined
+    cellStates(vectorIndex(address)).asOption.isDefined
 
-  private[manual] def isFull: Boolean = ! cellStates.exists(_.ballState.isEmpty)
+  private[manual] def isFull: Boolean = ! cellStates.exists(_.asOption.isEmpty)
 
   // grid balls, setting:
 
@@ -76,7 +72,7 @@ private[game] class Board(private val cellStates: Vector[CellState],
         RowIndex.values.map { row =>
           ColumnIndex.values.map { column =>
             val addr = CellAddress(row, column)
-            getCellStateAt(addr).ballState.fold("-")(_.initial)
+            getCellStateAt(addr).asOption.fold("-")(_.initial)
           }.mkString("")
         }.mkString("/") +
         " + " + getOndeckBalls.map(_.initial).mkString("(", ", ", ")") +

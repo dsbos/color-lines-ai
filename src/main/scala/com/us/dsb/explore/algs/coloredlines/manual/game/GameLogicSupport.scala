@@ -32,7 +32,7 @@ object GameLogicSupport {
     else {
       val row = RowIndex.values(rng.nextInt(RowIndex.values.size))
       val col = ColumnIndex.values(rng.nextInt(ColumnIndex.values.size))
-      if (gameState.board.getBallStateAt(CellAddress(row, col)).isEmpty)
+      if (gameState.board.getCellStateAt(CellAddress(row, col)).asOption.isEmpty)
         Some(CellAddress(row, col))
       else
         pickRandomEmptyCell(gameState) // loop: try again
@@ -200,7 +200,7 @@ object GameLogicSupport {
         case false =>  // can't move--ignore (keep tap-UI selection state)
           gameState
         case true =>
-          val moveBallColor = gameState.board.getBallStateAt(from).get  //????
+          val moveBallColor = gameState.board.getCellStateAt(from).asOption.get //?????? pass in?  getOrElse?
           val postMoveBoard =
             gameState.withBoardWithNoBallAt(from).withBoardWithBallAt(to, moveBallColor)
 
