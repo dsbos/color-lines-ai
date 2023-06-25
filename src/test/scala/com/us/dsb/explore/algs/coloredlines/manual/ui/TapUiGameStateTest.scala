@@ -1,7 +1,7 @@
 package com.us.dsb.explore.algs.coloredlines.manual.ui
 
 import com.us.dsb.colorlines.game.board.{
-  CellAddress, ColumnIndex, Index, RowIndex, columnIndices, rowIndices}
+  CellAddress, ColumnIndex, Index, RowIndex, columnIndices}
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.*
 
 import org.scalatest.funspec.AnyFunSpec
@@ -13,7 +13,7 @@ class TapUiGameStateTest extends AnyFunSpec {
 
   describe("GameState selection:") {
     //???? randomize?
-    lazy val someRow = rowIndices.head
+    lazy val someRow = RowIndex.values.head
     lazy val someCol = columnIndices.head
     lazy val tapUiGameState0 = TapUiGameState.initial()
     lazy val address = CellAddress(someRow, someCol)

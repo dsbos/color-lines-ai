@@ -40,10 +40,14 @@ object Index extends RefinedTypeOps.Numeric[Index, Int] {
 
 /** Row index value. */
 opaque type RowIndex = Index
+
 object RowIndex {
   def apply(raw: Index): RowIndex = raw
+
   extension (rowIndex: RowIndex)
     def raw: Index = rowIndex: Index
+
+  val values: IndexedSeq[RowIndex] = Index.values.map(RowIndex(_))
 }
 
 /** Column index value. */
@@ -61,5 +65,4 @@ object ColumnIndex {
 //extension (rowIndex: RowIndex)
 //  def value: Index = rowIndex: Index
 
-val rowIndices: IndexedSeq[RowIndex] = Index.values.map(RowIndex(_))
 val columnIndices: IndexedSeq[ColumnIndex] = Index.values.map(ColumnIndex(_))

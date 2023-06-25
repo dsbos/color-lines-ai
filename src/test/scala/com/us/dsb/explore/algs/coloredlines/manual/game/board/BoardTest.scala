@@ -1,7 +1,7 @@
 package com.us.dsb.explore.algs.coloredlines.manual.game.board
 
 import com.us.dsb.colorlines.game.board.{
-  BallColor, BoardOrder, CellAddress, ColumnIndex, Index, IndexOrigin, RowIndex, columnIndices, rowIndices}
+  BallColor, BoardOrder, CellAddress, ColumnIndex, Index, IndexOrigin, RowIndex, columnIndices}
 
 import org.scalatest.PrivateMethodTester
 import org.scalatest.funspec.AnyFunSpec
@@ -11,7 +11,7 @@ class BoardTest extends AnyFunSpec {
 
   private lazy val regularFilledBoard = {
     var colorIndex = 0
-    rowIndices.foldLeft(Board.empty) { (board, row) =>
+    RowIndex.values.foldLeft(Board.empty) { (board, row) =>
       columnIndices.foldLeft(board){ (board, column) =>
         colorIndex = (colorIndex + 1) % BallColor.values.length
         board.withBallAt(CellAddress(row, column), BallColor.values(colorIndex))
@@ -20,7 +20,7 @@ class BoardTest extends AnyFunSpec {
   }
   private lazy val variedAllButFilledBoard = {
     var colorIndex = 0
-    rowIndices.foldLeft(Board.empty) { (board, row) =>
+    RowIndex.values.foldLeft(Board.empty) { (board, row) =>
       columnIndices.foldLeft(board){ (board, column) =>
         if (row.raw.value == 2 && column.raw.value == 2) { // skip one  //??? clear one from regularFilledBoard?
           board
@@ -36,7 +36,7 @@ class BoardTest extends AnyFunSpec {
   describe("Board$.empty should return board:") {
     lazy val board = Board.empty
     it("- with empty grid cells") {
-      rowIndices.foreach { row =>
+      RowIndex.values.foreach { row =>
         columnIndices.foreach { column =>
           val address = CellAddress(row, column)
           assert(board.getBallStateAt(address).isEmpty)
@@ -61,18 +61,18 @@ class BoardTest extends AnyFunSpec {
 
     it("should compute array length - 1 for last row, last column") {
       // ?? TODO 2->3 . refined:  Change Index.unsafeFrom back to Index once macros re-exist:
-      val address_n_n  = CellAddress(rowIndices.last, ColumnIndex(Index.unsafeFrom(9)))  //????? use BoardOrder?
+      val address_n_n  = CellAddress(RowIndex.values.last, ColumnIndex(Index.unsafeFrom(9)))  //????? use BoardOrder?
       val index = Board.empty `invokePrivate` vectorIndex(address_n_n)
       index shouldEqual BoardOrder * BoardOrder - 1
     }
 
     describe("should compute indices in row-major order (chosen but ~isolated):") {
       it("- (IO 1) row 1 column 3 => (IO 0) vector index 2") {
-        val `row 1 column 3` = CellAddress(rowIndices.head, columnIndices(3 - IndexOrigin))
+        val `row 1 column 3` = CellAddress(RowIndex.values.head, columnIndices(3 - IndexOrigin))
         Board.empty `invokePrivate` vectorIndex(`row 1 column 3`) shouldEqual 3 - IndexOrigin
       }
       it("- (IO 1) row 3 column 1 => (IO 0) vector index 8") {  //????? adjust label?
-        val `row 3 column 1` = CellAddress(rowIndices(3 - IndexOrigin), columnIndices.head)
+        val `row 3 column 1` = CellAddress(RowIndex.values(3 - IndexOrigin), columnIndices.head)
         Board.empty `invokePrivate` vectorIndex(`row 3 column 1`) shouldEqual
             (3 - IndexOrigin) * BoardOrder + (1 - IndexOrigin)
       }

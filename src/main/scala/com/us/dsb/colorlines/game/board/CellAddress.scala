@@ -1,7 +1,7 @@
 package com.us.dsb.colorlines.game.board
 
 import com.us.dsb.colorlines.game.board.{
-  ColumnIndex, Index, IndexOrigin, RowIndex, rowIndices, columnIndices}
+  ColumnIndex, Index, IndexOrigin, RowIndex, columnIndices}
 
 /** Valid (in-board) cell address.  (Re private constructor, see `CellAddress.apply`.) */
 case class CellAddress private(row: RowIndex,
@@ -16,7 +16,7 @@ case class CellAddress private(row: RowIndex,
 object CellAddress {
 
   private val instances: IndexedSeq[IndexedSeq[CellAddress]] =
-    rowIndices.map { rowIndex =>
+    RowIndex.values.map { rowIndex =>
         columnIndices.map { colIndex =>
           new CellAddress(rowIndex, colIndex)
         }

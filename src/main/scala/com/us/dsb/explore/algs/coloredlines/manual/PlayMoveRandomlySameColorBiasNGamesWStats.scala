@@ -1,7 +1,7 @@
 package com.us.dsb.explore.algs.coloredlines.manual
 
 import com.us.dsb.colorlines.game.board.{
-  BallColor, CellAddress, IndexOrigin, columnIndices, rowIndices}
+  BallColor, CellAddress, IndexOrigin, columnIndices, RowIndex}
 import com.us.dsb.explore.algs.coloredlines.manual.game.GameLogicSupport
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.LowerGameState
 
@@ -27,7 +27,7 @@ object PlayMoveRandomlySameColorBiasNGamesWStats extends App {
 
       val colorToCellTuples: Iterable[(BallColor, CellAddress)] =
         for {
-          row <- rowIndices
+          row <- RowIndex.values
           col <- columnIndices
           cellAddress = CellAddress(row, col)
           ballColor <- gameState.board.getBallStateAt(cellAddress)
@@ -40,10 +40,12 @@ object PlayMoveRandomlySameColorBiasNGamesWStats extends App {
       val (from, to) =
         if (highestCount < 2) {
           // no balls of same color
-          val from: CellAddress = CellAddress.fromRaw(IndexOrigin + rng.nextInt(rowIndices.size),
-                                                      IndexOrigin + rng.nextInt(columnIndices.size))
-          val to: CellAddress = CellAddress.fromRaw(IndexOrigin + rng.nextInt(rowIndices.size),
-                                                    IndexOrigin + rng.nextInt(columnIndices.size))
+          val from: CellAddress =
+            CellAddress.fromRaw(IndexOrigin + rng.nextInt(RowIndex.values.size),
+                                IndexOrigin + rng.nextInt(columnIndices.size))
+          val to: CellAddress =
+            CellAddress.fromRaw(IndexOrigin + rng.nextInt(RowIndex.values.size),
+                                IndexOrigin + rng.nextInt(columnIndices.size))
           (to, from)
         }
         else {
@@ -59,8 +61,9 @@ object PlayMoveRandomlySameColorBiasNGamesWStats extends App {
 
 
           val tempFrom = twoSomeColorBallCells.head
-          val tempTo: CellAddress = CellAddress.fromRaw(IndexOrigin + rng.nextInt(rowIndices.size),
-                                                        IndexOrigin + rng.nextInt(columnIndices.size))
+          val tempTo: CellAddress =
+            CellAddress.fromRaw(IndexOrigin + rng.nextInt(RowIndex.values.size),
+                                IndexOrigin + rng.nextInt(columnIndices.size))
           (tempFrom, tempTo)
           //          ???
         }
@@ -76,10 +79,12 @@ object PlayMoveRandomlySameColorBiasNGamesWStats extends App {
           tryMoveResult1
         }
         else {
-          val from: CellAddress = CellAddress.fromRaw(IndexOrigin + rng.nextInt(rowIndices.size),
-                                                      IndexOrigin + rng.nextInt(columnIndices.size))
-          val to: CellAddress = CellAddress.fromRaw(IndexOrigin + rng.nextInt(rowIndices.size),
-                                                    IndexOrigin + rng.nextInt(columnIndices.size))
+          val from: CellAddress =
+            CellAddress.fromRaw(IndexOrigin + rng.nextInt(RowIndex.values.size),
+                                IndexOrigin + rng.nextInt(columnIndices.size))
+          val to: CellAddress =
+            CellAddress.fromRaw(IndexOrigin + rng.nextInt(RowIndex.values.size),
+                                IndexOrigin + rng.nextInt(columnIndices.size))
           val tryMoveResult2 = GameLogicSupport.doTryMoveBall(gameState, from, to)
 
           val validMove = tryMoveResult2.moveWasValid

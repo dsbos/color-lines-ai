@@ -1,7 +1,7 @@
 package com.us.dsb.explore.algs.coloredlines.manual.ui
 
 import com.us.dsb.colorlines.game.board.{
-  BallColor, CellAddress, ColumnIndex, Index, RowIndex, columnIndices, rowIndices}
+  BallColor, CellAddress, ColumnIndex, Index, RowIndex, columnIndices}
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.BallColorRenderingExtensions
 
 import scala.annotation.unused
@@ -62,7 +62,7 @@ private case class GameUIState(tapUiGameState: TapUiGameState,
           (columnIndices.length - 1) * cellSeparator.length
     val rowSeparator = "\n" + ("-" * wholeWidth) + "\n"
 
-    rowIndices.map { row =>
+    RowIndex.values.map { row =>
       columnIndices.map { column =>
         val scanAddress = CellAddress(row, column)
         val tapCellStateStr =
@@ -83,7 +83,7 @@ private case class GameUIState(tapUiGameState: TapUiGameState,
   // ?? Unused as of 2023-06-08; previously in LowerGameState.
   @unused
   private def renderCompactTableMultilineWithSelection(selectionAddress: Option[CellAddress]): String = {
-    rowIndices.map { row =>
+    RowIndex.values.map { row =>
       columnIndices.map { column =>
         val addr = CellAddress(row, column)
         val isSelected = selectionAddress.fold(false)(_ == addr)
