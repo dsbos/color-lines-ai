@@ -1,5 +1,3 @@
-// ?????? TODO:  Move out of package "game" (for abstract game) to UI package,
-// OR at least move selectionAddress address part out:
 package com.us.dsb.explore.algs.coloredlines.manual.ui
 
 import com.us.dsb.colorlines.game.board.CellAddress
@@ -10,11 +8,11 @@ import com.us.dsb.explore.algs.coloredlines.manual.ui.tapapi.{TapCase, TapInterp
 import cats.syntax.either.*
 import scala.util.Random
 
-// ?????? TODO: Possibly name with "virtual"/"net"/"abstract"/etc.
+// ????? TODO: Possibly name with "virtual"/"net"/"abstract"/etc.
 
 private[ui] object TapUiGameState {
 
-  // ?????? TODO:  Probably purge. (Not used used.):
+  // ????? TODO:  Probably purge. (Not used.):
   /**
    * Result of completed game.
    */
@@ -66,7 +64,7 @@ private[ui] case class TapUiGameState(gameState: LowerGameState,
   // ?? maybe add result of move (win/draw/other) with new state (so caller
   //  doesn't have to check state's gameResult; also, think about where I'd add
   //  game history
-  // ?????? TODO: Rename; maybe "move" to "... tap move ..."?
+  // ????? TODO: Rename; maybe "move" to "... tap move ..."?
   private[ui] def tryMoveAt(tapAddress: CellAddress): Either[String, TapUiGameState] = {
     //???? test
     import TapCase.*

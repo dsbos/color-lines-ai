@@ -112,7 +112,7 @@ private[manual] object LineDetector {
     linesRemovedGameState
   }
 
-  // ?????? TODO:  Review uses (return type):  Which one don't need to report whether any removals?
+  // ????? TODO:  Review uses (return type):  Which ones don't need to report whether any removals?
   /**
    * @param gameState
    *   updated game state

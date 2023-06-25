@@ -5,7 +5,7 @@ import eu.timepit.refined.numeric.Interval.Closed
 
 // ???? TODO:  Review:  Should these be in package game.board, game, or split (e.g., board vs. lines)?
 // ???? TODO:  Review:  Should these be in package or specific object(s) (e.g., BoardIndexing)?
-// ?????? TODO:  Assimilate parameterization of added-balls count, scoring, etc.
+// ????? TODO:  Assimilate parameterization of added-balls count, scoring, etc.
 
 // ?????? TODO:  Move IndexOrigin to Index.Origin, probably moving BoardOrder to
 //   Index.Something.  (Or maybe move multiple top-level declarations into an

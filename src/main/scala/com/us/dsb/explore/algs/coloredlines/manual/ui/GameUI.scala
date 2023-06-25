@@ -25,9 +25,9 @@ private[manual] object GameUI {
   private[ui] object UICommand {
     // (Q: Why doesn't UICommand's "sealed" obviate the following one (for
     //   exhaustive-match checks)?
-    // ?????? TODO:  Clarify moving _selection_, not _ball_:
+    // ????? TODO:  Clarify moving _selection_, not _ball_:
     private[ui] sealed trait UIMoveCommand extends UICommand
-    // ?????? TODO:  Clean names (e.g., different "move" in UIMoveCommand vs. Move).
+    // ????? TODO:  Clean names (e.g., different "move" in UIMoveCommand vs. Move).
     //  maybe GoUp/SelectUp/MoveSelectionUp/SelectUp/PrevRow; Move -> MoveBall?
     //????? test (use (drive with) commands)
     private[ui] case object Up    extends UIMoveCommand
@@ -86,7 +86,7 @@ private[manual] object GameUI {
     }
   }
 
-  // ?????? TODO: maybe "move ball at selection" (vs. "make move at ...")?
+  // ????? TODO: maybe "move ball at selection" (vs. "make move at ...")?
   private def moveAtSelection(io: SegregatedConsoleIO,
                               uiState: GameUIState
                              ): GameUIState = {
