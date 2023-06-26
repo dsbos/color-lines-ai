@@ -62,10 +62,8 @@ import com.us.dsb.colorlines.game.board.{
 
   // Miscellaneous:
 
-  // ?????? TODO:  Maybe move to toDebugString/toLogString/toCompactString, adding
-  //   to BoardReadView (for future game-playing logic).
-  /** Makes compact single-line string like"<rgb------/---------/.../---------; (bgr) >". */
-  override def toString: String = {
+  /** Makes compact single-line string like"<RGB------/---------/.../--------- + (B, G, R) >". */
+  override def toCompactString: String = {
     import BallColorRenderingExtensions.*
     "<" ++
         RowIndex.values.map { row =>
@@ -77,5 +75,8 @@ import com.us.dsb.colorlines.game.board.{
         " + " + getOndeckBalls.map(_.initial).mkString("(", ", ", ")") +
         ">"
   }
+
+  /** Sames as `toCompactString`. */
+  override def toString: String = toCompactString
 
 }

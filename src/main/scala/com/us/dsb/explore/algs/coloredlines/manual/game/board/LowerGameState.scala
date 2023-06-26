@@ -45,7 +45,9 @@ private[manual] class LowerGameState(private[manual] val board: Board,
   // renderings:
 
   /** Makes compact single-line string. */
-  override def toString: String = "< " + board.toString + "; " + score + " pts" + ">"
+  def toCompactString: String = "< " + board.toCompactString + "; " + score + " pts" + ">"
 
+  /** Sames as `toCompactString`. */
+  override def toString: String = toCompactString
 }
 

@@ -31,6 +31,7 @@ class LowerGameStateTest extends AnyFunSpec {
           ColumnIndex.values.map(_ => "-").mkString("")
         }
             .mkString("< <", "/", " + ()>; 0 pts>")
+      LowerGameState.empty.toCompactString shouldBe expected
       LowerGameState.empty.toString shouldBe expected
     }
     it("- board with grid balls") (pending)

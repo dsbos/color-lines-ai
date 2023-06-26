@@ -87,6 +87,7 @@ class BoardTest extends AnyFunSpec {
           ColumnIndex.values.map(_ => "-").mkString("")
         }
             .mkString("<", "/", " + ()>")
+      Board.empty.toCompactString shouldBe expected
       Board.empty.toString shouldBe expected
     }
     it("- board with grid balls") (pending)

@@ -9,5 +9,7 @@ trait BoardReadView {
   def isFull: Boolean
 
   def getOndeckBalls: Iterable[BallColor]
+
+  def toCompactString: String
 }
 
