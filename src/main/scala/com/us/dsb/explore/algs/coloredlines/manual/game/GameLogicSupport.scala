@@ -2,7 +2,7 @@ package com.us.dsb.explore.algs.coloredlines.manual.game
 
 import com.us.dsb.colorlines.game.board.{
   BallColor, BoardOrder, CellAddress, IndexOrigin, ColumnIndex, RowIndex}
-import com.us.dsb.explore.algs.coloredlines.manual.game.board.{Board, LowerGameState}
+import com.us.dsb.explore.algs.coloredlines.manual.game.board.{Board, BoardReadView, LowerGameState}
 import com.us.dsb.explore.algs.coloredlines.manual.game.lines.LineDetector
 import com.us.dsb.explore.algs.coloredlines.manual.game.lines.LineDetector.BallArrivalResult
 
@@ -25,17 +25,17 @@ object GameLogicSupport {
   /** Selects an empty cell randomly (if any). */
   // (was "private" before test calls:)
   @tailrec
-  private[game] def pickRandomEmptyCell(gameState: LowerGameState)
+  private[game] def pickRandomEmptyCell(board: BoardReadView)
                                        (using rng: Random): Option[CellAddress] = {
-    if (gameState.board.isFull)
+    if (board.isFull)
       None
     else {
       val row = RowIndex.values(rng.nextInt(RowIndex.values.size))
       val col = ColumnIndex.values(rng.nextInt(ColumnIndex.values.size))
-      if (gameState.board.getCellStateAt(CellAddress(row, col)).asOption.isEmpty)
+      if (board.getCellStateAt(CellAddress(row, col)).asOption.isEmpty)
         Some(CellAddress(row, col))
       else
-        pickRandomEmptyCell(gameState) // loop: try again
+        pickRandomEmptyCell(board) // loop: try again
     }
   }
 
@@ -53,7 +53,7 @@ object GameLogicSupport {
           .foldLeft(BallArrivalResult(gameState, anyRemovals = false)) {
             (resultSoFar, _) =>
               val address =
-                pickRandomEmptyCell(resultSoFar.gameState)
+                pickRandomEmptyCell(resultSoFar.gameState.board)
                     .getOrElse(scala.sys.error("Unexpectedly full board"))
               val postPlacementGameState =
                 resultSoFar.gameState.withBoardWithBallAt(address, pickRandomBallColor())
@@ -75,7 +75,7 @@ object GameLogicSupport {
       gameState.board.getOndeckBalls
         .foldLeft(BallArrivalResult(gameState, anyRemovals = false)) {
           (curMoveResult, onDeckBall) =>
-            pickRandomEmptyCell(curMoveResult.gameState) match {
+            pickRandomEmptyCell(curMoveResult.gameState.board) match {
               case None =>  // board full; break out early (game will become over)
                 curMoveResult
               case Some(address) =>

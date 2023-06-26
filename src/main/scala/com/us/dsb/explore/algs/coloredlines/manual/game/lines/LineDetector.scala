@@ -2,7 +2,7 @@ package com.us.dsb.explore.algs.coloredlines.manual.game.lines
 
 import com.us.dsb.colorlines.game.board.{BallColor, CellAddress, Index}
 import com.us.dsb.colorlines.game.lines.LineOrder
-import com.us.dsb.explore.algs.coloredlines.manual.game.board.{Board, LowerGameState}
+import com.us.dsb.explore.algs.coloredlines.manual.game.board.{BoardReadView, LowerGameState}
 
 // ?? TODO:  reduce repeated passing of board, ball color, etc.; maybe make
 // LineDetector a class, to be instantiated for each move; or make local class
@@ -26,7 +26,7 @@ private[manual] object LineDetector {
   private val relativeDirectionFactors = List(1, -1) // use type of length 2 (refined List?, Tuple2?, some array?)
 
   private[lines] def haveMatchingBallAt(moveBallColor: BallColor,
-                                        board: Board,
+                                        board: BoardReadView,
                                         rawRowIndex: Int,
                                         rawColIndex: Int): Boolean = {
     val inRange =
@@ -47,7 +47,7 @@ private[manual] object LineDetector {
   // ????? TODO:  Probably get ball color via ballTo, rather than having clients
   //   pass it down several levels:
   private[lines] def computeDirectionResult(moveBallColor: BallColor,
-                                            board: Board,
+                                            board: BoardReadView,
                                             ballTo: CellAddress,
                                             lineDirectionAxis: LineAxis,
                                             lineDirectionFactor: Int): RelativeDirectionResult = {
@@ -76,7 +76,7 @@ private[manual] object LineDetector {
                                        directionsResults: List[RelativeDirectionResult])
 
   private[lines] def computeLineAxisResult(moveBallColor: BallColor,
-                                           board: Board,
+                                           board: BoardReadView,
                                            ballTo: CellAddress,
                                            lineDirectionAxis: LineAxis): AxisResult = {
     // ?? TODO:  maybe "...direction...lengths"?

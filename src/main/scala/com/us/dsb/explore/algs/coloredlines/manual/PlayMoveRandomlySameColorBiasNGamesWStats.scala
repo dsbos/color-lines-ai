@@ -1,9 +1,9 @@
 package com.us.dsb.explore.algs.coloredlines.manual
 
 import com.us.dsb.colorlines.game.board.{
-  BallColor, CellAddress, IndexOrigin, ColumnIndex, RowIndex}
+  BallColor, CellAddress, ColumnIndex, IndexOrigin, RowIndex}
 import com.us.dsb.explore.algs.coloredlines.manual.game.GameLogicSupport
-import com.us.dsb.explore.algs.coloredlines.manual.game.board.LowerGameState
+import com.us.dsb.explore.algs.coloredlines.manual.game.board.{BoardReadView, LowerGameState}
 
 import scala.collection.immutable
 import scala.util.Random
@@ -24,13 +24,14 @@ object PlayMoveRandomlySameColorBiasNGamesWStats extends App {
     var moveCount = 0
     var validMoveCount = 0
     while (! gameState.board.isFull) {
+      val boardView: BoardReadView = gameState.board
 
       val colorToCellTuples: Iterable[(BallColor, CellAddress)] =
         for {
           row <- RowIndex.values
           col <- ColumnIndex.values
           cellAddress = CellAddress(row, col)
-          ballColor <- gameState.board.getCellStateAt(cellAddress).asOption
+          ballColor <- boardView.getCellStateAt(cellAddress).asOption
         } yield (ballColor, cellAddress)
       val x2: Map[BallColor, Iterable[(BallColor, CellAddress)]] = colorToCellTuples.groupBy(_._1)
       val colorToCellCountMap: Map[BallColor, Int] = x2.map(x => (x._1, x._2.size))

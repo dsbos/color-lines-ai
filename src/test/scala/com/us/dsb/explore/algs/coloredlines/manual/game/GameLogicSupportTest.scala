@@ -74,7 +74,7 @@ class GameLogicSupportTest extends AnyFunSpec {
     it("ball can't move across block (complete diagonal; random probe ball location)") {
       val probeBall = GameLogicSupport.pickRandomBallColor()
       val diagonalGameState = makeDiagonallyDividedBoardGameState  //????? just Board?
-      val fromBallAddress = GameLogicSupport.pickRandomEmptyCell(diagonalGameState).get
+      val fromBallAddress = GameLogicSupport.pickRandomEmptyCell(diagonalGameState.board).get
       val boardWithProbe = diagonalGameState.withBoardWithBallAt(fromBallAddress, probeBall)
 
       // transpose ball coordinates to get cell across boundary
