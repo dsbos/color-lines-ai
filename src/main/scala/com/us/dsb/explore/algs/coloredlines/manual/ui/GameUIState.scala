@@ -1,7 +1,7 @@
 package com.us.dsb.explore.algs.coloredlines.manual.ui
 
-import com.us.dsb.colorlines.game.board.{BallColor, CellAddress, CellState, ColumnIndex, Index, RowIndex}
-import com.us.dsb.explore.algs.coloredlines.manual.game.board.BallColorRenderingExtensions
+import com.us.dsb.colorlines.game.board.{
+  BallColor, BallColorRenderingExtensions, CellAddress, CellState, ColumnIndex, Index, RowIndex}
 
 import scala.annotation.unused
 

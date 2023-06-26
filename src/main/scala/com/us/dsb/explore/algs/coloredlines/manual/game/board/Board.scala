@@ -64,6 +64,7 @@ private[game] class Board(private val cellStates: Vector[CellState],
   //   to BoardReadView (for future game-playing logic).
   /** Makes compact single-line string like"<rgb------/---------/.../---------; (bgr) >". */
   override def toString: String = {
+    import com.us.dsb.colorlines.game.board.BallColorRenderingExtensions
     import BallColorRenderingExtensions.*
     "<" ++
         RowIndex.values.map { row =>
