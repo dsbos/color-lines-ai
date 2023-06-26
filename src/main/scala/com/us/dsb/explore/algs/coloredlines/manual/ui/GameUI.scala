@@ -2,7 +2,7 @@
 //  (eventually) splitting virtual tap level vs. text-control level:
 package com.us.dsb.explore.algs.coloredlines.manual.ui
 
-import com.us.dsb.colorlines.game.board.{CellAddress, IndexOrigin}
+import com.us.dsb.colorlines.game.board.{CellAddress, ColumnIndex, Index, RowIndex}
 
 import cats.syntax.option.*
 import cats.syntax.either.*
@@ -172,7 +172,8 @@ private[manual] object GameUI {
   def runGame(io: SegregatedConsoleIO): GameUIResult = {
     val initialState =
       GameUIState(tapUiGameState = TapUiGameState.initial(),
-                  cursorAddress  = CellAddress.fromRaw(IndexOrigin, IndexOrigin))
+                  cursorAddress  = CellAddress(RowIndex(Index.MinValue),
+                                               ColumnIndex(Index.MinValue)))
     getAndDoUiCommands(io, initialState)
   }
 

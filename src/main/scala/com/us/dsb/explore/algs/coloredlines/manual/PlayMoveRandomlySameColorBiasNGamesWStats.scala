@@ -1,7 +1,7 @@
 package com.us.dsb.explore.algs.coloredlines.manual
 
 import com.us.dsb.colorlines.game.board.{
-  BallColor, BoardReadView, CellAddress, ColumnIndex, IndexOrigin, RowIndex}
+  BallColor, BoardReadView, CellAddress, ColumnIndex, RowIndex}
 import com.us.dsb.explore.algs.coloredlines.manual.game.GameLogicSupport
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.LowerGameState
 
@@ -42,11 +42,11 @@ object PlayMoveRandomlySameColorBiasNGamesWStats extends App {
         if (highestCount < 2) {
           // no balls of same color
           val from: CellAddress =
-            CellAddress.fromRaw(IndexOrigin + rng.nextInt(RowIndex.values.size),
-                                IndexOrigin + rng.nextInt(ColumnIndex.values.size))
+            CellAddress(RowIndex.values(rng.nextInt(RowIndex.values.size)),
+                        ColumnIndex.values(rng.nextInt(ColumnIndex.values.size)))
           val to: CellAddress =
-            CellAddress.fromRaw(IndexOrigin + rng.nextInt(RowIndex.values.size),
-                                IndexOrigin + rng.nextInt(ColumnIndex.values.size))
+            CellAddress(RowIndex.values(rng.nextInt(RowIndex.values.size)),
+                        ColumnIndex.values(rng.nextInt(ColumnIndex.values.size)))
           (to, from)
         }
         else {
@@ -63,8 +63,8 @@ object PlayMoveRandomlySameColorBiasNGamesWStats extends App {
 
           val tempFrom = twoSomeColorBallCells.head
           val tempTo: CellAddress =
-            CellAddress.fromRaw(IndexOrigin + rng.nextInt(RowIndex.values.size),
-                                IndexOrigin + rng.nextInt(ColumnIndex.values.size))
+            CellAddress(RowIndex.values(rng.nextInt(RowIndex.values.size)),
+                        ColumnIndex.values(rng.nextInt(ColumnIndex.values.size)))
           (tempFrom, tempTo)
           //          ???
         }
@@ -81,11 +81,11 @@ object PlayMoveRandomlySameColorBiasNGamesWStats extends App {
         }
         else {
           val from: CellAddress =
-            CellAddress.fromRaw(IndexOrigin + rng.nextInt(RowIndex.values.size),
-                                IndexOrigin + rng.nextInt(ColumnIndex.values.size))
+            CellAddress(RowIndex.values(rng.nextInt(RowIndex.values.size)),
+                        ColumnIndex.values(rng.nextInt(ColumnIndex.values.size)))
           val to: CellAddress =
-            CellAddress.fromRaw(IndexOrigin + rng.nextInt(RowIndex.values.size),
-                                IndexOrigin + rng.nextInt(ColumnIndex.values.size))
+            CellAddress(RowIndex.values(rng.nextInt(RowIndex.values.size)),
+                        ColumnIndex.values(rng.nextInt(ColumnIndex.values.size)))
           val tryMoveResult2 = GameLogicSupport.doTryMoveBall(gameState, from, to)
 
           val validMove = tryMoveResult2.moveWasValid

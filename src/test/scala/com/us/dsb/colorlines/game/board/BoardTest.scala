@@ -1,7 +1,6 @@
 package com.us.dsb.colorlines.game.board
 
-import com.us.dsb.colorlines.game.board.{
-  BallColor, Board, BoardOrder, CellAddress, ColumnIndex, Index, IndexOrigin, RowIndex}
+import com.us.dsb.colorlines.game.board.{BoardOrder, ColumnIndex, Index, RowIndex}
 
 import org.scalatest.PrivateMethodTester
 import org.scalatest.funspec.AnyFunSpec
@@ -54,7 +53,8 @@ class BoardTest extends AnyFunSpec {
 
     it("should compute 0 for first row, first column") {
       // ?? TODO 2->3 . refined:  Change Index.unsafeFrom back to Index once macros re-exist:
-      val address_1_1  = CellAddress(RowIndex(Index.unsafeFrom(IndexOrigin)), ColumnIndex.values.head)
+      val address_1_1  = CellAddress(RowIndex(Index.MinValue),
+                                     ColumnIndex.values.head)
       val index = Board.empty `invokePrivate` vectorIndex(address_1_1)
       index shouldEqual 0
     }
@@ -68,13 +68,13 @@ class BoardTest extends AnyFunSpec {
 
     describe("should compute indices in row-major order (chosen but ~isolated):") {
       it("- (IO 1) row 1 column 3 => (IO 0) vector index 2") {
-        val `row 1 column 3` = CellAddress(RowIndex.values.head, ColumnIndex.values(3 - IndexOrigin))
-        Board.empty `invokePrivate` vectorIndex(`row 1 column 3`) shouldEqual 3 - IndexOrigin
+        val `row 1 column 3` = CellAddress(RowIndex.values.head, ColumnIndex.values(3 - Index.Origin))
+        Board.empty `invokePrivate` vectorIndex(`row 1 column 3`) shouldEqual 3 - Index.Origin
       }
       it("- (IO 1) row 3 column 1 => (IO 0) vector index 8") {  //????? adjust label?
-        val `row 3 column 1` = CellAddress(RowIndex.values(3 - IndexOrigin), ColumnIndex.values.head)
+        val `row 3 column 1` = CellAddress(RowIndex.values(3 - Index.Origin), ColumnIndex.values.head)
         Board.empty `invokePrivate` vectorIndex(`row 3 column 1`) shouldEqual
-            (3 - IndexOrigin) * BoardOrder + (1 - IndexOrigin)
+            (3 - Index.Origin) * BoardOrder + (1 - Index.Origin)
       }
     }
   }

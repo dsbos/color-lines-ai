@@ -1,6 +1,6 @@
 package com.us.dsb.explore.algs.coloredlines.manual
 
-import com.us.dsb.colorlines.game.board.{CellAddress, IndexOrigin, RowIndex, ColumnIndex}
+import com.us.dsb.colorlines.game.board.{CellAddress, RowIndex, ColumnIndex}
 import com.us.dsb.explore.algs.coloredlines.manual.game.GameLogicSupport
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.LowerGameState
 
@@ -25,11 +25,11 @@ object PlayMoveRandomlyNGamesWStats extends App {
 
       // ???? TODO:  Use BoardOrder, Index.MinValue, size of rowIndices/columnIndices, or what??
       val from: CellAddress =
-        CellAddress.fromRaw(IndexOrigin + rng.nextInt(RowIndex.values.size),
-                            IndexOrigin + rng.nextInt(ColumnIndex.values.size))
+        CellAddress(RowIndex.values(rng.nextInt(RowIndex.values.size)),
+                    ColumnIndex.values(rng.nextInt(ColumnIndex.values.size)))
       val to: CellAddress =
-        CellAddress.fromRaw(IndexOrigin + rng.nextInt(RowIndex.values.size),
-                            IndexOrigin + rng.nextInt(ColumnIndex.values.size))
+        CellAddress(RowIndex.values(rng.nextInt(RowIndex.values.size)),
+                    ColumnIndex.values(rng.nextInt(ColumnIndex.values.size)))
       val tryMoveResult = GameLogicSupport.doTryMoveBall(gameState, from, to)
 
       val validMove = tryMoveResult.moveWasValid

@@ -1,6 +1,6 @@
 package com.us.dsb.colorlines.game.board
 
-import com.us.dsb.colorlines.game.board.{ColumnIndex, Index, IndexOrigin, RowIndex}
+import com.us.dsb.colorlines.game.board.{ColumnIndex, Index, RowIndex}
 
 /** Valid (in-board) cell address.  (Re private constructor, see `CellAddress.apply`.) */
 case class CellAddress private(row: RowIndex,
@@ -23,7 +23,7 @@ object CellAddress {
 
   /** Logical constructor but returns re-used instances. */
   def apply(row: RowIndex, column: ColumnIndex): CellAddress =
-    instances(row.raw.value - IndexOrigin)(column.raw.value - IndexOrigin)
+    instances(row.raw.value - Index.Origin)(column.raw.value - Index.Origin)
 
   /** Constructs cell address from raw index Int values (not offsets). */
   def fromRaw(rawRowIndex: Int, rawColumnIndex: Int) =

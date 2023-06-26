@@ -1,7 +1,5 @@
 package com.us.dsb.colorlines.game.board
 
-import com.us.dsb.colorlines.game.board.BallColor
-
 // ?? TODO:  Maybe re-investigate using union type BallColor | None.type.  (See 
 //  my
 //  https://users.scala-lang.org/t/how-to-select-union-type-branch-in-a-for-comprehension/9369/2).

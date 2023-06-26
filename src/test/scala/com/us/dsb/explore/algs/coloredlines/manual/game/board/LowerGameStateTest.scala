@@ -1,7 +1,7 @@
 package com.us.dsb.explore.algs.coloredlines.manual.game.board
 
 import com.us.dsb.colorlines.game.board.{
-  BoardOrder, CellAddress, IndexOrigin, ColumnIndex, RowIndex}
+  BoardOrder, CellAddress, Index, ColumnIndex, RowIndex}
 
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers.*
@@ -27,7 +27,7 @@ class LowerGameStateTest extends AnyFunSpec {
 
     it("- empty board") {
       val expected =   // "<---------/---------/.../--------->"
-        (IndexOrigin to BoardOrder).map { _ =>
+        (Index.Origin to BoardOrder).map { _ =>
           ColumnIndex.values.map(_ => "-").mkString("")
         }
             .mkString("< <", "/", " + ()>; 0 pts>")

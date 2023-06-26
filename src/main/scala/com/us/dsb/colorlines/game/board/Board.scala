@@ -1,7 +1,6 @@
 package com.us.dsb.colorlines.game.board
 
-import com.us.dsb.colorlines.game.board.{
-  BallColor, BoardOrder, BoardReadView, CellAddress, CellState, ColumnIndex, IndexOrigin, RowIndex}
+import com.us.dsb.colorlines.game.board.{BoardOrder, CellState, ColumnIndex, Index, RowIndex}
 
 // ????? TODO:  Revisit "private[game]" once callers are moved to com.us.dsb.colorlines.game...
 
@@ -28,9 +27,9 @@ import com.us.dsb.colorlines.game.board.{
   /** Computes row-major cell-array index from row and column numbers. */
   // ???? TODO: Use BoardOrder and IndexOrigin? Index.MinValue/.MaxValue?  colIndices.size?
   private def vectorIndex(address: CellAddress): Int =
-    (address.row.raw.value - IndexOrigin)
+    (address.row.raw.value - Index.Origin)
         * BoardOrder
-        + (address.column.raw.value - IndexOrigin)
+        + (address.column.raw.value - Index.Origin)
 
   // Read-only API (BoardReadView) methods:
 

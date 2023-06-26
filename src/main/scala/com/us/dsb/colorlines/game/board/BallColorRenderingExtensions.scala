@@ -1,7 +1,5 @@
 package com.us.dsb.colorlines.game.board
 
-import com.us.dsb.colorlines.game.board.BallColor
-
 import scala.io.AnsiColor
 
 // ???? TODO:  Probably split tap-state rendering (for tap UI) from ball-color-only

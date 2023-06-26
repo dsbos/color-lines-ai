@@ -1,6 +1,6 @@
 package com.us.dsb.explore.algs.coloredlines.manual
 
-import com.us.dsb.colorlines.game.board.{BoardOrder, CellAddress, IndexOrigin}
+import com.us.dsb.colorlines.game.board.{BoardOrder, CellAddress, Index}
 import com.us.dsb.explore.algs.coloredlines.manual.game.GameLogicSupport
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.LowerGameState
 
@@ -22,12 +22,14 @@ object PlayMoveRandomlyNorthwestBiasNGamesWStats extends App {
     var moveCount = 0
     var validMoveCount = 0
     while (! gameState.board.isFull) {
-      val fromRow: Int = math.sqrt(rng.nextInt(BoardOrder * BoardOrder)).toInt + IndexOrigin
-      val fromCol: Int = math.sqrt(rng.nextInt(BoardOrder * BoardOrder)).toInt + IndexOrigin
-      val toRow: Int = math.sqrt((BoardOrder * BoardOrder - IndexOrigin)
-                                     - rng.nextInt(BoardOrder * BoardOrder)).toInt + IndexOrigin
-      val toCol: Int = math.sqrt((BoardOrder * BoardOrder - IndexOrigin)
-                                     - rng.nextInt(BoardOrder * BoardOrder)).toInt + IndexOrigin
+      // ????? TODO:  Use Index.Origin and BoardOrder, or use Index.MinValue and .MaxValue (or some range-size value)?
+      // bias:  9 gets higher probabily (81 - 64 = 17 out of 81 than 1 (1 - 0 = 0))
+      val fromRow: Int = math.sqrt(rng.nextInt(BoardOrder * BoardOrder)).toInt + Index.Origin
+      val fromCol: Int = math.sqrt(rng.nextInt(BoardOrder * BoardOrder)).toInt + Index.Origin
+      val toRow: Int = math.sqrt((BoardOrder * BoardOrder - Index.Origin)
+                                     - rng.nextInt(BoardOrder * BoardOrder)).toInt + Index.Origin
+      val toCol: Int = math.sqrt((BoardOrder * BoardOrder - Index.Origin)
+                                     - rng.nextInt(BoardOrder * BoardOrder)).toInt + Index.Origin
 
       val from = CellAddress.fromRaw(fromRow, fromCol)
       val to = CellAddress.fromRaw(toRow, toCol)
