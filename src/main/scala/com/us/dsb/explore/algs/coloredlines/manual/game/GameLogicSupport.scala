@@ -17,6 +17,8 @@ object GameLogicSupport {
   private[game] val InitialBallCount: Int = 5
   private[game] val OnDeckBallCount: Int = 3
 
+  // ???? TODO:  Rework these two so tests can force sequence of colors (and locations):
+
   // (was "private" before test calls:)
   private[game] def pickRandomBallColor()(using rng: Random): BallColor = {
     BallColor.values(rng.nextInt(BallColor.values.size))
