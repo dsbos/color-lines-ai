@@ -95,7 +95,8 @@ private[manual] object LineDetector {
   /** Removes completed lines' balls. */
   private[lines] def removeCompletedLinesBalls(ballTo: CellAddress,
                                                preremovalGameState: LowerGameState,
-                                               completedLineAxesResults: List[AxisResult]): LowerGameState = {
+                                               completedLineAxesResults: List[AxisResult]
+                                              ): LowerGameState = {
     val newBallRemovedGameState = preremovalGameState.withBoardWithNoBallAt(ballTo)
     val linesRemovedGameState =
       completedLineAxesResults.foldLeft(newBallRemovedGameState) { (axisBoard, axisResult) =>

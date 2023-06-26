@@ -106,7 +106,7 @@ object GameLogicSupport {
   /**
    * @param toTapCell - must be empty */
   // (was "private" before test calls:)
-  private[game] def pathExists(gameState: LowerGameState,
+  private[game] def pathExists(board: BoardReadView,
                                fromBallCell: CellAddress,
                                toTapCell: CellAddress): Boolean = {
     //??println(s"pathExists: fromBallCell = $fromBallCell, toTapCell = $toTapCell")
@@ -118,7 +118,7 @@ object GameLogicSupport {
     val blockedAt: Array[Array[Boolean]] =
       RowIndex.values.map { row =>
           ColumnIndex.values.map { column =>
-            gameState.board.hasABallAt(CellAddress(row, column))
+            board.hasABallAt(CellAddress(row, column))
           }.toArray
       }.toArray
     val cellsToExpandFrom = mutable.Queue[CellAddress](fromBallCell)
@@ -190,7 +190,7 @@ object GameLogicSupport {
         //println(s"@ no vacancy at to address $from")
         false  // ?? TODO:  Expand to report no vacancy there
       }
-      else if (! pathExists(gameState, from, to)) {
+      else if (! pathExists(gameState.board, from, to)) {
         //println(s"@ no path from $from to $to")
         false  // ?? TODO:  Expand to report no path
       }

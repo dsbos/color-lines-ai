@@ -52,7 +52,8 @@ class GameLogicSupportTest extends AnyFunSpec {
           RowIndex.values.foreach { row =>
             ColumnIndex.values.foreach { column =>
               val toVacancyAddress = CellAddress(row, column)
-              val pathExists = GameLogicSupport.pathExists(gameState, fromBallAddress, toVacancyAddress)
+              val pathExists =
+                GameLogicSupport.pathExists(gameState.board, fromBallAddress, toVacancyAddress)
               withClue( s"from $fromBallAddress to $toVacancyAddress") {
                 pathExists shouldBe true
               }
@@ -75,14 +76,15 @@ class GameLogicSupportTest extends AnyFunSpec {
       val probeBall = GameLogicSupport.pickRandomBallColor()
       val diagonalGameState = makeDiagonallyDividedBoardGameState  //????? just Board?
       val fromBallAddress = GameLogicSupport.pickRandomEmptyCell(diagonalGameState.board).get
-      val boardWithProbe = diagonalGameState.withBoardWithBallAt(fromBallAddress, probeBall)
+      val boardWithProbe = diagonalGameState.withBoardWithBallAt(fromBallAddress, probeBall).board
 
       // transpose ball coordinates to get cell across boundary
       val toVacancyAddress =
         CellAddress(row    = RowIndex(fromBallAddress.column.raw),
                     column = ColumnIndex(fromBallAddress.row.raw))
 
-      val pathExists = GameLogicSupport.pathExists(boardWithProbe, fromBallAddress, toVacancyAddress)
+      val pathExists =
+        GameLogicSupport.pathExists(boardWithProbe, fromBallAddress, toVacancyAddress)
       pathExists shouldBe false
     }
 
