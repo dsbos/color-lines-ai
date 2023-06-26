@@ -1,18 +1,20 @@
-package com.us.dsb.explore.algs.coloredlines.manual.game.board
+package com.us.dsb.colorlines.game.board
 
 import com.us.dsb.colorlines.game.board.{
   BallColor, BoardOrder, BoardReadView, CellAddress, CellState, ColumnIndex, IndexOrigin, RowIndex}
 
+// ????? TODO:  Revisit "private[game]" once callers are moved to com.us.dsb.colorlines.game...
+
 // ?? TODO:  Revisit having companion object before class:
-private[game] object Board {
-  private[game] def empty: Board =
+/*??private[game]*/ object Board {
+  /*??private[game]*/ def empty: Board =
     Board(Vector.fill[CellState](BoardOrder * BoardOrder)(CellState.empty), Nil)
 }
 
 /**
  * Core state of board (just cells and on-deck balls; e.g.; no score, tap-UI selection).
  */
-private[game] class Board(private val cellStates: Vector[CellState],
+/*??private[game]*/ class Board(private val cellStates: Vector[CellState],
                           private val ondeckBalls: Iterable[BallColor]
                          )
     extends BoardReadView {
@@ -48,14 +50,14 @@ private[game] class Board(private val cellStates: Vector[CellState],
                             newState: CellState): Board =
     copy(cellStates = cellStates.updated(vectorIndex(address), newState))
 
-  private[game] def withBallAt(address: CellAddress,
+  /*??private[game]*/ def withBallAt(address: CellAddress,
                                ball: BallColor): Board =
     withCellState(address, CellState.withBallOfColor(ball))
 
-  private[game] def withNoBallAt(address: CellAddress): Board =
+  /*??private[game]*/def withNoBallAt(address: CellAddress): Board =
     withCellState(address, CellState.empty)
 
-  private[game] def withOnDeckBalls(newBalls: Iterable[BallColor]): Board =
+  /*??private[game]*/ def withOnDeckBalls(newBalls: Iterable[BallColor]): Board =
     copy(ondeckBalls = newBalls)
 
   // Miscellaneous:
@@ -64,7 +66,6 @@ private[game] class Board(private val cellStates: Vector[CellState],
   //   to BoardReadView (for future game-playing logic).
   /** Makes compact single-line string like"<rgb------/---------/.../---------; (bgr) >". */
   override def toString: String = {
-    import com.us.dsb.colorlines.game.board.BallColorRenderingExtensions
     import BallColorRenderingExtensions.*
     "<" ++
         RowIndex.values.map { row =>

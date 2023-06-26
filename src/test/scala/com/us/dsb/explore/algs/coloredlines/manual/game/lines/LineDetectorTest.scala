@@ -1,7 +1,6 @@
 package com.us.dsb.explore.algs.coloredlines.manual.game.lines
 
-import com.us.dsb.colorlines.game.board.{BallColor, BoardOrder, CellAddress, IndexOrigin}
-import com.us.dsb.explore.algs.coloredlines.manual.game.board.Board
+import com.us.dsb.colorlines.game.board.{BallColor, Board, BoardOrder, CellAddress, IndexOrigin}
 
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers.*

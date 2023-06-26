@@ -1,7 +1,7 @@
-package com.us.dsb.explore.algs.coloredlines.manual.game.board
+package com.us.dsb.colorlines.game.board
 
 import com.us.dsb.colorlines.game.board.{
-  BallColor, BoardOrder, CellAddress, ColumnIndex, Index, IndexOrigin, RowIndex}
+  BallColor, Board, BoardOrder, CellAddress, ColumnIndex, Index, IndexOrigin, RowIndex}
 
 import org.scalatest.PrivateMethodTester
 import org.scalatest.funspec.AnyFunSpec
