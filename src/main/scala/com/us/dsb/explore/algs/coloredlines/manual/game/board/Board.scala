@@ -1,18 +1,7 @@
 package com.us.dsb.explore.algs.coloredlines.manual.game.board
 
 import com.us.dsb.colorlines.game.board.{
-  BallColor, BoardOrder, CellAddress, CellState, ColumnIndex, IndexOrigin, RowIndex}
-
-/** Read-only part of `Board` API (segregated for narrower dependency). */
-trait BoardReadView {
-  def getCellStateAt(address: CellAddress): CellState
-
-  def hasABallAt(address: CellAddress): Boolean
-
-  def isFull: Boolean
-
-  def getOndeckBalls: Iterable[BallColor]
-}
+  BallColor, BoardOrder, BoardReadView, CellAddress, CellState, ColumnIndex, IndexOrigin, RowIndex}
 
 // ?? TODO:  Revisit having companion object before class:
 private[game] object Board {
