@@ -125,7 +125,7 @@ object GameLogicSupport {
         //println(s"@ no vacancy at to address $from")
         false  // ?? TODO:  Expand to report no vacancy there
       }
-      else if (! NameThisGameLogicSupport.pathExists(gameState.board, from, to)) {
+      else if (! PathChecker.pathExists(gameState.board, from, to)) {
         //println(s"@ no path from $from to $to")
         false  // ?? TODO:  Expand to report no path
       }

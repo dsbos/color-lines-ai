@@ -8,7 +8,7 @@ import org.scalatest.matchers.should.Matchers.*
 
 import scala.util.Random
 
-class NameThisGameLogicSupportTest extends AnyFunSpec {
+class PathCheckerTest extends AnyFunSpec {
 
   // ????? TODO:  Review w.r.t. tests' using just BoardReadView API vs. not other
   //   Board and GameLogicSupport stuff, so maybe NameThisGameLogicSupportTest
@@ -56,7 +56,7 @@ class NameThisGameLogicSupportTest extends AnyFunSpec {
   }
 
   describe("pathExists:") {
-    import NameThisGameLogicSupport.pathExists
+    import PathChecker.pathExists
 
     it("minimal path") {
       pathExists(OneBallBoard(1, 1), CellAddress.fromRaw(1, 1), CellAddress.fromRaw(2, 2))
