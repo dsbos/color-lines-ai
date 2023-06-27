@@ -4,7 +4,7 @@ import com.us.dsb.colorlines.game.GameState
 import com.us.dsb.colorlines.game.board.{
   BallColor, Board, BoardReadView, CellAddress, ColumnIndex, RowIndex}
 import com.us.dsb.colorlines.game.logic.PathChecker
-import com.us.dsb.explore.algs.coloredlines.manual.game.lines.LineDetector
+import com.us.dsb.explore.algs.coloredlines.manual.game.lines.LineReaper
 
 import cats.syntax.option.*
 
@@ -58,7 +58,7 @@ object GameLogicSupport {
                     .getOrElse(scala.sys.error("Unexpectedly full board"))
               val postPlacementState =
                 gameStateSoFar.withBoardWithBallAt(address, pickRandomBallColor())
-              val reapResult = LineDetector.reapAnyLines(postPlacementState, address)
+              val reapResult = LineReaper.reapAnyLines(postPlacementState, address)
               reapResult.gameState
       }
 
@@ -86,7 +86,7 @@ object GameLogicSupport {
                 val postDequeueState = gameStateSoFar.withBoard(postDequeueBoard)
                 val postPlacementState = postDequeueState.withBoardWithBallAt(address,
                                                                               onDeckBall)
-                val reapResult = LineDetector.reapAnyLines(postPlacementState, address)
+                val reapResult = LineReaper.reapAnyLines(postPlacementState, address)
                 reapResult.gameState
             }
         }
@@ -143,7 +143,7 @@ object GameLogicSupport {
           val postMoveGameState =
             gameState.withBoardWithNoBallAt(from).withBoardWithBallAt(to, moveBallColor)
 
-          val reapResult = LineDetector.reapAnyLines(postMoveGameState, to)
+          val reapResult = LineReaper.reapAnyLines(postMoveGameState, to)
           val postPostReapingResult =
             if (! reapResult.anyRemovals)
               placeOndeckBalls(reapResult.gameState)

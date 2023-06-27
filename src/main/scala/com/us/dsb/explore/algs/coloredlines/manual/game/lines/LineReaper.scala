@@ -5,14 +5,14 @@ import com.us.dsb.colorlines.game.board.{BallColor, BoardReadView, CellAddress, 
 import com.us.dsb.colorlines.game.lines.LineOrder
 
 // ?? TODO:  reduce repeated passing of board, ball color, etc.; maybe make
-// LineDetector a class, to be instantiated for each move; or make local class
+// LineReaper a class, to be instantiated for each move; or make local class
 // for passing (but leave external-client interface same)
-private[manual] object LineDetector {
+private[manual] object LineReaper {
 
   // ?? TODO:  Maybe make refined type for deltas? (check use w/relativeDirectionFactors):
-  private[lines] case class LineAxis(labelArray: String,
-                                     rowDelta: Int, // -1 / 0 / 1
-                                     colDelta: Int)
+  private case class LineAxis(labelArray: String,
+                              rowDelta: Int, // -1 / 0 / 1
+                              colDelta: Int)
 
   private val lineAxes =
     List(
@@ -55,7 +55,7 @@ private[manual] object LineDetector {
     val newBallColIndex = ballTo.column.raw.value
     import lineDirectionAxis.{colDelta, rowDelta}
     var excursionLength = 0
-    while ( {
+    while ({
       val candidateExcursionLength = excursionLength + 1
       val candidateRowIndex = newBallRowIndex + rowDelta * lineDirectionFactor * candidateExcursionLength
       val candidateColIndex = newBallColIndex + colDelta * lineDirectionFactor * candidateExcursionLength
