@@ -23,6 +23,7 @@ private[manual] object LineDetector {
 
   private val relativeDirectionFactors = List(1, -1) // use type of length 2 (refined List?, Tuple2?, some array?)
 
+  // ([lines] for testing)
   private[lines] def haveMatchingBallAt(moveBallColor: BallColor,
                                         board: BoardReadView,
                                         rawRowIndex: Int,
@@ -40,15 +41,15 @@ private[manual] object LineDetector {
 
   // ???? TODO:  Review names ("result" -> "...length..."?); maybe newtype (to flatten)?
 
-  private[lines] case class RelativeDirectionResult(excursionLength: Int)
+  private case class RelativeDirectionResult(excursionLength: Int)
 
   // ????? TODO:  Probably get ball color via ballTo, rather than having clients
   //   pass it down several levels:
-  private[lines] def computeDirectionResult(moveBallColor: BallColor,
-                                            board: BoardReadView,
-                                            ballTo: CellAddress,
-                                            lineDirectionAxis: LineAxis,
-                                            lineDirectionFactor: Int): RelativeDirectionResult = {
+  private def computeDirectionResult(moveBallColor: BallColor,
+                                     board: BoardReadView,
+                                     ballTo: CellAddress,
+                                     lineDirectionAxis: LineAxis,
+                                     lineDirectionFactor: Int): RelativeDirectionResult = {
     // ???? TODO: Revisit names (shorten, to shorten lines)?
     val newBallRowIndex = ballTo.row.raw.value
     val newBallColIndex = ballTo.column.raw.value
@@ -68,15 +69,15 @@ private[manual] object LineDetector {
     RelativeDirectionResult(excursionLength)
   }
 
-  private[lines] case class AxisResult(axis: LineAxis,
-                                       axisLineAddedLength: Int, // length WITHOUT moved ball
-                                       // ?? TODO:  maybe "...direction...lengths"?:
-                                       directionsResults: List[RelativeDirectionResult])
+  private case class AxisResult(axis: LineAxis,
+                                axisLineAddedLength: Int, // length WITHOUT moved ball
+                                // ?? TODO:  maybe "...direction...lengths"?:
+                                directionsResults: List[RelativeDirectionResult])
 
-  private[lines] def computeLineAxisResult(moveBallColor: BallColor,
-                                           board: BoardReadView,
-                                           ballTo: CellAddress,
-                                           lineDirectionAxis: LineAxis): AxisResult = {
+  private def computeLineAxisResult(moveBallColor: BallColor,
+                                    board: BoardReadView,
+                                    ballTo: CellAddress,
+                                    lineDirectionAxis: LineAxis): AxisResult = {
     // ?? TODO:  maybe "...direction...lengths"?
     val directionsResults: List[RelativeDirectionResult] =
       relativeDirectionFactors.map { lineDirectionFactor =>
@@ -91,10 +92,10 @@ private[manual] object LineDetector {
   }
 
   /** Removes completed lines' balls. */
-  private[lines] def removeCompletedLinesBalls(ballTo: CellAddress,
-                                               preremovalGameState: LowerGameState,
-                                               completedLineAxesResults: List[AxisResult]
-                                              ): LowerGameState = {
+  private def removeCompletedLinesBalls(ballTo: CellAddress,
+                                        preremovalGameState: LowerGameState,
+                                        completedLineAxesResults: List[AxisResult]
+                                       ): LowerGameState = {
     val newBallRemovedGameState = preremovalGameState.withBoardWithNoBallAt(ballTo)
     val linesRemovedGameState =
       completedLineAxesResults.foldLeft(newBallRemovedGameState) { (axisBoard, axisResult) =>
