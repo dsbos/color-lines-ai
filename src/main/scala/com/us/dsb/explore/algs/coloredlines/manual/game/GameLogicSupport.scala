@@ -3,8 +3,8 @@ package com.us.dsb.explore.algs.coloredlines.manual.game
 import com.us.dsb.colorlines.game.GameState
 import com.us.dsb.colorlines.game.board.{
   BallColor, Board, BoardReadView, CellAddress, ColumnIndex, RowIndex}
+import com.us.dsb.colorlines.game.logic.LineReaper
 import com.us.dsb.colorlines.game.logic.PathChecker
-import com.us.dsb.explore.algs.coloredlines.manual.game.lines.LineReaper
 
 import cats.syntax.option.*
 

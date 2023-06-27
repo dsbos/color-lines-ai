@@ -1,4 +1,4 @@
-package com.us.dsb.explore.algs.coloredlines.manual.game.lines
+package com.us.dsb.colorlines.game.logic
 
 import com.us.dsb.colorlines.game.board.{BallColor, Board, BoardOrder, CellAddress, Index}
 

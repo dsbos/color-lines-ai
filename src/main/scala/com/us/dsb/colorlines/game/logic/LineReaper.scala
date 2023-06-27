@@ -1,4 +1,4 @@
-package com.us.dsb.explore.algs.coloredlines.manual.game.lines
+package com.us.dsb.colorlines.game.logic
 
 import com.us.dsb.colorlines.game.GameState
 import com.us.dsb.colorlines.game.board.{BallColor, BoardReadView, CellAddress, Index}
@@ -7,24 +7,25 @@ import com.us.dsb.colorlines.game.lines.LineOrder
 // ?? TODO:  reduce repeated passing of board, ball color, etc.; maybe make
 // LineReaper a class, to be instantiated for each move; or make local class
 // for passing (but leave external-client interface same)
-private[manual] object LineReaper {
+
+/*??private[game]*/ object LineReaper {
 
   // ?? TODO:  Maybe make refined type for deltas? (check use w/relativeDirectionFactors):
   private case class LineAxis(labelArray: String,
-                              rowDelta: Int, // -1 / 0 / 1
+                              rowDelta: Int,  // -1 / 0 / 1
                               colDelta: Int)
 
   private val lineAxes =
     List(
-      LineAxis("→",  0, +1), // →  W -->  E
-      LineAxis("↘", +1, +1), // ↘ NW --> SE
-      LineAxis("↓", +1,  0), // ↓ N  --> S
-      LineAxis("↙", +1, -1)) // ↙ NW --> SW
+      LineAxis("→",  0, +1),  // →  W -->  E
+      LineAxis("↘", +1, +1),  // ↘ NW --> SE
+      LineAxis("↓", +1,  0),  // ↓ N  --> S
+      LineAxis("↙", +1, -1))  // ↙ NW --> SW
 
   private val relativeDirectionFactors = List(1, -1) // use type of length 2 (refined List?, Tuple2?, some array?)
 
-  // ([lines] for testing)
-  private[lines] def haveMatchingBallAt(moveBallColor: BallColor,
+  // ([logic] for testing)
+  private[logic] def haveMatchingBallAt(moveBallColor: BallColor,
                                         board: BoardReadView,
                                         rawRowIndex: Int,
                                         rawColIndex: Int): Boolean = {
@@ -120,13 +121,13 @@ private[manual] object LineReaper {
    * @param anyRemovals
    *   whether any lines reaped
    */
-  private[manual] case class ReapingAttemptResult(gameState: GameState,
-                                                  anyRemovals: Boolean)
+  private[game] case class ReapingAttemptResult(gameState: GameState,
+                                                anyRemovals: Boolean)
   /** Reaps any complete lines from just-placed ball.
    * @return
    *   Updated board and score if any completed lines; input state if no lines.
    */
-  private[game] def reapAnyLines(gameState: GameState,
+  /*??private[game]*/ def reapAnyLines(gameState: GameState,
                                  ballTo: CellAddress
                                 ): ReapingAttemptResult = {
     //println(s"+reapAnyLines(... ballTo = $ballTo...).1")
@@ -149,7 +150,7 @@ private[manual] object LineReaper {
     val (resultGameState, scoreResult) =
       completedLineAxesResults match {
         case Nil =>
-          (gameState, None) // return None for score (signal to place 3 more IF ball moved by user)
+          (gameState, None) // return None for score (signal to place 3 more IF ball moved by user)//??????? EDIT
         case linesAxes =>
           //????? test
           val totalBallsBeingRemoved = 1 + linesAxes.map(_.axisLineAddedLength).sum
@@ -160,7 +161,7 @@ private[manual] object LineReaper {
           val postLinesRemovalGameState = removeCompletedLinesBalls(ballTo,
                                                                     gameState,
                                                                     completedLineAxesResults)
-          // ???? TODO:  Pull out method to make score function clearer.
+          // ?????? TODO:  Pull out method to make score function clearer.
           val ballPlacementScore = 2 * LineOrder + 4 * (totalBallsBeingRemoved - LineOrder)
           (postLinesRemovalGameState.withAddedScore(ballPlacementScore), Some(ballPlacementScore))
       }
