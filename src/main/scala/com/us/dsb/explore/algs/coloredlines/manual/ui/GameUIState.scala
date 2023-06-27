@@ -79,7 +79,7 @@ private case class GameUIState(tapUiGameState: TapUiGameState,
     }.mkString(rowSeparator)     // make whole-board multi-line string
   }
 
-  // ?? Unused as of 2023-06-08; previously in LowerGameState.
+  // ?? Unused as of 2023-06-08; previously in GameState.
   @unused
   private def renderCompactTableMultilineWithSelection(selectionAddress: Option[CellAddress]): String = {
     RowIndex.values.map { row =>

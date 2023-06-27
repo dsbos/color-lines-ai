@@ -1,9 +1,9 @@
 package com.us.dsb.explore.algs.coloredlines.manual.game
 
+import com.us.dsb.colorlines.game.GameState
 import com.us.dsb.colorlines.game.board.{
   BallColor, Board, BoardReadView, CellAddress, ColumnIndex, RowIndex}
 import com.us.dsb.colorlines.game.logic.PathChecker
-import com.us.dsb.explore.algs.coloredlines.manual.game.board.LowerGameState
 import com.us.dsb.explore.algs.coloredlines.manual.game.lines.LineDetector
 
 import cats.syntax.option.*
@@ -47,8 +47,8 @@ object GameLogicSupport {
    * @param gameState
    *   expected to be empty //???? maybe refactor something?
    */
-  private[manual] def placeInitialBalls(gameState: LowerGameState)
-                                       (using Random): LowerGameState = {
+  private[manual] def placeInitialBalls(gameState: GameState)
+                                       (using Random): GameState = {
     val postPlacementsArrivalResult =
       (1 to InitialBallCount)
           .foldLeft(gameState) {
@@ -69,8 +69,8 @@ object GameLogicSupport {
   // ???? TODO:  Maybe handle board-full condition more cleanly (don't dequeue
   //   unplaced balls, don't over-replenish).  Maybe fail fast, and don't depend
   //   on (irregular) callers to check whether board becomes full.
-  private def placeOndeckBalls(gameState: LowerGameState)
-                              (using Random): LowerGameState = {
+  private def placeOndeckBalls(gameState: GameState)
+                              (using Random): GameState = {
     val postPlacementResult =
       //???? for 1 to 3, consume on-deck ball from list, and then place (better for internal state view);
       // can replenish incrementally or later; later might show up better in internal state view
@@ -95,18 +95,18 @@ object GameLogicSupport {
     postPlacementResult.withBoard(replenishedOnDeckBoard)
   }
 
-  private[manual] def doPass(gameState: LowerGameState)
-                            (using Random): LowerGameState =
+  private[manual] def doPass(gameState: GameState)
+                            (using Random): GameState =
     placeOndeckBalls(gameState)
 
   // ???? TODO:  Maybe rename with "try"/"attempt":
-  case class MoveBallResult(gameState: LowerGameState,
+  case class MoveBallResult(gameState: GameState,
                             moveWasValid: Boolean)
   {
     //??println(s"*  $this")
   }
 
-  private[manual] def doTryMoveBall(gameState: LowerGameState,
+  private[manual] def doTryMoveBall(gameState: GameState,
                                     from: CellAddress,
                                     to: CellAddress
                                     )(using Random): MoveBallResult = {

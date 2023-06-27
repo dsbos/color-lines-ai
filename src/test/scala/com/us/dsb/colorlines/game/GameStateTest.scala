@@ -1,15 +1,16 @@
-package com.us.dsb.explore.algs.coloredlines.manual.game.board
+package com.us.dsb.colorlines.game
 
-import com.us.dsb.colorlines.game.board.{
-  BoardOrder, CellAddress, Index, ColumnIndex, RowIndex}
+import com.us.dsb.colorlines.game.board.*
 
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers.*
 
-class LowerGameStateTest extends AnyFunSpec {
+import scala.runtime.stdLibPatches.Predef.assert
 
-  describe("LowerGameState$.empty should return board:") {
-    lazy val gameState = LowerGameState.empty
+class GameStateTest extends AnyFunSpec {
+
+  describe("GameState$.empty should return board:") {
+    lazy val gameState = GameState.empty
     it("- with empty board--empty grid cells") {
       RowIndex.values.foreach { row =>
         ColumnIndex.values.foreach { column =>
@@ -23,7 +24,7 @@ class LowerGameStateTest extends AnyFunSpec {
     }
   }
 
-  describe("LowerGameState.toString should render:") {
+  describe("GameState.toString should render:") {
 
     it("- empty board") {
       val expected =   // "<---------/---------/.../--------->"
@@ -31,20 +32,20 @@ class LowerGameStateTest extends AnyFunSpec {
           ColumnIndex.values.map(_ => "-").mkString("")
         }
             .mkString("< <", "/", " + ()>; 0 pts>")
-      LowerGameState.empty.toCompactString shouldBe expected
-      LowerGameState.empty.toString shouldBe expected
+      GameState.empty.toCompactString shouldBe expected
+      GameState.empty.toString shouldBe expected
     }
     it("- board with grid balls") (pending)
     it("- board with on-deck balls") (pending)
   }
 
   // ("it" and "pending" to note without "!!! IGNORED !!!"
-  it("LowerGameState.renderMultiline") {
+  it("GameState.renderMultiline") {
     pending
   }
 
   // ("it" and "cancel" to note without "!!! IGNORED !!!"
-  it("LowerGameState.renderCompactMultiline") {
+  it("GameState.renderCompactMultiline") {
     pending
   }
 

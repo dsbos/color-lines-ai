@@ -1,8 +1,8 @@
 package com.us.dsb.explore.algs.coloredlines.manual.ui
 
+import com.us.dsb.colorlines.game.GameState
 import com.us.dsb.colorlines.game.board.CellAddress
 import com.us.dsb.explore.algs.coloredlines.manual.game.GameLogicSupport
-import com.us.dsb.explore.algs.coloredlines.manual.game.board.LowerGameState
 import com.us.dsb.explore.algs.coloredlines.manual.ui.tapapi.{TapCase, TapInterpreter}
 
 import cats.syntax.either.*
@@ -21,9 +21,10 @@ private[ui] object TapUiGameState {
     private[ui] case class Done(score: Int) extends GameResult
   }
 
+  // ?????? TODO:  Move from UI class/package to ...colorlines.game...:
+
   private def makeInitialState(using Random): TapUiGameState = {
-    // ???? TODO:  Move "GameLogicSupport.placeInitialBalls(LowerGameState.empty)" down into GameLogicSupport
-    val initialPlacementResult = GameLogicSupport.placeInitialBalls(LowerGameState.empty)
+    val initialPlacementResult = GameLogicSupport.placeInitialBalls(GameState.empty)
     TapUiGameState(initialPlacementResult, None)
   }
 
@@ -36,9 +37,9 @@ import TapUiGameState.*
 
 /** Virtual-tap--UI game state and controller.
  */
-private[ui] case class TapUiGameState(gameState: LowerGameState,
-                                          selectionAddress: Option[CellAddress]
-                                         )(using Random) {
+private[ui] case class TapUiGameState(gameState: GameState,
+                                      selectionAddress: Option[CellAddress]
+                                     )(using Random) {
 
   // top-UI selection:
 

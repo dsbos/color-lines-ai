@@ -1,8 +1,8 @@
 package com.us.dsb.explore.algs.coloredlines.manual
 
+import com.us.dsb.colorlines.game.GameState
 import com.us.dsb.colorlines.game.board.{BoardOrder, CellAddress, Index}
 import com.us.dsb.explore.algs.coloredlines.manual.game.GameLogicSupport
-import com.us.dsb.explore.algs.coloredlines.manual.game.board.LowerGameState
 
 import scala.util.Random
 
@@ -17,8 +17,8 @@ object PlayMoveRandomlyNorthwestBiasNGamesWStats extends App {
 
   /** @return ending score */
   def playAGame: Int = {
-    val initialPlacementResult = GameLogicSupport.placeInitialBalls(LowerGameState.empty)
-    var gameState: LowerGameState = initialPlacementResult
+    val initialPlacementResult = GameLogicSupport.placeInitialBalls(GameState.empty)
+    var gameState: GameState = initialPlacementResult
     var moveCount = 0
     var validMoveCount = 0
     while (! gameState.board.isFull) {

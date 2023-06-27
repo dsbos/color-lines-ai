@@ -1,8 +1,8 @@
 package com.us.dsb.explore.algs.coloredlines.manual.game.lines
 
+import com.us.dsb.colorlines.game.GameState
 import com.us.dsb.colorlines.game.board.{BallColor, BoardReadView, CellAddress, Index}
 import com.us.dsb.colorlines.game.lines.LineOrder
-import com.us.dsb.explore.algs.coloredlines.manual.game.board.LowerGameState
 
 // ?? TODO:  reduce repeated passing of board, ball color, etc.; maybe make
 // LineDetector a class, to be instantiated for each move; or make local class
@@ -93,9 +93,9 @@ private[manual] object LineDetector {
 
   /** Removes completed lines' balls. */
   private def removeCompletedLinesBalls(ballTo: CellAddress,
-                                        preremovalGameState: LowerGameState,
+                                        preremovalGameState: GameState,
                                         completedLineAxesResults: List[AxisResult]
-                                       ): LowerGameState = {
+                                       ): GameState = {
     val newBallRemovedGameState = preremovalGameState.withBoardWithNoBallAt(ballTo)
     val linesRemovedGameState =
       completedLineAxesResults.foldLeft(newBallRemovedGameState) { (axisBoard, axisResult) =>
@@ -120,13 +120,13 @@ private[manual] object LineDetector {
    * @param anyRemovals
    *   whether any lines reaped
    */
-  private[manual] case class ReapingAttemptResult(gameState: LowerGameState,
+  private[manual] case class ReapingAttemptResult(gameState: GameState,
                                                   anyRemovals: Boolean)
   /** Reaps any complete lines from just-placed ball.
    * @return
    *   Updated board and score if any completed lines; input state if no lines.
    */
-  private[game] def reapAnyLines(gameState: LowerGameState,
+  private[game] def reapAnyLines(gameState: GameState,
                                  ballTo: CellAddress
                                 ): ReapingAttemptResult = {
     //println(s"+reapAnyLines(... ballTo = $ballTo...).1")

@@ -1,7 +1,7 @@
 package com.us.dsb.explore.algs.coloredlines.manual
 
+import com.us.dsb.colorlines.game.GameState
 import com.us.dsb.explore.algs.coloredlines.manual.game.GameLogicSupport
-import com.us.dsb.explore.algs.coloredlines.manual.game.board.LowerGameState
 
 import scala.util.Random
 
@@ -16,8 +16,8 @@ object PlayJustPassingNGamesWStats extends App {
 
   /** @return ending score */
   def playAGame: Int = {
-    val initialPlacementResult = GameLogicSupport.placeInitialBalls(LowerGameState.empty)
-    var gameState: LowerGameState = initialPlacementResult
+    val initialPlacementResult = GameLogicSupport.placeInitialBalls(GameState.empty)
+    var gameState: GameState = initialPlacementResult
     while (! gameState.board.isFull) {
       gameState = GameLogicSupport.doPass(gameState)
     }

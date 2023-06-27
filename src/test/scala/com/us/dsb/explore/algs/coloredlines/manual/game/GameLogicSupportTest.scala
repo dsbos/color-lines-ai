@@ -1,11 +1,7 @@
 package com.us.dsb.explore.algs.coloredlines.manual.game
 
-import com.us.dsb.colorlines.game.board.{CellAddress, ColumnIndex, RowIndex}
-import com.us.dsb.explore.algs.coloredlines.manual.game.board.LowerGameState
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers.*
-
-import scala.util.Random
 
 class GameLogicSupportTest extends AnyFunSpec {
 
