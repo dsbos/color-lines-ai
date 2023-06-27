@@ -10,7 +10,7 @@ import scala.util.Random
 
 class NameThisGameLogicSupportTest extends AnyFunSpec {
 
-  // ?????? TODO:  Review w.r.t. tests' using just BoardReadView API vs. not other
+  // ????? TODO:  Review w.r.t. tests' using just BoardReadView API vs. not other
   //   Board and GameLogicSupport stuff, so maybe NameThisGameLogicSupportTest
   //   doesn't depend on GameLogicSupport.
 
