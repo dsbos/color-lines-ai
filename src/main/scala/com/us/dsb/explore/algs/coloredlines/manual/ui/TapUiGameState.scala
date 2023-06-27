@@ -24,7 +24,7 @@ private[ui] object TapUiGameState {
   private def makeInitialState(using Random): TapUiGameState = {
     // ???? TODO:  Move "GameLogicSupport.placeInitialBalls(LowerGameState.empty)" down into GameLogicSupport
     val initialPlacementResult = GameLogicSupport.placeInitialBalls(LowerGameState.empty)
-    TapUiGameState(initialPlacementResult.gameState, None)
+    TapUiGameState(initialPlacementResult, None)
   }
 
   private[ui] def initial(seed: Long): TapUiGameState = makeInitialState(using Random(seed))
@@ -91,8 +91,7 @@ private[ui] case class TapUiGameState(gameState: LowerGameState,
           selectionUpdatedState.copy(gameState = tryMoveResult.gameState)
         case PassTap        =>
           val passResult = GameLogicSupport.doPass(gameState)
-          copy(gameState = passResult.gameState)
-              .withNoSelection
+          copy(gameState = passResult).withNoSelection
       }
 
     val nextState =

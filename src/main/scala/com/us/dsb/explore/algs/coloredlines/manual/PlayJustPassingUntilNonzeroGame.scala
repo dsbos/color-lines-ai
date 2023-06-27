@@ -2,7 +2,6 @@ package com.us.dsb.explore.algs.coloredlines.manual
 
 import com.us.dsb.explore.algs.coloredlines.manual.game.GameLogicSupport
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.LowerGameState
-import com.us.dsb.explore.algs.coloredlines.manual.game.lines.LineDetector.BallArrivalResult
 
 import scala.util.Random
 
@@ -23,10 +22,9 @@ object PlayJustPassingUntilNonzeroGame extends App {
     println(s"@@@@ Game #$gameCount")
 
     val initialPlacementResult = GameLogicSupport.placeInitialBalls(LowerGameState.empty)(using Random())
-    var gameState: LowerGameState = initialPlacementResult.gameState
+    var gameState: LowerGameState = initialPlacementResult
     while (! gameState.board.isFull) {
-      val wholeResult: BallArrivalResult = GameLogicSupport.doPass(gameState)
-      gameState = wholeResult.gameState
+      gameState = GameLogicSupport.doPass(gameState)
     }
     lastGameScore = gameState.getScore
     if (0 != gameState.getScore) {

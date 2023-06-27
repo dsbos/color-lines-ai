@@ -7,8 +7,6 @@ import com.us.dsb.explore.algs.coloredlines.manual.game.board.LowerGameState
 // ?? TODO:  reduce repeated passing of board, ball color, etc.; maybe make
 // LineDetector a class, to be instantiated for each move; or make local class
 // for passing (but leave external-client interface same)
-// ?? TODO Revisit containment of BallArrivalResult inside; that's the reason
-//   LineDetector's "private[game]" was widened to "private[manual]"
 private[manual] object LineDetector {
 
   // ?? TODO:  Maybe make refined type for deltas? (check use w/relativeDirectionFactors):
@@ -115,26 +113,21 @@ private[manual] object LineDetector {
     linesRemovedGameState
   }
 
-  // ????? TODO:  Review uses (return type):  Which ones don't need to report whether any removals?
   /**
    * @param gameState
    *   updated game state
    * @param anyRemovals
-   *   whether any lines reaped (re placing on-deck balls)
+   *   whether any lines reaped
    */
-  private[manual] case class BallArrivalResult(gameState: LowerGameState,
-                                               anyRemovals: Boolean)
-  {
-    //??println(s"* $this")
-  }
-
+  private[manual] case class ReapingAttemptResult(gameState: LowerGameState,
+                                                  anyRemovals: Boolean)
   /** Reaps any complete lines from just-placed ball.
    * @return
    *   Updated board and score if any completed lines; input state if no lines.
    */
   private[game] def reapAnyLines(gameState: LowerGameState,
                                  ballTo: CellAddress
-                                ): BallArrivalResult = {
+                                ): ReapingAttemptResult = {
     //println(s"+reapAnyLines(... ballTo = $ballTo...).1")
     // ????? TODO:  Resolve following .get.
     //   - Maybe use getOrElse with "Unexpected case".
@@ -171,7 +164,7 @@ private[manual] object LineDetector {
           (postLinesRemovalGameState.withAddedScore(ballPlacementScore), Some(ballPlacementScore))
       }
     //println(s"-handleBallArrival(... ballTo = $ballTo...).9 = score result = $scoreResult")
-    BallArrivalResult(resultGameState, anyRemovals = scoreResult.isDefined)
+    ReapingAttemptResult(resultGameState, anyRemovals = scoreResult.isDefined)
   }
 
 }

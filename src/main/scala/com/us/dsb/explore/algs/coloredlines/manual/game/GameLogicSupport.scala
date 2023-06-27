@@ -4,7 +4,6 @@ import com.us.dsb.colorlines.game.board.{
   BallColor, Board, BoardReadView, CellAddress, ColumnIndex, RowIndex}
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.LowerGameState
 import com.us.dsb.explore.algs.coloredlines.manual.game.lines.LineDetector
-import com.us.dsb.explore.algs.coloredlines.manual.game.lines.LineDetector.BallArrivalResult
 
 import cats.syntax.option.*
 
@@ -48,57 +47,55 @@ object GameLogicSupport {
    *   expected to be empty //???? maybe refactor something?
    */
   private[manual] def placeInitialBalls(gameState: LowerGameState)
-                                       (using Random): BallArrivalResult = {
-    val postPlacementsResult =
+                                       (using Random): LowerGameState = {
+    val postPlacementsArrivalResult =
       (1 to InitialBallCount)
-          .foldLeft(BallArrivalResult(gameState, anyRemovals = false)) {
-            (resultSoFar, _) =>
+          .foldLeft(gameState) {
+            (gameStateSoFar, _) =>
               val address =
-                pickRandomEmptyCell(resultSoFar.gameState.board)
+                pickRandomEmptyCell(gameStateSoFar.board)
                     .getOrElse(scala.sys.error("Unexpectedly full board"))
-              val postPlacementGameState =
-                resultSoFar.gameState.withBoardWithBallAt(address, pickRandomBallColor())
-              LineDetector.reapAnyLines(postPlacementGameState, address)
+              val postPlacementState =
+                gameStateSoFar.withBoardWithBallAt(address, pickRandomBallColor())
+              val reapResult = LineDetector.reapAnyLines(postPlacementState, address)
+              reapResult.gameState
       }
 
-    val replenishedOnDeckBoard = replenishOnDeckBalls(postPlacementsResult.gameState.board)
-    postPlacementsResult.copy(gameState = postPlacementsResult.gameState.withBoard(replenishedOnDeckBoard))
+    val replenishedOnDeckBoard = replenishOnDeckBalls(postPlacementsArrivalResult.board)
+    postPlacementsArrivalResult.withBoard(replenishedOnDeckBoard)
   }
 
   // ???? TODO:  Maybe handle board-full condition more cleanly (don't dequeue
   //   unplaced balls, don't over-replenish).  Maybe fail fast, and don't depend
   //   on (irregular) callers to check whether board becomes full.
   private def placeOndeckBalls(gameState: LowerGameState)
-                              (using Random): BallArrivalResult = {
+                              (using Random): LowerGameState = {
     val postPlacementResult =
       //???? for 1 to 3, consume on-deck ball from list, and then place (better for internal state view);
       // can replenish incrementally or later; later might show up better in internal state view
       gameState.board.getOndeckBalls
-        .foldLeft(BallArrivalResult(gameState, anyRemovals = false)) {
-          (curMoveResult, onDeckBall) =>
-            pickRandomEmptyCell(curMoveResult.gameState.board) match {
-              case None =>  // board full; break out early (game will become over)
-                curMoveResult
+        .foldLeft(gameState) {
+          (gameStateSoFar, onDeckBall) =>
+            pickRandomEmptyCell(gameStateSoFar.board) match {
+              case None          =>  // board full; break out early (game will become over)
+                gameStateSoFar
               case Some(address) =>
-                val postPlacementGameState = {
-                  val curBoard = curMoveResult.gameState.board
-                  val postDequeueBoard =
-                    curBoard
-                        .withOnDeckBalls(curBoard.getOndeckBalls.tail)
-                        .withBallAt(address, onDeckBall)
-                  val postDequeueGameState = curMoveResult.gameState.withBoard(postDequeueBoard)
-                  postDequeueGameState
-                }
-                LineDetector.reapAnyLines(postPlacementGameState, address)
+                val curBoard = gameStateSoFar.board
+                val postDequeueBoard = curBoard.withOnDeckBalls(curBoard.getOndeckBalls.tail)
+                val postDequeueState = gameStateSoFar.withBoard(postDequeueBoard)
+                val postPlacementState = postDequeueState.withBoardWithBallAt(address,
+                                                                              onDeckBall)
+                val reapResult = LineDetector.reapAnyLines(postPlacementState, address)
+                reapResult.gameState
             }
         }
 
-    val replenishedOnDeckBoard = replenishOnDeckBalls(postPlacementResult.gameState.board)
-    postPlacementResult.copy(gameState = postPlacementResult.gameState.withBoard(replenishedOnDeckBoard))
+    val replenishedOnDeckBoard = replenishOnDeckBalls(postPlacementResult.board)
+    postPlacementResult.withBoard(replenishedOnDeckBoard)
   }
 
   private[manual] def doPass(gameState: LowerGameState)
-                            (using Random): BallArrivalResult =
+                            (using Random): LowerGameState =
     placeOndeckBalls(gameState)
 
   // ???? TODO:  Maybe rename with "try"/"attempt":
@@ -142,16 +139,16 @@ object GameLogicSupport {
         case true =>
           // ????? TODO:  Rework condition structures here and just above to eliminate this .get:
           val moveBallColor = gameState.board.getCellStateAt(from).asOption.get //??
-          val postMoveBoard =
+          val postMoveGameState =
             gameState.withBoardWithNoBallAt(from).withBoardWithBallAt(to, moveBallColor)
 
-          val postReapingResult = LineDetector.reapAnyLines(postMoveBoard, to)
-          val postPostReadingResult =
-            if (! postReapingResult.anyRemovals)
-              placeOndeckBalls(postReapingResult.gameState)
+          val reapResult = LineDetector.reapAnyLines(postMoveGameState, to)
+          val postPostReapingResult =
+            if (! reapResult.anyRemovals)
+              placeOndeckBalls(reapResult.gameState)
             else
-              postReapingResult
-          postPostReadingResult.gameState
+              reapResult.gameState
+          postPostReapingResult
       }
     MoveBallResult(newGameState, moveWasValid)
   }
