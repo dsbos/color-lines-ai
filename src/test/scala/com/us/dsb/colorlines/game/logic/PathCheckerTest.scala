@@ -1,7 +1,8 @@
-package com.us.dsb.explore.algs.coloredlines.manual.game
+package com.us.dsb.colorlines.game.logic
 
 import com.us.dsb.colorlines.game.board.{
   BallColor, Board, BoardOrder, BoardReadView, CellAddress, CellState, ColumnIndex, Index, RowIndex}
+import com.us.dsb.explore.algs.coloredlines.manual.game.GameLogicSupport
 
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers.*

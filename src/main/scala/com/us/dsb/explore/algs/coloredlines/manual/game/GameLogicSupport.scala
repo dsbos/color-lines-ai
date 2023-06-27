@@ -2,6 +2,7 @@ package com.us.dsb.explore.algs.coloredlines.manual.game
 
 import com.us.dsb.colorlines.game.board.{
   BallColor, Board, BoardReadView, CellAddress, ColumnIndex, RowIndex}
+import com.us.dsb.colorlines.game.logic.PathChecker
 import com.us.dsb.explore.algs.coloredlines.manual.game.board.LowerGameState
 import com.us.dsb.explore.algs.coloredlines.manual.game.lines.LineDetector
 
@@ -18,15 +19,15 @@ object GameLogicSupport {
   // ???? TODO:  Rework these two so tests can force sequence of colors (and locations):
 
   // (was "private" before test calls:)
-  private[game] def pickRandomBallColor()(using rng: Random): BallColor = {
+  /*private[game]*/ def pickRandomBallColor()(using rng: Random): BallColor = {
     BallColor.values(rng.nextInt(BallColor.values.size))
   }
 
   /** Selects an empty cell randomly (if any). */
   // (was "private" before test calls:)
   @tailrec
-  private[game] def pickRandomEmptyCell(board: BoardReadView)
-                                       (using rng: Random): Option[CellAddress] = {
+  /*private[game]*/ def pickRandomEmptyCell(board: BoardReadView)
+                                           (using rng: Random): Option[CellAddress] = {
     if (board.isFull)
       None
     else {

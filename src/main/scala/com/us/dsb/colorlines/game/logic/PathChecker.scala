@@ -1,4 +1,4 @@
-package com.us.dsb.explore.algs.coloredlines.manual.game
+package com.us.dsb.colorlines.game.logic
 
 import com.us.dsb.colorlines.game.board.{
   BoardOrder, BoardReadView, CellAddress, Index, ColumnIndex, RowIndex}
@@ -24,9 +24,9 @@ object PathChecker {
    *   (requirement undefined); must be empty, at least if not starting cell)
    * @return
    */
-  private[game] def pathExists(board: BoardReadView,
-                              fromBallCell: CellAddress,
-                              toEmptyCell: CellAddress): Boolean = {
+  def pathExists(board: BoardReadView,
+                 fromBallCell: CellAddress,
+                 toEmptyCell: CellAddress): Boolean = {
    // ???? TODO:  Revisit looping/recursion.  (What is class/method that
    //  logically loops until computation-and-control expression returns
    //  termination value (None?)?  How much instance allocation would that do?)
