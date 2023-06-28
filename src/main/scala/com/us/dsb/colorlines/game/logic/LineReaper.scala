@@ -149,7 +149,6 @@ import com.us.dsb.colorlines.game.lines.LineOrder
   /*??private[game]*/ def reapAnyLines(gameState: GameState,
                                  ballTo: CellAddress
                                 ): ReapingAttemptResult = {
-    //println(s"+reapAnyLines(... ballTo = $ballTo...).1")
     // ????? TODO:  Resolve following .get.
     //   - Maybe use getOrElse with "Unexpected case".
     //   - Maybe add BallColor parameter (pros and cans ...).
@@ -162,10 +161,8 @@ import com.us.dsb.colorlines.game.lines.LineOrder
       lineAxes.map { lineAxis =>
         computeLineAxisResult(moveBallColor, gameState.board, ballTo, lineAxis)
       }
-    // println("? allAxesResults:" + allAxesResults.mkString("\n- ", "\n- ", ""))
     val completedLineAxesResults =
       allAxesResults.filter(_.axisLineAddedLength + 1 >= LineOrder)
-    // println("? completedLineAxesResults:" + completedLineAxesResults.map("- " + _.toString).mkString("\n", "\n", "\n:end"))
     val (resultGameState, scoreResult) =
       completedLineAxesResults match {
         case Nil =>
@@ -178,7 +175,6 @@ import com.us.dsb.colorlines.game.lines.LineOrder
           val ballPlacementScore = computeReapingScore(totalBallsBeingRemoved)
           (postLinesRemovalGameState.withAddedScore(ballPlacementScore), Some(ballPlacementScore))
       }
-    //println(s"-handleBallArrival(... ballTo = $ballTo...).9 = score result = $scoreResult")
     ReapingAttemptResult(resultGameState, anyRemovals = scoreResult.isDefined)
   }
 

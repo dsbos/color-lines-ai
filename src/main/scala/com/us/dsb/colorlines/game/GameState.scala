@@ -16,7 +16,6 @@ object GameState {
 class GameState(val board: Board,
                 val score: Int) {
   println("* GameState  : " + this)
-  //print("")
 
   // internal/support methods:
 

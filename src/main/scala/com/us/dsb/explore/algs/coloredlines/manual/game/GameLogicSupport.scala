@@ -102,15 +102,11 @@ object GameLogicSupport {
   // ???? TODO:  Maybe rename with "try"/"attempt":
   case class MoveBallResult(gameState: GameState,
                             moveWasValid: Boolean)
-  {
-    //??println(s"*  $this")
-  }
 
   private[manual] def doTryMoveBall(gameState: GameState,
                                     from: CellAddress,
                                     to: CellAddress
                                     )(using Random): MoveBallResult = {
-    //println(s"@@ doTryMoveBall: $from -> $to")
     //???? separate move-ball move validation from actually moving (selection
     //   clearing depends on just validity of move, not on deleting any lines)
     //   - see note near some Option/etc. re encoding only valid moves at
@@ -119,15 +115,12 @@ object GameLogicSupport {
     // ?? TODO:  Maybe add enumeration of invalid-move conditions:
     val moveWasValid =
       if (! gameState.board.hasABallAt(from)) {
-        //println(s"@ no ball at from address $from")
-        false  // ?? TODO:  Expand to reporting no ball there
+        false  // ?? TODO:  Expand to report no ball there
       }
       else if (gameState.board.hasABallAt(to)) {
-        //println(s"@ no vacancy at to address $from")
         false  // ?? TODO:  Expand to report no vacancy there
       }
       else if (! PathChecker.pathExists(gameState.board, from, to)) {
-        //println(s"@ no path from $from to $to")
         false  // ?? TODO:  Expand to report no path
       }
       else {
