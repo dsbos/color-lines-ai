@@ -25,16 +25,16 @@ class GameState(val board: Board,
 
   // board state:
 
-  /*private[game]*/ def withBoard(board: Board): GameState = copy(board = board)
+  /*??private[game]*/ def withBoard(board: Board): GameState = copy(board = board)
 
-  /*private[game]*/ def withBoardWithBallAt(address: CellAddress, ball: BallColor): GameState =
+  /*??private[game]*/ def withBoardWithBallAt(address: CellAddress, ball: BallColor): GameState =
     copy(board = board.withBallAt(address, ball))
-  /*private[game]*/ def withBoardWithNoBallAt(address: CellAddress): GameState =
+  /*??private[game]*/ def withBoardWithNoBallAt(address: CellAddress): GameState =
     copy(board = board.withNoBallAt(address))
 
   // (running/total) score:
 
-  /*private[game]*/ def withAddedScore(increment: Int): GameState =
+  private[game] def withAddedScore(increment: Int): GameState =
     copy(score = this.score + increment)
 
   def getScore: Int = score

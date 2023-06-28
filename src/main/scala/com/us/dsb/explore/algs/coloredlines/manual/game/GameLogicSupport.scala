@@ -19,14 +19,14 @@ object GameLogicSupport {
   // ???? TODO:  Rework these two so tests can force sequence of colors (and locations):
 
   // (was "private" before test calls:)
-  /*private[game]*/ def pickRandomBallColor()(using rng: Random): BallColor = {
+  /*??private[game]*/ def pickRandomBallColor()(using rng: Random): BallColor = {
     BallColor.values(rng.nextInt(BallColor.values.size))
   }
 
   /** Selects an empty cell randomly (if any). */
   // (was "private" before test calls:)
   @tailrec
-  /*private[game]*/ def pickRandomEmptyCell(board: BoardReadView)
+  /*??private[game]*/ def pickRandomEmptyCell(board: BoardReadView)
                                            (using rng: Random): Option[CellAddress] = {
     if (board.isFull)
       None

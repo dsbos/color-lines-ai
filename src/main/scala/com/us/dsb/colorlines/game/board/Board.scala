@@ -5,8 +5,8 @@ import com.us.dsb.colorlines.game.board.{BoardOrder, CellState, ColumnIndex, Ind
 // ????? TODO:  Revisit "private[game]" once callers are moved to com.us.dsb.colorlines.game...
 
 // ?? TODO:  Revisit having companion object before class:
-/*??private[game]*/ object Board {
-  /*??private[game]*/ def empty: Board =
+private[game] object Board {
+  private[game] def empty: Board =
     Board(Vector.fill[CellState](BoardOrder * BoardOrder)(CellState.empty), Nil)
 }
 
@@ -49,11 +49,11 @@ import com.us.dsb.colorlines.game.board.{BoardOrder, CellState, ColumnIndex, Ind
                             newState: CellState): Board =
     copy(cellStates = cellStates.updated(vectorIndex(address), newState))
 
-  /*??private[game]*/ def withBallAt(address: CellAddress,
+  private[game] def withBallAt(address: CellAddress,
                                ball: BallColor): Board =
     withCellState(address, CellState.withBallOfColor(ball))
 
-  /*??private[game]*/def withNoBallAt(address: CellAddress): Board =
+  private[game] def withNoBallAt(address: CellAddress): Board =
     withCellState(address, CellState.empty)
 
   /*??private[game]*/ def withOnDeckBalls(newBalls: Iterable[BallColor]): Board =
