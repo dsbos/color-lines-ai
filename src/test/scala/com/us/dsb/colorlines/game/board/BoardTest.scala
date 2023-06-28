@@ -1,6 +1,7 @@
 package com.us.dsb.colorlines.game.board
 
-import com.us.dsb.colorlines.game.board.{BoardOrder, ColumnIndex, Index, RowIndex}
+import com.us.dsb.colorlines.game.Parameters.BoardOrder
+import com.us.dsb.colorlines.game.board.{ColumnIndex, Index, RowIndex}
 
 import org.scalatest.PrivateMethodTester
 import org.scalatest.funspec.AnyFunSpec

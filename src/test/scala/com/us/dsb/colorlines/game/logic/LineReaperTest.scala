@@ -1,6 +1,7 @@
 package com.us.dsb.colorlines.game.logic
 
-import com.us.dsb.colorlines.game.board.{BallColor, Board, BoardOrder, CellAddress, Index}
+import com.us.dsb.colorlines.game.Parameters.BoardOrder
+import com.us.dsb.colorlines.game.board.{BallColor, Board, CellAddress, Index}
 
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers.*

@@ -1,22 +1,13 @@
 package com.us.dsb.colorlines.game.board
 
+import com.us.dsb.colorlines.game.Parameters.BoardOrder
+
 import eu.timepit.refined.api.{Refined, RefinedTypeOps}
 import eu.timepit.refined.numeric.Interval.Closed
 
-// ???? TODO: Probably gather together multiple parameters (board order, line
-//   order, numbers of initial and added balls, scoring).
-//   Also, maybe have regular vs. reduced versions, with redirecting version
-//    having single source-level switch between them (or runtime switch?).
 
-// ???? TODO:  Maybe move BoardOrder to Index.Something, parallel to Index.Origin.
-//   Maybe move multiple top-level declarations into an indexing object or
+// ???? TODO:  Maybe move multiple top-level declarations into an indexing object or
 //   package, maybe making some private.)
-
-/** Order (linear size) of board, as type for refined type [[Index]]. */
-type BoardOrder = 9
-
-/** Order (linear size) of board, as regular value. */
-val BoardOrder: BoardOrder = valueOf[BoardOrder]
 
 /** Board row or column index integer; 1-based; top row, left column are #1. */
 // (Upper bound BoardOrder is lower bound 1 plus BoardOrder minus 1 re delta.)

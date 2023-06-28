@@ -1,7 +1,7 @@
 package com.us.dsb.colorlines.game.logic
 
-import com.us.dsb.colorlines.game.board.{
-  BoardOrder, BoardReadView, CellAddress, Index, ColumnIndex, RowIndex}
+import com.us.dsb.colorlines.game.Parameters
+import com.us.dsb.colorlines.game.board.{BoardReadView, CellAddress, ColumnIndex, Index, RowIndex}
 
 import cats.syntax.option.*
 
@@ -62,8 +62,8 @@ object PathChecker {
           neighborOffsets.foreach { (rowInc, colInc) =>
             val rowOffset: Int = reachedAddr.row.raw.value    - Index.Origin + rowInc
             val colOffset: Int = reachedAddr.column.raw.value - Index.Origin + colInc
-            if (! (   0 <= rowOffset && rowOffset < BoardOrder
-                   && 0 <= colOffset && colOffset < BoardOrder)) {
+            if (! (   0 <= rowOffset && rowOffset < Parameters.BoardOrder
+                   && 0 <= colOffset && colOffset < Parameters.BoardOrder)) {
               // off board--ignore this offset
             } else if (blockedAt(rowOffset)(colOffset)) {
               // ball-blocked or already traversed--ignore this offset

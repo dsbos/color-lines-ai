@@ -1,6 +1,7 @@
 package com.us.dsb.colorlines.game.board
 
-import com.us.dsb.colorlines.game.board.{BoardOrder, CellState, ColumnIndex, Index, RowIndex}
+import com.us.dsb.colorlines.game.Parameters.BoardOrder
+import com.us.dsb.colorlines.game.board.{CellState, ColumnIndex, Index, RowIndex}
 
 // ????? TODO:  Revisit "private[game]" once callers are moved to com.us.dsb.colorlines.game...
 

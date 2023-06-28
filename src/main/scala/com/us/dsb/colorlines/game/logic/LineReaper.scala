@@ -1,8 +1,7 @@
 package com.us.dsb.colorlines.game.logic
 
-import com.us.dsb.colorlines.game.GameState
+import com.us.dsb.colorlines.game.{GameState, Parameters}
 import com.us.dsb.colorlines.game.board.{BallColor, BoardReadView, CellAddress, Index}
-import com.us.dsb.colorlines.game.logic.LineOrder
 
 // ?? TODO:  reduce repeated passing of board, ball color, etc.:
 //   - maybe make LineReaper a class, to be instantiated for each move
@@ -127,13 +126,6 @@ import com.us.dsb.colorlines.game.logic.LineOrder
     linesRemovedGameState
   }
 
-  private def computeReapingScore(numberOfBallsRemoved: Int): Int = {
-    // Original game scoring was score = <number of balls removed> * 4 - 10,
-    //  which seems to be from 2 points per ball in 5-ball line, but 4 each for
-    //  any balls in line beyond 5.
-    2 * LineOrder + 4 * (numberOfBallsRemoved - LineOrder)
-  }
-
   /**
    * @param gameState
    *   updated game state
@@ -162,7 +154,7 @@ import com.us.dsb.colorlines.game.logic.LineOrder
         computeLineAxisResult(moveBallColor, gameState.board, ballTo, lineAxis)
       }
     val completedLineAxesResults =
-      allAxesResults.filter(_.axisLineAddedLength + 1 >= LineOrder)
+      allAxesResults.filter(_.axisLineAddedLength + 1 >= Parameters.LineOrder)
     val (resultGameState, scoreResult) =
       completedLineAxesResults match {
         case Nil =>
@@ -172,7 +164,7 @@ import com.us.dsb.colorlines.game.logic.LineOrder
           println(s"* * reaped at $ballTo: $totalBallsBeingRemoved $moveBallColor balls")
           val postLinesRemovalGameState =
             removeCompletedLinesBalls(ballTo, gameState, completedLineAxesResults)
-          val ballPlacementScore = computeReapingScore(totalBallsBeingRemoved)
+          val ballPlacementScore = Parameters.computeReapingScore(totalBallsBeingRemoved)
           (postLinesRemovalGameState.withAddedScore(ballPlacementScore), Some(ballPlacementScore))
       }
     ReapingAttemptResult(resultGameState, anyRemovals = scoreResult.isDefined)

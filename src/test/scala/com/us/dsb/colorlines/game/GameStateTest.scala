@@ -28,7 +28,7 @@ class GameStateTest extends AnyFunSpec {
 
     it("- empty board") {
       val expected =   // "<---------/---------/.../--------->"
-        (Index.Origin to BoardOrder).map { _ =>
+        (Index.Origin to Parameters.BoardOrder).map { _ =>
           ColumnIndex.values.map(_ => "-").mkString("")
         }
             .mkString("< <", "/", " + ()>; 0 pts>")

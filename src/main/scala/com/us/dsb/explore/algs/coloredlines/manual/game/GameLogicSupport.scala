@@ -1,8 +1,7 @@
 package com.us.dsb.explore.algs.coloredlines.manual.game
 
-import com.us.dsb.colorlines.game.GameState
-import com.us.dsb.colorlines.game.board.{
-  BallColor, Board, BoardReadView, CellAddress, ColumnIndex, RowIndex}
+import com.us.dsb.colorlines.game.{GameState, Parameters}
+import com.us.dsb.colorlines.game.board.{BallColor, Board, BoardReadView, CellAddress, ColumnIndex, RowIndex}
 import com.us.dsb.colorlines.game.logic.LineReaper
 import com.us.dsb.colorlines.game.logic.PathChecker
 
@@ -12,9 +11,6 @@ import scala.annotation.tailrec
 import scala.util.Random
 
 object GameLogicSupport {
-
-  private[game] val InitialBallCount: Int = 5
-  private[game] val OnDeckBallCount: Int = 3
 
   // ???? TODO:  Rework these two so tests can force sequence of colors (and locations):
 
@@ -41,7 +37,7 @@ object GameLogicSupport {
   }
 
   private def replenishOnDeckBalls(board: Board)(using Random): Board =
-    board.withOnDeckBalls(List.fill(OnDeckBallCount)(pickRandomBallColor()))
+    board.withOnDeckBalls(List.fill(Parameters.OnDeckBallCount)(pickRandomBallColor()))
 
   /**
    * @param gameState
@@ -50,7 +46,7 @@ object GameLogicSupport {
   private[manual] def placeInitialBalls(gameState: GameState)
                                        (using Random): GameState = {
     val postPlacementsArrivalResult =
-      (1 to InitialBallCount)
+      (1 to Parameters.InitialBallCount)
           .foldLeft(gameState) {
             (gameStateSoFar, _) =>
               val address =
