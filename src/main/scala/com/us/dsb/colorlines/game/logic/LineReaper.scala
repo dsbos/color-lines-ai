@@ -4,9 +4,10 @@ import com.us.dsb.colorlines.game.GameState
 import com.us.dsb.colorlines.game.board.{BallColor, BoardReadView, CellAddress, Index}
 import com.us.dsb.colorlines.game.lines.LineOrder
 
-// ?? TODO:  reduce repeated passing of board, ball color, etc.; maybe make
-// LineReaper a class, to be instantiated for each move; or make local class
-// for passing (but leave external-client interface same)
+// ?? TODO:  reduce repeated passing of board, ball color, etc.:
+//   - maybe make LineReaper a class, to be instantiated for each move
+//   - maybe make local class for passing (but leave external-client interface same)
+//   - maybe pass bundle class
 
 /*??private[game]*/ object LineReaper {
 
@@ -22,7 +23,8 @@ import com.us.dsb.colorlines.game.lines.LineOrder
       LineAxis("↓", +1,  0),  // ↓ N  --> S
       LineAxis("↙", +1, -1))  // ↙ NW --> SW
 
-  private val relativeDirectionFactors = List(1, -1) // use type of length 2 (refined List?, Tuple2?, some array?)
+  // ???? TODO:  Maybe use some iterable type of length 2  (refined List?, Tuple2?, some array?)
+  private val relativeDirectionFactors = List(1, -1)
 
   // ([logic] for testing)
   private[logic] def haveMatchingBallAt(moveBallColor: BallColor,
@@ -40,17 +42,18 @@ import com.us.dsb.colorlines.game.lines.LineOrder
     haveMatch
   }
 
-  // ???? TODO:  Review names ("result" -> "...length..."?); maybe newtype (to flatten)?
-
-  private case class RelativeDirectionResult(excursionLength: Int)
+  // ?? TODO:  Would "spur" be better than long "excursion"?
+  // ?? TODO:  Maybe flatten by eliminating DirectionExecursionLength:
+  private case class DirectionExecursionLength(value: Int) extends AnyVal
 
   // ????? TODO:  Probably get ball color via ballTo, rather than having clients
   //   pass it down several levels:
-  private def computeDirectionResult(moveBallColor: BallColor,
-                                     board: BoardReadView,
-                                     ballTo: CellAddress,
-                                     lineDirectionAxis: LineAxis,
-                                     lineDirectionFactor: Int): RelativeDirectionResult = {
+  private def computeDirectionExecursionLength(moveBallColor: BallColor,
+                                               board: BoardReadView,
+                                               ballTo: CellAddress,
+                                               lineDirectionAxis: LineAxis,
+                                               lineDirectionFactor: Int
+                                                ): DirectionExecursionLength = {
     // ???? TODO: Revisit names (shorten, to shorten lines)?
     val newBallRowIndex = ballTo.row.raw.value
     val newBallColIndex = ballTo.column.raw.value
@@ -67,29 +70,38 @@ import com.us.dsb.colorlines.game.lines.LineOrder
       }
       haveMatchingBall
     }) {}
-    RelativeDirectionResult(excursionLength)
+    DirectionExecursionLength(excursionLength)
   }
 
+  /**
+   * @param axis
+   *   for which axis
+   * @param axisLineAddedLength
+   *   length without placed ball
+   * @param directionsResults
+   *   axis subdirection results (execursion length; returned for removal code)
+   */
   private case class AxisResult(axis: LineAxis,
-                                axisLineAddedLength: Int, // length WITHOUT moved ball
-                                // ?? TODO:  maybe "...direction...lengths"?:
-                                directionsResults: List[RelativeDirectionResult])
+                                axisLineAddedLength: Int,
+                                directionExcursionLengths: List[DirectionExecursionLength])
 
+  // ?????? TODO:  Would having lineDirectionAxis first be clearer/more logical?
   private def computeLineAxisResult(moveBallColor: BallColor,
                                     board: BoardReadView,
                                     ballTo: CellAddress,
-                                    lineDirectionAxis: LineAxis): AxisResult = {
+                                    lineDirectionAxis: LineAxis
+                                   ): AxisResult = {
     // ?? TODO:  maybe "...direction...lengths"?
-    val directionsResults: List[RelativeDirectionResult] =
+    val directionExecursionLengths: List[DirectionExecursionLength] =
       relativeDirectionFactors.map { lineDirectionFactor =>
-        computeDirectionResult(moveBallColor,
-                               board,
-                               ballTo,
-                               lineDirectionAxis,
-                               lineDirectionFactor)
+        computeDirectionExecursionLength(moveBallColor,
+                                         board,
+                                         ballTo,
+                                         lineDirectionAxis,
+                                         lineDirectionFactor)
       }
-    val axisLineAddedLength = directionsResults.map(_.excursionLength).sum
-    AxisResult(lineDirectionAxis, axisLineAddedLength, directionsResults)
+    val axisLineAddedLength = directionExecursionLengths.map(_.value).sum
+    AxisResult(lineDirectionAxis, axisLineAddedLength, directionExecursionLengths)
   }
 
   /** Removes completed lines' balls. */
@@ -100,8 +112,8 @@ import com.us.dsb.colorlines.game.lines.LineOrder
     val newBallRemovedGameState = preremovalGameState.withBoardWithNoBallAt(ballTo)
     val linesRemovedGameState =
       completedLineAxesResults.foldLeft(newBallRemovedGameState) { (axisBoard, axisResult) =>
-        val fromOffset = -axisResult.directionsResults(1).excursionLength
-        val toOffset   =  axisResult.directionsResults(0).excursionLength
+        val fromOffset = -axisResult.directionExcursionLengths(1).value
+        val toOffset   =  axisResult.directionExcursionLengths(0).value
         val lineRemovedGameState =
           (fromOffset to toOffset).foldLeft(axisBoard) { (directionBoard, offset) =>
             import axisResult.axis.{colDelta, rowDelta}
@@ -113,6 +125,13 @@ import com.us.dsb.colorlines.game.lines.LineOrder
         lineRemovedGameState
       }
     linesRemovedGameState
+  }
+
+  private def computeReapingScore(numberOfBallsRemoved: Int): Int = {
+    // Original game scoring was score = <number of balls removed> * 4 - 10,
+    //  which seems to be from 2 points per ball in 5-ball line, but 4 each for
+    //  any balls in line beyond 5.
+    2 * LineOrder + 4 * (numberOfBallsRemoved - LineOrder)
   }
 
   /**
@@ -150,19 +169,13 @@ import com.us.dsb.colorlines.game.lines.LineOrder
     val (resultGameState, scoreResult) =
       completedLineAxesResults match {
         case Nil =>
-          (gameState, None) // return None for score (signal to place 3 more IF ball moved by user)//??????? EDIT
-        case linesAxes =>
-          //????? test
-          val totalBallsBeingRemoved = 1 + linesAxes.map(_.axisLineAddedLength).sum
+          (gameState, None) // None for score leads to placing on-deck balls
+        case axesResults =>
+          val totalBallsBeingRemoved = 1 + axesResults.map(_.axisLineAddedLength).sum
           println(s"* * reaped at $ballTo: $totalBallsBeingRemoved $moveBallColor balls")
-          //???? move?
-          // note original game scoring: score = totalBallsBeingRemoved * 4 - 10,
-          //  which seems to be from 2 pts per ball in 5-ball line, but 4 for any extra balls in line
-          val postLinesRemovalGameState = removeCompletedLinesBalls(ballTo,
-                                                                    gameState,
-                                                                    completedLineAxesResults)
-          // ?????? TODO:  Pull out method to make score function clearer.
-          val ballPlacementScore = 2 * LineOrder + 4 * (totalBallsBeingRemoved - LineOrder)
+          val postLinesRemovalGameState =
+            removeCompletedLinesBalls(ballTo, gameState, completedLineAxesResults)
+          val ballPlacementScore = computeReapingScore(totalBallsBeingRemoved)
           (postLinesRemovalGameState.withAddedScore(ballPlacementScore), Some(ballPlacementScore))
       }
     //println(s"-handleBallArrival(... ballTo = $ballTo...).9 = score result = $scoreResult")
