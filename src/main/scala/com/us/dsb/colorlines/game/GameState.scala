@@ -44,7 +44,7 @@ class GameState(val board: Board,
   /** Makes compact single-line string. */
   def toCompactString: String = "< " + board.toCompactString + "; " + score + " pts" + ">"
 
-  /** Sames as `toCompactString`. */
+  /** Same as `toCompactString`. */
   override def toString: String = toCompactString
 }
 

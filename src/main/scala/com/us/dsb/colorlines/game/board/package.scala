@@ -3,8 +3,10 @@ package com.us.dsb.colorlines.game.board
 import eu.timepit.refined.api.{Refined, RefinedTypeOps}
 import eu.timepit.refined.numeric.Interval.Closed
 
-// ????? TODO:  Assimilate parameterization of added-balls count, scoring, etc.,
-//   with BoardOrder parameterization of board size..
+// ???? TODO: Probably gather together multiple parameters (board order, line
+//   order, numbers of initial and added balls, scoring).
+//   Also, maybe have regular vs. reduced versions, with redirecting version
+//    having single source-level switch between them (or runtime switch?).
 
 // ???? TODO:  Maybe move BoardOrder to Index.Something, parallel to Index.Origin.
 //   Maybe move multiple top-level declarations into an indexing object or

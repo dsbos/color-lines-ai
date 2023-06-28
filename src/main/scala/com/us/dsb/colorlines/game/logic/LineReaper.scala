@@ -2,7 +2,7 @@ package com.us.dsb.colorlines.game.logic
 
 import com.us.dsb.colorlines.game.GameState
 import com.us.dsb.colorlines.game.board.{BallColor, BoardReadView, CellAddress, Index}
-import com.us.dsb.colorlines.game.lines.LineOrder
+import com.us.dsb.colorlines.game.logic.LineOrder
 
 // ?? TODO:  reduce repeated passing of board, ball color, etc.:
 //   - maybe make LineReaper a class, to be instantiated for each move
