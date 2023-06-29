@@ -24,7 +24,7 @@ private[ui] object TapUiGameState {
   // ?????? TODO:  Move from UI class/package to ...colorlines.game...:
 
   private def makeInitialState(using Random): TapUiGameState = {
-    val initialPlacementResult = GameLogicSupport.placeInitialBalls(GameState.empty)
+    val initialPlacementResult = GameLogicSupport.getInitialState()
     TapUiGameState(initialPlacementResult, None)
   }
 
@@ -38,9 +38,8 @@ import TapUiGameState.*
 /** Virtual-tap--UI game state and controller.
  */
 private[ui] case class TapUiGameState(gameState: GameState,
-                                      selectionAddress: Option[CellAddress]
-                                     )(using Random) {
-
+                                      selectionAddress: Option[CellAddress])
+                                     (using Random) {
   // top-UI selection:
 
   private[ui] def withCellSelected(address: CellAddress): TapUiGameState =

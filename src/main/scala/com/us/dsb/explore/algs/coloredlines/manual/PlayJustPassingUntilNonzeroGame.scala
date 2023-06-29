@@ -21,7 +21,7 @@ object PlayJustPassingUntilNonzeroGame extends App {
     println()
     println(s"@@@@ Game #$gameCount")
 
-    val initialPlacementResult = GameLogicSupport.placeInitialBalls(GameState.empty)(using Random())
+    val initialPlacementResult = GameLogicSupport.getInitialState()
     var gameState: GameState = initialPlacementResult
     while (! gameState.board.isFull) {
       gameState = GameLogicSupport.doPass(gameState)

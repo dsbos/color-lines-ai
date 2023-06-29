@@ -22,7 +22,7 @@ private[game] object Board {
   // Internal/support methods (most):
 
   private def copy(cellStates: Vector[CellState] = cellStates,
-                   ondeckBalls: Iterable[BallColor]  = ondeckBalls) =
+                   ondeckBalls: Iterable[BallColor] = ondeckBalls) =
     Board(cellStates, ondeckBalls)
 
   /** Computes row-major cell-array index from row and column numbers. */
@@ -65,15 +65,16 @@ private[game] object Board {
   /** Makes compact single-line string like"<RGB------/---------/.../--------- + (B, G, R) >". */
   override def toCompactString: String = {
     import BallColorRenderingExtensions.*
-    "<" ++
-        RowIndex.values.map { row =>
-          ColumnIndex.values.map { column =>
-            val addr = CellAddress(row, column)
-            getCellStateAt(addr).asOption.fold("-")(_.initial)
-          }.mkString("")
-        }.mkString("/") +
-        " + " + getOndeckBalls.map(_.initial).mkString("(", ", ", ")") +
-        ">"
+    "<"
+        + RowIndex.values.map { row =>
+            ColumnIndex.values.map { column =>
+              val addr = CellAddress(row, column)
+              getCellStateAt(addr).asOption.fold("-")(_.initial)
+            }.mkString("")
+          }.mkString("/")
+        + " + "
+        + getOndeckBalls.map(_.initial).mkString("(", ", ", ")")
+        + ">"
   }
 
   /** Sames as `toCompactString`. */

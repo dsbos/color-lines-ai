@@ -1,7 +1,8 @@
 package com.us.dsb.explore.algs.coloredlines.manual.game
 
 import com.us.dsb.colorlines.game.{GameState, Parameters}
-import com.us.dsb.colorlines.game.board.{BallColor, Board, BoardReadView, CellAddress, ColumnIndex, RowIndex}
+import com.us.dsb.colorlines.game.board.{
+  BallColor, Board, BoardReadView, CellAddress, ColumnIndex, RowIndex}
 import com.us.dsb.colorlines.game.logic.LineReaper
 import com.us.dsb.colorlines.game.logic.PathChecker
 
@@ -12,7 +13,8 @@ import scala.util.Random
 
 object GameLogicSupport {
 
-  // ???? TODO:  Rework these two so tests can force sequence of colors (and locations):
+  // ???? TODO:  Probably rework random-pick methods so tests can control
+  //  sequence of colors and locations, rather than just fixing sequence via seed:
 
   // (was "private" before test calls:)
   /*??private[game]*/ def pickRandomBallColor()(using rng: Random): BallColor = {
@@ -36,18 +38,24 @@ object GameLogicSupport {
     }
   }
 
-  private def replenishOnDeckBalls(board: Board)(using Random): Board =
+  // ????? TODO:  Maybe clarify code re overwriting even if list not fully
+  //  drained (which happens only when board full and game over anyway):
+  private def fillOnDeckBalls(board: Board)
+                             (using Random): Board =
     board.withOnDeckBalls(List.fill(Parameters.OnDeckBallCount)(pickRandomBallColor()))
 
   /**
-   * @param gameState
-   *   expected to be empty //???? maybe refactor something?
+   * Places initial balls on board and on-deck list.
+   * @param emptyGameState
+   *   expected to be empty
+   * @param Random
+   *   affects ball colors and placement coordinates
    */
-  private[manual] def placeInitialBalls(gameState: GameState)
+  private[manual] def placeInitialBalls(emptyGameState: GameState)
                                        (using Random): GameState = {
-    val postPlacementsArrivalResult =
+    val postPlacementsResult =
       (1 to Parameters.InitialBallCount)
-          .foldLeft(gameState) {
+          .foldLeft(emptyGameState) {
             (gameStateSoFar, _) =>
               val address =
                 pickRandomEmptyCell(gameStateSoFar.board)
@@ -57,10 +65,14 @@ object GameLogicSupport {
               val reapResult = LineReaper.reapAnyLines(postPlacementState, address)
               reapResult.gameState
       }
-
-    val replenishedOnDeckBoard = replenishOnDeckBalls(postPlacementsArrivalResult.board)
-    postPlacementsArrivalResult.withBoard(replenishedOnDeckBoard)
+    postPlacementsResult.withBoard(fillOnDeckBalls(postPlacementsResult.board))
   }
+
+  /** Gets initial state (with 5 balls placed). */
+  def getInitialState()
+                     (using Random): GameState =
+    GameLogicSupport.placeInitialBalls(GameState.empty)
+
 
   // ???? TODO:  Maybe handle board-full condition more cleanly (don't dequeue
   //   unplaced balls, don't over-replenish).  Maybe fail fast, and don't depend
@@ -74,7 +86,7 @@ object GameLogicSupport {
         .foldLeft(gameState) {
           (gameStateSoFar, onDeckBall) =>
             pickRandomEmptyCell(gameStateSoFar.board) match {
-              case None          =>  // board full; break out early (game will become over)
+              case None          =>  // board full; ignore on-deck ball
                 gameStateSoFar
               case Some(address) =>
                 val curBoard = gameStateSoFar.board
@@ -86,9 +98,7 @@ object GameLogicSupport {
                 reapResult.gameState
             }
         }
-
-    val replenishedOnDeckBoard = replenishOnDeckBalls(postPlacementResult.board)
-    postPlacementResult.withBoard(replenishedOnDeckBoard)
+    postPlacementResult.withBoard(fillOnDeckBalls(postPlacementResult.board))
   }
 
   private[manual] def doPass(gameState: GameState)
@@ -101,8 +111,8 @@ object GameLogicSupport {
 
   private[manual] def doTryMoveBall(gameState: GameState,
                                     from: CellAddress,
-                                    to: CellAddress
-                                    )(using Random): MoveBallResult = {
+                                    to: CellAddress)
+                                   (using Random): MoveBallResult = {
     //???? separate move-ball move validation from actually moving (selection
     //   clearing depends on just validity of move, not on deleting any lines)
     //   - see note near some Option/etc. re encoding only valid moves at

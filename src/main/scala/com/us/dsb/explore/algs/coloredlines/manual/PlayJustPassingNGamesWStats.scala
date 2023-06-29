@@ -16,7 +16,7 @@ object PlayJustPassingNGamesWStats extends App {
 
   /** @return ending score */
   def playAGame: Int = {
-    val initialPlacementResult = GameLogicSupport.placeInitialBalls(GameState.empty)
+    val initialPlacementResult = GameLogicSupport.getInitialState()
     var gameState: GameState = initialPlacementResult
     while (! gameState.board.isFull) {
       gameState = GameLogicSupport.doPass(gameState)

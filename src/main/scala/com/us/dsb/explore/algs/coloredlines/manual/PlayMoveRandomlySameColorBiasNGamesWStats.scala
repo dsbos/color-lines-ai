@@ -19,7 +19,7 @@ object PlayMoveRandomlySameColorBiasNGamesWStats extends App {
 
   /** @return ending score */
   def playAGame: Int = {
-    val initialPlacementResult = GameLogicSupport.placeInitialBalls(GameState.empty)
+    val initialPlacementResult = GameLogicSupport.getInitialState()
     var gameState: GameState = initialPlacementResult
     var moveCount = 0
     var validMoveCount = 0
