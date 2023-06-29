@@ -1,9 +1,9 @@
 package com.us.dsb.colorlines.game.logic
 
+import com.us.dsb.colorlines.game.GameLogicSupport
 import com.us.dsb.colorlines.game.Parameters.BoardOrder
 import com.us.dsb.colorlines.game.board.{
   BallColor, Board, BoardReadView, CellAddress, CellState, ColumnIndex, Index, RowIndex}
-import com.us.dsb.explore.algs.coloredlines.manual.game.GameLogicSupport
 
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers.*

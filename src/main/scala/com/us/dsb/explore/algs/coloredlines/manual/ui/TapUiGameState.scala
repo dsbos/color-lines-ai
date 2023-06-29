@@ -1,8 +1,7 @@
 package com.us.dsb.explore.algs.coloredlines.manual.ui
 
-import com.us.dsb.colorlines.game.GameState
+import com.us.dsb.colorlines.game.{GameLogicSupport, GameState}
 import com.us.dsb.colorlines.game.board.CellAddress
-import com.us.dsb.explore.algs.coloredlines.manual.game.GameLogicSupport
 import com.us.dsb.explore.algs.coloredlines.manual.ui.tapapi.{TapCase, TapInterpreter}
 
 import cats.syntax.either.*

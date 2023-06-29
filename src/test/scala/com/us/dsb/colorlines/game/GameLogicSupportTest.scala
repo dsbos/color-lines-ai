@@ -1,4 +1,4 @@
-package com.us.dsb.explore.algs.coloredlines.manual.game
+package com.us.dsb.colorlines.game
 
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers.*

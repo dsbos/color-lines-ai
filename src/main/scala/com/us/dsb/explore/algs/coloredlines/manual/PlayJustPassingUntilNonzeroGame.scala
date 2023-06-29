@@ -1,7 +1,6 @@
 package com.us.dsb.explore.algs.coloredlines.manual
 
-import com.us.dsb.colorlines.game.GameState
-import com.us.dsb.explore.algs.coloredlines.manual.game.GameLogicSupport
+import com.us.dsb.colorlines.game.{GameLogicSupport, GameState}
 
 import scala.util.Random
 

@@ -1,8 +1,7 @@
 package com.us.dsb.explore.algs.coloredlines.manual
 
-import com.us.dsb.colorlines.game.GameState
+import com.us.dsb.colorlines.game.{GameLogicSupport, GameState}
 import com.us.dsb.colorlines.game.board.{CellAddress, RowIndex, ColumnIndex}
-import com.us.dsb.explore.algs.coloredlines.manual.game.GameLogicSupport
 
 import scala.util.Random
 

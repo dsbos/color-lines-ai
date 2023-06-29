@@ -1,6 +1,5 @@
-package com.us.dsb.explore.algs.coloredlines.manual.game
+package com.us.dsb.colorlines.game
 
-import com.us.dsb.colorlines.game.{GameState, Parameters}
 import com.us.dsb.colorlines.game.board.{
   BallColor, Board, BoardReadView, CellAddress, ColumnIndex, RowIndex}
 import com.us.dsb.colorlines.game.logic.LineReaper
@@ -10,6 +9,17 @@ import cats.syntax.option.*
 
 import scala.annotation.tailrec
 import scala.util.Random
+
+// ?????? TODO:  Soon return to moving/splitting/cleaining recently-moved GameLogicSupport
+
+// ?????? TODO:  Probably split move-handling methods from support methods.
+// ?????? TODO:  Resolve package(s) (game vs. game.logic).
+// ?????? TODO:  Maybe start splitting public vs. private packages (interface
+//   for clients vs. implementation).  Might split three ways:
+//   - essential public interface (e.g., BoardReadView, API to make moves)
+//   - private implementation (e.g., mutable Board and mutation code)
+//   - non-essential utilities (e.g., path checker, maybe non-mutation part of
+//     reaping)
 
 object GameLogicSupport {
 
@@ -51,8 +61,8 @@ object GameLogicSupport {
    * @param Random
    *   affects ball colors and placement coordinates
    */
-  private[manual] def placeInitialBalls(emptyGameState: GameState)
-                                       (using Random): GameState = {
+  private[game] def placeInitialBalls(emptyGameState: GameState)
+                                     (using Random): GameState = {
     val postPlacementsResult =
       (1 to Parameters.InitialBallCount)
           .foldLeft(emptyGameState) {
@@ -101,18 +111,18 @@ object GameLogicSupport {
     postPlacementResult.withBoard(fillOnDeckBalls(postPlacementResult.board))
   }
 
-  private[manual] def doPass(gameState: GameState)
-                            (using Random): GameState =
+  def doPass(gameState: GameState)
+            (using Random): GameState =
     placeOndeckBalls(gameState)
 
   // ???? TODO:  Maybe rename with "try"/"attempt":
   case class MoveBallResult(gameState: GameState,
                             moveWasValid: Boolean)
 
-  private[manual] def doTryMoveBall(gameState: GameState,
-                                    from: CellAddress,
-                                    to: CellAddress)
-                                   (using Random): MoveBallResult = {
+  def doTryMoveBall(gameState: GameState,
+                    from: CellAddress,
+                    to: CellAddress)
+                   (using Random): MoveBallResult = {
     //???? separate move-ball move validation from actually moving (selection
     //   clearing depends on just validity of move, not on deleting any lines)
     //   - see note near some Option/etc. re encoding only valid moves at
