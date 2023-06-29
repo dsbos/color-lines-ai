@@ -1,7 +1,7 @@
-package com.us.dsb.explore.algs.coloredlines.manual.ui.tapapi
+package com.us.dsb.colorlines.manual.tapapi
 
 import com.us.dsb.colorlines.game.board.CellAddress
-import com.us.dsb.explore.algs.coloredlines.manual.ui.TapUiGameState
+import com.us.dsb.colorlines.manual.TapUiGameState
 
 object TapInterpreter {
 

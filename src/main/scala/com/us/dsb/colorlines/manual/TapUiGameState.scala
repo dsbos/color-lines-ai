@@ -1,23 +1,23 @@
-package com.us.dsb.explore.algs.coloredlines.manual.ui
+package com.us.dsb.colorlines.manual
 
 import com.us.dsb.colorlines.game.{GameLogicSupport, GameState}
 import com.us.dsb.colorlines.game.board.CellAddress
-import com.us.dsb.explore.algs.coloredlines.manual.ui.tapapi.{TapCase, TapInterpreter}
+import com.us.dsb.colorlines.manual.tapapi.{TapCase, TapInterpreter}
 
 import cats.syntax.either.*
 import scala.util.Random
 
 // ????? TODO: Possibly name with "virtual"/"net"/"abstract"/etc.
 
-private[ui] object TapUiGameState {
+private[manual] object TapUiGameState {
 
   // ????? TODO:  Probably purge. (Not used.):
   /**
    * Result of completed game.
    */
-  private[ui] sealed trait GameResult
-  private[ui] object GameResult {
-    private[ui] case class Done(score: Int) extends GameResult
+  private[manual] sealed trait GameResult
+  private[manual] object GameResult {
+    private[manual] case class Done(score: Int) extends GameResult
   }
 
   // ?????? TODO:  Move from UI class/package to ...colorlines.game...:
@@ -27,8 +27,8 @@ private[ui] object TapUiGameState {
     TapUiGameState(initialPlacementResult, None)
   }
 
-  private[ui] def initial(seed: Long): TapUiGameState = makeInitialState(using Random(seed))
-  private[ui] def initial(): TapUiGameState = makeInitialState(using Random())
+  private[manual] def initial(seed: Long): TapUiGameState = makeInitialState(using Random(seed))
+  private[manual] def initial(): TapUiGameState = makeInitialState(using Random())
 }
 import TapUiGameState.*
 
@@ -36,21 +36,21 @@ import TapUiGameState.*
 
 /** Virtual-tap--UI game state and controller.
  */
-private[ui] case class TapUiGameState(gameState: GameState,
+private[manual] case class TapUiGameState(gameState: GameState,
                                       selectionAddress: Option[CellAddress])
                                      (using Random) {
   // top-UI selection:
 
-  private[ui] def withCellSelected(address: CellAddress): TapUiGameState =
+  private[manual] def withCellSelected(address: CellAddress): TapUiGameState =
     copy(selectionAddress = Some(address))
 
-  private[ui] def withNoSelection: TapUiGameState =
+  private[manual] def withNoSelection: TapUiGameState =
     copy(selectionAddress = None)
 
-  private[ui] def hasAnyCellSelected: Boolean =
+  private[manual] def hasAnyCellSelected: Boolean =
     selectionAddress.isDefined
 
-  private[ui] def getSelectionCoordinates: Option[CellAddress] =
+  private[manual] def getSelectionCoordinates: Option[CellAddress] =
     selectionAddress
 
   private[manual] def isSelectedAt(address: CellAddress): Boolean =
@@ -64,7 +64,7 @@ private[ui] case class TapUiGameState(gameState: GameState,
   //  doesn't have to check state's gameResult; also, think about where I'd add
   //  game history
   // ????? TODO: Rename; maybe "move" to "... tap move ..."?
-  private[ui] def tryMoveAt(tapAddress: CellAddress): Either[String, TapUiGameState] = {
+  private[manual] def tryMoveAt(tapAddress: CellAddress): Either[String, TapUiGameState] = {
     //???? test
     import TapCase.*
     val tapCase = TapInterpreter.interpretTapLocationToTapCase(this, tapAddress)

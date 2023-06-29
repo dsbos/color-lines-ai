@@ -1,4 +1,4 @@
-package com.us.dsb.explore.algs.coloredlines.manual.ui
+package com.us.dsb.colorlines.manual
 
 import org.scalatest.LoneElement
 import org.scalatest.funspec.AnyFunSpec

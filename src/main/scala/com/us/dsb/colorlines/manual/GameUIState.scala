@@ -1,4 +1,4 @@
-package com.us.dsb.explore.algs.coloredlines.manual.ui
+package com.us.dsb.colorlines.manual
 
 import com.us.dsb.colorlines.game.board.{
   BallColor, BallColorRenderingExtensions, CellAddress, CellState, ColumnIndex, Index, RowIndex}
@@ -31,12 +31,12 @@ private case class GameUIState(tapUiGameState: TapUiGameState,
   //   9 table-level IDs tied to GUI cells/buttons?);
 
   // ???? TODO:  "adjusted"? "offset"?
-  private[ui] def withRowAdjustedBy(delta: Int): GameUIState = {
+  private[manual] def withRowAdjustedBy(delta: Int): GameUIState = {
     val adjustedRow = RowIndex(adjustAndWrapToRange(cursorAddress.row.raw, delta))
     copy(cursorAddress = cursorAddress.copy(row = adjustedRow))
   }
 
-  private[ui] def withColumnAdjustedBy(delta: Int): GameUIState = {
+  private[manual] def withColumnAdjustedBy(delta: Int): GameUIState = {
     val adjustedColumn = ColumnIndex(adjustAndWrapToRange(cursorAddress.column.raw, delta))
     copy(cursorAddress = cursorAddress.copy(column = adjustedColumn))
   }
@@ -91,7 +91,7 @@ private case class GameUIState(tapUiGameState: TapUiGameState,
     }.mkString("\n")   // make whole-board multi-line string
   }
 
-  private[ui] def toDisplayString: String = {
+  private[manual] def toDisplayString: String = {
     import BallColorRenderingExtensions.*
     val ondeckList =
       tapUiGameState.gameState.board.getOndeckBalls

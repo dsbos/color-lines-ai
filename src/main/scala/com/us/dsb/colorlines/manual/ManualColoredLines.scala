@@ -1,6 +1,6 @@
-package com.us.dsb.explore.algs.coloredlines.manual
+package com.us.dsb.colorlines.manual
 
-import com.us.dsb.explore.algs.coloredlines.manual.ui.{GameUI, LiveColoredSegregatedConsoleIO}
+import com.us.dsb.colorlines.manual.{GameUI, LiveColoredSegregatedConsoleIO}
 
 private object ManualColoredLines extends App {
 

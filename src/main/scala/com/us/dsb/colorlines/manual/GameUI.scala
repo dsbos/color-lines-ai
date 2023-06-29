@@ -1,6 +1,6 @@
 // ???? TODO:  Rename to reflect text control (and virtual tap level), probably
 //  (eventually) splitting virtual tap level vs. text-control level:
-package com.us.dsb.explore.algs.coloredlines.manual.ui
+package com.us.dsb.colorlines.manual
 
 import com.us.dsb.colorlines.game.board.{CellAddress, ColumnIndex, Index, RowIndex}
 
@@ -14,28 +14,28 @@ import scala.annotation.tailrec
 private[manual] object GameUI {
 
   // ?? enhance; maybe just put clean strings in; maybe build on GameResult (plus quit case)
-  private[ui] case class GameUIResult(text: String)
+  private[manual] case class GameUIResult(text: String)
 
 
   // ("extends EnumEntry" gets .entryName, enables Enum; "extends Enum[...]"
   // enables (and requires) .values.
 
   // ???? TODO:  Rename to reflect selection-based tap ~simulation (TextTapUiCommand?):
-  private[ui] sealed trait UICommand derives CanEqual
-  private[ui] object UICommand {
+  private[manual] sealed trait UICommand derives CanEqual
+  private[manual] object UICommand {
     // (Q: Why doesn't UICommand's "sealed" obviate the following one (for
     //   exhaustive-match checks)?
     // ????? TODO:  Clarify moving _selection_, not _ball_:
-    private[ui] sealed trait UIMoveCommand extends UICommand
+    private[manual] sealed trait UIMoveCommand extends UICommand
     // ????? TODO:  Clean names (e.g., different "move" in UIMoveCommand vs. Move).
     //  maybe GoUp/SelectUp/MoveSelectionUp/SelectUp/PrevRow; Move -> MoveBall?
     //????? test (use (drive with) commands)
-    private[ui] case object Up    extends UIMoveCommand
-    private[ui] case object Down  extends UIMoveCommand
-    private[ui] case object Left  extends UIMoveCommand
-    private[ui] case object Right extends UIMoveCommand
-    private[ui] case object Move  extends UICommand  // tap to select if ..., tap to move if ...
-    private[ui] case object Quit  extends UICommand
+    private[manual] case object Up    extends UIMoveCommand
+    private[manual] case object Down  extends UIMoveCommand
+    private[manual] case object Left  extends UIMoveCommand
+    private[manual] case object Right extends UIMoveCommand
+    private[manual] case object Move  extends UICommand  // tap to select if ..., tap to move if ...
+    private[manual] case object Quit  extends UICommand
   }
   // ?? Decide "UICommand._" re little scala.Right ~clashes.
 

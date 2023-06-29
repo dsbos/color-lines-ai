@@ -1,6 +1,6 @@
-package com.us.dsb.explore.algs.coloredlines.manual.ui
+package com.us.dsb.colorlines.manual
 
-import com.us.dsb.explore.algs.coloredlines.manual.ui.GameUI.UICommand
+import com.us.dsb.colorlines.manual.GameUI.UICommand
 
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers.*
