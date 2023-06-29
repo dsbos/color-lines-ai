@@ -23,8 +23,8 @@ class PathCheckerTest extends AnyFunSpec {
                   s"string lengths be $BoardOrder, but were ${rowStrings.map(_.size)}")
     private val cellStates: IndexedSeq[IndexedSeq[CellState]] =
       rowStrings.toIndexedSeq.map { rowString =>
-        rowString.map { cellOccupanyCharacter =>
-          cellOccupanyCharacter match {
+        rowString.map { cellOccupancyCharacter =>
+          cellOccupancyCharacter match {
             case '-'   => CellState.empty
             case 'B'   => CellState.withBallOfColor(BallColor.Yellow)  // any color
             case other => throw IllegalArgumentException(s"Invalid character '$other; use '-' or 'B'")

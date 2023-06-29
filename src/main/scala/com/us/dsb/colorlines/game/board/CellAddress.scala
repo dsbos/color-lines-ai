@@ -26,7 +26,7 @@ object CellAddress {
     instances(row.raw.value - Index.Origin)(column.raw.value - Index.Origin)
 
   /** Constructs cell address from raw index Int values (not offsets). */
-  def fromRaw(rawRowIndex: Int, rawColumnIndex: Int) =
+  def fromRaw(rawRowIndex: Int, rawColumnIndex: Int): CellAddress =
     CellAddress(RowIndex(Index.unsafeFrom(rawRowIndex)),
                 ColumnIndex(Index.unsafeFrom(rawColumnIndex)))
 }

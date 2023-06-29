@@ -55,7 +55,7 @@ object ColumnIndex {
   val values: IndexedSeq[ColumnIndex] = Index.values.map(ColumnIndex(_))
 }
 
-// ?? TOOD:  Investigate Refined and/or Scala bug:  Having extension method
+// ?? TODD:  Investigate Refined and/or Scala bug:  Having extension method
 //   here (not in object RowIndex) using name "value" causes weird error at
 //   unwrapping call, even if differently-named extension method exists
 //   (at this level of in object RowIndex)and is used for unwrapping call:

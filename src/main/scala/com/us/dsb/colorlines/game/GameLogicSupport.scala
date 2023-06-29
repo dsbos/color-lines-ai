@@ -10,7 +10,7 @@ import cats.syntax.option.*
 import scala.annotation.tailrec
 import scala.util.Random
 
-// ?????? TODO:  Soon return to moving/splitting/cleaining recently-moved GameLogicSupport
+// ?????? TODO:  Soon return to moving/splitting/cleaning recently-moved GameLogicSupport
 
 // ?????? TODO:  Probably split move-handling methods from support methods.
 // ?????? TODO:  Resolve package(s) (game vs. game.logic).

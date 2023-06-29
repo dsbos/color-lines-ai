@@ -42,17 +42,17 @@ private[game] object LineReaper {
   }
 
   // ?? TODO:  Would "spur" be better than long "excursion"?
-  // ?? TODO:  Maybe flatten by eliminating DirectionExecursionLength:
-  private case class DirectionExecursionLength(value: Int) extends AnyVal
+  // ?? TODO:  Maybe flatten by eliminating DirectionExcursionLength:
+  private case class DirectionExcursionLength(value: Int) extends AnyVal
 
   // ????? TODO:  Probably get ball color via ballTo, rather than having clients
   //   pass it down several levels:
-  private def computeDirectionExecursionLength(moveBallColor: BallColor,
-                                               board: BoardReadView,
-                                               ballTo: CellAddress,
-                                               lineDirectionAxis: LineAxis,
-                                               lineDirectionFactor: Int
-                                                ): DirectionExecursionLength = {
+  private def computeDirectionExcursionLength(moveBallColor: BallColor,
+                                              board: BoardReadView,
+                                              ballTo: CellAddress,
+                                              lineDirectionAxis: LineAxis,
+                                              lineDirectionFactor: Int
+                                               ): DirectionExcursionLength = {
     // ???? TODO: Revisit names (shorten, to shorten lines)?
     val newBallRowIndex = ballTo.row.raw.value
     val newBallColIndex = ballTo.column.raw.value
@@ -69,7 +69,7 @@ private[game] object LineReaper {
       }
       haveMatchingBall
     }) {}
-    DirectionExecursionLength(excursionLength)
+    DirectionExcursionLength(excursionLength)
   }
 
   /**
@@ -78,11 +78,11 @@ private[game] object LineReaper {
    * @param axisLineAddedLength
    *   ball-line length without placed ball
    * @param directionExcursionLengths
-   *   per-subdirection lengths (execursion length; returned for removal code)
+   *   per-subdirection lengths (excursion length; returned for removal code)
    */
   private case class AxisResult(axis: LineAxis,
                                 axisLineAddedLength: Int,
-                                directionExcursionLengths: List[DirectionExecursionLength])
+                                directionExcursionLengths: List[DirectionExcursionLength])
 
   // ?????? TODO:  Would having lineDirectionAxis first be clearer/more logical?
   private def computeLineAxisResult(moveBallColor: BallColor,
@@ -91,16 +91,16 @@ private[game] object LineReaper {
                                     lineDirectionAxis: LineAxis
                                    ): AxisResult = {
     // ?? TODO:  maybe "...direction...lengths"?
-    val directionExecursionLengths: List[DirectionExecursionLength] =
+    val directionExcursionLengths: List[DirectionExcursionLength] =
       relativeDirectionFactors.map { lineDirectionFactor =>
-        computeDirectionExecursionLength(moveBallColor,
-                                         board,
-                                         ballTo,
-                                         lineDirectionAxis,
-                                         lineDirectionFactor)
+        computeDirectionExcursionLength(moveBallColor,
+                                        board,
+                                        ballTo,
+                                        lineDirectionAxis,
+                                        lineDirectionFactor)
       }
-    val axisLineAddedLength = directionExecursionLengths.map(_.value).sum
-    AxisResult(lineDirectionAxis, axisLineAddedLength, directionExecursionLengths)
+    val axisLineAddedLength = directionExcursionLengths.map(_.value).sum
+    AxisResult(lineDirectionAxis, axisLineAddedLength, directionExcursionLengths)
   }
 
   /** Removes completed lines' balls. */

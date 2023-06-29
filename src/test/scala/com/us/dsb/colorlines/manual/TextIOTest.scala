@@ -4,7 +4,7 @@ import org.scalatest.LoneElement
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers.*
 
-class XxTextIOTest extends AnyFunSpec {
+class TextIOTest extends AnyFunSpec {
 
   it/*describe*/("TextIO?:") {
     cancel()

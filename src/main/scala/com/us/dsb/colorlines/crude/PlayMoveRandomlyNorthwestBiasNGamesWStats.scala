@@ -23,7 +23,7 @@ object PlayMoveRandomlyNorthwestBiasNGamesWStats extends App {
     var validMoveCount = 0
     while (! gameState.board.isFull) {
       // ????? TODO:  Use Index.Origin and BoardOrder, or use Index.MinValue and .MaxValue (or some range-size value)?
-      // bias:  9 gets higher probabily (81 - 64 = 17 out of 81 than 1 (1 - 0 = 0))
+      // bias:  9 gets higher probably (81 - 64 = 17 out of 81 than 1 (1 - 0 = 0))
       val fromRow: Int = math.sqrt(rng.nextInt(BoardOrder * BoardOrder)).toInt + Index.Origin
       val fromCol: Int = math.sqrt(rng.nextInt(BoardOrder * BoardOrder)).toInt + Index.Origin
       val toRow: Int = math.sqrt((BoardOrder * BoardOrder - Index.Origin)
