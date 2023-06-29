@@ -76,9 +76,9 @@ private[game] object LineReaper {
    * @param axis
    *   for which axis
    * @param axisLineAddedLength
-   *   length without placed ball
-   * @param directionsResults
-   *   axis subdirection results (execursion length; returned for removal code)
+   *   ball-line length without placed ball
+   * @param directionExcursionLengths
+   *   per-subdirection lengths (execursion length; returned for removal code)
    */
   private case class AxisResult(axis: LineAxis,
                                 axisLineAddedLength: Int,
@@ -155,6 +155,10 @@ private[game] object LineReaper {
       }
     val completedLineAxesResults =
       allAxesResults.filter(_.axisLineAddedLength + 1 >= Parameters.LineOrder)
+
+    // ???? TODO:  Maybe eventually split out read-only/reap-~preparation code (vs.
+    //  actual mutation code) so clients can also use it (to evaluate potential moves).
+
     val (resultGameState, scoreResult) =
       completedLineAxesResults match {
         case Nil =>
