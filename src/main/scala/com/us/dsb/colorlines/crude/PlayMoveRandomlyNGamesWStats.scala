@@ -1,8 +1,7 @@
-package com.us.dsb.explore.algs.coloredlines.manual
+package com.us.dsb.colorlines.crude
 
 import com.us.dsb.colorlines.game.{GameLogicSupport, GameState}
-import com.us.dsb.colorlines.game.Parameters.BoardOrder
-import com.us.dsb.colorlines.game.board.{CellAddress, Index}
+import com.us.dsb.colorlines.game.board.{CellAddress, RowIndex, ColumnIndex}
 
 import scala.util.Random
 
@@ -10,7 +9,7 @@ import scala.util.Random
  * Initial, crude runner to play by just passing (not moving balls), playing
  * N games, computing average score and other statistics
  */
-object PlayMoveRandomlyNorthwestBiasNGamesWStats extends App {
+object PlayMoveRandomlyNGamesWStats extends App {
   private val GameCount = 1000
 
   private given rng: Random = Random()
@@ -22,18 +21,14 @@ object PlayMoveRandomlyNorthwestBiasNGamesWStats extends App {
     var moveCount = 0
     var validMoveCount = 0
     while (! gameState.board.isFull) {
-      // ????? TODO:  Use Index.Origin and BoardOrder, or use Index.MinValue and .MaxValue (or some range-size value)?
-      // bias:  9 gets higher probabily (81 - 64 = 17 out of 81 than 1 (1 - 0 = 0))
-      val fromRow: Int = math.sqrt(rng.nextInt(BoardOrder * BoardOrder)).toInt + Index.Origin
-      val fromCol: Int = math.sqrt(rng.nextInt(BoardOrder * BoardOrder)).toInt + Index.Origin
-      val toRow: Int = math.sqrt((BoardOrder * BoardOrder - Index.Origin)
-                                     - rng.nextInt(BoardOrder * BoardOrder)).toInt + Index.Origin
-      val toCol: Int = math.sqrt((BoardOrder * BoardOrder - Index.Origin)
-                                     - rng.nextInt(BoardOrder * BoardOrder)).toInt + Index.Origin
 
-      val from = CellAddress.fromRaw(fromRow, fromCol)
-      val to = CellAddress.fromRaw(toRow, toCol)
-
+      // ???? TODO:  Use BoardOrder, Index.MinValue, size of rowIndices/columnIndices, or what??
+      val from: CellAddress =
+        CellAddress(RowIndex.values(rng.nextInt(RowIndex.values.size)),
+                    ColumnIndex.values(rng.nextInt(ColumnIndex.values.size)))
+      val to: CellAddress =
+        CellAddress(RowIndex.values(rng.nextInt(RowIndex.values.size)),
+                    ColumnIndex.values(rng.nextInt(ColumnIndex.values.size)))
       val tryMoveResult = GameLogicSupport.doTryMoveBall(gameState, from, to)
 
       val validMove = tryMoveResult.moveWasValid

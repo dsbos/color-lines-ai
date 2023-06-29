@@ -1,4 +1,4 @@
-package com.us.dsb.explore.algs.coloredlines.manual
+package com.us.dsb.colorlines.crude
 
 import com.us.dsb.colorlines.game.{GameLogicSupport, GameState}
 

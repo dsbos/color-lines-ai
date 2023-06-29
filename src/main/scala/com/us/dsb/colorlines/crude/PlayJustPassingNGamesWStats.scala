@@ -1,4 +1,4 @@
-package com.us.dsb.explore.algs.coloredlines.manual
+package com.us.dsb.colorlines.crude
 
 import com.us.dsb.colorlines.game.{GameLogicSupport, GameState}
 
@@ -24,6 +24,7 @@ object PlayJustPassingNGamesWStats extends App {
   }
 
   var gameScoresSum = 0
+  var gameScoresSquaredSum = 0
   var firstNonzeroGameNumber = 0
   var nonzeroGameCount = 0
   var highestScore = 0
@@ -36,6 +37,8 @@ object PlayJustPassingNGamesWStats extends App {
     val gameScore = playAGame
 
     gameScoresSum += gameScore
+    gameScoresSquaredSum += gameScore * gameScore
+
     highestScore = highestScore max gameScore
     if (gameScore > 0) {
       nonzeroGameCount += 1
@@ -46,11 +49,18 @@ object PlayJustPassingNGamesWStats extends App {
     }
   }
 
-  val meanScore = 1.0 * gameScoresSum / GameCount
-  println(s"@@@@@ End:  $GameCount games" +
-              f", meanScore = $meanScore%8.3f" +
-              s", minNonzeroScore = $minNonzeroScore" +
-              s", highestScore = $highestScore" +
-              s", nonzeroGameCount = $nonzeroGameCount" +
+  val meanScore = gameScoresSum * 1.0 / GameCount
+  // (Crude (https://stackoverflow.com/questions/1174984/how-to-efficiently-calculate-a-running-standard-deviation/1175084#1175084):)
+  val stdDev = math.sqrt(gameScoresSquaredSum * 1.0 / GameCount - meanScore * meanScore)
+
+  println(s"@@@@@ End:  $GameCount games"
+              +
+              f"; scores: mean = $meanScore%5.3f" +
+              f", stdDev = $stdDev%5.3f" +
+              s", lowest != 0 = $minNonzeroScore" +
+              s", highest = $highestScore"
+              +
+              s"; nonzeroGameCount = $nonzeroGameCount"
+              +
               s", firstNonzeroGameNumber = $firstNonzeroGameNumber ")
 }
