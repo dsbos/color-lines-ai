@@ -10,7 +10,7 @@ import scala.util.Random
  * N games, computing average score and other statistics
  */
 object PlayMoveRandomlyNGamesWStats extends App {
-  private val GameCount = 1000
+  private val GameCount = 3000
 
   private given rng: Random = Random()
 
@@ -42,13 +42,12 @@ object PlayMoveRandomlyNGamesWStats extends App {
     gameState.getScore
   }
 
-
-  var gameScoresSum = 0
-  var firstNonzeroGameNumber = 0
-  var nonzeroGameCount = 0
-  var highestScore = 0
-  var minNonzeroScore = Int.MaxValue
-
+  private var gameScoresSum = 0
+  private var gameScoresSquaredSum = 0
+  private var firstNonzeroGameNumber = 0
+  private var nonzeroGameCount = 0
+  private var highestScore = 0
+  private var minNonzeroScore = Int.MaxValue
 
   (1 to GameCount).foreach { gameNumber =>
     println()
@@ -57,6 +56,7 @@ object PlayMoveRandomlyNGamesWStats extends App {
     val gameScore = playAGame
 
     gameScoresSum += gameScore
+    gameScoresSquaredSum += gameScore * gameScore
     highestScore = highestScore max gameScore
     if (gameScore > 0) {
       nonzeroGameCount += 1
@@ -65,16 +65,17 @@ object PlayMoveRandomlyNGamesWStats extends App {
         firstNonzeroGameNumber = gameNumber
       }
     }
-
-
   }
-  val meanScore = 1.0 * gameScoresSum / GameCount
-  println(s"@@@@@ End:  $GameCount games" +
-              f", meanScore = $meanScore%8.3f" +
-              s", minNonzeroScore = $minNonzeroScore" +
-              s", highestScore = $highestScore" +
-              s", nonzeroGameCount = $nonzeroGameCount" +
-              s", firstNonzeroGameNumber = $firstNonzeroGameNumber ")
 
+  val meanScore = gameScoresSum * 1.0 / GameCount
+  // (Crude (https://stackoverflow.com/questions/1174984/how-to-efficiently-calculate-a-running-standard-deviation/1175084#1175084):)
+  val stdDev = math.sqrt(gameScoresSquaredSum * 1.0 / GameCount - meanScore * meanScore)
 
+  println(s"@@@@@ End:  $GameCount games"
+              + f"; scores: mean = $meanScore%5.3f"
+              + f", stdDev = $stdDev%5.3f"
+              + s", lowest>0 = $minNonzeroScore"
+              + s", highest = $highestScore"
+              + s", nonzeroCount = $nonzeroGameCount"
+              + s"; firstNonzeroGameNumber = $firstNonzeroGameNumber ")
 }
