@@ -28,7 +28,7 @@ object PlayJustPassingNGamesWStats extends App {
   var firstNonzeroGameNumber = 0
   var nonzeroGameCount = 0
   var highestScore = 0
-  var minPositiveScore = Int.MaxValue
+  var minNonzeroScore = Int.MaxValue
 
   (1 to GameCount).foreach { gameNumber =>
     println()
@@ -40,17 +40,17 @@ object PlayJustPassingNGamesWStats extends App {
     highestScore = highestScore max gameScore
     if (gameScore > 0) {
       nonzeroGameCount += 1
-      minPositiveScore = minPositiveScore min gameScore
+      minNonzeroScore = minNonzeroScore min gameScore
       if (firstNonzeroGameNumber == 0) {
         firstNonzeroGameNumber = gameNumber
       }
     }
   }
 
-  val averageScore = 1.0 * gameScoresSum / GameCount
+  val meanScore = 1.0 * gameScoresSum / GameCount
   println(s"@@@@@ End:  $GameCount games" +
-              f", averageScore = $averageScore%8.3f" +
-              s", minPositiveScore = $minPositiveScore" +
+              f", meanScore = $meanScore%8.3f" +
+              s", minNonzeroScore = $minNonzeroScore" +
               s", highestScore = $highestScore" +
               s", nonzeroGameCount = $nonzeroGameCount" +
               s", firstNonzeroGameNumber = $firstNonzeroGameNumber ")

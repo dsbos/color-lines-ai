@@ -33,6 +33,5 @@ object PlayJustPassingUntilNonzeroGame extends App {
 
     ! nonzeroGame
   }) ()
-  println(s"At game #$gameCount, non-zero score of $lastGameScore")
-
+  println(f"@@@@@ End:  At game #$gameCount%2d, non-zero score of $lastGameScore")
 }
