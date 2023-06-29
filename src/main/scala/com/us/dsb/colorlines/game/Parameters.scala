@@ -11,9 +11,9 @@ object Parameters {
   /** Order (linear size) of board, as regular value. */
   val BoardOrder: BoardOrder = valueOf[BoardOrder]
 
-  /*??private[game]*/ val InitialBallCount: Int = 5
+  private[game] val InitialBallCount: Int = 5
 
-  /*??private[game]*/ val OnDeckBallCount: Int = 3
+  private[game] val OnDeckBallCount: Int = 3
 
   /** Order (minimum length) of scorable lines. */
   private[game] val LineOrder: Int = 5

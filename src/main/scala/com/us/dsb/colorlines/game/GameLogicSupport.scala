@@ -27,15 +27,15 @@ object GameLogicSupport {
   //  sequence of colors and locations, rather than just fixing sequence via seed:
 
   // (was "private" before test calls:)
-  /*??private[game]*/ def pickRandomBallColor()(using rng: Random): BallColor = {
+  private[game] def pickRandomBallColor()(using rng: Random): BallColor = {
     BallColor.values(rng.nextInt(BallColor.values.size))
   }
 
   /** Selects an empty cell randomly (if any). */
   // (was "private" before test calls:)
   @tailrec
-  /*??private[game]*/ def pickRandomEmptyCell(board: BoardReadView)
-                                           (using rng: Random): Option[CellAddress] = {
+  private[game] def pickRandomEmptyCell(board: BoardReadView)
+                                       (using rng: Random): Option[CellAddress] = {
     if (board.isFull)
       None
     else {

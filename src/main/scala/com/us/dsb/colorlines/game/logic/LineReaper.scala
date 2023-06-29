@@ -8,7 +8,7 @@ import com.us.dsb.colorlines.game.board.{BallColor, BoardReadView, CellAddress, 
 //   - maybe make local class for passing (but leave external-client interface same)
 //   - maybe pass bundle class
 
-/*??private[game]*/ object LineReaper {
+private[game] object LineReaper {
 
   // ?? TODO:  Maybe make refined type for deltas? (check use w/relativeDirectionFactors):
   private case class LineAxis(labelArray: String,
@@ -138,7 +138,7 @@ import com.us.dsb.colorlines.game.board.{BallColor, BoardReadView, CellAddress, 
    * @return
    *   Updated board and score if any completed lines; input state if no lines.
    */
-  /*??private[game]*/ def reapAnyLines(gameState: GameState,
+  private[game] def reapAnyLines(gameState: GameState,
                                  ballTo: CellAddress
                                 ): ReapingAttemptResult = {
     // ????? TODO:  Resolve following .get.

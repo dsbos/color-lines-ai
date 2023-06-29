@@ -14,7 +14,7 @@ private[game] object Board {
 /**
  * Core state of board (just cells and on-deck balls; e.g.; no score, tap-UI selection).
  */
-/*??private[game]*/ class Board(private val cellStates: Vector[CellState],
+private[game] class Board(private val cellStates: Vector[CellState],
                           private val ondeckBalls: Iterable[BallColor]
                          )
     extends BoardReadView {
@@ -57,12 +57,12 @@ private[game] object Board {
   private[game] def withNoBallAt(address: CellAddress): Board =
     withCellState(address, CellState.empty)
 
-  /*??private[game]*/ def withOnDeckBalls(newBalls: Iterable[BallColor]): Board =
+  private[game] def withOnDeckBalls(newBalls: Iterable[BallColor]): Board =
     copy(ondeckBalls = newBalls)
 
   // Miscellaneous:
 
-  /** Makes compact single-line string like"<RGB------/---------/.../--------- + (B, G, R) >". */
+  /** Makes compact single-line string like"<RGB------/---------/.../--------- + (B, G, R)>". */
   override def toCompactString: String = {
     import BallColorRenderingExtensions.*
     "<"
