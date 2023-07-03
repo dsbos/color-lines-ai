@@ -4,7 +4,6 @@ package com.us.dsb.colorlines.manual
 
 import com.us.dsb.colorlines.game.board.{CellAddress, ColumnIndex, Index, RowIndex}
 
-import cats.syntax.option.*
 import cats.syntax.either.*
 
 import scala.annotation.tailrec
