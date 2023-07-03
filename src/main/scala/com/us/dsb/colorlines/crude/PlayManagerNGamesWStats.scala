@@ -5,10 +5,6 @@ import com.us.dsb.colorlines.game.board.BoardReadView
 
 import scala.util.Random
 
-// ??????? TODO:  Augment PlayManagerNGamesWStats to support 
-//  PlayMoveRandomlySameColorBiasNGamesWStats (maybe by passing player some
-//  result of previous move).
-
 /**
  * Basic runner to play using given player, playing N games, computing average
  * score and other statistics
