@@ -119,48 +119,68 @@ object GameLogicSupport {
   case class MoveBallResult(gameState: GameState,
                             moveWasValid: Boolean)
 
+
+  /**
+   * Moves ball given validated source ball and target vacant cell locations:
+   *
+   * @param gameState
+   * @param from
+   * @param to
+   * @param Random
+   * @return
+   */
+  private def doMoveBall(gameState: GameState,
+                         from: CellAddress,
+                         to: CellAddress)
+                        (using Random
+                        ): GameState = {
+    // ????? TODO:  Rework condition structures here and just above to eliminate this .get:
+    val moveBallColor = gameState.board.getCellStateAt(from).asOption.get //??
+    val postMoveGameState =
+      gameState.withBoardWithNoBallAt(from).withBoardWithBallAt(to, moveBallColor)
+
+    val reapResult = LineReaper.reapAnyLines(postMoveGameState, to)
+    val postPostReapingResult =
+      if (! reapResult.anyRemovals)
+        placeOndeckBalls(reapResult.gameState)
+      else
+        reapResult.gameState
+    postPostReapingResult
+
+  }
+
+  def canMoveBall(board: BoardReadView,
+                  from: CellAddress,
+                  to: CellAddress): Boolean = {
+    // ????? TODO:  Maybe add enumeration of invalid-move conditions:
+    if (! board.hasABallAt(from)) {
+      false // ?? TODO:  Expand to report no ball there
+    }
+    else if (board.hasABallAt(to)) {
+      false // ?? TODO:  Expand to report no vacancy there
+    }
+    else if (! PathChecker.pathExists(board, from, to)) {
+      false // ?? TODO:  Expand to report no path
+    }
+    else {
+      true
+    }
+  }
+
+
   def doTryMoveBall(gameState: GameState,
                     from: CellAddress,
                     to: CellAddress)
                    (using Random): MoveBallResult = {
-    //???? separate move-ball move validation from actually moving (selection
-    //   clearing depends on just validity of move, not on deleting any lines)
-    //   - see note near some Option/etc. re encoding only valid moves at
-    //     that point in move-execution path
-
-    // ?? TODO:  Maybe add enumeration of invalid-move conditions:
-    val moveWasValid =
-      if (! gameState.board.hasABallAt(from)) {
-        false  // ?? TODO:  Expand to report no ball there
-      }
-      else if (gameState.board.hasABallAt(to)) {
-        false  // ?? TODO:  Expand to report no vacancy there
-      }
-      else if (! PathChecker.pathExists(gameState.board, from, to)) {
-        false  // ?? TODO:  Expand to report no path
+    val moveIsValid = canMoveBall(gameState.board, from, to)
+    val newGameState =
+      if (moveIsValid) {
+        doMoveBall(gameState, from, to)
       }
       else {
-        true
+        gameState
       }
-    val newGameState =
-      moveWasValid match {
-        case false =>  // can't move--ignore (keep tap-UI selection state)
-          gameState
-        case true =>
-          // ????? TODO:  Rework condition structures here and just above to eliminate this .get:
-          val moveBallColor = gameState.board.getCellStateAt(from).asOption.get //??
-          val postMoveGameState =
-            gameState.withBoardWithNoBallAt(from).withBoardWithBallAt(to, moveBallColor)
-
-          val reapResult = LineReaper.reapAnyLines(postMoveGameState, to)
-          val postPostReapingResult =
-            if (! reapResult.anyRemovals)
-              placeOndeckBalls(reapResult.gameState)
-            else
-              reapResult.gameState
-          postPostReapingResult
-      }
-    MoveBallResult(newGameState, moveWasValid)
+    MoveBallResult(newGameState, moveIsValid)
   }
 
 }
