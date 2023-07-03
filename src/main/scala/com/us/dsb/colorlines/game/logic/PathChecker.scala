@@ -41,39 +41,44 @@ object PathChecker {
             board.hasABallAt(CellAddress(row, column))
           }.toArray
       }
-    val cellsToExpandFrom = mutable.Queue[CellAddress](fromBallCell)
+    val cellsToCheckAndExpandFrom = {
+      // Construct at maximum needed size to avoid a little reallocation:
+      val maxQueueSize = RowIndex.values.size * ColumnIndex.values.size
+      new mutable.Queue[CellAddress](initialSize = maxQueueSize)
+          .enqueue(fromBallCell)
+    }
 
     @tailrec
     def loopOnNextQueuedAddress: Boolean = {
       // Note:  Using .isEmpty and .dequeue() to avoid dequeueFirst's allocation
       // of Some instances:
-      if (cellsToExpandFrom.isEmpty) {
+      if (cellsToCheckAndExpandFrom.isEmpty) {
         // no more steps/cells to try--no path exists
         false
       }
       else {
-        val reachedAddr = cellsToExpandFrom.dequeue()
+        val reachedAddr = cellsToCheckAndExpandFrom.dequeue()
         if (reachedAddr == toEmptyCell) {
-          // got to target--a path exists
+          // got to target cell--a path exists
           true
         }
         else {
-          // no path yet; queue up neighbors neither ball-blocked nor already processed
+          // no path yet--queue up neighbors neither ball-blocked nor already processed
           neighborOffsets.foreach { (rowInc, colInc) =>
             val rowOffset: Int = reachedAddr.row.raw.value    - Index.Origin + rowInc
             val colOffset: Int = reachedAddr.column.raw.value - Index.Origin + colInc
             if (! (   0 <= rowOffset && rowOffset < Parameters.BoardOrder
                    && 0 <= colOffset && colOffset < Parameters.BoardOrder)) {
-              // off board--ignore this offset
+              // address off board--ignore this offset
             } else if (blockedAt(rowOffset)(colOffset)) {
-              // ball-blocked or already traversed--ignore this offset
+              // cell ball-blocked or already traversed to/queued--ignore this offset
             }
             else {
-              // vacant--record traversed to and queue traversing from cell:
+              // cell vacant--record traversed to and queue traversing from cell:
               blockedAt(rowOffset).update(colOffset, true)
               val neighborAddress = CellAddress(RowIndex.values(rowOffset),
                                                 ColumnIndex.values(colOffset))
-              cellsToExpandFrom.enqueue(neighborAddress)
+              cellsToCheckAndExpandFrom.enqueue(neighborAddress)
             }
           }
           loopOnNextQueuedAddress
