@@ -10,7 +10,7 @@ import org.scalatest.matchers.should.Matchers.*
 
 import scala.util.Random
 
-class PathCheckerTest extends AnyFunSpec {
+class SimplePathCheckerTest extends AnyFunSpec {
 
   // ????? TODO:  Review w.r.t. tests' using just BoardReadView API vs. not other
   //   Board and GameLogicSupport stuff, so maybe NameThisGameLogicSupportTest
@@ -58,10 +58,31 @@ class PathCheckerTest extends AnyFunSpec {
   }
 
   describe("pathExists:") {
-    import PathChecker.pathExists
+    import SimplePathChecker.pathExists
 
     it("minimal path") {
       pathExists(OneBallBoard(1, 1), CellAddress.fromRaw(1, 1), CellAddress.fromRaw(2, 2))
+          `shouldBe` true
+    }
+
+    it("NAME THIS . SE") {
+      pathExists(OneBallBoard(3, 3), CellAddress.fromRaw(3, 3), CellAddress.fromRaw(7, 7))
+          `shouldBe` true
+    }
+    it("NAME THIS . SSE") {
+      pathExists(OneBallBoard(3, 3), CellAddress.fromRaw(3, 3), CellAddress.fromRaw(7, 5))
+          `shouldBe` true
+    }
+    it("NAME THIS . NW") {
+      pathExists(OneBallBoard(7, 7), CellAddress.fromRaw(7, 7), CellAddress.fromRaw(3, 3))
+          `shouldBe` true
+    }
+    it("NAME THIS . S") {
+      pathExists(OneBallBoard(3, 3), CellAddress.fromRaw(3, 3), CellAddress.fromRaw(7, 3))
+          `shouldBe` true
+    }
+    it("NAME THIS . E") {
+      pathExists(OneBallBoard(3, 3), CellAddress.fromRaw(3, 3), CellAddress.fromRaw(3, 7))
           `shouldBe` true
     }
 
@@ -177,6 +198,24 @@ class PathCheckerTest extends AnyFunSpec {
       val actual = pathExists(boardWithProbe, fromBallAddress, toVacancyAddress)
       actual shouldBe false
     }
+
+
+    it("xxx to see trying to go toward, but going away when needed") {
+      val spiralBoard =
+        SimpleOccupancyBoard("B--------",
+                             "----B----",
+                             "----B----",
+                             "-BBBB----",
+                             "---------",
+                             "---------",
+                             "---------",
+                             "---BBBBBB",
+                             "---------")
+      pathExists(spiralBoard, CellAddress.fromRaw(1, 1), CellAddress.fromRaw(9, 9))
+          `shouldBe` true
+    }
+
+
   }
 
 }

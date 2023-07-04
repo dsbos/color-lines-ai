@@ -3,7 +3,7 @@ package com.us.dsb.colorlines.game
 import com.us.dsb.colorlines.game.board.{
   BallColor, Board, BoardReadView, CellAddress, ColumnIndex, RowIndex}
 import com.us.dsb.colorlines.game.logic.LineReaper
-import com.us.dsb.colorlines.game.logic.PathChecker
+import com.us.dsb.colorlines.game.logic.SimplePathChecker
 
 import cats.syntax.option.*
 
@@ -159,7 +159,7 @@ object GameLogicSupport {
     else if (board.hasABallAt(to)) {
       false // ?? TODO:  Expand to report no vacancy there
     }
-    else if (! PathChecker.pathExists(board, from, to)) {
+    else if (! SimplePathChecker.pathExists(board, from, to)) {
       false // ?? TODO:  Expand to report no path
     }
     else {

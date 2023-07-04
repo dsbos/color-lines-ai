@@ -8,7 +8,10 @@ import cats.syntax.option.*
 import scala.annotation.tailrec
 import scala.collection.mutable
 
-object PathChecker {
+/**
+ * Simple breadth-first path checker (not aware of target direction).
+ */
+object SimplePathChecker {
 
   // Note:  Pulled out of pathExists's looping method to reduce allocations:
   private val neighborOffsets = List((+1, 0), (-1, 0), (0, +1), (0, -1))
