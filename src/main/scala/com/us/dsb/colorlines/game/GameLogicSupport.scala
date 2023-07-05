@@ -167,7 +167,6 @@ object GameLogicSupport {
     }
   }
 
-
   def doTryMoveBall(gameState: GameState,
                     from: CellAddress,
                     to: CellAddress)

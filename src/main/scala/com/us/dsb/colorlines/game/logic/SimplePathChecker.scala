@@ -11,25 +11,14 @@ import scala.collection.mutable
 /**
  * Simple breadth-first path checker (not aware of target direction).
  */
-object SimplePathChecker {
+object SimplePathChecker extends PathChecker {
 
   // Note:  Pulled out of pathExists's looping method to reduce allocations:
   private val neighborOffsets = List((+1, 0), (-1, 0), (0, +1), (0, -1))
 
-  /**
-   * Reports whether ball-movement path exists from given starting cell to
-   * given target cell.
-   * @param board
-   * @param fromBallCell
-   *   address of starting cell (expected to contain ball (requirement undefined))
-   * @param toEmptyCell
-   *   address of target cell (expected to be different from starting cell
-   *   (requirement undefined); must be empty, at least if not starting cell)
-   * @return
-   */
-  def pathExists(board: BoardReadView,
-                 fromBallCell: CellAddress,
-                 toEmptyCell: CellAddress): Boolean = {
+  override def pathExists(board: BoardReadView,
+                          fromBallCell: CellAddress,
+                          toEmptyCell: CellAddress): Boolean = {
    // ???? TODO:  Revisit looping/recursion.  (What is class/method that
    //  logically loops until computation-and-control expression returns
    //  termination value (None?)?  How much instance allocation would that do?)
