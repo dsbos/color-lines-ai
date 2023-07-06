@@ -42,6 +42,7 @@ class BoardTest extends AnyFunSpec {
           assert(board.getCellStateAt(address).asOption.isEmpty)
         }
       }
+      board.getBallCount shouldBe 0
     }
     it("- with empty on-deck list") {
       assert(board.getOndeckBalls.isEmpty)

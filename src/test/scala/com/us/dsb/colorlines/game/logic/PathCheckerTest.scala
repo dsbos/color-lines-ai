@@ -33,10 +33,8 @@ open class PathCheckerTest(checker: PathChecker) extends AnyFunSpec {
       }
     override def getCellStateAt(address: CellAddress): CellState =
       cellStates(address.row.raw.value - Index.Origin)(address.column.raw.value - Index.Origin)
-    override def hasABallAt(address: CellAddress): Boolean =
-      getCellStateAt(address).asOption.isDefined
 
-    override def isFull: Boolean = ???
+    override def getBallCount: Int = ???
     override def getOndeckBalls: Iterable[BallColor] = ???
     override def toCompactString: String = ???
   }
@@ -49,10 +47,7 @@ open class PathCheckerTest(checker: PathChecker) extends AnyFunSpec {
         CellState.withBallOfColor(BallColor.Blue)
       else
         CellState.empty
-    override def hasABallAt(address: CellAddress): Boolean =
-      getCellStateAt(address).asOption.isDefined
-
-    override def isFull: Boolean = ???
+    override def getBallCount: Int = ???
     override def getOndeckBalls: Iterable[BallColor] = ???
     override def toCompactString: String = ???
   }

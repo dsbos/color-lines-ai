@@ -37,10 +37,11 @@ private[game] class Board(private val cellStates: Vector[CellState],
   override def getCellStateAt(address: CellAddress): CellState =
     cellStates(vectorIndex(address))
 
-  override def hasABallAt(address: CellAddress): Boolean =
-    getCellStateAt(address).asOption.isDefined
+  // ?? TODO:  Maybe optimize:  Store ball/vacancy count to avoid scan,
+  //   especially for isFull.
+  override def isFull: Boolean = ! cellStates.exists(_.asOption.isEmpty)
 
-  override def isFull: Boolean = !cellStates.exists(_.asOption.isEmpty)
+  override def getBallCount: Int = cellStates.count(_.asOption.isDefined)
 
   override def getOndeckBalls: Iterable[BallColor] = ondeckBalls
 
