@@ -9,21 +9,20 @@ import scala.annotation.tailrec
 import scala.collection.mutable
 
 /**
- * Simple breadth-first path checker (not aware of target direction).
+ * Simple breadth-first path checker.  (Not aware of target direction.)
+ *
+ * Optimized to avoid most object allocation (e.g., uses mutable data structures).
  */
 object SimplePathChecker extends PathChecker {
 
-  // Note:  Pulled out of pathExists's looping method to reduce allocations:
+  // Optimization:  Pulled out to here (static) to reduce allocations:
   private val neighborOffsets = List((+1, 0), (-1, 0), (0, +1), (0, -1))
 
   override def pathExists(board: BoardReadView,
                           fromBallCell: CellAddress,
                           toEmptyCell: CellAddress): Boolean = {
-   // ???? TODO:  Revisit looping/recursion.  (What is class/method that
-   //  logically loops until computation-and-control expression returns
-   //  termination value (None?)?  How much instance allocation would that do?)
 
-   // Note:  Using mutable Array and mutable.Queue to reduce instance allocation.
+   // Optimization:  Mutable Array and mutable.Queue to reduce instance allocation:
 
    /** Whether each cell is blocked from (further) "reaching"--by ball or
     *  already reached in search. */
@@ -34,16 +33,16 @@ object SimplePathChecker extends PathChecker {
           }.toArray
       }
     val cellsToCheckAndExpandFrom = {
-      // Construct at maximum needed size to avoid a little reallocation:
+      // Note: Constructing at maximum needed size to avoid reallocation:
       val maxQueueSize = RowIndex.values.size * ColumnIndex.values.size
       new mutable.Queue[CellAddress](initialSize = maxQueueSize)
-          .enqueue(fromBallCell)
     }
+    cellsToCheckAndExpandFrom.enqueue(fromBallCell)
 
     @tailrec
     def loopOnNextQueuedAddress: Boolean = {
-      // Note:  Using .isEmpty and .dequeue() to avoid dequeueFirst's allocation
-      // of Some instances:
+      // Optimization:  Using .isEmpty and .dequeue() to avoid dequeueFirst's
+      //   allocation of Some instances:
       if (cellsToCheckAndExpandFrom.isEmpty) {
         // no more steps/cells to try--no path exists
         false
@@ -78,8 +77,7 @@ object SimplePathChecker extends PathChecker {
       }
     }
 
-    val result = loopOnNextQueuedAddress
-    result
+    val pathExists = loopOnNextQueuedAddress
+    pathExists
   }
 }
-
