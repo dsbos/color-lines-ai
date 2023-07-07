@@ -9,7 +9,7 @@ import scala.annotation.tailrec
 import scala.collection.mutable
 
 /**
- * Simple breadth-first path checker.  (Not aware of target direction.)
+ * Simple breadth-first path-existence detector.  (Not aware of target direction.)
  *
  * Optimized to avoid most object allocation (e.g., uses mutable data structures).
  */
