@@ -39,9 +39,10 @@ open class PathCheckerTest(checker: PathChecker) extends AnyFunSpec {
     override def toCompactString: String = ???
   }
 
-  private class OneBallBoard(row: Int, column: Int) extends BoardReadView {
-    private val oneBallAddress = CellAddress.fromRaw(row, column)
-
+  private class OneBallBoard(oneBallAddress: CellAddress) extends BoardReadView {
+    def this(row: Int, column: Int) = {
+      this(CellAddress.fromRaw(row, column))
+    }
     override def getCellStateAt(address: CellAddress): CellState =
       if (address == oneBallAddress)
         CellState.withBallOfColor(BallColor.Blue)
@@ -52,151 +53,161 @@ open class PathCheckerTest(checker: PathChecker) extends AnyFunSpec {
     override def toCompactString: String = ???
   }
 
-  describe("pathExists:") {
-    import checker.pathExists
+  def callPathExists(board: BoardReadView, srcAndTgtRowAndCol: ((Int, Int), (Int, Int))) = {
+    val ((srcRow, srcCol), (tgtRow, tgtCol)) = srcAndTgtRowAndCol
+    checker.pathExists(board,
+                       CellAddress.fromRaw(srcRow, srcCol),
+                       CellAddress.fromRaw(tgtRow, tgtCol))
+  }
 
-    it("minimal path") {
-      pathExists(OneBallBoard(1, 1), CellAddress.fromRaw(1, 1), CellAddress.fromRaw(2, 2))
-          `shouldBe` true
-    }
+  it("minimal path ((1,1)->(1,2))") {
+    callPathExists(OneBallBoard(1, 1), (1, 1) -> (1, 2)) shouldBe true
+  }
 
-    it("NAME THIS . SE") {
-      pathExists(OneBallBoard(3, 3), CellAddress.fromRaw(3, 3), CellAddress.fromRaw(7, 7))
-          `shouldBe` true
-    }
-    it("NAME THIS . SSE") {
-      pathExists(OneBallBoard(3, 3), CellAddress.fromRaw(3, 3), CellAddress.fromRaw(7, 5))
-          `shouldBe` true
-    }
-    it("NAME THIS . NW") {
-      pathExists(OneBallBoard(7, 7), CellAddress.fromRaw(7, 7), CellAddress.fromRaw(3, 3))
-          `shouldBe` true
-    }
-    it("NAME THIS . S") {
-      pathExists(OneBallBoard(3, 3), CellAddress.fromRaw(3, 3), CellAddress.fromRaw(7, 3))
-          `shouldBe` true
-    }
-    it("NAME THIS . E") {
-      pathExists(OneBallBoard(3, 3), CellAddress.fromRaw(3, 3), CellAddress.fromRaw(3, 7))
-          `shouldBe` true
-    }
+  it("minimal blocked ball") {
+    val board =
+      SimpleOccupancyBoard("---------",
+                           "---------",
+                           "---------",
+                           "---------",
+                           "---------",
+                           "---------",
+                           "---------",
+                           "-------BB",
+                           "-------BB")
+    callPathExists(board, (9, 9) -> (9, 8)) shouldBe false
+  }
 
-    it("minimal blocked ball") {
-      val spiralBoard =
-        SimpleOccupancyBoard("---------",
-                             "---------",
-                             "---------",
-                             "---------",
-                             "---------",
-                             "---------",
-                             "---------",
-                             "-------BB",
-                             "-------BB")
-      pathExists(spiralBoard, CellAddress.fromRaw(9, 9), CellAddress.fromRaw(9, 8))
-          `shouldBe` false
-    }
+  it("minimal blocked target") {
+    val board =
+      SimpleOccupancyBoard("-------B-",
+                           "--------B",
+                           "---------",
+                           "---------",
+                           "---------",
+                           "---------",
+                           "---------",
+                           "---------",
+                           "B--------")
+    callPathExists(board, (9, 1) -> (1, 9)) shouldBe false
+  }
 
-    it("ball anywhere on one-ball board can move to anywhere else") {
+  it("ball anywhere on one-ball board can move to anywhere else") {
+    for {
+      ballRow <- RowIndex.values
+      ballColumn <- ColumnIndex.values
+    } yield {
+      val fromBallAddress = CellAddress(ballRow, ballColumn)
+      val board: BoardReadView = OneBallBoard(fromBallAddress)
       for {
-        ballRow <- RowIndex.values
-        ballColumn <- ColumnIndex.values
+        toRow <- RowIndex.values
+        toColumn <- ColumnIndex.values
+        toVacancyAddress = CellAddress(toRow, toColumn)
+        // don't assert anything about path to where ball already is
+        if toVacancyAddress != fromBallAddress
       } yield {
-        val fromBallAddress = CellAddress(ballRow, ballColumn)
-        // ?????? TODO: Maybe use OneBallBoard to avoid depending on Board (not just BoardReadView):
-        val board =
-          Board.empty.withBallAt(fromBallAddress,
-                                 BallColor.values(Random.nextInt(BallColor.values.length)))
-        for {
-          toRow <- RowIndex.values
-          toColumn <- ColumnIndex.values
-          toVacancyAddress = CellAddress(toRow, toColumn)
-          // don't assert anything about path to where ball already is
-          if toVacancyAddress != fromBallAddress
-        } yield {
-          val actual = pathExists(board, fromBallAddress, toVacancyAddress)
-          withClue(s"from $fromBallAddress to $toVacancyAddress") {
-            actual shouldBe true
-          }
+        val actual =  checker.pathExists(board, fromBallAddress, toVacancyAddress)
+        withClue(s"from $fromBallAddress to $toVacancyAddress") {
+          actual shouldBe true
         }
       }
     }
+  }
 
-    it("find path for blocky spiral path") {
-      // Note:  Tests all 4 neighbor directions.
-      val spiralBoard =
-        SimpleOccupancyBoard("B--------",
-                             "BBBBBBBB-",
-                             "-------B-",
-                             "-BBBBB-B-",
-                             "-B---B-B-",
-                             "-B-BBB-B-",
-                             "-B-----B-",
-                             "-BBBBBBB-",
-                             "---------")
-      pathExists(spiralBoard, CellAddress.fromRaw(1, 1), CellAddress.fromRaw(5, 5))
-          `shouldBe` true
-    }
+  it("find path for blocky spiral path") {
+    // Note:  Tests all 4 neighbor directions.
+    val spiralBoard =
+      SimpleOccupancyBoard("B--------",
+                           "BBBBBBBB-",
+                           "-------B-",
+                           "-BBBBB-B-",
+                           "-B---B-B-",
+                           "-B-BBB-B-",
+                           "-B-----B-",
+                           "-BBBBBBB-",
+                           "---------")
+    callPathExists(spiralBoard, (1, 1) -> (5, 5)) shouldBe true
+  }
 
-    it("find no path for blocked blocky spiral path") {
-      val spiralBoard =
-        SimpleOccupancyBoard("B--------",
-                             "BBBBBBBB-",
-                             "-------B-",
-                             "-BBBBB-B-",
-                             "-B---BBB-", // blocked at (5, 7)
-                             "-B-BBB-B-",
-                             "-B-----B-",
-                             "-BBBBBBB-",
-                             "---------")
-      pathExists(spiralBoard, CellAddress.fromRaw(1, 1), CellAddress.fromRaw(5, 5))
-          `shouldBe` false
-    }
+  it("find no path for blocked blocky spiral path") {
+    val spiralBoard =
+      SimpleOccupancyBoard("B--------",
+                           "BBBBBBBB-",
+                           "-------B-",
+                           "-BBBBB-B-",
+                           "-B---BBB-", // blocked at (5, 7)
+                           "-B-BBB-B-",
+                           "-B-----B-",
+                           "-BBBBBBB-",
+                           "---------")
+    callPathExists(spiralBoard, (1, 1) -> (5, 5)) shouldBe false
+  }
 
-    it("find no path for blocked no-corners spiral path") {
-      val spiralBoard =
-        SimpleOccupancyBoard("B--------",
-                             "BBBBBBB--", // some blocking-line corners vacant
-                             "-------B-",
-                             "--BBBB-B-",
-                             "-B---BB--",
-                             "-B-BBB-B-",
-                             "-B-----B-",
-                             "--BBBBB--",
-                             "---------")
-      pathExists(spiralBoard, CellAddress.fromRaw(1, 1), CellAddress.fromRaw(5, 5))
-          `shouldBe` false
-    }
+  it("find no path for blocked no-corners spiral path") {
+    val spiralBoard =
+      SimpleOccupancyBoard("B--------",
+                           "BBBBBBB--", // some blocking-line corners vacant
+                           "-------B-",
+                           "--BBBB-B-",
+                           "-B---BB--",
+                           "-B-BBB-B-",
+                           "-B-----B-",
+                           "--BBBBB--",
+                           "---------")
+    callPathExists(spiralBoard, (1, 1) -> (5, 5)) shouldBe false
+  }
 
-    it("ball can't move across diagonal line (random probe ball location)") {
-      given Random()
-      lazy val board0 = Board.empty
-
-      // top left (1, 1) to bottom right (N, N)
-      def makeDiagonallyDividedBoard: Board = {
-        val diagonalAddresses =
-          RowIndex.values.zip(ColumnIndex.values).map { (row, column) => CellAddress(row, column) }
-        diagonalAddresses.foldLeft(board0) { (board, address) =>
-          board.withBallAt(address, GameLogicSupport.pickRandomBallColor())
-        }
+  it("ball can't move across diagonal line (random probe ball location)") {
+    given Random()
+    // top left (1, 1) to bottom right (N, N)
+    def makeDiagonallyDividedBoard: Board = {
+      val diagonalAddresses =
+        RowIndex.values.zip(ColumnIndex.values).map { (row, column) => CellAddress(row, column) }
+      diagonalAddresses.foldLeft(Board.empty) { (board, address) =>
+        board.withBallAt(address, GameLogicSupport.pickRandomBallColor())
       }
-
-      val probeBall = GameLogicSupport.pickRandomBallColor()
-      val diagonalBoard = makeDiagonallyDividedBoard
-      val fromBallAddress = GameLogicSupport.pickRandomEmptyCell(diagonalBoard).get
-      val boardWithProbe = diagonalBoard.withBallAt(fromBallAddress, probeBall)
-
-      // transpose ball coordinates to get cell across boundary
-      val toVacancyAddress =
-        CellAddress(row    = RowIndex(fromBallAddress.column.raw),
-                    column = ColumnIndex(fromBallAddress.row.raw))
-
-      val actual = pathExists(boardWithProbe, fromBallAddress, toVacancyAddress)
-      actual shouldBe false
     }
 
+    val diagonalBoard = makeDiagonallyDividedBoard
+    val probeBall = GameLogicSupport.pickRandomBallColor()
+    val fromBallAddress = GameLogicSupport.pickRandomEmptyCell(diagonalBoard).get
+    val boardWithProbe = diagonalBoard.withBallAt(fromBallAddress, probeBall)
 
-    it("xxx to see trying to go toward, but going away when needed") {
-      val spiralBoard =
+    // transpose ball coordinates to get some cell on other side of boundary
+    val toVacancyAddress =
+      CellAddress(row    = RowIndex(fromBallAddress.column.raw),
+                  column = ColumnIndex(fromBallAddress.row.raw))
+
+    val actual = checker.pathExists(boardWithProbe, fromBallAddress, toVacancyAddress)
+    actual shouldBe false
+  }
+
+  describe("re directional optimization (need temp. printlns and manual review)") {
+    it("N to S") {callPathExists(OneBallBoard(3, 5), (3, 5) -> (7, 5)) shouldBe true}
+    it("S to N") {callPathExists(OneBallBoard(7, 5), (7, 5) -> (3, 5)) shouldBe true}
+    it("W to E") {callPathExists(OneBallBoard(5, 3), (5, 3) -> (5, 7)) shouldBe true}
+    it("E to W") {callPathExists(OneBallBoard(5, 7), (5, 7) -> (5, 3)) shouldBe true}
+
+    // ???? TODO:  Regularize and round out:
+
+    it("TBD . SE") {
+      callPathExists(OneBallBoard(3, 3), (3, 3) -> (7, 7)) shouldBe true
+    }
+    it("TBD . SSE") {
+      callPathExists(OneBallBoard(3, 3), (3, 3) -> (7, 5)) shouldBe true
+    }
+    it("TBD . NW") {
+      callPathExists(OneBallBoard(7, 7), (7, 7) -> (3, 3)) shouldBe true
+    }
+    it("TBD . S") {
+      callPathExists(OneBallBoard(3, 3), (3, 3) -> (7, 3)) shouldBe true
+    }
+    it("TBD . E") {
+      callPathExists(OneBallBoard(3, 3), (3, 3) -> (3, 7)) shouldBe true
+    }
+
+    it("see trying to go toward, but going away when needed") {
+      val board =
         SimpleOccupancyBoard("B--------",
                              "----B----",
                              "----B----",
@@ -206,11 +217,10 @@ open class PathCheckerTest(checker: PathChecker) extends AnyFunSpec {
                              "---------",
                              "---BBBBBB",
                              "---------")
-      pathExists(spiralBoard, CellAddress.fromRaw(1, 1), CellAddress.fromRaw(9, 9))
-          `shouldBe` true
+      callPathExists(board, (1, 1) -> (9, 9)) shouldBe true
     }
 
-
   }
+
 
 }
