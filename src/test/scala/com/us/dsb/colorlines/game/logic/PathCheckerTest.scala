@@ -53,7 +53,9 @@ open class PathCheckerTest(checker: PathChecker) extends AnyFunSpec {
     override def toCompactString: String = ???
   }
 
-  def callPathExists(board: BoardReadView, srcAndTgtRowAndCol: ((Int, Int), (Int, Int))) = {
+  private def callPathExists(board: BoardReadView, 
+                             srcAndTgtRowAndCol: ((Int, Int), (Int, Int))
+                            ): Boolean = {
     val ((srcRow, srcCol), (tgtRow, tgtCol)) = srcAndTgtRowAndCol
     checker.pathExists(board,
                        CellAddress.fromRaw(srcRow, srcCol),

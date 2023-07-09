@@ -13,7 +13,7 @@ import scala.util.Random
 object PlayMoveRandomlySameColorBiasNGamesWStats extends App {
   private given rng: Random = Random()
 
-  class NameThisPlayer extends Player {
+  private class NameThisPlayer extends Player {
     override def chooseMove(board: BoardReadView): PlayerMove = {
 
       val colorToAddressTuples: Iterable[(BallColor, CellAddress)] =

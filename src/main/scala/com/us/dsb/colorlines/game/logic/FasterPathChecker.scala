@@ -47,7 +47,7 @@ object FasterPathChecker extends PathChecker {
       }
 
     // Optimization:  Using mutable stack to reduce instance allocation:
-    // Optimization:  Currently implementing stack outselves  (Note:  Unclear
+    // Optimization:  Currently implementing stack ourselves  (Note:  Unclear
     //  whether faster than using (already-reasonably-optimal) mutable.Stack.):
 
     val cellsToCheckAndExpandFrom: Array[CellAddress] = {
@@ -85,7 +85,7 @@ object FasterPathChecker extends PathChecker {
               - row delta negative: first (-1, 0)
                 - column delta positive: then (0, +1), (0, -1), (+1, 0)
                 - column delta negative: then (0, -1), (0, +1), (+1, 0)
-            - column absolutedelta bigger than row absolutedelta:
+            - column absolute delta bigger than row absolutedelta:
               - column delta positive: first (0, +1)
                 - row delta positive: then (+1, 0), (-1, 0), (0, -1)
                 - row delta negative: then (-1, 0), (+1, 0), (0, -1)

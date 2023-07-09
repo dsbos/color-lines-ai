@@ -24,7 +24,8 @@ object Index extends RefinedTypeOps.Numeric[Index, Int] {
   /** Index origin for row/column indexes, as regular value. */
   val Origin: Origin = valueOf[Origin]
 
-  val values: IndexedSeq[Index] = (Index.MinValue.value to Index.MaxValue.value).map(Index.unsafeFrom(_))
+  val values: IndexedSeq[Index] = 
+    (Index.MinValue.value to Index.MaxValue.value).map(Index.unsafeFrom(_))
   // ???? TODO:  Review whether to add cardinality member (returning BoardOrder),
   //   so code using Index.value uses another Index.Xyz instead of separate
   //   BoardOrder (any maybe val Board order can be hidden (by moving top-level
