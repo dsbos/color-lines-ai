@@ -20,8 +20,6 @@ private[manual] object TapUiGameState {
     private[manual] case class Done(score: Int) extends GameResult
   }
 
-  // ?????? TODO:  Move from UI class/package to ...colorlines.game...:
-
   private def makeInitialState(using Random): TapUiGameState = {
     val initialPlacementResult = GameLogicSupport.getInitialState()
     TapUiGameState(initialPlacementResult, None)

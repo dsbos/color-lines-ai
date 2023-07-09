@@ -61,7 +61,8 @@ object GameLogicSupport {
    *   affects ball colors and placement coordinates
    */
   private[game] def placeInitialBalls(emptyGameState: GameState)
-                                     (using Random): GameState = {
+                                     (using Random
+                                     ): GameState = {
     val postPlacementsResult =
       (1 to Parameters.InitialBallCount)
           .foldLeft(emptyGameState) {

@@ -84,7 +84,7 @@ private[game] object LineReaper {
                                 axisLineAddedLength: Int,
                                 directionExcursionLengths: List[DirectionExcursionLength])
 
-  // ?????? TODO:  Would having lineDirectionAxis first be clearer/more logical?
+  // ???? TODO:  Would having lineDirectionAxis first be clearer/more logical?
   private def computeLineAxisResult(moveBallColor: BallColor,
                                     board: BoardReadView,
                                     ballTo: CellAddress,
