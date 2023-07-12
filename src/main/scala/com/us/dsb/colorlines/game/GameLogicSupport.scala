@@ -48,7 +48,7 @@ object GameLogicSupport {
   }
 
   // ????? TODO:  Maybe clarify code re overwriting even if list not fully
-  //  drained (which happens only when board full and game over anyway):
+  //  drained (but that happens only when board full and game over anyway):
   private def fillOnDeckBalls(board: Board)
                              (using Random): Board =
     board.withOnDeckBalls(List.fill(Parameters.OnDeckBallCount)(pickRandomBallColor()))
@@ -134,7 +134,8 @@ object GameLogicSupport {
                          to: CellAddress)
                         (using Random
                         ): GameState = {
-    // ????? TODO:  Rework condition structures here and just above to eliminate this .get:
+    // ????? TODO:  Rework condition structures here and just above to eliminate
+    //  following .get (maybe by taking some validate-move object):
     val moveBallColor = gameState.board.getCellStateAt(from).asOption.get //??
     val postMoveGameState =
       gameState.withBoardWithNoBallAt(from).withBoardWithBallAt(to, moveBallColor)

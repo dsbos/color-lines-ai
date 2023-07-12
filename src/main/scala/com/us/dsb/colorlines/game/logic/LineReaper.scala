@@ -141,12 +141,12 @@ private[game] object LineReaper {
   private[game] def reapAnyLines(gameState: GameState,
                                  ballTo: CellAddress
                                 ): ReapingAttemptResult = {
-    // ????? TODO:  Resolve following .get.
+    // ???? TODO:  Resolve following .get.
     //   - Maybe use getOrElse with "Unexpected case".
     //   - Maybe add BallColor parameter (pros and cans ...).
     //   - Maybe eliminate passing BallColor down, having deeper method (re-)get
     //     it via ballTo and board.
-    val moveBallColor = gameState.board.getCellStateAt(ballTo).asOption.get //?????? pass in?  getOrElse?
+    val moveBallColor = gameState.board.getCellStateAt(ballTo).asOption.get
     println(s"* * placed at $ballTo: $moveBallColor")
 
     val allAxesResults: List[AxisResult] =
