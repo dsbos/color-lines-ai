@@ -56,9 +56,15 @@ object HalfAdderRandomWeightsNNExpl extends App {
       var activation: Double = uninitialized
 
       override def updateActivation(): Unit = {
-        val weightedInputs =
-          inputs.map { (neuron, weight) => neuron.activation * weight }
-        val act = standardLogisticFunction(bias + weightedInputs.sum)
+
+        // Optimization:  About 10-15% faster overall as of 2023-07-13:
+        // val weightedInputs =
+        //   inputs.map { (neuron, weight) => neuron.activation * weight }
+        // val sum1 = weightedInputs.sum
+        var sum2 = 0.0
+        inputs.foreach { (neuron, weight) => sum2 += neuron.activation * weight }
+
+        val act = standardLogisticFunction(bias + sum2)
         activation = act
       }
     }
@@ -71,7 +77,7 @@ object HalfAdderRandomWeightsNNExpl extends App {
                                             ins.map(in => (in, randomWeight))*))
     private val outs =
       Array.fill(outSize)(NoninputNeuron(randomBias,
-                                         hidden1s.map(in => (in, randomWeight)) *))
+                                         hidden1s.map(in => (in, randomWeight))*))
 
     def setInputActivations(activations: Double*): Unit = {
       assert(ins.size == activations.size)
@@ -87,6 +93,8 @@ object HalfAdderRandomWeightsNNExpl extends App {
 
     def getOutputActivations: IndexedSeq[Double] = {
       outs.map(_.activation)
+      // Attempted optimization:  No detected speedup:
+      //scala.collection.immutable.ArraySeq.unsafeWrapArray(outs.map(_.activation))
     }
 
   }
@@ -128,12 +136,13 @@ object HalfAdderRandomWeightsNNExpl extends App {
     }.sum
   }
 
+  val startMs = System.currentTimeMillis()
   var base = RandomlyWeightedNeuralNetwork(3, 4, 3)
+  var baseFitness = computeFitness(base)
   var iterations = 0
   while (iterations < 1_000_000_000) do {
     iterations += 1
     val cand = RandomlyWeightedNeuralNetwork(3, 4, 2)
-    val baseFitness = computeFitness(base)
     val candFitness = computeFitness(cand)
 
     //println(s"prev: = $prevFitness, cand: = $candFitness")
@@ -144,7 +153,12 @@ object HalfAdderRandomWeightsNNExpl extends App {
         println(f"$a1 + $a2 + $a3 = $c $s: ${nnOutput._1}%7.3f, ${nnOutput._2}%7.3f")
       }
       base = cand
+      baseFitness = candFitness
     }
 
   }
+  val endMs = System.currentTimeMillis()
+  val durationMs = endMs - startMs
+  println(s"for $iterations iterations, durationMs = $durationMs ms"
+              + s" (${durationMs * 1.0 / iterations} ms/iteration)")
 }
