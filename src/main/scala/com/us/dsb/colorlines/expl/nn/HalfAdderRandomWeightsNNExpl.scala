@@ -40,25 +40,24 @@ object HalfAdderRandomWeightsNNExpl extends App {
     private def randomBias = randomWeight // ?? same for now
 
     trait Neuron {
-      def computeActivation(): Unit
+      def updateActivation(): Unit
       def activation: Double
     }
 
     case class InputNeuron() extends Neuron {
-      //?????? probably move domain-specific Byte/inputValue out from generic activation
-      var inputValue: Byte = 0  //?? 0 or 1
       var activation: Double = uninitialized
 
-      override def computeActivation(): Unit =
-        activation = inputValue
+      override def updateActivation(): Unit = ()  // no-op
     }
 
     /** Neuron including incoming connections. */
-    case class NoninputNeuron(bias: Double, inputs: (Neuron, Double)*) extends Neuron {
+    case class NoninputNeuron(bias: Double,
+                              inputs: (Neuron, Double)*) extends Neuron {
       var activation: Double = uninitialized
 
-      override def computeActivation(): Unit = {
-        val weightedInputs = inputs.map { (neuron, weight) => neuron.activation * weight }
+      override def updateActivation(): Unit = {
+        val weightedInputs =
+          inputs.map { (neuron, weight) => neuron.activation * weight }
         val act = standardLogisticFunction(bias + weightedInputs.sum)
         activation = act
       }
@@ -74,18 +73,33 @@ object HalfAdderRandomWeightsNNExpl extends App {
       Array.fill(outSize)(NoninputNeuron(randomBias,
                                          hidden1s.map(in => (in, randomWeight)) *))
 
-    //?????? probably move domain-specific Byte and Tuple2 out from generic NN operations
-    def eval(inputs: (Byte, Byte, Byte)): (Double, Double) = {
-      ins(0).inputValue = inputs._1
-      ins(1).inputValue = inputs._2
-      ins(2).inputValue = inputs._3
-      ins.foreach(_.computeActivation())
-      hidden1s.foreach(_.computeActivation())
-      outs.foreach(_.computeActivation())
-      (outs(0).activation, outs(1).activation)
+    def setInputActivations(activations: Double*): Unit = {
+      assert(ins.size == activations.size)
+      ins.zip(activations).foreach((in, act) => in.activation = act)
     }
+
+
+    def updateActivation(): Unit = {
+      ins.foreach(_.updateActivation())  //???? handled by setInputActivations
+      hidden1s.foreach(_.updateActivation())
+      outs.foreach(_.updateActivation())
+    }
+
+    def getOutputActivations: IndexedSeq[Double] = {
+      outs.map(_.activation)
+    }
+
   }
-  val x: Byte = 0
+
+  def eval(nw: RandomlyWeightedNeuralNetwork,
+           inputs: (Byte, Byte, Byte)
+          ): (Double, Double) = {
+    nw.setInputActivations(inputs._1, inputs._2, inputs._3)
+    nw.updateActivation()
+    val outActs = nw.getOutputActivations
+    (outActs(0), outActs(1))
+  }
+
 
   val cases: List[((Byte, Byte, Byte), (Byte, Byte))] = {
     List( // 3 bits to add -> 2-bit sum (high bit, low bit)
@@ -105,7 +119,7 @@ object HalfAdderRandomWeightsNNExpl extends App {
 
   def computeFitness(nw: RandomlyWeightedNeuralNetwork): Double = {
     cases.map { case ((a1, a2, a3), (c, s)) =>
-      val nnOutput = nw.eval(a1, a2, a3)
+      val nnOutput = eval(nw, (a1, a2, a3))
       val cError = nnOutput._1 - c
       val sError = nnOutput._2 - s
       val error = cError * cError + sError * sError
@@ -126,7 +140,7 @@ object HalfAdderRandomWeightsNNExpl extends App {
     if candFitness > baseFitness then {
       println(s"@ $iterations: base: = $baseFitness -> cand: = $candFitness")
       cases.foreach { case ((a1, a2, a3), (c, s)) =>
-        val nnOutput = base.eval(a1, a2, a3)
+        val nnOutput = eval(base, (a1, a2, a3))
         println(f"$a1 + $a2 + $a3 = $c $s: ${nnOutput._1}%7.3f, ${nnOutput._2}%7.3f")
       }
       base = cand
