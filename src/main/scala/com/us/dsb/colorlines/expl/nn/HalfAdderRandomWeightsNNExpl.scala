@@ -3,7 +3,7 @@ package com.us.dsb.colorlines.expl.nn
 import scala.compiletime.uninitialized
 import scala.util.Random
 
-object Scratch extends App {
+object HalfAdderRandomWeightsNNExpl extends App {
 
   /**
    * @param x0
