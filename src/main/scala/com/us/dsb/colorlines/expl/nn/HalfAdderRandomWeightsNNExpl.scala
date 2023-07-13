@@ -24,23 +24,20 @@ object HalfAdderRandomWeightsNNExpl extends App {
   }
 
 
-//  for (i <- 1 to 20) {
-//    val xx1 = (Random.nextFloat() - 0.5) * 10
-//    val x = xx1   //   * xx1 * math.signum(xx1)
-//
-//    val f = standardLogisticFunction(x)
-//    //println(f"f(${x}%10.2f) = $f%10.5f")
-//
-//  }
-
-  case class Network342() {
+  /**
+   * ... (Mutable activation.)
+   */
+  case class RandomlyWeightedNeuralNetwork(inSize: Int,
+                                           hiddenSize: Int,
+                                           outSize: Int) {
     private def randomWeight = {
       val `rand_0_to_1`: Double = Random.nextFloat()
+      //?????? parameterize
       val `rand_-1_to_1`: Double = (`rand_0_to_1` - 0.5) * 2
       val `rand_-x_to_x`: Double = `rand_-1_to_1` * 20
       `rand_-x_to_x`
     }
-    private def randomBias = randomWeight // ??? for now
+    private def randomBias = randomWeight // ?? same for now
 
     trait Neuron {
       def computeActivation(): Unit
@@ -48,72 +45,44 @@ object HalfAdderRandomWeightsNNExpl extends App {
     }
 
     case class InputNeuron() extends Neuron {
+      //?????? probably move domain-specific Byte/inputValue out from generic activation
       var inputValue: Byte = 0  //?? 0 or 1
       var activation: Double = uninitialized
 
-      def computeActivation(): Unit =
+      override def computeActivation(): Unit =
         activation = inputValue
     }
 
+    /** Neuron including incoming connections. */
     case class NoninputNeuron(bias: Double, inputs: (Neuron, Double)*) extends Neuron {
       var activation: Double = uninitialized
 
-      def computeActivation(): Unit = {
-        val x = inputs.map { (neuron, weight) => neuron.activation * weight }
-        val sum = x.sum
-        val biased = bias + sum
-        val act = standardLogisticFunction(sum)
+      override def computeActivation(): Unit = {
+        val weightedInputs = inputs.map { (neuron, weight) => neuron.activation * weight }
+        val act = standardLogisticFunction(bias + weightedInputs.sum)
         activation = act
       }
     }
 
-    val in1: InputNeuron = InputNeuron()
-    val in2: InputNeuron = InputNeuron()
-    val in3: InputNeuron = InputNeuron()
+    //???? eventually parameterize number of hidden layers (and different sizes?)
+    private val ins =
+      Array.fill(inSize)(InputNeuron())
+    private val hidden1s =
+      Array.fill(hiddenSize)(NoninputNeuron(randomBias,
+                                            ins.map(in => (in, randomWeight))*))
+    private val outs =
+      Array.fill(outSize)(NoninputNeuron(randomBias,
+                                         hidden1s.map(in => (in, randomWeight)) *))
 
-    val hidden4: NoninputNeuron = NoninputNeuron(randomBias,
-                                                 (in1, randomWeight),
-                                                 (in2, randomWeight),
-                                                 (in3, randomWeight))
-    val hidden5: NoninputNeuron = NoninputNeuron(randomBias,
-                                                 (in1, randomWeight),
-                                                 (in2, randomWeight),
-                                                 (in3, randomWeight))
-    val hidden6: NoninputNeuron = NoninputNeuron(randomBias,
-                                                 (in1, randomWeight),
-                                                 (in2, randomWeight),
-                                                 (in3, randomWeight))
-    val hidden7: NoninputNeuron = NoninputNeuron(randomBias,
-                                                 (in1, randomWeight),
-                                                 (in2, randomWeight),
-                                                 (in3, randomWeight))
-
-    val out8: NoninputNeuron = NoninputNeuron(randomBias,
-                                              (hidden4, randomWeight),
-                                              (hidden5, randomWeight),
-                                              (hidden6, randomWeight),
-                                              (hidden7, randomWeight))
-    val out9: NoninputNeuron = NoninputNeuron(randomBias,
-                                              (hidden4, randomWeight),
-                                              (hidden5, randomWeight),
-                                              (hidden6, randomWeight),
-                                              (hidden7, randomWeight))
-
-
+    //?????? probably move domain-specific Byte and Tuple2 out from generic NN operations
     def eval(inputs: (Byte, Byte, Byte)): (Double, Double) = {
-      in1.inputValue = inputs._1
-      in2.inputValue = inputs._2
-      in3.inputValue = inputs._3
-      in1.computeActivation()
-      in2.computeActivation()
-      in3.computeActivation()
-      hidden4.computeActivation()
-      hidden5.computeActivation()
-      hidden6.computeActivation()
-      hidden7.computeActivation()
-      out8.computeActivation()
-      out9.computeActivation()
-      (out8.activation, out9.activation)
+      ins(0).inputValue = inputs._1
+      ins(1).inputValue = inputs._2
+      ins(2).inputValue = inputs._3
+      ins.foreach(_.computeActivation())
+      hidden1s.foreach(_.computeActivation())
+      outs.foreach(_.computeActivation())
+      (outs(0).activation, outs(1).activation)
     }
   }
   val x: Byte = 0
@@ -134,7 +103,7 @@ object HalfAdderRandomWeightsNNExpl extends App {
         }
   }
 
-  def computeFitness(nw: Network342): Double = {
+  def computeFitness(nw: RandomlyWeightedNeuralNetwork): Double = {
     cases.map { case ((a1, a2, a3), (c, s)) =>
       val nnOutput = nw.eval(a1, a2, a3)
       val cError = nnOutput._1 - c
@@ -145,22 +114,22 @@ object HalfAdderRandomWeightsNNExpl extends App {
     }.sum
   }
 
-  var prev = Network342()
+  var base = RandomlyWeightedNeuralNetwork(3, 4, 3)
   var iterations = 0
   while (iterations < 1_000_000_000) do {
     iterations += 1
-    val cand = Network342()
-    val prevFitness = computeFitness(prev)
+    val cand = RandomlyWeightedNeuralNetwork(3, 4, 2)
+    val baseFitness = computeFitness(base)
     val candFitness = computeFitness(cand)
 
     //println(s"prev: = $prevFitness, cand: = $candFitness")
-    if candFitness > prevFitness then {
-      println(s"@ $iterations: prev: = $prevFitness -> cand: = $candFitness")
+    if candFitness > baseFitness then {
+      println(s"@ $iterations: base: = $baseFitness -> cand: = $candFitness")
       cases.foreach { case ((a1, a2, a3), (c, s)) =>
-        val nnOutput = prev.eval(a1, a2, a3)
+        val nnOutput = base.eval(a1, a2, a3)
         println(f"$a1 + $a2 + $a3 = $c $s: ${nnOutput._1}%7.3f, ${nnOutput._2}%7.3f")
       }
-      prev = cand
+      base = cand
     }
 
   }
