@@ -84,7 +84,6 @@ object HalfAdderRandomWeightsNNExpl extends App {
       ins.zip(activations).foreach((in, act) => in.activation = act)
     }
 
-
     def updateActivation(): Unit = {
       ins.foreach(_.updateActivation())  //???? handled by setInputActivations
       hidden1s.foreach(_.updateActivation())
@@ -108,7 +107,6 @@ object HalfAdderRandomWeightsNNExpl extends App {
     (outActs(0), outActs(1))
   }
 
-
   val cases: List[((Byte, Byte, Byte), (Byte, Byte))] = {
     List( // 3 bits to add -> 2-bit sum (high bit, low bit)
           (0, 0, 0) -> (0, 0),
@@ -126,36 +124,42 @@ object HalfAdderRandomWeightsNNExpl extends App {
   }
 
   def computeFitness(nw: RandomlyWeightedNeuralNetwork): Double = {
-    cases.map { case ((a1, a2, a3), (c, s)) =>
-      val nnOutput = eval(nw, (a1, a2, a3))
-      val cError = nnOutput._1 - c
-      val sError = nnOutput._2 - s
-      val error = cError * cError + sError * sError
-      val caseFitness = -error
-      caseFitness
-    }.sum
+    val fitness =
+      cases.map { case ((a1, a2, a3), (c, s)) =>
+        val nnOutput = eval(nw, (a1, a2, a3))
+        val cError = nnOutput._1 - c
+        val sError = nnOutput._2 - s
+        val error = cError * cError + sError * sError
+        val caseFitness = -error
+        caseFitness
+      }.sum
+    fitness
   }
 
   val startMs = System.currentTimeMillis()
-  var base = RandomlyWeightedNeuralNetwork(3, 4, 3)
-  var baseFitness = computeFitness(base)
+  var curr = RandomlyWeightedNeuralNetwork(3, 4, 2)
+  var currFitness = computeFitness(curr)
   var iterations = 0
   while (iterations < 1_000_000_000) do {
     iterations += 1
+    if (0 == iterations % 10_000_000) {
+      println(s"@ $iterations ...")
+    }
     val cand = RandomlyWeightedNeuralNetwork(3, 4, 2)
     val candFitness = computeFitness(cand)
 
-    //println(s"prev: = $prevFitness, cand: = $candFitness")
-    if candFitness > baseFitness then {
-      println(s"@ $iterations: base: = $baseFitness -> cand: = $candFitness")
+    //println(s"prev: $prevFitness, cand: $candFitness")
+    if candFitness > currFitness then {
+      println(f"@ $iterations: base: $currFitness%6.3f -> cand: $candFitness%6.3f")
       cases.foreach { case ((a1, a2, a3), (c, s)) =>
-        val nnOutput = eval(base, (a1, a2, a3))
-        println(f"$a1 + $a2 + $a3 = $c $s: ${nnOutput._1}%7.3f, ${nnOutput._2}%7.3f")
+        val nnOutput = eval(cand, (a1, a2, a3))
+        println(f"$a1 + $a2 + $a3 = $c $s: ${nnOutput._1}%5.3f, ${nnOutput._2}%5.3f"
+                    + f";  ∆c = ${nnOutput._1 - c}%6.3f"
+                    + f", ∆s = ${nnOutput._2 - s}%6.3f")
       }
-      base = cand
-      baseFitness = candFitness
+      curr = cand
+      currFitness = candFitness
     }
-
   }
   val endMs = System.currentTimeMillis()
   val durationMs = endMs - startMs
