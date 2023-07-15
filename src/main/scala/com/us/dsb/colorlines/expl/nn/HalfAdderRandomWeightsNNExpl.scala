@@ -31,28 +31,34 @@ object HalfAdderRandomWeightsNNExpl extends App {
                                            hiddenSize: Int,
                                            outSize: Int) {
     private def randomWeight = {
-      val `rand_0_to_1`: Double = Random.nextFloat()
-      //?????? parameterize
-      val `rand_-1_to_1`: Double = (`rand_0_to_1` - 0.5) * 2
-      val `rand_-x_to_x`: Double = `rand_-1_to_1` * 20
-      `rand_-x_to_x`
+      if true then {
+        val `rand_0_to_1`: Double = Random.nextFloat()
+        //?????? parameterize
+        val `rand_-1_to_1`: Double = (`rand_0_to_1` - 0.5) * 2
+        val `rand_-x_to_x`: Double = `rand_-1_to_1` * 20 //????
+        `rand_-x_to_x`
+      }
+      else {
+        Random.nextGaussian() * 20
+      }
     }
+
     private def randomBias = randomWeight // ?? same for now
 
-    trait Neuron {
+    private trait Neuron {
       def updateActivation(): Unit
       def activation: Double
     }
 
-    case class InputNeuron() extends Neuron {
+    private case class InputNeuron() extends Neuron {
       var activation: Double = uninitialized
 
       override def updateActivation(): Unit = ()  // no-op
     }
 
     /** Neuron including incoming connections. */
-    case class NoninputNeuron(bias: Double,
-                              inputs: (Neuron, Double)*) extends Neuron {
+    private case class NoninputNeuron(bias: Double,
+                                      inputs: (Neuron, Double)*) extends Neuron {
       var activation: Double = uninitialized
 
       override def updateActivation(): Unit = {
@@ -136,26 +142,29 @@ object HalfAdderRandomWeightsNNExpl extends App {
     fitness
   }
 
+  def makeHalfAdderNetwork: RandomlyWeightedNeuralNetwork =
+    RandomlyWeightedNeuralNetwork(3, 4, 2)
+
   val startMs = System.currentTimeMillis()
-  var curr = RandomlyWeightedNeuralNetwork(3, 4, 2)
+  var curr = makeHalfAdderNetwork
   var currFitness = computeFitness(curr)
+  val maxIterations = 10_000_000
   var iterations = 0
-  while (iterations < 1_000_000_000) do {
+  while (iterations < maxIterations) do {
     iterations += 1
-    if (0 == iterations % 10_000_000) {
-      println(s"@ $iterations ...")
+    if (1 == iterations % 1_000_000) {
+      println(f"@ $iterations (/$maxIterations) currFitness = $currFitness%8.5f ...")
     }
-    val cand = RandomlyWeightedNeuralNetwork(3, 4, 2)
+    val cand = makeHalfAdderNetwork
     val candFitness = computeFitness(cand)
 
-    //println(s"prev: $prevFitness, cand: $candFitness")
     if candFitness > currFitness then {
-      println(f"@ $iterations: base: $currFitness%6.3f -> cand: $candFitness%6.3f")
+      println(f"@ $iterations: base: $currFitness%8.5f -> cand: $candFitness%8.5f")
       cases.foreach { case ((a1, a2, a3), (c, s)) =>
         val nnOutput = eval(cand, (a1, a2, a3))
-        println(f"$a1 + $a2 + $a3 = $c $s: ${nnOutput._1}%5.3f, ${nnOutput._2}%5.3f"
-                    + f";  ∆c = ${nnOutput._1 - c}%6.3f"
-                    + f", ∆s = ${nnOutput._2 - s}%6.3f")
+        println(f"$a1 + $a2 + $a3 = $c $s: ${nnOutput._1}%8.5f, ${nnOutput._2}%8.5f"
+                    + f";  ∆c = ${nnOutput._1 - c}%8.5f"
+                    + f", ∆s = ${nnOutput._2 - s}%8.5f")
       }
       curr = cand
       currFitness = candFitness
