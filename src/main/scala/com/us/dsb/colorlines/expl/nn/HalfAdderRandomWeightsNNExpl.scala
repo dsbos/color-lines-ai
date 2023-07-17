@@ -5,26 +5,6 @@ import scala.util.Random
 
 object HalfAdderRandomWeightsNNExpl extends App {
 
-  /**
-   * @param x0
-   *   x values of function's midpoint
-   * @param L
-   *   supremum of the function
-   * @param k
-   *   logistics grawth rate
-   * @param x
-   *
-   * @return
-   */
-  def logisticFunction(x0: Double, L: Double, k: Double, x: Double): Double = {
-    1 / (1 + math.exp(-(x - x0)))
-  }
-
-  /** ... zero x0, L, and k */
-  def standardLogisticFunction(x: Double): Double = {
-    logisticFunction(x0 = 0, L = 1, k = 1, x)
-  }
-
   case class OneHiddenTopology(inputLayerSize : Int,
                                hiddenLayerSize: Int,
                                outputLayerSize: Int)
@@ -106,7 +86,7 @@ object HalfAdderRandomWeightsNNExpl extends App {
 
           val bias = thisLayerBiases(thisIdx)
           //???????? check: does bias go _after_ activation function?
-          val act = standardLogisticFunction(bias + sum)
+          val act = ActivationFunctions.standardLogisticFunction(bias + sum)
           thisLayerActivations(thisIdx) = act
         }
       }
@@ -181,7 +161,7 @@ object HalfAdderRandomWeightsNNExpl extends App {
         var sum2 = 0.0
         inputs.foreach { (neuron, weight) => sum2 += neuron.activation * weight }
 
-        val act = standardLogisticFunction(bias + sum2)
+        val act = ActivationFunctions.standardLogisticFunction(bias + sum2)
         activation = act
       }
     }
