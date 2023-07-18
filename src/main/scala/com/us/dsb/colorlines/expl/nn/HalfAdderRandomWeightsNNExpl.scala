@@ -1,47 +1,64 @@
 package com.us.dsb.colorlines.expl.nn
 
+import scala.annotation.targetName
 import scala.compiletime.uninitialized
 import scala.util.Random
 
 object HalfAdderRandomWeightsNNExpl extends App {
+  
+  object Types {
+
+    opaque type Bias       = Double
+    opaque type Weight     = Double
+    opaque type Activation = Double
+
+    object Bias       { def apply(value: Double): Bias       = value }
+    object Weight     { def apply(value: Double): Weight     = value }
+    object Activation { def apply(value: Double): Activation = value }
+
+    extension (raw: Bias)       @targetName("Bias_raw")       def raw: Double = raw
+    extension (raw: Weight)     @targetName("Weight_raw")     def raw: Double = raw
+    extension (raw: Activation) @targetName("Activation_raw") def raw: Double = raw
+  }
+  import Types.*
 
   case class OneHiddenTopology(inputLayerSize : Int,
                                hiddenLayerSize: Int,
                                outputLayerSize: Int)
 
   case class RandomOneHiddenNeuralNetworkWeightsAndBiases(topology: OneHiddenTopology) {
-    private def randomWeight = {
+    private def randomWeight: Weight = {
       if true then {
         val `rand_0_to_1`: Double = Random.nextFloat()
         //?????? parameterize
         val `rand_-1_to_1`: Double = (`rand_0_to_1` - 0.5) * 2
-        val `rand_-x_to_x`: Double = `rand_-1_to_1` * 20 //????
-        `rand_-x_to_x`
+        val `rand_-x_to_x`: Double = `rand_-1_to_1` * 20  //????
+        Weight(`rand_-x_to_x`)
       }
       else {
-        Random.nextGaussian() * 20
+        Weight(Random.nextGaussian() * 20)
       }
     }
 
-    private def randomBias = randomWeight // ?? same for now
+    private def randomBias: Bias = Bias(randomWeight.raw)  // ?? same for now
 
     import topology.*
     //?????? wrap Array usage (opaque type? regular class?)
-    val hiddenLayerBiases: Array[Double] = Array.fill(hiddenLayerSize)(randomBias)
-    val hiddenLayerInputWeights: Array[Array[Double]] = // indexed by hidden, then input
+    val hiddenLayerBiases: Array[Types.Bias] = Array.fill(hiddenLayerSize)(randomBias)
+    val hiddenLayerInputWeights: Array[Array[Weight]] =  // indexed by hidden, then input
       Array.fill(hiddenLayerSize)(Array.fill(inputLayerSize)(randomWeight))
-    val outputLayerBiases: Array[Double] = Array.fill(outputLayerSize)(randomBias)
-    val outputLayerInputWeights: Array[Array[Double]] = // indexed by output, then hidden
+    val outputLayerBiases: Array[Bias] = Array.fill(outputLayerSize)(randomBias)
+    val outputLayerInputWeights: Array[Array[Weight]] =  // indexed by output, then hidden
       Array.fill(outputLayerSize)(Array.fill(hiddenLayerSize)(randomWeight))
     print("")
   }
 
-  //?????? change from mutable and updated by eval. metjhod to constructed by eval. method
+  //?????? change from mutable and updated by eval. method to constructed by eval. method
   case class OneHiddenActivations(topology: OneHiddenTopology) {
     import topology.*
-    val inputLayer: Array[Double] = Array.fill(inputLayerSize)(0)
-    val hiddenLayer: Array[Double] = Array.fill(hiddenLayerSize)(0)
-    val outputLayer: Array[Double] = Array.fill(outputLayerSize)(0)
+    val inputLayer: Array[Activation] = Array.fill(inputLayerSize)(Activation(0))
+    val hiddenLayer: Array[Activation] = Array.fill(hiddenLayerSize)(Activation(0))
+    val outputLayer: Array[Activation] = Array.fill(outputLayerSize)(Activation(0))
   }
 
   /**
@@ -52,10 +69,10 @@ object HalfAdderRandomWeightsNNExpl extends App {
     val weightsAndBiases = RandomOneHiddenNeuralNetworkWeightsAndBiases(topology)
 
 
-    //?????? REWORK activation evaluation to tale passed-in input and return
+    //?????? REWORK activation evaluation to take passed-in input and return
     // outputs (not updating mutable...):
 
-    def setInputActivations(activations: Double*): Unit = {
+    def setInputActivations(activations: Activation*): Unit = {
       assert(topology.inputLayerSize == activations.size)
 
       activations.zipWithIndex.foreach { (activation, inputIndex) =>
@@ -66,16 +83,16 @@ object HalfAdderRandomWeightsNNExpl extends App {
     def updateActivation(): Unit = {
 
       def updateLayerActivation(prevLayerSize: Int,  //?????? use activations-array size(?)
-                                prevLayerActs: Array[Double],
+                                prevLayerActs: Array[Activation],
                                 thisLayerSize: Int,  //?????? use activations-array size(?)
-                                thisLayerBiases: Array[Double],
-                                thisLayerWeights: Array[Array[Double]],
-                                thisLayerActivations: Array[Double]) = {
+                                thisLayerBiases: Array[Bias],
+                                thisLayerWeights: Array[Array[Weight]],
+                                thisLayerActivations: Array[Activation]) = {
         for (thisIdx <- 0 until thisLayerSize) {
 
           val productVector =
             for (prevIdx <- 0 until prevLayerSize) yield {
-              prevLayerActs(prevIdx) * thisLayerWeights(thisIdx)(prevIdx)
+              prevLayerActs(prevIdx).raw * thisLayerWeights(thisIdx)(prevIdx).raw
             }
           val sum = productVector.sum
 
@@ -86,8 +103,8 @@ object HalfAdderRandomWeightsNNExpl extends App {
 
           val bias = thisLayerBiases(thisIdx)
           //???????? check: does bias go _after_ activation function?
-          val act = ActivationFunctions.standardLogisticFunction(bias + sum)
-          thisLayerActivations(thisIdx) = act
+          val act = ActivationFunctions.standardLogisticFunction(bias.raw + sum)
+          thisLayerActivations(thisIdx) = Activation(act)
         }
       }
 
@@ -106,7 +123,7 @@ object HalfAdderRandomWeightsNNExpl extends App {
                             activations.outputLayer)
     }
 
-    def getOutputActivations: IndexedSeq[Double] = {
+    def getOutputActivations: IndexedSeq[Activation] = {
       activations.outputLayer
       // Attempted optimization:  No detected speedup:
       //scala.collection.immutable.ArraySeq.unsafeWrapArray(outs.map(_.activation))
@@ -197,14 +214,22 @@ object HalfAdderRandomWeightsNNExpl extends App {
 
   //?????? rename; longer; "evaluate" sounds like evaluating fitness, vs. evaluating
   //  next function; ** "execute"? "compute"? ~~"evaluate function"
+  //?????? Maybe wrap Byte in Bit opaque type to limit to 0 and 1:
+  //?????? Possibly wrap Double in something reflecting approximated "bitness":
   def eval(nw: RandomlyWeightedOneHiddenTopologyNeuralNetwork2,
            inputs: (Byte, Byte, Byte)
           ): (Double, Double) = {
-    //?????? rework to pass in input and receive outputs (not updating mutable...)
-    nw.setInputActivations(inputs._1, inputs._2, inputs._3)
+    //?????? rework to pass in input and receive outputs (not updating mutable arrays...)
+
+    // ???? TODO:  Is there way to map tuple to collection?  Or have fixed length
+    // on collection?  (Tuple inputs and outputs were for fixed lengths for half-adder.)
+    nw.setInputActivations(Activation(inputs._1),
+                           Activation(inputs._2),
+                           Activation(inputs._3))
+
     nw.updateActivation()
     val outActs = nw.getOutputActivations
-    (outActs(0), outActs(1))
+    (outActs(0).raw, outActs(1).raw)
   }
 
   val cases: List[((Byte, Byte, Byte), (Byte, Byte))] = {
@@ -223,6 +248,7 @@ object HalfAdderRandomWeightsNNExpl extends App {
         }
   }
 
+  // ?? TODO: _Possibly_ wrap Double in some opaque fitness type:
   def computeFitness(nw: RandomlyWeightedOneHiddenTopologyNeuralNetwork2): Double = {
     val fitness =
       cases.map { case ((a1, a2, a3), (c, s)) =>
@@ -242,7 +268,7 @@ object HalfAdderRandomWeightsNNExpl extends App {
   val startMs = System.currentTimeMillis()
   var curr = makeHalfAdderNetwork
   var currFitness = computeFitness(curr)
-  val maxIterations = 10_000_000
+  val maxIterations = 100_000_000
   var iterations = 0
   while iterations < maxIterations do {
     iterations += 1
