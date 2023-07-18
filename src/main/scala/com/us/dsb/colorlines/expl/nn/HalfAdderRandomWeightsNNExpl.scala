@@ -65,8 +65,8 @@ object HalfAdderRandomWeightsNNExpl extends App {
    * ... without explicit neuron objects (with arrays) ... still mutable activation ...
    */
   case class RandomlyWeightedOneHiddenTopologyNeuralNetwork2(topology: OneHiddenTopology) {
-    val activations: OneHiddenActivations = OneHiddenActivations(topology)
-    val weightsAndBiases = RandomOneHiddenNeuralNetworkWeightsAndBiases(topology)
+    private val activations: OneHiddenActivations = OneHiddenActivations(topology)
+    private val weightsAndBiases = RandomOneHiddenNeuralNetworkWeightsAndBiases(topology)
 
 
     //?????? REWORK activation evaluation to take passed-in input and return
@@ -125,87 +125,6 @@ object HalfAdderRandomWeightsNNExpl extends App {
 
     def getOutputActivations: IndexedSeq[Activation] = {
       activations.outputLayer
-      // Attempted optimization:  No detected speedup:
-      //scala.collection.immutable.ArraySeq.unsafeWrapArray(outs.map(_.activation))
-    }
-
-  }
-
-
-  /**
-   * ... with explicit neuron objects (with arrays) ... mutable activation ...
-   */
-  case class xxRandomlyWeightedOneHiddenTopologyNeuralNetwork1(topology: OneHiddenTopology,
-                                                                  inSize: Int,
-                                                                  hiddenSize: Int,
-                                                                  outSize: Int) {
-    private def randomWeight = {
-      if true then {
-        val `rand_0_to_1`: Double = Random.nextFloat()
-        //?????? parameterize
-        val `rand_-1_to_1`: Double = (`rand_0_to_1` - 0.5) * 2
-        val `rand_-x_to_x`: Double = `rand_-1_to_1` * 20 //????
-        `rand_-x_to_x`
-      }
-      else {
-        Random.nextGaussian() * 20
-      }
-    }
-    private def randomBias = randomWeight // ?? same for now
-
-    private trait Neuron {
-      def updateActivation(): Unit
-      def activation: Double
-    }
-
-    private case class InputNeuron() extends Neuron {
-      var activation: Double = uninitialized
-
-      override def updateActivation(): Unit = ()  // no-op
-    }
-
-    /** Neuron including incoming connections. */
-    private case class NoninputNeuron(bias: Double,
-                                      inputs: (Neuron, Double)*) extends Neuron {
-      var activation: Double = uninitialized
-
-      override def updateActivation(): Unit = {
-
-        // Optimization:  About 10-15% faster overall as of 2023-07-13:
-        // val weightedInputs =
-        //   inputs.map { (neuron, weight) => neuron.activation * weight }
-        // val sum1 = weightedInputs.sum
-        var sum2 = 0.0
-        inputs.foreach { (neuron, weight) => sum2 += neuron.activation * weight }
-
-        val act = ActivationFunctions.standardLogisticFunction(bias + sum2)
-        activation = act
-      }
-    }
-
-    //???? eventually parameterize number of hidden layers (and different sizes?)
-    private val ins =
-      Array.fill(inSize)(InputNeuron())
-    private val hidden1s =
-      Array.fill(hiddenSize)(NoninputNeuron(randomBias,
-                                            ins.map(in => (in, randomWeight))*))
-    private val outs =
-      Array.fill(outSize)(NoninputNeuron(randomBias,
-                                         hidden1s.map(in => (in, randomWeight))*))
-
-    def setInputActivations(activations: Double*): Unit = {
-      assert(ins.size == activations.size)
-      ins.zip(activations).foreach((in, act) => in.activation = act)
-    }
-
-    def updateActivation(): Unit = {
-      ins.foreach(_.updateActivation())  //???? handled by setInputActivations
-      hidden1s.foreach(_.updateActivation())
-      outs.foreach(_.updateActivation())
-    }
-
-    def getOutputActivations: IndexedSeq[Double] = {
-      outs.map(_.activation)
       // Attempted optimization:  No detected speedup:
       //scala.collection.immutable.ArraySeq.unsafeWrapArray(outs.map(_.activation))
     }
