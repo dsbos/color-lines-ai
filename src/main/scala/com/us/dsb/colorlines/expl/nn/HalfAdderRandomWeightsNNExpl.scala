@@ -1,7 +1,5 @@
 package com.us.dsb.colorlines.expl.nn
 
-import scala.annotation.targetName
-import scala.compiletime.uninitialized
 import scala.util.Random
 
 object HalfAdderRandomWeightsNNExpl extends App {
@@ -16,6 +14,7 @@ object HalfAdderRandomWeightsNNExpl extends App {
     object Weight     { def apply(value: Double): Weight     = value }
     object Activation { def apply(value: Double): Activation = value }
 
+    import scala.annotation.targetName
     extension (raw: Bias)       @targetName("Bias_raw")       def raw: Double = raw
     extension (raw: Weight)     @targetName("Weight_raw")     def raw: Double = raw
     extension (raw: Activation) @targetName("Activation_raw") def raw: Double = raw
@@ -43,92 +42,65 @@ object HalfAdderRandomWeightsNNExpl extends App {
     private def randomBias: Bias = Bias(randomWeight.raw)  // ?? same for now
 
     import topology.*
-    //?????? wrap Array usage (opaque type? regular class?)
-    val hiddenLayerBiases: Array[Types.Bias] = Array.fill(hiddenLayerSize)(randomBias)
-    val hiddenLayerInputWeights: Array[Array[Weight]] =  // indexed by hidden, then input
-      Array.fill(hiddenLayerSize)(Array.fill(inputLayerSize)(randomWeight))
-    val outputLayerBiases: Array[Bias] = Array.fill(outputLayerSize)(randomBias)
-    val outputLayerInputWeights: Array[Array[Weight]] =  // indexed by output, then hidden
-      Array.fill(outputLayerSize)(Array.fill(hiddenLayerSize)(randomWeight))
+    //?????? wrap collection usages (opaque type? regular class?)
+    val hiddenLayerBiases: IndexedSeq[Types.Bias] =
+      IndexedSeq.fill(hiddenLayerSize)(randomBias)
+    val hiddenLayerInputWeights: IndexedSeq[IndexedSeq[Weight]] =  // indexed by hidden, then input
+      IndexedSeq.fill(hiddenLayerSize)(IndexedSeq.fill(inputLayerSize)(randomWeight))
+    val outputLayerBiases: IndexedSeq[Bias] =
+      IndexedSeq.fill(outputLayerSize)(randomBias)
+    val outputLayerInputWeights: IndexedSeq[IndexedSeq[Weight]] =  // indexed by output, then hidden
+      IndexedSeq.fill(outputLayerSize)(IndexedSeq.fill(hiddenLayerSize)(randomWeight))
     print("")
   }
 
-  //?????? change from mutable and updated by eval. method to constructed by eval. method
-  case class OneHiddenActivations(topology: OneHiddenTopology) {
-    import topology.*
-    val inputLayer: Array[Activation] = Array.fill(inputLayerSize)(Activation(0))
-    val hiddenLayer: Array[Activation] = Array.fill(hiddenLayerSize)(Activation(0))
-    val outputLayer: Array[Activation] = Array.fill(outputLayerSize)(Activation(0))
-  }
-
   /**
-   * ... without explicit neuron objects (with arrays) ... still mutable activation ...
+   * ... without explicit neuron objects (with arrays) ... or stored activations ...
    */
   case class RandomlyWeightedOneHiddenTopologyNeuralNetwork2(topology: OneHiddenTopology) {
-    private val activations: OneHiddenActivations = OneHiddenActivations(topology)
     private val weightsAndBiases = RandomOneHiddenNeuralNetworkWeightsAndBiases(topology)
 
+    def computeActivations(inputActivations: IndexedSeq[Activation]): IndexedSeq[Activation] = {
 
-    //?????? REWORK activation evaluation to take passed-in input and return
-    // outputs (not updating mutable...):
-
-    def setInputActivations(activations: Activation*): Unit = {
-      assert(topology.inputLayerSize == activations.size)
-
-      activations.zipWithIndex.foreach { (activation, inputIndex) =>
-        this.activations.inputLayer(inputIndex) = activation
-      }
-    }
-
-    def updateActivation(): Unit = {
-
-      def updateLayerActivation(prevLayerSize: Int,  //?????? use activations-array size(?)
-                                prevLayerActs: Array[Activation],
-                                thisLayerSize: Int,  //?????? use activations-array size(?)
-                                thisLayerBiases: Array[Bias],
-                                thisLayerWeights: Array[Array[Weight]],
-                                thisLayerActivations: Array[Activation]) = {
-        for (thisIdx <- 0 until thisLayerSize) {
-
-          val productVector =
-            for (prevIdx <- 0 until prevLayerSize) yield {
-              prevLayerActs(prevIdx).raw * thisLayerWeights(thisIdx)(prevIdx).raw
+      def computeLayerActivation(prevLayerActs: IndexedSeq[Activation],
+                                 thisLayerBiases: IndexedSeq[Bias],
+                                 thisLayerWeights: IndexedSeq[IndexedSeq[Weight]]
+                                ): IndexedSeq[Activation] = {
+        assert(thisLayerBiases.size == thisLayerWeights.size)
+        val thisLayerActivations =
+          for {
+            thisNeuronIdx <- thisLayerBiases.indices
+            thisNeuronBias = thisLayerBiases(thisNeuronIdx)
+            thisNeuronInputWeights = thisLayerWeights(thisNeuronIdx)
+            //???assert(prevLayerActs.size == thisNeuronInputWeights.size)
+            sum = {
+              // Optimization:  Avoids creating collection of products:  Was
+              //   10-15% faster overall as of 2023-07-13:
+              var sum2 = 0d
+              for (prevNeuronIdx <- prevLayerActs.indices) {
+                sum2 += prevLayerActs(prevNeuronIdx).raw * thisNeuronInputWeights(prevNeuronIdx).raw
+              }
+              sum2
             }
-          val sum = productVector.sum
-
-          // // Optimization:  Avoids creating collection of products:  About 10-15%
-          // // faster overall as of 2023-07-13:
-          // var sum2 = 0.0
-          // inputs.foreach { (neuron, weight) => sum2 += neuron.activation * weight }
-
-          val bias = thisLayerBiases(thisIdx)
-          //???????? check: does bias go _after_ activation function?
-          val act = ActivationFunctions.standardLogisticFunction(bias.raw + sum)
-          thisLayerActivations(thisIdx) = Activation(act)
-        }
+            rawAct = ActivationFunctions.standardLogisticFunction(sum + thisNeuronBias.raw)
+            act = Activation(rawAct)
+          } yield {
+            act
+          }
+        thisLayerActivations
       }
 
-      updateLayerActivation(topology.inputLayerSize,
-                            activations.inputLayer,
-                            topology.hiddenLayerSize,
-                            weightsAndBiases.hiddenLayerBiases,
-                            weightsAndBiases.hiddenLayerInputWeights,
-                            activations.hiddenLayer)
+      val hiddenLayerActivations =
+        computeLayerActivation(inputActivations,
+                              weightsAndBiases.hiddenLayerBiases,
+                              weightsAndBiases.hiddenLayerInputWeights)
 
-      updateLayerActivation(topology.hiddenLayerSize,
-                            activations.hiddenLayer,
-                            topology.outputLayerSize,
-                            weightsAndBiases.outputLayerBiases,
-                            weightsAndBiases.outputLayerInputWeights,
-                            activations.outputLayer)
+      val outputLayerActivations =
+        computeLayerActivation(hiddenLayerActivations,
+                              weightsAndBiases.outputLayerBiases,
+                              weightsAndBiases.outputLayerInputWeights)
+      outputLayerActivations
     }
-
-    def getOutputActivations: IndexedSeq[Activation] = {
-      activations.outputLayer
-      // Attempted optimization:  No detected speedup:
-      //scala.collection.immutable.ArraySeq.unsafeWrapArray(outs.map(_.activation))
-    }
-
   }
 
   //?????? rename; longer; "evaluate" sounds like evaluating fitness, vs. evaluating
@@ -138,17 +110,14 @@ object HalfAdderRandomWeightsNNExpl extends App {
   def eval(nw: RandomlyWeightedOneHiddenTopologyNeuralNetwork2,
            inputs: (Byte, Byte, Byte)
           ): (Double, Double) = {
-    //?????? rework to pass in input and receive outputs (not updating mutable arrays...)
 
     // ???? TODO:  Is there way to map tuple to collection?  Or have fixed length
     // on collection?  (Tuple inputs and outputs were for fixed lengths for half-adder.)
-    nw.setInputActivations(Activation(inputs._1),
-                           Activation(inputs._2),
-                           Activation(inputs._3))
-
-    nw.updateActivation()
-    val outActs = nw.getOutputActivations
-    (outActs(0).raw, outActs(1).raw)
+    val inputActivations = IndexedSeq(Activation(inputs._1),
+                                      Activation(inputs._2),
+                                      Activation(inputs._3))
+    val outputActivations  = nw.computeActivations(inputActivations)
+    (outputActivations(0).raw, outputActivations(1).raw)
   }
 
   val cases: List[((Byte, Byte, Byte), (Byte, Byte))] = {
