@@ -1,6 +1,5 @@
 package com.us.dsb.colorlines.crude
 
-import com.us.dsb.colorlines.game.Parameters.BoardOrder
 import com.us.dsb.colorlines.game.board.{BoardReadView, CellAddress, ColumnIndex, Index, RowIndex}
 
 import scala.util.Random

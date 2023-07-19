@@ -1,26 +1,11 @@
 package com.us.dsb.colorlines.expl.nn
 
+import com.us.dsb.colorlines.expl.nn.LowlevelTypes.{Activation, Bias, Weight}
+
 import scala.util.Random
 
 object HalfAdderRandomWeightsNNExpl extends App {
   
-  object Types {
-
-    opaque type Bias       = Double
-    opaque type Weight     = Double
-    opaque type Activation = Double
-
-    object Bias       { def apply(value: Double): Bias       = value }
-    object Weight     { def apply(value: Double): Weight     = value }
-    object Activation { def apply(value: Double): Activation = value }
-
-    import scala.annotation.targetName
-    extension (raw: Bias)       @targetName("Bias_raw")       def raw: Double = raw
-    extension (raw: Weight)     @targetName("Weight_raw")     def raw: Double = raw
-    extension (raw: Activation) @targetName("Activation_raw") def raw: Double = raw
-  }
-  import Types.*
-
   case class OneHiddenTopology(inputLayerSize : Int,
                                hiddenLayerSize: Int,
                                outputLayerSize: Int)
@@ -43,7 +28,7 @@ object HalfAdderRandomWeightsNNExpl extends App {
 
     import topology.*
     //?????? wrap collection usages (opaque type? regular class?)
-    val hiddenLayerBiases: IndexedSeq[Types.Bias] =
+    val hiddenLayerBiases: IndexedSeq[Bias] =
       IndexedSeq.fill(hiddenLayerSize)(randomBias)
     val hiddenLayerInputWeights: IndexedSeq[IndexedSeq[Weight]] =  // indexed by hidden, then input
       IndexedSeq.fill(hiddenLayerSize)(IndexedSeq.fill(inputLayerSize)(randomWeight))
