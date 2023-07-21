@@ -46,46 +46,14 @@ object HalfAdderRandomWeightsNNExpl extends App {
     private val weightsAndBiases = RandomOneHiddenNeuralNetworkWeightsAndBiases(topology)
 
     def computeActivations(inputActivations: LayerActivations): LayerActivations = {
-
-      def computeLayerActivation(prevLayerActivations: LayerActivations,
-                                 thisLayerBiases: LayerBiases,
-                                 thisLayerWeights: LayerWeights
-                                ): LayerActivations = {
-        assert(thisLayerBiases.vector.size == thisLayerWeights.matrix.size)
-        val thisLayerActivations =
-          for {
-            thisNeuronIdx <- thisLayerBiases.vector.indices
-            thisNeuronBias = thisLayerBiases.vector(thisNeuronIdx)
-            thisNeuronInputWeights = thisLayerWeights.matrix(thisNeuronIdx)
-            _ = assert(prevLayerActivations.vector.size == thisNeuronInputWeights.size)
-            sum = {
-              // Optimization:  Avoids creating collection of products:  Was
-              //   10-15% faster overall as of 2023-07-13:
-              var sum2 = 0d
-              for (prevNeuronIdx <- prevLayerActivations.vector.indices) {
-                sum2 +=
-                    prevLayerActivations.vector(prevNeuronIdx).raw
-                        * thisNeuronInputWeights(prevNeuronIdx).raw
-              }
-              sum2
-            }
-            rawAct = ActivationFunctions.standardLogisticFunction(sum + thisNeuronBias.raw)
-            act = Activation(rawAct)
-          } yield {
-            act
-          }
-        LayerActivations(thisLayerActivations)
-      }
-
       val hiddenLayerActivations =
-        computeLayerActivation(inputActivations,
-                              weightsAndBiases.hiddenLayerBiases,
-                              weightsAndBiases.hiddenLayerInputWeights)
-
+        LowlevelTypes.computeLayerActivation(inputActivations,
+                                             weightsAndBiases.hiddenLayerBiases,
+                                             weightsAndBiases.hiddenLayerInputWeights)
       val outputLayerActivations =
-        computeLayerActivation(hiddenLayerActivations,
-                              weightsAndBiases.outputLayerBiases,
-                              weightsAndBiases.outputLayerInputWeights)
+        LowlevelTypes.computeLayerActivation(hiddenLayerActivations,
+                                             weightsAndBiases.outputLayerBiases,
+                                             weightsAndBiases.outputLayerInputWeights)
       outputLayerActivations
     }
   }
