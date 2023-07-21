@@ -12,20 +12,22 @@ object HalfAdderRandomWeightsNNExpl extends App {
                                outputLayerSize: Int)
 
   case class RandomOneHiddenNeuralNetworkWeightsAndBiases(topology: OneHiddenTopology) {
-    private def randomWeight: Weight = {
+    private def randomSomething: Double = {
       if true then {
         val `rand_0_to_1`: Double = Random.nextFloat()
         //?????? parameterize
         val `rand_-1_to_1`: Double = (`rand_0_to_1` - 0.5) * 2
         val `rand_-x_to_x`: Double = `rand_-1_to_1` * 20  //????
-        Weight(`rand_-x_to_x`)
+        //println(s"randomSomething: ${`rand_-x_to_x`}")
+        `rand_-x_to_x`
       }
       else {
-        Weight(Random.nextGaussian() * 20)
+        Random.nextGaussian() * 20
       }
     }
 
-    private def randomBias: Bias = Bias(randomWeight.raw)  // ?? same for now
+    private def randomWeight: Weight = Weight(randomSomething)  // ?? same for now
+    private def randomBias: Bias = Bias(randomSomething)  // ?? same for now
 
     import topology.*
     val hiddenLayerBiases: LayerBiases =
