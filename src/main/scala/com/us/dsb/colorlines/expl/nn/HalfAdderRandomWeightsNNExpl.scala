@@ -1,8 +1,9 @@
 package com.us.dsb.colorlines.expl.nn
 
-import com.us.dsb.colorlines.expl.nn.LowlevelTypes.{
+import com.us.dsb.colorlines.expl.nn.ArrayTypes.{
   LayerActivations, LayerBiases, LayerWeights}
-import com.us.dsb.colorlines.expl.nn.ScalarTypes.{Activation, Bias, Weight}
+import com.us.dsb.colorlines.expl.nn.ScalarTypes.{
+  Activation, Bias, Weight}
 
 import scala.util.Random
 
