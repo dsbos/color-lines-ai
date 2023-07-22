@@ -51,13 +51,13 @@ object HalfAdderRandomWeightsNNExpl extends App {
 
     def computeActivations(inputActivations: LayerActivations): LayerActivations = {
       val hiddenLayerActivations =
-        LowlevelTypes.computeLayerActivation(inputActivations,
-                                             weightsAndBiases.hiddenLayerBiases,
-                                             weightsAndBiases.hiddenLayerInputWeights)
+        ArrayTypes.computeLayerActivation(inputActivations,
+                                          weightsAndBiases.hiddenLayerBiases,
+                                          weightsAndBiases.hiddenLayerInputWeights)
       val outputLayerActivations =
-        LowlevelTypes.computeLayerActivation(hiddenLayerActivations,
-                                             weightsAndBiases.outputLayerBiases,
-                                             weightsAndBiases.outputLayerInputWeights)
+        ArrayTypes.computeLayerActivation(hiddenLayerActivations,
+                                          weightsAndBiases.outputLayerBiases,
+                                          weightsAndBiases.outputLayerInputWeights)
       outputLayerActivations
     }
   }
