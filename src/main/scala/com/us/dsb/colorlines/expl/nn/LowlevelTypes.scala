@@ -1,27 +1,12 @@
 package com.us.dsb.colorlines.expl.nn
 
+import com.us.dsb.colorlines.expl.nn.ScalarTypes.{Activation, Bias, Weight}
+
+//?????? Update comments re ScalarTypes extraction
 /**
  * Lower-level types for neural networks.
  */
 object LowlevelTypes {
-
-  //////////
-  // Scalar/numeric types:
-
-  opaque type Bias       = Double
-  opaque type Weight     = Double
-  opaque type Activation = Double
-
-  object Bias:
-    def apply(value: Double)           : Bias       = value
-    extension (raw: Bias)       def raw: Double     = raw
-
-  object Weight:
-    def apply(value: Double)           : Weight     = value
-    extension (raw: Weight)     def raw: Double     = raw
-  object Activation:
-    def apply(value: Double)           : Activation = value
-    extension (raw: Activation) def raw: Double     = raw
 
   //////////
   // Weight/etc. vector and matrix types:
@@ -40,9 +25,6 @@ object LowlevelTypes {
                              thisLayerBiases     : LayerBiases,
                              thisLayerWeights    : LayerWeights
                             ): LayerActivations = {
-    // Note weird extension/import behavior:   Importing Bias.raw makes
-    //   Weight.raw and Activation.raw avialable too.  Normal?  Compiler bug?
-    import Bias.raw
     assert(thisLayerBiases.vector.size == thisLayerWeights.matrix.size)
     val thisLayerActivations =
       for {
