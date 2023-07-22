@@ -62,7 +62,8 @@ object HalfAdderRandomWeightsNNExpl extends App {
   }
 
   //?????? rename; longer; "evaluate" sounds like evaluating fitness, vs. evaluating
-  //  next function; ** "execute"? "compute"? ~~"evaluate function"
+  //  next function; ** "execute"? "compute output"? ~~"evaluate function"? "calculate output"?
+  //  ("transform"?)
   //?????? Maybe wrap Byte in Bit opaque type to limit to 0 and 1:
   //?????? Possibly wrap Double in something reflecting approximated "bitness":
   def eval(nw: RandomlyWeightedOneHiddenTopologyNeuralNetwork2,
