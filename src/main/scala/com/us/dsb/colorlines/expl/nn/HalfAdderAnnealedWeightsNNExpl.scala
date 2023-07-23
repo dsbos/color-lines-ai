@@ -47,11 +47,6 @@ object HalfAdderAnnealedWeightsNNExpl extends App {
       LayerBiases.fill(outputLayerSize)(Bias(0))
     override val outputLayerInputWeights: LayerWeights =
       LayerWeights.fill(outputLayerSize, hiddenLayerSize)(Weight(0))
-//    println(s"Random: ... hiddenLayerBiases = $hiddenLayerBiases")
-//    println(s"Random: ... hiddenLayerInputWeights = $hiddenLayerInputWeights")
-//    println(s"Random: ... outputLayerBiases = $outputLayerBiases")
-//    println(s"Random: ... outputLayerInputWeights = $outputLayerInputWeights")
-//    print("")
   }
 
   class DerivedRandomOneHiddenNeuralNetworkWeightsAndBiases(
@@ -72,15 +67,6 @@ object HalfAdderAnnealedWeightsNNExpl extends App {
         base.outputLayerInputWeights.matrix.map { weights =>
           weights.map(w => Weight(w.raw + randomWeight.raw / 10))
         })
-//    println(s"Derived: ... base.hiddenLayerBiases = $hiddenLayerBiases")
-//    println(s"Derived: ...      hiddenLayerBiases = ${base.hiddenLayerBiases}")
-//    println(s"Derived: ... base.hiddenLayerInputWeights = $hiddenLayerInputWeights")
-//    println(s"Derived: ...      hiddenLayerInputWeights = ${base.hiddenLayerInputWeights}")
-//    println(s"Derived: ... base.outputLayerBiases = $outputLayerBiases")
-//    println(s"Derived: ...      outputLayerBiases = ${base.outputLayerBiases}")
-//    println(s"Derived: ... base.outputLayerInputWeights = $outputLayerInputWeights")
-//    println(s"Derived: ...      outputLayerInputWeights = ${base.outputLayerInputWeights}")
-//    print("")
   }
 
 
@@ -131,9 +117,7 @@ object HalfAdderAnnealedWeightsNNExpl extends App {
     val inputActivations = LayerActivations(IndexedSeq(Activation(inputs._1),
                                                        Activation(inputs._2),
                                                        Activation(inputs._3)))  //??????
-    //println(s"inputActivations = $inputActivations")
     val outputActivations  = nw.xxcomputeActivations(inputActivations)
-    //println(s"outputActivations = $outputActivations")
     (outputActivations.vector(0).raw,
         outputActivations.vector(1).raw)
   }
@@ -195,9 +179,10 @@ object HalfAdderAnnealedWeightsNNExpl extends App {
       println(f"@ $iterations: base: $currFitness%11.5g -> cand: $candFitness%11.5g")
       cases.foreach { case ((a1, a2, a3), (c, s)) =>
         val nnOutput = eval(cand, (a1, a2, a3))
-        println(f"$a1 + $a2 + $a3 = $c $s: ${nnOutput._1}%11.5g, ${nnOutput._2}%11.5g"
-                    + f";  ∆c = ${nnOutput._1 - c}%11.5g"
-                    + f", ∆s = ${nnOutput._2 - s}%11.5g")
+        if ! true then
+          println(f"$a1 + $a2 + $a3 = $c $s: ${nnOutput._1}%11.5g, ${nnOutput._2}%11.5g"
+                      + f";  ∆c = ${nnOutput._1 - c}%11.5g"
+                      + f", ∆s = ${nnOutput._2 - s}%11.5g")
       }
       curr = cand
       currFitness = candFitness
