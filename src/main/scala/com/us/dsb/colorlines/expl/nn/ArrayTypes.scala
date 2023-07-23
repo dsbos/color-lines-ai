@@ -18,6 +18,10 @@ object ArrayTypes {
    * ... indexed by layer neuron offset, then by previous-layer neuron offset
    */
   case class LayerWeights(matrix: IndexedSeq[IndexedSeq[Weight]])
+  object LayerWeights {
+    def fill(layerSize: Int, prevLayerSize: Int)(weight: => Weight): LayerWeights =
+      LayerWeights(IndexedSeq.fill(layerSize)(IndexedSeq.fill(prevLayerSize)(weight)))
+  }
 
   case class LayerActivations(vector: IndexedSeq[Activation])
 

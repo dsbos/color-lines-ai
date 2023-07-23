@@ -39,12 +39,14 @@ object HalfAdderAnnealedWeightsNNExpl extends App {
       extends OneHiddenNeuralNetworkWeightsAndBiases{
     import topology.*
     //?????? wrap collection usages (value type? opaque type? regular class?)
-    override val hiddenLayerBiases: LayerBiases = LayerBiases.fill(hiddenLayerSize)(Bias(0))
+    override val hiddenLayerBiases: LayerBiases =
+      LayerBiases.fill(hiddenLayerSize)(Bias(0))
     override val hiddenLayerInputWeights: LayerWeights =
-      LayerWeights(IndexedSeq.fill(hiddenLayerSize)(IndexedSeq.fill(inputLayerSize)(Weight(0))))
-    override val outputLayerBiases: LayerBiases = LayerBiases.fill(outputLayerSize)(Bias(0))
+      LayerWeights.fill(hiddenLayerSize, inputLayerSize)(Weight(0))
+    override val outputLayerBiases: LayerBiases =
+      LayerBiases.fill(outputLayerSize)(Bias(0))
     override val outputLayerInputWeights: LayerWeights =
-      LayerWeights(IndexedSeq.fill(outputLayerSize)(IndexedSeq.fill(hiddenLayerSize)(randomWeight)))
+      LayerWeights.fill(outputLayerSize, hiddenLayerSize)(Weight(0))
 //    println(s"Random: ... hiddenLayerBiases = $hiddenLayerBiases")
 //    println(s"Random: ... hiddenLayerInputWeights = $hiddenLayerInputWeights")
 //    println(s"Random: ... outputLayerBiases = $outputLayerBiases")
@@ -62,16 +64,14 @@ object HalfAdderAnnealedWeightsNNExpl extends App {
       LayerWeights(
         base.hiddenLayerInputWeights.matrix.map { weights =>
           weights.map( w => Weight(w.raw + randomWeight.raw / 10))
-        }
-        )
+        })
     override val outputLayerBiases: LayerBiases =
       LayerBiases(base.outputLayerBiases.vector.map(b => Bias(b.raw + randomBias.raw / 10)))
     override val outputLayerInputWeights: LayerWeights =
       LayerWeights(
         base.outputLayerInputWeights.matrix.map { weights =>
           weights.map(w => Weight(w.raw + randomWeight.raw / 10))
-        }
-        )
+        })
 //    println(s"Derived: ... base.hiddenLayerBiases = $hiddenLayerBiases")
 //    println(s"Derived: ...      hiddenLayerBiases = ${base.hiddenLayerBiases}")
 //    println(s"Derived: ... base.hiddenLayerInputWeights = $hiddenLayerInputWeights")

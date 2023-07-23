@@ -1,9 +1,7 @@
 package com.us.dsb.colorlines.expl.nn
 
-import com.us.dsb.colorlines.expl.nn.ArrayTypes.{
-  LayerActivations, LayerBiases, LayerWeights}
-import com.us.dsb.colorlines.expl.nn.ScalarTypes.{
-  Activation, Bias, Weight}
+import com.us.dsb.colorlines.expl.nn.ArrayTypes.{LayerActivations, LayerBiases, LayerWeights}
+import com.us.dsb.colorlines.expl.nn.ScalarTypes.{Activation, Bias, Weight}
 
 import scala.util.Random
 
@@ -32,12 +30,14 @@ object HalfAdderRandomWeightsNNExpl extends App {
     private def randomBias: Bias = Bias(randomSomething)  // ?? same for now
 
     import topology.*
-    val hiddenLayerBiases: LayerBiases = LayerBiases.fill(hiddenLayerSize)(randomBias)
+    val hiddenLayerBiases: LayerBiases =
+      LayerBiases.fill(hiddenLayerSize)(randomBias)
     val hiddenLayerInputWeights: LayerWeights =
-      LayerWeights(IndexedSeq.fill(hiddenLayerSize)(IndexedSeq.fill(inputLayerSize)(randomWeight)))
-    val outputLayerBiases: LayerBiases = LayerBiases.fill(outputLayerSize)(randomBias)
+      LayerWeights.fill(hiddenLayerSize, inputLayerSize)(randomWeight)
+    val outputLayerBiases: LayerBiases =
+      LayerBiases.fill(outputLayerSize)(randomBias)
     val outputLayerInputWeights: LayerWeights =
-      LayerWeights(IndexedSeq.fill(outputLayerSize)(IndexedSeq.fill(hiddenLayerSize)(randomWeight)))
+      LayerWeights.fill(outputLayerSize, hiddenLayerSize)(randomWeight)
     print("")
   }
 
