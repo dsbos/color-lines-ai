@@ -39,12 +39,10 @@ object HalfAdderAnnealedWeightsNNExpl extends App {
       extends OneHiddenNeuralNetworkWeightsAndBiases{
     import topology.*
     //?????? wrap collection usages (value type? opaque type? regular class?)
-    override val hiddenLayerBiases: LayerBiases =
-      LayerBiases(IndexedSeq.fill(hiddenLayerSize)(randomBias))
+    override val hiddenLayerBiases: LayerBiases = LayerBiases.fill(hiddenLayerSize)(Bias(0))
     override val hiddenLayerInputWeights: LayerWeights =
-      LayerWeights(IndexedSeq.fill(hiddenLayerSize)(IndexedSeq.fill(inputLayerSize)(randomWeight)))
-    override val outputLayerBiases: LayerBiases =
-      LayerBiases(IndexedSeq.fill(outputLayerSize)(randomBias))
+      LayerWeights(IndexedSeq.fill(hiddenLayerSize)(IndexedSeq.fill(inputLayerSize)(Weight(0))))
+    override val outputLayerBiases: LayerBiases = LayerBiases.fill(outputLayerSize)(Bias(0))
     override val outputLayerInputWeights: LayerWeights =
       LayerWeights(IndexedSeq.fill(outputLayerSize)(IndexedSeq.fill(hiddenLayerSize)(randomWeight)))
 //    println(s"Random: ... hiddenLayerBiases = $hiddenLayerBiases")

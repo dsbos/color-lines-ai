@@ -32,12 +32,10 @@ object HalfAdderRandomWeightsNNExpl extends App {
     private def randomBias: Bias = Bias(randomSomething)  // ?? same for now
 
     import topology.*
-    val hiddenLayerBiases: LayerBiases =
-      LayerBiases(IndexedSeq.fill(hiddenLayerSize)(randomBias))
+    val hiddenLayerBiases: LayerBiases = LayerBiases.fill(hiddenLayerSize)(randomBias)
     val hiddenLayerInputWeights: LayerWeights =
       LayerWeights(IndexedSeq.fill(hiddenLayerSize)(IndexedSeq.fill(inputLayerSize)(randomWeight)))
-    val outputLayerBiases: LayerBiases =
-      LayerBiases(IndexedSeq.fill(outputLayerSize)(randomBias))
+    val outputLayerBiases: LayerBiases = LayerBiases.fill(outputLayerSize)(randomBias)
     val outputLayerInputWeights: LayerWeights =
       LayerWeights(IndexedSeq.fill(outputLayerSize)(IndexedSeq.fill(hiddenLayerSize)(randomWeight)))
     print("")

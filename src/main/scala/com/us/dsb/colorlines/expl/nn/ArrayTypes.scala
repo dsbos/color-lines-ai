@@ -8,6 +8,10 @@ import com.us.dsb.colorlines.expl.nn.ScalarTypes.{Activation, Bias, Weight}
 object ArrayTypes {
 
   case class LayerBiases(vector: IndexedSeq[Bias])
+  object LayerBiases {
+    def fill(layerSize: Int)(bias: => Bias): LayerBiases =
+      LayerBiases(IndexedSeq.fill(layerSize)(bias))
+  }
 
   /**
    * @param matrix
