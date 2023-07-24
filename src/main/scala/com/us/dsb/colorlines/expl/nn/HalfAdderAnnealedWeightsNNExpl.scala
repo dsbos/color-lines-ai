@@ -1,6 +1,7 @@
 package com.us.dsb.colorlines.expl.nn
 
-import com.us.dsb.colorlines.expl.nn.ArrayTypes.{LayerActivations, LayerBiases, LayerWeights}
+import com.us.dsb.colorlines.expl.nn.ArrayTypes.{
+  LayerActivations, LayerBiases, LayerParameters, LayerWeights}
 import com.us.dsb.colorlines.expl.nn.ScalarTypes.{Activation, Bias, Weight, raw}
 
 import scala.util.Random
@@ -12,24 +13,23 @@ object HalfAdderAnnealedWeightsNNExpl extends App {
                                outputLayerSize: Int)
 
   trait OneHiddenNeuralNetworkWeightsAndBiases {
-    val hiddenLayerBiases: LayerBiases
-    val hiddenLayerInputWeights: LayerWeights
-    val outputLayerBiases: LayerBiases
-    val outputLayerInputWeights: LayerWeights  // indexed by output, then hidden
+    val hiddenLayer: LayerParameters
+    val outputLayer: LayerParameters
   }
 
   case class ZeroesOneHiddenNeuralNetworkWeightsAndBiases(topology: OneHiddenTopology)
       extends OneHiddenNeuralNetworkWeightsAndBiases{
-    import topology.*
-    //?????? wrap collection usages (value type? opaque type? regular class?)
-    override val hiddenLayerBiases: LayerBiases =
-      LayerBiases.fill(hiddenLayerSize)(Bias(0))
-    override val hiddenLayerInputWeights: LayerWeights =
-      LayerWeights.fill(hiddenLayerSize, inputLayerSize)(Weight(0))
-    override val outputLayerBiases: LayerBiases =
-      LayerBiases.fill(outputLayerSize)(Bias(0))
-    override val outputLayerInputWeights: LayerWeights =
-      LayerWeights.fill(outputLayerSize, hiddenLayerSize)(Weight(0))
+    import topology.{inputLayerSize, hiddenLayerSize, outputLayerSize}
+    val hiddenLayer: LayerParameters =
+      LayerParameters(hiddenLayerSize,
+                      LayerBiases.fill(hiddenLayerSize)(Bias(0)),
+                      LayerWeights.fill(hiddenLayerSize, inputLayerSize)(Weight(0)),
+                      topology.inputLayerSize)
+    val outputLayer: LayerParameters =
+      LayerParameters(topology.outputLayerSize,
+                      LayerBiases.fill(outputLayerSize)(Bias(0)),
+                      LayerWeights.fill(outputLayerSize, hiddenLayerSize)(Weight(0)),
+                      hiddenLayerSize)
   }
 
   private def randomSomething: Double = {
@@ -51,21 +51,27 @@ object HalfAdderAnnealedWeightsNNExpl extends App {
   class DerivedRandomOneHiddenNeuralNetworkWeightsAndBiases(
       base: OneHiddenNeuralNetworkWeightsAndBiases) extends OneHiddenNeuralNetworkWeightsAndBiases {
     val reductionFactor = 10.0
-    override val hiddenLayerBiases: LayerBiases =
-      LayerBiases(base.hiddenLayerBiases.vector.map(b => Bias(b.raw + randomBiasIncr.raw)))
-    //println(s"DerivedOneHiddenNeuralNetworkWeightsAndBiases: hiddenLayerBiases = $hiddenLayerBiases")
-    override val hiddenLayerInputWeights: LayerWeights =
-      LayerWeights(
-        base.hiddenLayerInputWeights.matrix.map { weights =>
-          weights.map( w => Weight(w.raw + randomWeightIncr.raw))
-        })
-    override val outputLayerBiases: LayerBiases =
-      LayerBiases(base.outputLayerBiases.vector.map(b => Bias(b.raw + randomBiasIncr.raw)))
-    override val outputLayerInputWeights: LayerWeights =
-      LayerWeights(
-        base.outputLayerInputWeights.matrix.map { weights =>
-          weights.map(w => Weight(w.raw + randomWeightIncr.raw))
-        })
+
+    override val hiddenLayer: LayerParameters =
+      LayerParameters(
+        base.hiddenLayer.size,
+        LayerBiases(base.hiddenLayer.biases.vector.map(b => Bias(b.raw + randomBiasIncr.raw))),
+        LayerWeights(
+          base.hiddenLayer.weights.matrix.map { weights =>
+            weights.map(w => Weight(w.raw + randomWeightIncr.raw))
+          }),
+        base.hiddenLayer.inputSize
+      )
+    override val outputLayer: LayerParameters =
+      LayerParameters(
+        base.outputLayer.size,
+        LayerBiases(base.outputLayer.biases.vector.map(b => Bias(b.raw + randomBiasIncr.raw))),
+        LayerWeights(
+          base.outputLayer.weights.matrix.map { weights =>
+            weights.map(w => Weight(w.raw + randomWeightIncr.raw))
+          }),
+        base.outputLayer.inputSize
+        )
   }
 
 
@@ -75,17 +81,14 @@ object HalfAdderAnnealedWeightsNNExpl extends App {
   abstract class OneHiddenTopologyNeuralNetwork(val topology: OneHiddenTopology) {
     def weightsAndBiases: OneHiddenNeuralNetworkWeightsAndBiases
 
-    def xxcomputeActivations(inputActivations: LayerActivations): LayerActivations = {
-
+    def computeOutputActivations(inputActivations: LayerActivations
+                                ): LayerActivations = {
       val hiddenLayerActivations =
         ArrayTypes.computeLayerActivation(inputActivations,
-                                          weightsAndBiases.hiddenLayerBiases,
-                                          weightsAndBiases.hiddenLayerInputWeights)
-
+                                          weightsAndBiases.hiddenLayer)
       val outputLayerActivations =
         ArrayTypes.computeLayerActivation(hiddenLayerActivations,
-                                          weightsAndBiases.outputLayerBiases,
-                                          weightsAndBiases.outputLayerInputWeights)
+                                          weightsAndBiases.outputLayer)
       outputLayerActivations
     }
   }
@@ -116,7 +119,7 @@ object HalfAdderAnnealedWeightsNNExpl extends App {
     val inputActivations = LayerActivations(IndexedSeq(Activation(inputs._1),
                                                        Activation(inputs._2),
                                                        Activation(inputs._3)))  //??????
-    val outputActivations  = nw.xxcomputeActivations(inputActivations)
+    val outputActivations  = nw.computeOutputActivations(inputActivations)
     (outputActivations.vector(0).raw,
         outputActivations.vector(1).raw)
   }

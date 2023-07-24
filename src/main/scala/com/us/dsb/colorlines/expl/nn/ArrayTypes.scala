@@ -25,17 +25,25 @@ object ArrayTypes {
 
   case class LayerActivations(vector: IndexedSeq[Activation])
 
+  //???????? revisit passing sizes, parameter order
+  case class LayerParameters(size     : Int,
+                             biases   : LayerBiases,
+                             weights  : LayerWeights,
+                             inputSize: Int) {
+    assert(biases.vector.size == size)
+    assert(weights.matrix.size == size)
+    assert(weights.matrix.forall(_.size == inputSize))
+  }
 
   def computeLayerActivation(prevLayerActivations: LayerActivations,
-                             thisLayerBiases     : LayerBiases,
-                             thisLayerWeights    : LayerWeights
+                             thisLayer           : LayerParameters
                             ): LayerActivations = {
-    assert(thisLayerBiases.vector.size == thisLayerWeights.matrix.size)
+    assert(thisLayer.biases.vector.size == thisLayer.weights.matrix.size)
     val thisLayerActivations =
       for {
-        thisNeuronIdx <- thisLayerBiases.vector.indices
-        thisNeuronBias = thisLayerBiases.vector(thisNeuronIdx)
-        thisNeuronInputWeights = thisLayerWeights.matrix(thisNeuronIdx)
+        thisNeuronIdx <- thisLayer.biases.vector.indices
+        thisNeuronBias = thisLayer.biases.vector(thisNeuronIdx)
+        thisNeuronInputWeights = thisLayer.weights.matrix(thisNeuronIdx)
         _ = assert(prevLayerActivations.vector.size == thisNeuronInputWeights.size)
         sum = {
           // Optimization:  Avoids creating collection of products:  Was
