@@ -18,24 +18,7 @@ object HalfAdderAnnealedWeightsNNExpl extends App {
     val outputLayerInputWeights: LayerWeights  // indexed by output, then hidden
   }
 
-  private def randomSomething: Double = {
-    if true then {
-      val `rand_0_to_1`: Double = Random.nextFloat()
-      //?????? parameterize
-      val `rand_-1_to_1`: Double = (`rand_0_to_1` - 0.5) * 2
-      val `rand_-x_to_x`: Double = `rand_-1_to_1` * 2 // 20 // 5 // 20 //????
-      //println(s"randomSomething: ${`rand_-x_to_x`}")
-      `rand_-x_to_x`
-    }
-    else {
-      Random.nextGaussian() * 20
-    }
-  }
-
-  private def randomWeight: Weight = Weight(randomSomething) // ?? same for now
-  private def randomBias: Bias = Bias(randomSomething) // ?? same for now
-
-  case class RandomOneHiddenNeuralNetworkWeightsAndBiases(topology: OneHiddenTopology)
+  case class ZeroesOneHiddenNeuralNetworkWeightsAndBiases(topology: OneHiddenTopology)
       extends OneHiddenNeuralNetworkWeightsAndBiases{
     import topology.*
     //?????? wrap collection usages (value type? opaque type? regular class?)
@@ -49,23 +32,39 @@ object HalfAdderAnnealedWeightsNNExpl extends App {
       LayerWeights.fill(outputLayerSize, hiddenLayerSize)(Weight(0))
   }
 
+  private def randomSomething: Double = {
+    if true then {
+      val `rand_0_to_1`: Double = Random.nextFloat()
+      //?????? parameterize
+      val `rand_-1_to_1`: Double = (`rand_0_to_1` - 0.5) * 2
+      val `rand_-x_to_x`: Double = `rand_-1_to_1` * 10 // 20 // 5 // 20 //????
+      //println(s"randomSomething: ${`rand_-x_to_x`}")
+      `rand_-x_to_x`
+    }
+    else {
+      Random.nextGaussian() * 20
+    }
+  }
+  private def randomWeightIncr: Weight = Weight(randomSomething  / 10) // ?? same for now
+  private def randomBiasIncr:   Bias   = Bias(  randomSomething  / 10) // ?? same for now
+
   class DerivedRandomOneHiddenNeuralNetworkWeightsAndBiases(
-                                                                 base: OneHiddenNeuralNetworkWeightsAndBiases) extends OneHiddenNeuralNetworkWeightsAndBiases {
+      base: OneHiddenNeuralNetworkWeightsAndBiases) extends OneHiddenNeuralNetworkWeightsAndBiases {
     val reductionFactor = 10.0
     override val hiddenLayerBiases: LayerBiases =
-      LayerBiases(base.hiddenLayerBiases.vector.map(b => Bias(b.raw + randomBias.raw / 10)))
+      LayerBiases(base.hiddenLayerBiases.vector.map(b => Bias(b.raw + randomBiasIncr.raw)))
     //println(s"DerivedOneHiddenNeuralNetworkWeightsAndBiases: hiddenLayerBiases = $hiddenLayerBiases")
     override val hiddenLayerInputWeights: LayerWeights =
       LayerWeights(
         base.hiddenLayerInputWeights.matrix.map { weights =>
-          weights.map( w => Weight(w.raw + randomWeight.raw / 10))
+          weights.map( w => Weight(w.raw + randomWeightIncr.raw))
         })
     override val outputLayerBiases: LayerBiases =
-      LayerBiases(base.outputLayerBiases.vector.map(b => Bias(b.raw + randomBias.raw / 10)))
+      LayerBiases(base.outputLayerBiases.vector.map(b => Bias(b.raw + randomBiasIncr.raw)))
     override val outputLayerInputWeights: LayerWeights =
       LayerWeights(
         base.outputLayerInputWeights.matrix.map { weights =>
-          weights.map(w => Weight(w.raw + randomWeight.raw / 10))
+          weights.map(w => Weight(w.raw + randomWeightIncr.raw))
         })
   }
 
@@ -93,7 +92,7 @@ object HalfAdderAnnealedWeightsNNExpl extends App {
 
   case class RandomlyWeightedOneHiddenTopologyNeuralNetwork(override val topology: OneHiddenTopology)
       extends OneHiddenTopologyNeuralNetwork(topology) {
-    override val weightsAndBiases = RandomOneHiddenNeuralNetworkWeightsAndBiases(topology)
+    override val weightsAndBiases = ZeroesOneHiddenNeuralNetworkWeightsAndBiases(topology)
   }
 
   case class DerivedRandomlyWeightedOneHiddenTopologyNeuralNetwork(
