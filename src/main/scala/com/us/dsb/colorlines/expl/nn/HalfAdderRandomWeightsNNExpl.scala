@@ -3,13 +3,15 @@ package com.us.dsb.colorlines.expl.nn
 import com.us.dsb.colorlines.expl.nn.ArrayTypes.{
   LayerActivations, LayerBiases, LayerParameters, LayerWeights}
 import com.us.dsb.colorlines.expl.nn.ScalarTypes.{Activation, Bias, Weight}
-import com.us.dsb.colorlines.expl.nn.TypesToSort.OneHiddenTopology
+import com.us.dsb.colorlines.expl.nn.TypesToSort.{
+  OneHiddenNeuralNetworkWeightsAndBiases, OneHiddenTopology}
 
 import scala.util.Random
 
 object HalfAdderRandomWeightsNNExpl extends App {
   
-  case class RandomOneHiddenNeuralNetworkWeightsAndBiases(topology: OneHiddenTopology) {
+  case class RandomOneHiddenNeuralNetworkWeightsAndBiases(topology: OneHiddenTopology)
+      extends OneHiddenNeuralNetworkWeightsAndBiases {
     private def randomSomething: Double = {
       if true then {
         val `rand_0_to_1`: Double = Random.nextFloat()
@@ -28,12 +30,12 @@ object HalfAdderRandomWeightsNNExpl extends App {
     private def randomBias: Bias = Bias(randomSomething)  // ?? same for now
 
     import topology.*
-    val hiddenLayer: LayerParameters =
+    override val hiddenLayer: LayerParameters =
       LayerParameters(topology.hiddenLayerSize,
                       LayerBiases.fill(hiddenLayerSize)(randomBias),
                       LayerWeights.fill(hiddenLayerSize, inputLayerSize)(randomWeight),
                       topology.inputLayerSize)
-    val outputLayer: LayerParameters =
+    override val outputLayer: LayerParameters =
       LayerParameters(topology.outputLayerSize,
                       LayerBiases.fill(outputLayerSize)(randomBias),
                       LayerWeights.fill(outputLayerSize, hiddenLayerSize)(randomWeight),
@@ -45,7 +47,8 @@ object HalfAdderRandomWeightsNNExpl extends App {
    * ... without explicit neuron objects (with arrays) ... or stored activations ...
    */
   case class RandomlyWeightedOneHiddenTopologyNeuralNetwork2(topology: OneHiddenTopology) {
-    private val weightsAndBiases = RandomOneHiddenNeuralNetworkWeightsAndBiases(topology)
+    private val weightsAndBiases: OneHiddenNeuralNetworkWeightsAndBiases =
+      RandomOneHiddenNeuralNetworkWeightsAndBiases(topology)
 
     def computeOutputActivations(inputActivations: LayerActivations
                                 ): LayerActivations = {
@@ -80,11 +83,13 @@ object HalfAdderRandomWeightsNNExpl extends App {
   }
 
   // ?? TODO: _Possibly_ wrap Double in some opaque fitness type:
-  def computeFitness(nw: RandomlyWeightedOneHiddenTopologyNeuralNetwork2): Double = 
+  //????????
+  def computeFitness(nw: RandomlyWeightedOneHiddenTopologyNeuralNetwork2): Double =
     HalfAdderCommon.computeFitness((a1: Byte, a2: Byte, a3: Byte) => eval(nw, (a1, a2, a3)))
 
   def makeHalfAdderNetwork: RandomlyWeightedOneHiddenTopologyNeuralNetwork2 =
     RandomlyWeightedOneHiddenTopologyNeuralNetwork2(OneHiddenTopology(3, 4, 2))
+  //????????
 
   val startMs = System.currentTimeMillis()
   var curr = makeHalfAdderNetwork
@@ -97,7 +102,7 @@ object HalfAdderRandomWeightsNNExpl extends App {
       val pct = 100.0 * iterations / maxIterations
       println(f"@ $iterations (/$maxIterations, ${pct}%4.1f%%) currFitness = $currFitness%8.5f ...")
     }
-    val cand = makeHalfAdderNetwork
+    val cand = makeHalfAdderNetwork  //????????
     val candFitness = computeFitness(cand)
 
     if candFitness > currFitness then {

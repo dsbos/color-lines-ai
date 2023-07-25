@@ -3,26 +3,22 @@ package com.us.dsb.colorlines.expl.nn
 import com.us.dsb.colorlines.expl.nn.ArrayTypes.{
   LayerActivations, LayerBiases, LayerParameters, LayerWeights}
 import com.us.dsb.colorlines.expl.nn.ScalarTypes.{Activation, Bias, Weight, raw}
-import com.us.dsb.colorlines.expl.nn.TypesToSort.OneHiddenTopology
+import com.us.dsb.colorlines.expl.nn.TypesToSort.{
+  OneHiddenNeuralNetworkWeightsAndBiases, OneHiddenTopology}
 
 import scala.util.Random
 
 object HalfAdderAnnealedWeightsNNExpl extends App {
 
-  trait OneHiddenNeuralNetworkWeightsAndBiases {
-    val hiddenLayer: LayerParameters
-    val outputLayer: LayerParameters
-  }
-
   case class ZeroesOneHiddenNeuralNetworkWeightsAndBiases(topology: OneHiddenTopology)
       extends OneHiddenNeuralNetworkWeightsAndBiases {
     import topology.{inputLayerSize, hiddenLayerSize, outputLayerSize}
-    val hiddenLayer: LayerParameters =
+    override val hiddenLayer: LayerParameters =
       LayerParameters(hiddenLayerSize,
                       LayerBiases.fill(hiddenLayerSize)(Bias(0)),
                       LayerWeights.fill(hiddenLayerSize, inputLayerSize)(Weight(0)),
                       topology.inputLayerSize)
-    val outputLayer: LayerParameters =
+    override val outputLayer: LayerParameters =
       LayerParameters(topology.outputLayerSize,
                       LayerBiases.fill(outputLayerSize)(Bias(0)),
                       LayerWeights.fill(outputLayerSize, hiddenLayerSize)(Weight(0)),
