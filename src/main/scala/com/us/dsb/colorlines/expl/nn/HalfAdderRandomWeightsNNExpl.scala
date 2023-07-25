@@ -82,35 +82,9 @@ object HalfAdderRandomWeightsNNExpl extends App {
         outputActivations.vector(1).raw)
   }
 
-  val cases: List[((Byte, Byte, Byte), (Byte, Byte))] = {
-    List( // 3 bits to add -> 2-bit sum (high bit, low bit)
-          (0, 0, 0) -> (0, 0),
-          (0, 0, 1) -> (0, 1),
-          (0, 1, 0) -> (0, 1),
-          (0, 1, 1) -> (1, 0),
-          (1, 0, 0) -> (0, 1),
-          (1, 0, 1) -> (1, 0),
-          (1, 1, 0) -> (1, 0),
-          (1, 1, 1) -> (1, 1),
-          )
-        .map { case ((a1, a2, a3), (c, s)) =>
-          ((a1.toByte, a2.toByte, a3.toByte), (c.toByte, s.toByte))
-        }
-  }
-
   // ?? TODO: _Possibly_ wrap Double in some opaque fitness type:
-  def computeFitness(nw: RandomlyWeightedOneHiddenTopologyNeuralNetwork2): Double = {
-    val fitness =
-      cases.map { case ((a1, a2, a3), (c, s)) =>
-        val nnOutput = eval(nw, (a1, a2, a3))
-        val cError = nnOutput._1 - c
-        val sError = nnOutput._2 - s
-        val error = cError * cError + sError * sError
-        val caseFitness = -error
-        caseFitness
-      }.sum
-    fitness
-  }
+  def computeFitness(nw: RandomlyWeightedOneHiddenTopologyNeuralNetwork2): Double = 
+    HalfAdderCommon.computeFitness((a1: Byte, a2: Byte, a3: Byte) => eval(nw, (a1, a2, a3)))
 
   def makeHalfAdderNetwork: RandomlyWeightedOneHiddenTopologyNeuralNetwork2 =
     RandomlyWeightedOneHiddenTopologyNeuralNetwork2(OneHiddenTopology(3, 4, 2))
@@ -131,7 +105,7 @@ object HalfAdderRandomWeightsNNExpl extends App {
 
     if candFitness > currFitness then {
       println(f"@ $iterations: base: $currFitness%8.5f -> cand: $candFitness%8.5f")
-      cases.foreach { case ((a1, a2, a3), (c, s)) =>
+      HalfAdderCommon.cases.foreach { case ((a1, a2, a3), (c, s)) =>
         val nnOutput = eval(cand, (a1, a2, a3))
         println(f"$a1 + $a2 + $a3 = $c $s: ${nnOutput._1}%8.5f, ${nnOutput._2}%8.5f"
                     + f";  ∆c = ${nnOutput._1 - c}%8.5f"
