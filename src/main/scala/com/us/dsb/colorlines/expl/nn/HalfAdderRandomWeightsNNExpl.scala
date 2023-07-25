@@ -3,15 +3,12 @@ package com.us.dsb.colorlines.expl.nn
 import com.us.dsb.colorlines.expl.nn.ArrayTypes.{
   LayerActivations, LayerBiases, LayerParameters, LayerWeights}
 import com.us.dsb.colorlines.expl.nn.ScalarTypes.{Activation, Bias, Weight}
+import com.us.dsb.colorlines.expl.nn.TypesToSort.OneHiddenTopology
 
 import scala.util.Random
 
 object HalfAdderRandomWeightsNNExpl extends App {
   
-  case class OneHiddenTopology(inputLayerSize : Int,
-                               hiddenLayerSize: Int,
-                               outputLayerSize: Int)
-
   case class RandomOneHiddenNeuralNetworkWeightsAndBiases(topology: OneHiddenTopology) {
     private def randomSomething: Double = {
       if true then {
