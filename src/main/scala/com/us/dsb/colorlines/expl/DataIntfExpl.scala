@@ -6,58 +6,61 @@ import com.us.dsb.colorlines.expl.nn.ScalarTypes.{Activation, Bias, Weight, raw}
 object DataIntfExpl extends App {
 
   // Model 1:  single flat trait, all indexing methods (no collections/objects), "manual" size/offset correpondence
-  trait Model1NeuralNetworkParametersIntf:
-    def getInputNeuronCount          : Int  //????? "activations"?
-    def getLayerCount                : Int
-    def getNeuronCount(layerNum: Int): Int
-    def getBias       (layerNum: Int)(neuronNum: Int)                    : Bias
-    def getWeight     (layerNum: Int)(neuronNum: Int)(predNeuronNum: Int): Weight
+  object Model1:
+    trait NeuralNetworkParametersIntf:
+      def getInputNeuronCount          : Int  //????? "activations"? "inputs"?
+      def getLayerCount                : Int
+      def getNeuronCount(layerNum: Int): Int
+      def getBias       (layerNum: Int)(neuronNum: Int)                    : Bias
+      def getWeight     (layerNum: Int)(neuronNum: Int)(predNeuronNum: Int): Weight
 
   // Model 2:  Like Model 1 except with layer subobject (still no collections, etc.)
-  trait Model2Layer:
-    def getInputNeuronCount: Int
-    def getNeuronCount     : Int
-    def getBias  (neuronNum: Int): Bias
-    def getWeight(neuronNum: Int)(predNeuronNum: Int): Weight
-  trait Model2NeuralNetworkParametersIntf:
-    def getInputNeuronCount: Int  //?????? have redundantly or get via first layer
-    def getLayerCount      : Int
-    def getLayer(layerNum: Int): Model2Layer
+  object Model2:
+    trait LayerParametersIntf:
+      def getInputNeuronCount: Int
+      def getNeuronCount     : Int
+      def getBias  (neuronNum: Int): Bias
+      def getWeight(neuronNum: Int)(predNeuronNum: Int): Weight
+    trait NeuralNetworkParametersIntf:
+      def getInputNeuronCount: Int  //?????? have redundantly or get via first layer?
+      def getLayerCount      : Int
+      def getLayer(layerNum: Int): LayerParametersIntf
 
   // Model 3:  Like model 2 except collection for layer subobjects (only)
-  trait Model3Layer:
-    def getInputNeuronCount: Int
-    def getNeuronCount     : Int
-    def getBias  (neuronNum: Int): Bias
-    def getWeight(neuronNum: Int)(predNeuronNum: Int): Weight
-  trait Model3NeuralNetworkParametersIntf:
-    def getInputNeuronCount: Int  //?????? have redundantly or get via first layer?
-    def getLayers: IndexedSeq[Model3Layer]
+  object Model3:
+    trait LayerParametersIntf:
+      def getInputNeuronCount: Int
+      def getNeuronCount     : Int
+      def getBias  (neuronNum: Int): Bias
+      def getWeight(neuronNum: Int)(predNeuronNum: Int): Weight
+    trait NeuralNetworkParametersIntf:
+      def getInputNeuronCount: Int  //?????? have redundantly or get via first layer?
+      def getLayers: IndexedSeq[LayerParametersIntf]
 
   // Model 4:  Typical collections/objects; two levels, biases separate from (2-D) weights; (no indexing methods)
-  trait Model4Layer:
-    def getInputNeuronCount: Int  //?????? have redundantly or get via bias or weight collections?
-    def getNeuronCount     : Int  //?????? have redundantly or get via bias or weight collections?
-    def getBiases : IndexedSeq[Bias]
-    def getWeights: IndexedSeq[IndexedSeq[Weight]]
-  trait Model4NeuralNetworkParametersIntf:
-    def getInputNeuronCount: Int  //?????? have redundantly or get via first layer?
-    def getLayers: IndexedSeq[Model4Layer]  // (or Seq)
+  object Model4:
+    trait LayerParametersIntf:
+      def getInputNeuronCount: Int  //?????? have redundantly or get via bias or weight collections?
+      def getNeuronCount     : Int  //?????? have redundantly or get via bias or weight collections?
+      def getBiases : IndexedSeq[Bias]
+      def getWeights: IndexedSeq[IndexedSeq[Weight]]
+    trait NeuralNetworkParametersIntf:
+      def getInputNeuronCount: Int      //?????? have redundantly or get via first layer?
+      def getLayers: IndexedSeq[LayerParametersIntf]  // (or Seq)
 
   // Model 5:  Like Model 5 except with three levels--neurons with 1-D weights and bias
-  trait Model5NeuronParameters:
-    def getInputNeuronCount: Int  //?????? what about redundancy and about proximity?
-    def getBias   : Bias
-    def getWeights: IndexedSeq[Weight]
-  trait Model5Layer:
-    def getInputNeuronCount: Int
-    def getNeuronCount     : Int
-    def getNeuronsParameters: IndexedSeq[Model5NeuronParameters]
-  trait Model5NeuralNetworkParametersIntf:
-    def getInputNeuronCount: Int            //?????? have redundantly or get via first layer?
-    def getLayers: IndexedSeq[Model5Layer]  // (or Seq)
-
-  ////////////////////////////////////////
+  object Model5:
+    trait NeuronParametersIntf:
+      def getInputNeuronCount: Int  //?????? what about redundancy and about proximity?
+      def getBias   : Bias
+      def getWeights: IndexedSeq[Weight]
+    trait LayerParametersIntf:
+      def getInputNeuronCount: Int
+      def getNeuronCount     : Int
+      def getNeuronsParameters: IndexedSeq[NeuronParametersIntf]
+    trait NeuralNetworkParametersIntf:
+      def getInputNeuronCount: Int  // Have redundantly to reduce digging down by client
+      def getLayers: IndexedSeq[LayerParametersIntf]  // (or Seq)
 
   object Temp {
 
@@ -90,11 +93,11 @@ object DataIntfExpl extends App {
       Activation(rawAct)
     }
 
-    val nn1: Model1NeuralNetworkParametersIntf = ???
-    val nn2: Model2NeuralNetworkParametersIntf = ???
-    val nn3: Model3NeuralNetworkParametersIntf = ???
-    val nn4: Model4NeuralNetworkParametersIntf = ???
-    val nn5: Model5NeuralNetworkParametersIntf = ???
+    val nn1: Model1.NeuralNetworkParametersIntf = ???
+    val nn2: Model2.NeuralNetworkParametersIntf = ???
+    val nn3: Model3.NeuralNetworkParametersIntf = ???
+    val nn4: Model4.NeuralNetworkParametersIntf = ???
+    val nn5: Model5.NeuralNetworkParametersIntf = ???
 
     val inputActivations: LayerActivations = ???
 
