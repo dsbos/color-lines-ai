@@ -64,10 +64,10 @@ object DataIntfExpl extends App {
 
   object Temp {
 
-    def computeNeuronActivation1ViaSeqs(inputActivations: LayerActivations,
-                                        neuronInputWeights: IndexedSeq[Weight],
-                                        neuronBias: Bias
-                                       ): Activation = {
+    def computeNeuronActivationViaSeqs(inputActivations: LayerActivations,
+                                       neuronInputWeights: IndexedSeq[Weight],
+                                       neuronBias: Bias
+                                      ): Activation = {
       require(inputActivations.vector.size == neuronInputWeights.size,
               s"inputActivations.vector.size = ${inputActivations.vector.size}"
                   +  s" != neuronInputWeights.size = ${neuronInputWeights.size}")
@@ -151,7 +151,7 @@ object DataIntfExpl extends App {
       nn4.getLayers.foldLeft(inputActivations) { (inActs, layer) =>
         val outActs =
           (0 until layer.getNeuronCount).map { neuronIdx =>
-            computeNeuronActivation1ViaSeqs(
+            computeNeuronActivationViaSeqs(
               inputActivations   = inActs,
               neuronInputWeights = layer.getWeights(neuronIdx),
               neuronBias         = layer.getBiases(neuronIdx))
@@ -169,7 +169,7 @@ object DataIntfExpl extends App {
       nn5.getLayers.foldLeft(inputActivations) { (inActs, layer) =>
         val outActs =
           layer.getNeuronsParameters.map { neuronData =>
-            computeNeuronActivation1ViaSeqs(
+            computeNeuronActivationViaSeqs(
               inputActivations   = inActs,
               neuronInputWeights = neuronData.getWeights,
               neuronBias         = neuronData.getBias)
