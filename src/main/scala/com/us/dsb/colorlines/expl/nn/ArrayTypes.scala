@@ -35,31 +35,46 @@ object ArrayTypes {
     assert(weights.matrix.forall(_.size == inputSize))
   }
 
+  /**
+   * Computes activation of a neuron; uses standard logistic function.
+   * @param inputActivations
+   *   activations of input neurons; size and order must correspond to those of
+   *   `weights`; _should_ be an `IndexedSeq` for speed
+   * @param weights
+   *   per-input weights of neuron; per input activation; _should_ be an
+   *  `IndexedSeq` for speed
+   * @param bias
+   *   bias of neuron
+   * @return
+   */
+  private def computeNeuronActivation(inputActivations: Seq[Activation],
+                                      weights: Seq[Weight],
+                                      bias: Bias
+                                     ): Activation = {
+    // Optimization:  Accumulating sum and using explicit while loop to avoid
+    // creating collection of products or intermediate Tuples.  Over twice as
+    // fast as .zip/.lazyZip, .map, and .sum.  (10-15% faster overall for
+    // half-adder app as of 2023-07-13.)
+    var sumAccum: Double = 0d
+    {
+      val end = inputActivations.indices.end  // avoiding re-accessing is significant
+      var inputIdx = inputActivations.indices.start
+      while inputIdx < end do
+        sumAccum += inputActivations(inputIdx).raw * weights(inputIdx).raw
+        inputIdx += 1
+    }
+    Activation(ActivationFunctions.standardLogisticFunction(sumAccum + bias.raw))
+  }
+
   def computeLayerActivation(prevLayerActivations: LayerActivations,
                              thisLayer           : LayerParameters
                             ): LayerActivations = {
     assert(thisLayer.biases.vector.size == thisLayer.weights.matrix.size)
     val thisLayerActivations =
-      for {
-        thisNeuronIdx <- thisLayer.biases.vector.indices
-        thisNeuronBias = thisLayer.biases.vector(thisNeuronIdx)
-        thisNeuronInputWeights = thisLayer.weights.matrix(thisNeuronIdx)
-        _ = assert(prevLayerActivations.vector.size == thisNeuronInputWeights.size)
-        sum = {
-          // Optimization:  Avoids creating collection of products:  Was
-          //   10-15% faster overall as of 2023-07-13:
-          var accum: Double = 0d
-          for (prevNeuronIdx <- prevLayerActivations.vector.indices) {
-            accum +=
-                prevLayerActivations.vector(prevNeuronIdx).raw
-                    * thisNeuronInputWeights(prevNeuronIdx).raw
-          }
-          accum
-        }
-        rawAct = ActivationFunctions.standardLogisticFunction(sum + thisNeuronBias.raw)
-        act = Activation(rawAct)
-      } yield {
-        act
+      for (neuronIdx <- thisLayer.biases.vector.indices) yield {
+        computeNeuronActivation(inputActivations = prevLayerActivations.vector,
+                                weights          = thisLayer.weights.matrix(neuronIdx),
+                                bias             = thisLayer.biases.vector(neuronIdx))
       }
     LayerActivations(thisLayerActivations)
   }
