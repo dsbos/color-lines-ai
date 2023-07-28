@@ -8,7 +8,7 @@ object DataIntfExpl extends App {
   // Model 1:  single flat trait, all indexing methods (no collections/objects), "manual" size/offset correpondence
   object Model1:
     trait NeuralNetworkParametersIntf:
-      def getInputNeuronCount          : Int  //????? "activations"? "inputs"?
+      def getInputCount          : Int  //????? "activations"? "inputs"?
       def getLayerCount                : Int
       def getNeuronCount(layerNum: Int): Int
       def getBias       (layerNum: Int)(neuronNum: Int)                    : Bias
@@ -17,49 +17,49 @@ object DataIntfExpl extends App {
   // Model 2:  Like Model 1 except with layer subobject (still no collections, etc.)
   object Model2:
     trait LayerParametersIntf:
-      def getInputNeuronCount: Int
-      def getNeuronCount     : Int
+      def getInputCount : Int
+      def getNeuronCount: Int
       def getBias  (neuronNum: Int): Bias
       def getWeight(neuronNum: Int)(predNeuronNum: Int): Weight
     trait NeuralNetworkParametersIntf:
-      def getInputNeuronCount: Int  //?????? have redundantly or get via first layer?
-      def getLayerCount      : Int
+      def getInputCount: Int  //?????? have redundantly or get via first layer?
+      def getLayerCount: Int
       def getLayer(layerNum: Int): LayerParametersIntf
 
   // Model 3:  Like model 2 except collection for layer subobjects (only)
   object Model3:
     trait LayerParametersIntf:
-      def getInputNeuronCount: Int
-      def getNeuronCount     : Int
+      def getInputCount : Int
+      def getNeuronCount: Int
       def getBias  (neuronNum: Int): Bias
       def getWeight(neuronNum: Int)(predNeuronNum: Int): Weight
     trait NeuralNetworkParametersIntf:
-      def getInputNeuronCount: Int  //?????? have redundantly or get via first layer?
+      def getInputCount: Int  //?????? have redundantly or get via first layer?
       def getLayers: IndexedSeq[LayerParametersIntf]
 
   // Model 4:  Typical collections/objects; two levels, biases separate from (2-D) weights; (no indexing methods)
   object Model4:
     trait LayerParametersIntf:
-      def getInputNeuronCount: Int  //?????? have redundantly or get via bias or weight collections?
-      def getNeuronCount     : Int  //?????? have redundantly or get via bias or weight collections?
+      def getInputCount : Int  //?????? have redundantly or get via bias or weight collections?
+      def getNeuronCount: Int  //?????? have redundantly or get via bias or weight collections?
       def getBiases : IndexedSeq[Bias]
       def getWeights: IndexedSeq[IndexedSeq[Weight]]
     trait NeuralNetworkParametersIntf:
-      def getInputNeuronCount: Int      //?????? have redundantly or get via first layer?
+      def getInputCount: Int      //?????? have redundantly or get via first layer?
       def getLayers: IndexedSeq[LayerParametersIntf]  // (or Seq)
 
   // Model 5:  Like Model 5 except with three levels--neurons with 1-D weights and bias
   object Model5:
     trait NeuronParametersIntf:
-      def getInputNeuronCount: Int  //?????? what about redundancy and about proximity?
+      def getInputCount: Int  //?????? what about redundancy and about proximity?
       def getBias   : Bias
       def getWeights: IndexedSeq[Weight]
     trait LayerParametersIntf:
-      def getInputNeuronCount: Int
-      def getNeuronCount     : Int
+      def getInputCount : Int
+      def getNeuronCount: Int
       def getNeuronsParameters: IndexedSeq[NeuronParametersIntf]
     trait NeuralNetworkParametersIntf:
-      def getInputNeuronCount: Int  // Have redundantly to reduce digging down by client
+      def getInputCount: Int  // Have redundantly to reduce digging down by client
       def getLayers: IndexedSeq[LayerParametersIntf]  // (or Seq)
 
   object Temp {
@@ -73,8 +73,9 @@ object DataIntfExpl extends App {
                   +  s" != neuronInputWeights.size = ${neuronInputWeights.size}")
       var sumAccum: Double = 0
       for (inputIdx <- inputActivations.vector.indices) {
-        sumAccum += inputActivations.vector(inputIdx).raw
-            * neuronInputWeights(inputIdx).raw
+        sumAccum +=
+            inputActivations.vector(inputIdx).raw
+                * neuronInputWeights(inputIdx).raw
       }
       Activation(ActivationFunctions.standardLogisticFunction(sumAccum + neuronBias.raw))
     }
