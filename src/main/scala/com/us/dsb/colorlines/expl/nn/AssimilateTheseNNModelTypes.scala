@@ -52,8 +52,6 @@ object AssimilateTheseNNModelTypes extends App {
 
     object Model5Impl {
 
-
-
     }
 
     val nn5 = {
