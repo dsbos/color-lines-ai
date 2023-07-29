@@ -14,6 +14,11 @@ object ScalarTypes {
   opaque type Weight     = Double
   opaque type Activation = Double
 
+  // Note:  Opaque type can't have "derives CanEqual":
+  given CanEqual[Bias,       Bias]       = CanEqual.derived
+  given CanEqual[Weight,     Weight]     = CanEqual.derived
+  given CanEqual[Activation, Activation] = CanEqual.derived
+
   object Bias       { def apply(value: Double): Bias       = value }
   object Weight     { def apply(value: Double): Weight     = value }
   object Activation { def apply(value: Double): Activation = value }

@@ -1,9 +1,12 @@
 package com.us.dsb.colorlines.expl.nn
 
 import com.us.dsb.colorlines.expl.nn.types.ArrayTypes.LayerActivations
-import com.us.dsb.colorlines.expl.nn2.types.ScalarTypes.{Activation, Bias, Weight, raw}
+import com.us.dsb.colorlines.expl.nn2.types.ScalarTypes.{
+  Activation, Bias, Weight, raw}
 import com.us.dsb.colorlines.expl.nn2.types.NeuralNetworkReadView.{
   LayerConfig, NetworkConfig, NeuronConfig}
+import com.us.dsb.colorlines.expl.nn2.types.NeuralNetworkSimpleImpl.{
+  Layer, Network, Neuron}
 
 import scala.collection.immutable.ArraySeq
 
@@ -51,47 +54,13 @@ object AssimilateTheseNNModelTypes extends App {
     object Model5Impl {
 
 
-      case class Neuron(override val inputCount: Int,
-                        override val bias: Bias,
-                        override val weights: Seq[Weight]) extends NeuronConfig {
-        require(weights.size == inputCount,
-                s"weights.size = ${weights.size} != $inputCount = xxinputCount")
-      }
 
-      case class Layer(override val inputCount: Int,
-                       override val neurons: Seq[Neuron]  //?????? Neuron or NeuronConfig?
-                      ) extends LayerConfig {
-        require(neurons.forall( n => n.inputCount == inputCount),
-                s"inputCount = $inputCount, neurons.map(_.xxinputCount) = ${neurons.map(_.inputCount)}")
-      }
-
-      case class NeuralNetwork(override val inputCount: Int,
-                               override val layers: Seq[Layer]  //?????? Layer or LayerConfig?
-                              ) extends NetworkConfig {
-        println(s"layers.map(_.neurons.size = ${layers.map(_.neurons.size)}")
-        println(s"layers.map(_.neurons.size.dropRight(1)) = ${layers.map(_.neurons.size).dropRight(1)}")
-        println(s"inputCount +: layers.map(_.neurons.size.dropRight(1)) = ${inputCount +: layers.map(_.neurons.size).dropRight(1)}")
-        println(s"layers.map(_.inputCount) = ${layers.map(_.inputCount)}")
-        require(
-          layers.map(_.inputCount) == inputCount +: layers.map(_.neurons.size).dropRight(1),
-          s"A layer input count(s) doesn't match predecessor size: "
-              + s"layers.map(_.inputCount) = ${layers.map(_.inputCount)}"
-              + s" != ${inputCount +: layers.dropRight(1).map(_.neurons.size)}"
-              + s" = inputCount +: layers.dropRight(1).map(_.neurons.size)"
-          )
-      }
     }
-
-    case class Model5NeuralNetworkParametersImpl(inputCount: Int,
-                                                ) extends NetworkConfig:
-      //????override def inputCount: Int = ???
-
-      override def layers: Seq[LayerConfig] = ???
 
     val nn5 = {
       import Model5Impl.*
       val inputCount = 2
-      new NeuralNetwork(
+      new Network(
         inputCount,
         Vector(
           Layer(inputCount,
