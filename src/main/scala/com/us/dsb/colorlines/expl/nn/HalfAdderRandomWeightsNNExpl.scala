@@ -44,6 +44,9 @@ object HalfAdderRandomWeightsNNExpl extends App {
     print("")
   }
 
+  private val activationFunction: Double => Activation =
+    raw => Activation(ActivationFunctions.standardLogisticFunction(raw))  //????????
+
   /**
    * ... without explicit neuron objects (with arrays) ... or stored activations ...
    */
@@ -55,10 +58,12 @@ object HalfAdderRandomWeightsNNExpl extends App {
                                 ): LayerActivations = {
       val hiddenLayerActivations =
         ArrayTypes.computeLayerActivation(inputActivations,
-                                          weightsAndBiases.hiddenLayer)
+                                          weightsAndBiases.hiddenLayer,
+                                          activationFunction)
       val outputLayerActivations =
         ArrayTypes.computeLayerActivation(hiddenLayerActivations,
-                                          weightsAndBiases.outputLayer)
+                                          weightsAndBiases.outputLayer,
+                                          activationFunction)
       outputLayerActivations
     }
   }

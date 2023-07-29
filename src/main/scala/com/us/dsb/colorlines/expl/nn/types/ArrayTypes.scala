@@ -65,7 +65,8 @@ object ArrayTypes {
   // ?????? TODO:  Pass in activation function.
   private def computeNeuronActivation(inputActivations: Seq[Activation],
                                       weights: Seq[Weight],
-                                      bias: Bias
+                                      bias: Bias,
+                                      activationFunction: Double => Activation  //???????? Double or Activation?
                                      ): Activation = {
     // Optimization:  Accumulating sum and using explicit while loop to avoid
     // creating collection of products or intermediate Tuples.  Over twice as
@@ -79,18 +80,20 @@ object ArrayTypes {
         sumAccum += inputActivations(inputIdx).raw * weights(inputIdx).raw
         inputIdx += 1
     }
-    Activation(ActivationFunctions.standardLogisticFunction(sumAccum + bias.raw))
+    activationFunction(sumAccum + bias.raw)
   }
 
   def computeLayerActivation(prevLayerActivations: LayerActivations,
-                             thisLayer           : LayerParameters
+                             thisLayer           : LayerParameters,
+                             activationFunction  : Double => Activation  //???????? Double or Activation?
                             ): LayerActivations = {
     assert(thisLayer.biases.vector.size == thisLayer.weights.matrix.size)
     val thisLayerActivations =
       for (neuronIdx <- thisLayer.biases.vector.indices) yield {
-        computeNeuronActivation(inputActivations = prevLayerActivations.vector,
-                                weights          = thisLayer.weights.matrix(neuronIdx),
-                                bias             = thisLayer.biases.vector(neuronIdx))
+        computeNeuronActivation(inputActivations   = prevLayerActivations.vector,
+                                bias               = thisLayer.biases.vector(neuronIdx),
+                                weights            = thisLayer.weights.matrix(neuronIdx),
+                                activationFunction = activationFunction)
       }
     LayerActivations(thisLayerActivations)
   }
