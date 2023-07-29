@@ -8,7 +8,7 @@ import scala.annotation.targetName
  * Common scalar/numeric types.
  */
 // ???? TODO:  Revisit name; "core"? "low-level"? "numeric"? (maybe not nec'ly all scalar)
-object ScalarTypes {
+object LowlevelTypes {
 
   opaque type Bias       = Double
   opaque type Weight     = Double

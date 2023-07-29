@@ -1,6 +1,6 @@
 package com.us.dsb.colorlines.expl.nn2.types
 
-import com.us.dsb.colorlines.expl.nn2.types.ScalarTypes.{Bias, Weight}
+import com.us.dsb.colorlines.expl.nn2.types.LowlevelTypes.{Bias, Weight}
 
 /**
  * Read-only API for parameters (no stored activations) of neural network.
