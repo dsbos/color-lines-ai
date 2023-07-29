@@ -2,28 +2,12 @@ package com.us.dsb.colorlines.expl.nn
 
 import com.us.dsb.colorlines.expl.nn.types.ArrayTypes.LayerActivations
 import com.us.dsb.colorlines.expl.nn2.types.ScalarTypes.{Activation, Bias, Weight, raw}
+import com.us.dsb.colorlines.expl.nn2.types.NeuralNetworkReadView.{
+  LayerConfig, NetworkConfig, NeuronConfig}
 
 import scala.collection.immutable.ArraySeq
 
 object AssimilateTheseNNModelTypes extends App {
-
-  // Naming:
-  // - "Config":
-  //   - to indicate ~static parameters (not including computed activations)
-  //   - singular, to be pluralizable (vs. "parameters")
-
-  // Model 5:  Like Model 5 except with three levels--neurons with 1-D weights and bias
-  object Model5:
-    trait NeuronConfig:
-      def xxinputCount: Int  //?????? what about redundancy and about proximity?
-      def bias      : Bias
-      def weights   : Seq[Weight]     // (caller should pass IndexedSeq)
-    trait LayerConfig:
-      def inputCount : Int            // Have somewhat redundantly to "cover" all neurons (weights arrays)
-      def neurons: Seq[NeuronConfig]  // (caller should pass IndexedSeq)
-    trait NeuralNetworkConfig:
-      def inputCount: Int             // Have redundantly to reduce digging down by client
-      def layers: Seq[LayerConfig]    // (caller should pass IndexedSeq)
 
   object Temp {
 
@@ -65,25 +49,25 @@ object AssimilateTheseNNModelTypes extends App {
 //    val nn5: Model5.NeuralNetworkConfig = ???
 
     object Model5Impl {
-      import Model5.*
 
-      case class Neuron(override val xxinputCount: Int,
+
+      case class Neuron(override val inputCount: Int,
                         override val bias: Bias,
                         override val weights: Seq[Weight]) extends NeuronConfig {
-        require(weights.size == xxinputCount,
-                s"weights.size = ${weights.size} != $xxinputCount = xxinputCount")
+        require(weights.size == inputCount,
+                s"weights.size = ${weights.size} != $inputCount = xxinputCount")
       }
 
       case class Layer(override val inputCount: Int,
                        override val neurons: Seq[Neuron]  //?????? Neuron or NeuronConfig?
                       ) extends LayerConfig {
-        require(neurons.forall( n => n.xxinputCount == inputCount),
-                s"inputCount = $inputCount, neurons.map(_.xxinputCount) = ${neurons.map(_.xxinputCount)}")
+        require(neurons.forall( n => n.inputCount == inputCount),
+                s"inputCount = $inputCount, neurons.map(_.xxinputCount) = ${neurons.map(_.inputCount)}")
       }
 
       case class NeuralNetwork(override val inputCount: Int,
                                override val layers: Seq[Layer]  //?????? Layer or LayerConfig?
-                              ) extends NeuralNetworkConfig {
+                              ) extends NetworkConfig {
         println(s"layers.map(_.neurons.size = ${layers.map(_.neurons.size)}")
         println(s"layers.map(_.neurons.size.dropRight(1)) = ${layers.map(_.neurons.size).dropRight(1)}")
         println(s"inputCount +: layers.map(_.neurons.size.dropRight(1)) = ${inputCount +: layers.map(_.neurons.size).dropRight(1)}")
@@ -99,10 +83,10 @@ object AssimilateTheseNNModelTypes extends App {
     }
 
     case class Model5NeuralNetworkParametersImpl(inputCount: Int,
-                                                ) extends Model5.NeuralNetworkConfig:
+                                                ) extends NetworkConfig:
       //????override def inputCount: Int = ???
 
-      override def layers: Seq[Model5.LayerConfig] = ???
+      override def layers: Seq[LayerConfig] = ???
 
     val nn5 = {
       import Model5Impl.*
