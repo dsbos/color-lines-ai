@@ -1,5 +1,6 @@
-package com.us.dsb.colorlines.expl.nn
+package com.us.dsb.colorlines.expl
 
+import com.us.dsb.colorlines.expl.nn.ActivationFunctions
 import com.us.dsb.colorlines.expl.nn.types.ArrayTypes.LayerActivations
 import com.us.dsb.colorlines.expl.nn.types.ScalarTypes.{Activation, Bias, Weight, raw}
 
