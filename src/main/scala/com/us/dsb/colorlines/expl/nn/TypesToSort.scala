@@ -1,6 +1,6 @@
 package com.us.dsb.colorlines.expl.nn
 
-import com.us.dsb.colorlines.expl.nn.ArrayTypes.LayerParameters
+import com.us.dsb.colorlines.expl.nn.types.ArrayTypes.LayerParameters
 
 object TypesToSort {
   case class OneHiddenTopology(inputLayerSize : Int,

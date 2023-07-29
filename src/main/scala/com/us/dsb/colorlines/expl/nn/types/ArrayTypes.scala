@@ -62,6 +62,7 @@ object ArrayTypes {
    *   bias of neuron
    * @return
    */
+  // ?????? TODO:  Pass in activation function.
   private def computeNeuronActivation(inputActivations: Seq[Activation],
                                       weights: Seq[Weight],
                                       bias: Bias
