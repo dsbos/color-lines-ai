@@ -3,64 +3,73 @@ package com.us.dsb.colorlines.expl.nn
 import com.us.dsb.colorlines.expl.nn.ArrayTypes.LayerActivations
 import com.us.dsb.colorlines.expl.nn.ScalarTypes.{Activation, Bias, Weight, raw}
 
+import scala.collection.immutable.ArraySeq
+
 object DataIntfExpl extends App {
+
+  // Naming:
+  // - "Config":
+  //   - to indicate ~static parameters (not including computed activations)
+  //   - singular, to be pluralizable (vs. "parameters")
 
   // Model 1:  single flat trait, all indexing methods (no collections/objects), "manual" size/offset correpondence
   object Model1:
-    trait NeuralNetworkParametersIntf:
-      def getInputCount          : Int  //????? "activations"? "inputs"?
-      def getLayerCount                : Int
-      def getNeuronCount(layerNum: Int): Int
-      def getBias       (layerNum: Int)(neuronNum: Int)                    : Bias
-      def getWeight     (layerNum: Int)(neuronNum: Int)(predNeuronNum: Int): Weight
+    trait NeuralNetworkConfig:
+      def inputCount                 : Int
+      def layerCount                 : Int
+      def neuronCounts(layerNum: Int): Int
+      def biases      (layerNum: Int)(neuronNum: Int)                    : Bias
+      def weights     (layerNum: Int)(neuronNum: Int)(predNeuronNum: Int): Weight
+  // Note:  Thpse are unclear re when all weights, layer's weights, or neuron's weights.
+
+  //???????? CONTINUE with "def xx"--use in assertions and/or purge:
 
   // Model 2:  Like Model 1 except with layer subobject (still no collections, etc.)
   object Model2:
-    trait LayerParametersIntf:
-      def getInputCount : Int
-      def getNeuronCount: Int
-      def getBias  (neuronNum: Int): Bias
-      def getWeight(neuronNum: Int)(predNeuronNum: Int): Weight
-    trait NeuralNetworkParametersIntf:
-      def getInputCount: Int  //?????? have redundantly or get via first layer?
-      def getLayerCount: Int
-      def getLayer(layerNum: Int): LayerParametersIntf
+    trait LayerConfig:
+      def xxinputCount : Int
+      def neuronCount: Int
+      def biases (neuronNum: Int): Bias
+      def weights(neuronNum: Int)(predNeuronNum: Int): Weight
+    trait NeuralNetworkConfig:
+      def inputCount: Int  // Have redundantly to reduce digging down by client
+      def layerCount: Int
+      def layer(layerNum: Int): LayerConfig
 
   // Model 3:  Like model 2 except collection for layer subobjects (only)
   object Model3:
-    trait LayerParametersIntf:
-      def getInputCount : Int
-      def getNeuronCount: Int
-      def getBias  (neuronNum: Int): Bias
-      def getWeight(neuronNum: Int)(predNeuronNum: Int): Weight
-    trait NeuralNetworkParametersIntf:
-      def getInputCount: Int  //?????? have redundantly or get via first layer?
-      def getLayers: IndexedSeq[LayerParametersIntf]
+    trait LayerConfig:
+      def xxinputCount : Int
+      def neuronCount: Int
+      def biases (neuronNum: Int): Bias
+      def weights(neuronNum: Int)(predNeuronNum: Int): Weight
+    trait NeuralNetworkConfig:
+      def inputCount: Int  // Have redundantly to reduce digging down by client
+      def layers: IndexedSeq[LayerConfig]
 
   // Model 4:  Typical collections/objects; two levels, biases separate from (2-D) weights; (no indexing methods)
   object Model4:
-    trait LayerParametersIntf:
-      def getInputCount : Int  //?????? have redundantly or get via bias or weight collections?
-      def getNeuronCount: Int  //?????? have redundantly or get via bias or weight collections?
-      def getBiases : IndexedSeq[Bias]
-      def getWeights: IndexedSeq[IndexedSeq[Weight]]
-    trait NeuralNetworkParametersIntf:
-      def getInputCount: Int      //?????? have redundantly or get via first layer?
-      def getLayers: IndexedSeq[LayerParametersIntf]  // (or Seq)
+    trait LayerConfig:
+      def xxinputCount : Int  //?????? have redundantly or get via bias or weight collections?
+      def neuronCount: Int  //?????? have redundantly or get via bias or weight collections?
+      def biases : IndexedSeq[Bias]
+      def weights: IndexedSeq[IndexedSeq[Weight]]
+    trait NeuralNetworkConfig:
+      def inputCount: Int  // Have redundantly to reduce digging down by client
+      def layers    : IndexedSeq[LayerConfig]  // (or Seq)
 
   // Model 5:  Like Model 5 except with three levels--neurons with 1-D weights and bias
   object Model5:
-    trait NeuronParametersIntf:
-      def getInputCount: Int  //?????? what about redundancy and about proximity?
-      def getBias   : Bias
-      def getWeights: IndexedSeq[Weight]
-    trait LayerParametersIntf:
-      def getInputCount : Int
-      def getNeuronCount: Int
-      def getNeuronsParameters: IndexedSeq[NeuronParametersIntf]
-    trait NeuralNetworkParametersIntf:
-      def getInputCount: Int  // Have redundantly to reduce digging down by client
-      def getLayers: IndexedSeq[LayerParametersIntf]  // (or Seq)
+    trait NeuronConfig:
+      def xxinputCount: Int  //?????? what about redundancy and about proximity?
+      def bias      : Bias
+      def weights   : IndexedSeq[Weight]
+    trait LayerConfig:
+      def xxinputCount : Int  // Have somewhat redundantly to "cover" all neurons (weights arrays)
+      def neurons: IndexedSeq[NeuronConfig]
+    trait NeuralNetworkConfig:
+      def inputCount: Int  // Have redundantly to reduce digging down by client
+      def layers: IndexedSeq[LayerConfig]  // (or Seq)
 
   object Temp {
 
@@ -71,7 +80,7 @@ object DataIntfExpl extends App {
       require(inputActivations.vector.size == neuronInputWeights.size,
               s"inputActivations.vector.size = ${inputActivations.vector.size}"
                   +  s" != neuronInputWeights.size = ${neuronInputWeights.size}")
-      var sumAccum: Double = 0
+      var sumAccum: Double = 0  //?????? add bias here?
       for (inputIdx <- inputActivations.vector.indices) {
         sumAccum +=
             inputActivations.vector(inputIdx).raw
@@ -86,7 +95,7 @@ object DataIntfExpl extends App {
                                       neuronBias        : Bias   //?? () => Bias for symmetry?
                                      ): Activation = {
       // Note:  Can't check sizes.
-      var sumAccum: Double = 0
+      var sumAccum: Double = 0  //?????? add bias here?
       for (inputIdx <- 0 until inputSize) {
         sumAccum += inputActivations(inputIdx).raw * neuronInputWeights(inputIdx).raw
       }
@@ -94,21 +103,23 @@ object DataIntfExpl extends App {
       Activation(rawAct)
     }
 
-    val nn1: Model1.NeuralNetworkParametersIntf = ???
-    val nn2: Model2.NeuralNetworkParametersIntf = ???
-    val nn3: Model3.NeuralNetworkParametersIntf = ???
-    val nn4: Model4.NeuralNetworkParametersIntf = ???
-    val nn5: Model5.NeuralNetworkParametersIntf = ???
+    val nn1: Model1.NeuralNetworkConfig = ???
+    val nn2: Model2.NeuralNetworkConfig = ???
+    val nn3: Model3.NeuralNetworkConfig = ???
+    val nn4: Model4.NeuralNetworkConfig = ???
+    val nn5: Model5.NeuralNetworkConfig = ???
 
-    val inputActivations: LayerActivations = ???
+    def makeInputActivations(count: Int): LayerActivations =
+      LayerActivations(ArraySeq.fill(count)(Activation(1.23)))
 
 
-    val outputActivations1: LayerActivations =
-      (0 until nn1.getLayerCount).foldLeft(inputActivations) { (inActs, layerIndex) =>
-        val layerNeuronBases = nn1.getBias(layerIndex)
-        val layerNeuronWeights = nn1.getWeight(layerIndex)
+    val outputActivations1: LayerActivations = {
+      val inputActivations = makeInputActivations(nn1.inputCount)
+      (0 until nn1.layerCount).foldLeft(inputActivations) { (inActs, layerIndex) =>
+        val layerNeuronBases   = nn1.biases(layerIndex)
+        val layerNeuronWeights = nn1.weights(layerIndex)
         val outActs =
-          (0 until nn1.getNeuronCount(layerIndex)).map { neuronIdx =>
+          (0 until nn1.neuronCounts(layerIndex)).map { neuronIdx =>
             computeNeuronActivationViaFns(
               inputSize          = inActs.vector.size,
               inputActivations   = inActs.vector,
@@ -118,71 +129,81 @@ object DataIntfExpl extends App {
           }
         LayerActivations(outActs)
       }
+    }
 
-    val outputActivations2: LayerActivations =
-      (0 until nn2.getLayerCount).foldLeft(inputActivations) { (inActs, layerIndex) =>
-        val layer = nn2.getLayer(layerIndex)
+    val outputActivations2: LayerActivations = {
+      val inputActivations = makeInputActivations(nn2.inputCount)
+      (0 until nn2.layerCount).foldLeft(inputActivations) { (inActs, layerIndex) =>
+        val layer = nn2.layer(layerIndex)
         val outActs =
-          (0 until layer.getNeuronCount).map { neuronIdx =>
+          (0 until layer.neuronCount).map { neuronIdx =>
             computeNeuronActivationViaFns(
               inputSize          = inActs.vector.size,
               inputActivations   = inActs.vector,
-              neuronInputWeights =  layer.getWeight(neuronIdx),
-              neuronBias         = layer.getBias(neuronIdx)
+              neuronInputWeights = layer.weights(neuronIdx),
+              neuronBias         = layer.biases(neuronIdx)
               )
           }
         LayerActivations(outActs)
       }
+    }
 
-    val outputActivations3: LayerActivations =
-      nn3.getLayers.foldLeft(inputActivations) { (inActs, layer) =>
+    val outputActivations3: LayerActivations = {
+      val inputActivations = makeInputActivations(nn3.inputCount)
+      nn3.layers.foldLeft(inputActivations) { (inActs, layer) =>
         val outActs =
-          (0 until layer.getNeuronCount).map { neuronIdx =>
+          (0 until layer.neuronCount).map { neuronIdx =>
             computeNeuronActivationViaFns(
               inputSize          = inActs.vector.size,
               inputActivations   = inActs.vector,
-              neuronInputWeights = layer.getWeight(neuronIdx),
-              neuronBias         = layer.getBias(neuronIdx)
+              neuronInputWeights = layer.weights(neuronIdx),
+              neuronBias         = layer.biases(neuronIdx)
               )
           }
         LayerActivations(outActs)
       }
+    }
 
-    val outputActivations4: LayerActivations =
-      nn4.getLayers.foldLeft(inputActivations) { (inActs, layer) =>
+    val outputActivations4: LayerActivations = {
+      val inputActivations = makeInputActivations(nn4.inputCount)
+      nn4.layers.foldLeft(inputActivations) { (inActs, layer) =>
         val outActs =
-          (0 until layer.getNeuronCount).map { neuronIdx =>
+          (0 until layer.neuronCount).map { neuronIdx =>
             computeNeuronActivationViaSeqs(
               inputActivations   = inActs,
-              neuronInputWeights = layer.getWeights(neuronIdx),
-              neuronBias         = layer.getBiases(neuronIdx))
+              neuronInputWeights = layer.weights(neuronIdx),
+              neuronBias         = layer.biases(neuronIdx))
             // (OR:)
             computeNeuronActivationViaFns(
               inputSize          = inActs.vector.size,
               inputActivations   = inActs.vector,
-              neuronInputWeights = layer.getWeights(neuronIdx),
-              neuronBias         = layer.getBiases(neuronIdx))
+              neuronInputWeights = layer.weights(neuronIdx),
+              neuronBias         = layer.biases(neuronIdx))
           }
         LayerActivations(outActs)
       }
+    }
 
-    val outputActivations5: LayerActivations =
-      nn5.getLayers.foldLeft(inputActivations) { (inActs, layer) =>
+    val outputActivations5: LayerActivations = {
+      val inputActivations = makeInputActivations(nn5.inputCount)
+      nn5.layers.foldLeft(inputActivations) { (inActs, layer) =>
         val outActs =
-          layer.getNeuronsParameters.map { neuronData =>
+          layer.neurons.map { neuronData =>
             computeNeuronActivationViaSeqs(
               inputActivations   = inActs,
-              neuronInputWeights = neuronData.getWeights,
-              neuronBias         = neuronData.getBias)
+              neuronInputWeights = neuronData.weights,
+              neuronBias         = neuronData.bias)
             // (OR:)
             computeNeuronActivationViaFns(
               inputSize          = inActs.vector.size,
               inputActivations   = inActs.vector,
-              neuronInputWeights = neuronData.getWeights,
-              neuronBias         = neuronData.getBias)
+              neuronInputWeights = neuronData.weights,
+              neuronBias         = neuronData.bias)
           }
         LayerActivations(outActs)
       }
+    }
+
   }
 
 }
