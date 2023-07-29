@@ -1,7 +1,7 @@
 package com.us.dsb.colorlines.expl.nn
 
 import com.us.dsb.colorlines.expl.nn.types.ArrayTypes.LayerActivations
-import com.us.dsb.colorlines.expl.nn.types.ScalarTypes.{Activation, Bias, Weight, raw}
+import com.us.dsb.colorlines.expl.nn2.types.ScalarTypes.{Activation, Bias, Weight, raw}
 
 import scala.collection.immutable.ArraySeq
 

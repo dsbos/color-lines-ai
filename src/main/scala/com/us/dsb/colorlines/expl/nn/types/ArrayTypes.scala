@@ -1,7 +1,7 @@
 package com.us.dsb.colorlines.expl.nn.types
 
 import com.us.dsb.colorlines.expl.nn.ActivationFunctions
-import com.us.dsb.colorlines.expl.nn.types.ScalarTypes.{Activation, Bias, Weight}
+import com.us.dsb.colorlines.expl.nn2.types.ScalarTypes.{Activation, Bias, Weight}
 
 /**
  * Common vector/matrix types.

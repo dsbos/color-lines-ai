@@ -1,4 +1,4 @@
-package com.us.dsb.colorlines.expl.nn.types
+package com.us.dsb.colorlines.expl.nn2.types
 
 import scala.annotation.targetName
 
@@ -7,7 +7,7 @@ import scala.annotation.targetName
 /**
  * Common scalar/numeric types.
  */
-// ???? TODO:  Revisit name; "core"? "low-level"? (not nec'ly all scalar)
+// ???? TODO:  Revisit name; "core"? "low-level"? "numeric"? (maybe not nec'ly all scalar)
 object ScalarTypes {
 
   opaque type Bias       = Double

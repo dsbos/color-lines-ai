@@ -3,9 +3,9 @@ package com.us.dsb.colorlines.expl.nn
 import com.us.dsb.colorlines.expl.nn.types.ArrayTypes
   import com.us.dsb.colorlines.expl.nn.types.ArrayTypes.{
   LayerActivations, LayerBiases, LayerParameters, LayerWeights}
-import com.us.dsb.colorlines.expl.nn.types.ScalarTypes.{Activation, Bias, Weight}
 import com.us.dsb.colorlines.expl.nn.TypesToSort.{
   OneHiddenNeuralNetworkWeightsAndBiases, OneHiddenTopology}
+import com.us.dsb.colorlines.expl.nn2.types.ScalarTypes.{Activation, Bias, Weight}
 
 import scala.util.Random
 
@@ -28,7 +28,7 @@ object HalfAdderRandomWeightsNNExpl extends App {
     }
 
     private def randomWeight: Weight = Weight(randomSomething)  // ?? same for now
-    private def randomBias: Bias = Bias(randomSomething)  // ?? same for now
+    private def randomBias  : Bias   = Bias(randomSomething)  // ?? same for now
 
     import topology.*
     override val hiddenLayer: LayerParameters =
