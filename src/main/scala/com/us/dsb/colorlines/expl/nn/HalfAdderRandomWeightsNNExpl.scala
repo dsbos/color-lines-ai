@@ -73,7 +73,7 @@ object HalfAdderRandomWeightsNNExpl extends App {
   //  network"  "calculate output"?  ("transform"?)
   //?????? Maybe wrap Byte in Bit opaque type to limit to 0 and 1:
   //?????? Possibly wrap Double in something reflecting approximated "bitness":
-  def eval(nw: RandomlyWeightedOneHiddenTopologyNeuralNetwork2,
+  def eval(nw: RandomlyWeightedOneHiddenTopologyNeuralNetwork2,  //??????
            inputs: (Byte, Byte, Byte)
           ): (Double, Double) = {
 

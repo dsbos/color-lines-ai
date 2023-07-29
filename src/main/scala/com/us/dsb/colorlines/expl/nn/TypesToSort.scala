@@ -7,6 +7,7 @@ object TypesToSort {
                                hiddenLayerSize: Int,
                                outputLayerSize: Int)
 
+  // ?????? TODO:  Assimilate model from DataIntfExpl/NameThis
   trait OneHiddenNeuralNetworkWeightsAndBiases {
     val hiddenLayer: LayerParameters
     val outputLayer: LayerParameters

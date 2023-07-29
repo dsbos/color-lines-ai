@@ -145,7 +145,6 @@ object HalfAdderAnnealedWeightsNNExpl extends App {
       val pct = 100.0 * iterations / maxIterations
       println(f"@ $iterations (/$maxIterations, ${pct}%4.1f%%) currFitness = $currFitness%11.5g ...")
     }
-    //??????val cand = makeHalfAdderNetwork
     val cand = makeDerivedHalfAdderNetwork(curr)
     val candFitness = computeFitness(cand)
 
