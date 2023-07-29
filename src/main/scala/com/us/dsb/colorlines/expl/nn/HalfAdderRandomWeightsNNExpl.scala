@@ -2,7 +2,7 @@ package com.us.dsb.colorlines.expl.nn
 
 import com.us.dsb.colorlines.expl.nn.ArrayTypes.{
   LayerActivations, LayerBiases, LayerParameters, LayerWeights}
-import com.us.dsb.colorlines.expl.nn.ScalarTypes.{Activation, Bias, Weight}
+import com.us.dsb.colorlines.expl.nn.types.ScalarTypes.{Activation, Bias, Weight}
 import com.us.dsb.colorlines.expl.nn.TypesToSort.{
   OneHiddenNeuralNetworkWeightsAndBiases, OneHiddenTopology}
 

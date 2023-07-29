@@ -1,4 +1,4 @@
-package com.us.dsb.colorlines.expl.nn
+package com.us.dsb.colorlines.expl.nn.types
 
 import scala.annotation.targetName
 

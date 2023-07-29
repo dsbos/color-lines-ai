@@ -1,5 +1,6 @@
-package com.us.dsb.colorlines.expl.nn
+package com.us.dsb.colorlines.expl.nn.types
 
+import com.us.dsb.colorlines.expl.nn.ActivationFunctions
 import com.us.dsb.colorlines.expl.nn.types.ScalarTypes.{Activation, Bias, Weight}
 
 /**
@@ -7,22 +8,36 @@ import com.us.dsb.colorlines.expl.nn.types.ScalarTypes.{Activation, Bias, Weight
  */
 object ArrayTypes {
 
-  case class LayerBiases(vector: IndexedSeq[Bias])
+  /**
+   * Biases of all neurons in a layer.
+   * @param vector
+   *    ; _should_ be an`IndexedSeq` for speed
+   */
+  case class LayerBiases(vector: Seq[Bias])
   object LayerBiases {
     def fill(layerSize: Int)(bias: => Bias): LayerBiases =
       LayerBiases(IndexedSeq.fill(layerSize)(bias))
   }
 
   /**
+   * For all neurons in layer, all (input) weights of each neuron.
+   *
    * @param matrix
-   * ... indexed by layer neuron offset, then by previous-layer neuron offset
+   *   ... indexed by layer neuron offset, then by previous-layer neuron offset
+   * @param matrix
+   * ...; _should_ be an `IndexedSeq` for speed
    */
-  case class LayerWeights(matrix: IndexedSeq[IndexedSeq[Weight]])
+  case class LayerWeights(matrix: Seq[Seq[Weight]])
   object LayerWeights {
     def fill(layerSize: Int, prevLayerSize: Int)(weight: => Weight): LayerWeights =
       LayerWeights(IndexedSeq.fill(layerSize)(IndexedSeq.fill(prevLayerSize)(weight)))
   }
 
+  /**
+   *
+   * @param vector
+   *   ; _should_ be an `IndexedSeq` for speed
+   */
   case class LayerActivations(vector: Seq[Activation])
 
   //???????? revisit passing sizes, parameter order
