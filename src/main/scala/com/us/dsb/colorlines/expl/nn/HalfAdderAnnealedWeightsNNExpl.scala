@@ -5,6 +5,7 @@ import com.us.dsb.colorlines.expl.nn.types.ArrayTypes.{
   LayerActivations, LayerBiases, LayerParameters, LayerWeights}
 import com.us.dsb.colorlines.expl.nn.TypesToSort.{
   OneHiddenNeuralNetworkWeightsAndBiases, OneHiddenTopology}
+import com.us.dsb.colorlines.expl.nn2.ActivationFunctions
 import com.us.dsb.colorlines.expl.nn2.types.ScalarTypes.{Activation, Bias, Weight, raw}
 
 import scala.util.Random

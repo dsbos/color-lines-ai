@@ -1,6 +1,5 @@
 package com.us.dsb.colorlines.expl.nn.types
 
-import com.us.dsb.colorlines.expl.nn.ActivationFunctions
 import com.us.dsb.colorlines.expl.nn2.types.ScalarTypes.{Activation, Bias, Weight}
 
 /**

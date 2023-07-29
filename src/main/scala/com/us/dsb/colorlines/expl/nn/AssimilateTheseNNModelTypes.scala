@@ -1,10 +1,9 @@
 package com.us.dsb.colorlines.expl.nn
 
 import com.us.dsb.colorlines.expl.nn.types.ArrayTypes.LayerActivations
+import com.us.dsb.colorlines.expl.nn2.ActivationFunctions
 import com.us.dsb.colorlines.expl.nn2.types.ScalarTypes.{
   Activation, Bias, Weight, raw}
-import com.us.dsb.colorlines.expl.nn2.types.NeuralNetworkReadView.{
-  LayerConfig, NetworkConfig, NeuronConfig}
 import com.us.dsb.colorlines.expl.nn2.types.NeuralNetworkSimpleImpl.{
   Layer, Network, Neuron}
 
@@ -58,7 +57,6 @@ object AssimilateTheseNNModelTypes extends App {
     }
 
     val nn5 = {
-      import Model5Impl.*
       val inputCount = 2
       new Network(
         inputCount,
