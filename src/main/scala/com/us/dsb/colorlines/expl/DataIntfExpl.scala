@@ -126,15 +126,14 @@ object DataIntfExpl extends App {
         override def inputCount: Int = nn5.inputCount
         override def layerCount: Int = nn5.layers.size
         override def layer(layerNum: Int): Model2.LayerConfig = {
-          case class LayerConfigImpl(layer: Model5Impl.Layer)
-              extends Model2.LayerConfig {
+          new Model2.LayerConfig {
+            val nn5Layer = nn5.layers(layerNum)
             override def xxinputCount: Int = ???
-            override def neuronCount: Int = layer.neurons.size
-            override def biases(neuronNum: Int): Bias = layer.neurons(neuronNum).bias
+            override def neuronCount: Int = nn5Layer.neurons.size
+            override def biases(neuronNum: Int): Bias = nn5Layer.neurons(neuronNum).bias
             override def weights(neuronNum: Int)
-                                (inputNum : Int): Weight = layer.neurons(neuronNum).weights(inputNum)
+                                (inputNum : Int): Weight = nn5Layer.neurons(neuronNum).weights(inputNum)
           }
-          LayerConfigImpl(nn5.layers(layerNum))
         }
       }
     val nn3 =
