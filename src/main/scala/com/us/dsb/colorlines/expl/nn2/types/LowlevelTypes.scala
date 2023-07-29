@@ -27,4 +27,12 @@ object LowlevelTypes {
   extension (raw: Bias)       @targetName("Bias_raw")       def raw: Double = raw
   extension (raw: Weight)     @targetName("Weight_raw")     def raw: Double = raw
   extension (raw: Activation) @targetName("Activation_raw") def raw: Double = raw
+
+  /**
+   *
+   * @param vector
+   *   ...; _should_ be an `IndexedSeq` for speed
+   */
+  case class LayerActivations(vector: Seq[Activation])  //??????? revisit:  have a wrapper type?
+
 }

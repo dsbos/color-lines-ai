@@ -1,9 +1,8 @@
 package com.us.dsb.colorlines.expl.nn
 
-import com.us.dsb.colorlines.expl.nn.types.ArrayTypes.LayerActivations
 import com.us.dsb.colorlines.expl.nn2.ActivationFunctions
 import com.us.dsb.colorlines.expl.nn2.types.LowlevelTypes.{
-  Activation, Bias, Weight, raw}
+  Activation, Bias, LayerActivations, Weight, raw}
 import com.us.dsb.colorlines.expl.nn2.types.NeuralNetworkSimpleImpl.{
   Layer, Network, Neuron}
 

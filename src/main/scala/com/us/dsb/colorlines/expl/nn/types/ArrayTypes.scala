@@ -1,7 +1,7 @@
 package com.us.dsb.colorlines.expl.nn.types
 
 import com.us.dsb.colorlines.expl.nn2.types.LowlevelTypes.{
-  Activation, Bias, Weight}
+  Activation, Bias, LayerActivations, Weight}
 
 /**
  * Common vector/matrix types.
@@ -33,14 +33,7 @@ object ArrayTypes {
       LayerWeights(IndexedSeq.fill(layerSize)(IndexedSeq.fill(prevLayerSize)(weight)))
   }
 
-  /**
-   *
-   * @param vector
-   *   ; _should_ be an `IndexedSeq` for speed
-   */
-  case class LayerActivations(vector: Seq[Activation])
-
-  //???????? revisit passing sizes, parameter order
+  //?????? revisit passing sizes, parameter order
   case class LayerParameters(size     : Int,
                              biases   : LayerBiases,
                              weights  : LayerWeights,

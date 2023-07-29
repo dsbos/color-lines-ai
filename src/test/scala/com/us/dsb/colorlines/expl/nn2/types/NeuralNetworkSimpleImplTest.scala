@@ -1,9 +1,9 @@
 package com.us.dsb.colorlines.expl.nn2.types
 
-import com.us.dsb.colorlines.expl.nn.types.ArrayTypes.LayerActivations //???????? assim. into nn2
-  import com.us.dsb.colorlines.expl.nn2.types.NeuralNetworkSimpleImpl.{
+import com.us.dsb.colorlines.expl.nn2.types.NeuralNetworkSimpleImpl.{
   Layer, Network, Neuron}
-import com.us.dsb.colorlines.expl.nn2.types.LowlevelTypes.{Activation, Bias, Weight}
+import com.us.dsb.colorlines.expl.nn2.types.LowlevelTypes.{
+  Activation, Bias, LayerActivations, Weight}
 import com.us.dsb.colorlines.expl.nn.AssimilateTheseNNModelTypes.Temp.computeNeuronActivationViaSeqs //???????? assim. into nn2
 
 import org.scalatest.funspec.AnyFunSpec
