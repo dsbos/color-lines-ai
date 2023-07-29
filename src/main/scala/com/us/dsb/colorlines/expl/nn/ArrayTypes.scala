@@ -23,7 +23,7 @@ object ArrayTypes {
       LayerWeights(IndexedSeq.fill(layerSize)(IndexedSeq.fill(prevLayerSize)(weight)))
   }
 
-  case class LayerActivations(vector: IndexedSeq[Activation])
+  case class LayerActivations(vector: Seq[Activation])
 
   //???????? revisit passing sizes, parameter order
   case class LayerParameters(size     : Int,
