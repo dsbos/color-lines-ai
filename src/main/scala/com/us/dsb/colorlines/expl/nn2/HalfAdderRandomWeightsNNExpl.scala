@@ -1,12 +1,9 @@
 package com.us.dsb.colorlines.expl.nn
 
-import com.us.dsb.colorlines.expl.nn2.ActivationComputation.{
-  ActivationFunction, computeNetworkOutputActivation}
-import com.us.dsb.colorlines.expl.nn2.ActivationFunctions
-import com.us.dsb.colorlines.expl.nn2.types.LowlevelTypes.{
-  Activation, Bias, LayerActivations, Weight}
-import com.us.dsb.colorlines.expl.nn2.types.NeuralNetworkSimpleImpl.{
-  Layer, Network, Neuron}
+import com.us.dsb.colorlines.expl.nn2.ActivationComputation.{ActivationFunction, computeNetworkOutputActivation}
+import com.us.dsb.colorlines.expl.nn2.{ActivationFunctions, HalfAdderCommon}
+import com.us.dsb.colorlines.expl.nn2.types.LowlevelTypes.{Activation, Bias, LayerActivations, Weight}
+import com.us.dsb.colorlines.expl.nn2.types.NeuralNetworkSimpleImpl.{Layer, Network, Neuron}
 import com.us.dsb.colorlines.expl.nn2.types.NeuralNetworkReadView.NetworkConfig
 
 import scala.util.Random

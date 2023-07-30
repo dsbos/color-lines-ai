@@ -1,4 +1,4 @@
-package com.us.dsb.colorlines.expl.nn
+package com.us.dsb.colorlines.expl.nn2
 
 import com.us.dsb.colorlines.expl.nn2.ActivationComputation.{
   ActivationFunction, computeNetworkOutputActivation}

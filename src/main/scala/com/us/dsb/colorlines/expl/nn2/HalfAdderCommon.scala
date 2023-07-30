@@ -1,4 +1,4 @@
-package com.us.dsb.colorlines.expl.nn
+package com.us.dsb.colorlines.expl.nn2
 
 object HalfAdderCommon {
 
@@ -39,6 +39,5 @@ object HalfAdderCommon {
     //println(s"fitness = $fitness")
     fitness
   }
-
 
 }
