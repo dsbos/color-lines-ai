@@ -15,10 +15,10 @@ object ArrayTypes {
    * @param vector
    *    ; _should_ be an`IndexedSeq` for speed
    */
-  case class LayerBiases(vector: Seq[Bias])
-  object LayerBiases {
-    def fill(layerSize: Int)(bias: => Bias): LayerBiases =
-      LayerBiases(IndexedSeq.fill(layerSize)(bias))
+  case class OLDLayerBiases(vector: Seq[Bias])
+  object OLDLayerBiases {
+    def fill(layerSize: Int)(bias: => Bias): OLDLayerBiases =
+      OLDLayerBiases(IndexedSeq.fill(layerSize)(bias))
   }
 
   /**
@@ -36,8 +36,8 @@ object ArrayTypes {
   }
 
   //?????? revisit passing sizes, parameter order
-  case class LayerParameters(size     : Int,
-                             biases   : LayerBiases,
+  case class OLDLayerParameters(size     : Int,
+                             biases   : OLDLayerBiases,
                              weights  : LayerWeights,
                              inputSize: Int) {
     assert(biases.vector.size == size)
@@ -45,8 +45,8 @@ object ArrayTypes {
     assert(weights.matrix.forall(_.size == inputSize))
   }
 
-  def computeLayerActivation(prevLayerActivations: LayerActivations,
-                             thisLayer           : LayerParameters,
+  def OLDcomputeLayerActivation(prevLayerActivations: LayerActivations,
+                             thisLayer           : OLDLayerParameters,
                              activationFunction  : ActivationFunction  //??????? Double or Activation?
                             ): LayerActivations = {
     assert(thisLayer.biases.vector.size == thisLayer.weights.matrix.size)
