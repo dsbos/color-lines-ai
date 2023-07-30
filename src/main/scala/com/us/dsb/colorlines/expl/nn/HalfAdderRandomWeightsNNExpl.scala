@@ -5,6 +5,7 @@ import com.us.dsb.colorlines.expl.nn.types.ArrayTypes
   LayerBiases, LayerParameters, LayerWeights}
 import com.us.dsb.colorlines.expl.nn.TypesToSort.{
   OneHiddenNeuralNetworkWeightsAndBiases, OneHiddenTopology}
+import com.us.dsb.colorlines.expl.nn2.ActivationComputation.ActivationFunction
 import com.us.dsb.colorlines.expl.nn2.ActivationFunctions
 import com.us.dsb.colorlines.expl.nn2.types.LowlevelTypes.{
   Activation, Bias, LayerActivations, Weight}
@@ -46,8 +47,8 @@ object HalfAdderRandomWeightsNNExpl extends App {
     print("")
   }
 
-  private val activationFunction: Double => Activation =
-    raw => Activation(ActivationFunctions.standardLogisticFunction(raw))  //????????
+  private val activationFunction: ActivationFunction =
+    raw => Activation(ActivationFunctions.standardLogisticFunction(raw))  //??????
 
   /**
    * ... without explicit neuron objects (with arrays) ... or stored activations ...
@@ -91,7 +92,7 @@ object HalfAdderRandomWeightsNNExpl extends App {
   }
 
   // ?? TODO: _Possibly_ wrap Double in some opaque fitness type:
-  //????????
+  //??????
   def computeFitness(nw: RandomlyWeightedOneHiddenTopologyNeuralNetwork2): Double =
     HalfAdderCommon.computeFitness((a1: Byte, a2: Byte, a3: Byte) => eval(nw, (a1, a2, a3)))
 

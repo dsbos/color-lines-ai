@@ -1,8 +1,9 @@
 package com.us.dsb.colorlines.expl.nn.types
 
+import com.us.dsb.colorlines.expl.nn2.ActivationComputation.ActivationFunction
 import com.us.dsb.colorlines.expl.nn2.ActivationComputation.computeNeuronActivation
 import com.us.dsb.colorlines.expl.nn2.types.LowlevelTypes.{
-  Activation, Bias, LayerActivations, Weight}
+  Bias, LayerActivations, Weight}
 
 /**
  * Common vector/matrix types.
@@ -46,7 +47,7 @@ object ArrayTypes {
 
   def computeLayerActivation(prevLayerActivations: LayerActivations,
                              thisLayer           : LayerParameters,
-                             activationFunction  : Double => Activation  //???????? Double or Activation?
+                             activationFunction  : ActivationFunction  //??????? Double or Activation?
                             ): LayerActivations = {
     assert(thisLayer.biases.vector.size == thisLayer.weights.matrix.size)
     val thisLayerActivations =
