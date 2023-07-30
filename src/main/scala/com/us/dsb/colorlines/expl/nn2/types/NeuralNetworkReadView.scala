@@ -24,5 +24,7 @@ object NeuralNetworkReadView {
   trait NetworkConfig:
     def inputCount: Int               // Have redundantly to reduce digging down by client
     def layers    : Seq[LayerConfig]  // (caller should pass IndexedSeq)
+    //?????? what about outputSize/-Count?; Have redundantly to reduce digging down by client?
+    // (does client need/want to know size before executing, when it'll have output of size?
 
 }

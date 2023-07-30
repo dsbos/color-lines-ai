@@ -3,7 +3,7 @@ package com.us.dsb.colorlines.expl.nn
 import com.us.dsb.colorlines.expl.nn.types.ArrayTypes.OLDLayerParameters
 
 object TypesToSort {
-  case class OneHiddenTopology(inputLayerSize : Int,
+  case class OLDOneHiddenTopology(inputLayerSize : Int,
                                hiddenLayerSize: Int,
                                outputLayerSize: Int)
 

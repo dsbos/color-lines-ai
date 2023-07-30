@@ -1,11 +1,12 @@
 package com.us.dsb.colorlines.expl.nn
 
-import com.us.dsb.colorlines.expl.nn.types.ArrayTypes
-import com.us.dsb.colorlines.expl.nn.TypesToSort.OneHiddenTopology
-import com.us.dsb.colorlines.expl.nn2.ActivationComputation.{ActivationFunction, computeNetworkOutputActivation}
+import com.us.dsb.colorlines.expl.nn2.ActivationComputation.{
+  ActivationFunction, computeNetworkOutputActivation}
 import com.us.dsb.colorlines.expl.nn2.ActivationFunctions
-import com.us.dsb.colorlines.expl.nn2.types.LowlevelTypes.{Activation, Bias, LayerActivations, Weight}
-import com.us.dsb.colorlines.expl.nn2.types.NeuralNetworkSimpleImpl.{Layer, Network, Neuron}
+import com.us.dsb.colorlines.expl.nn2.types.LowlevelTypes.{
+  Activation, Bias, LayerActivations, Weight}
+import com.us.dsb.colorlines.expl.nn2.types.NeuralNetworkSimpleImpl.{
+  Layer, Network, Neuron}
 import com.us.dsb.colorlines.expl.nn2.types.NeuralNetworkReadView.NetworkConfig
 
 import scala.util.Random
@@ -25,25 +26,30 @@ object HalfAdderRandomWeightsNNExpl extends App {
       Random.nextGaussian() * 20
     }
   }
-
   private def randomWeight: Weight = Weight(randomSomething)  // ?? same for now
   private def randomBias  : Bias   = Bias(randomSomething)    // ?? same for now
 
-  def randomWeights(count: Int): Seq[Weight] = Vector.fill(count)(randomWeight)
-  def randomNeurons(neuronCount: Int, inputSize: Int): Seq[Neuron] =
-    Vector.fill(neuronCount)(
-      Neuron(inputSize, randomBias, randomWeights(inputSize))
-    )
-
-  def makeRandomOneHiddenLayerNetwork(topology: OneHiddenTopology): NetworkConfig =  {
-    import topology.{inputLayerSize, hiddenLayerSize, outputLayerSize}
-    Network(
-      inputLayerSize,
-      Vector(
-        Layer(inputLayerSize,  randomNeurons(hiddenLayerSize, inputLayerSize)),
-        Layer(hiddenLayerSize, randomNeurons(outputLayerSize, hiddenLayerSize))
+  /**
+   * @param inputSize
+   * @param layerSizes
+   *   ...; (non-input layers)
+   * @return
+   */
+  // ????? TODO:  Probably add random-bias/-weight function parameters
+  def makeRandomNetwork(inputSize: Int, layerSizes: Int*): NetworkConfig = {
+    def randomWeights(count: Int): Seq[Weight] = Vector.fill(count)(randomWeight)
+    def randomNeurons(neuronCount: Int, inputSize: Int): Seq[Neuron] =
+      Vector.fill(neuronCount)(
+        Neuron(inputSize, randomBias, randomWeights(inputSize))
         )
-      )
+
+    // Pair each non-input layer's size with predecessor's size:
+    val layerAndInputSizePairs = layerSizes.zip(inputSize +: layerSizes.dropRight(1))
+    val layers =
+      layerAndInputSizePairs.map { (layerSize, inputSize) =>
+        Layer(inputSize, randomNeurons(layerSize, inputSize))
+      }
+    Network(inputSize, layers)
   }
 
   private val activationFunction: ActivationFunction =
@@ -74,9 +80,7 @@ object HalfAdderRandomWeightsNNExpl extends App {
   def computeFitness(nw: NetworkConfig): Double =
     HalfAdderCommon.computeFitness((a1: Byte, a2: Byte, a3: Byte) => eval(nw, (a1, a2, a3)))
 
-  def makeHalfAdderNetwork: NetworkConfig =
-    makeRandomOneHiddenLayerNetwork(OneHiddenTopology(3, 4, 2))
-  //????????
+  def makeHalfAdderNetwork: NetworkConfig = makeRandomNetwork(3, 4, 2)
 
   val startMs = System.currentTimeMillis()
   var curr = makeHalfAdderNetwork

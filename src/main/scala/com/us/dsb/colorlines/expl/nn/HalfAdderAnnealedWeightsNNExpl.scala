@@ -4,7 +4,7 @@ import com.us.dsb.colorlines.expl.nn.types.ArrayTypes
 import com.us.dsb.colorlines.expl.nn.types.ArrayTypes.{
   OLDLayerBiases, OLDLayerParameters, LayerWeights}
 import com.us.dsb.colorlines.expl.nn.TypesToSort.{
-  OLDOneHiddenNeuralNetworkWeightsAndBiases, OneHiddenTopology}
+  OLDOneHiddenNeuralNetworkWeightsAndBiases, OLDOneHiddenTopology}
 import com.us.dsb.colorlines.expl.nn2.ActivationComputation.ActivationFunction
 import com.us.dsb.colorlines.expl.nn2.ActivationFunctions
 import com.us.dsb.colorlines.expl.nn2.types.LowlevelTypes.{
@@ -14,7 +14,7 @@ import scala.util.Random
 
 object HalfAdderAnnealedWeightsNNExpl extends App {
 
-  case class ZeroesOneHiddenNeuralNetworkWeightsAndBiases(topology: OneHiddenTopology)
+  case class ZeroesOneHiddenNeuralNetworkWeightsAndBiases(topology: OLDOneHiddenTopology)
       extends OLDOneHiddenNeuralNetworkWeightsAndBiases {
     import topology.{inputLayerSize, hiddenLayerSize, outputLayerSize}
     override val hiddenLayer: OLDLayerParameters =
@@ -77,7 +77,7 @@ object HalfAdderAnnealedWeightsNNExpl extends App {
   /**
    * ... without explicit neuron objects (with arrays) ... or stored activations ...
    */
-  abstract class OneHiddenTopologyNeuralNetwork(val topology: OneHiddenTopology) {
+  abstract class OneHiddenTopologyNeuralNetwork(val topology: OLDOneHiddenTopology) {
     def weightsAndBiases: OLDOneHiddenNeuralNetworkWeightsAndBiases
 
     def OLDcomputeOutputActivations(inputActivations: LayerActivations
@@ -94,7 +94,7 @@ object HalfAdderAnnealedWeightsNNExpl extends App {
     }
   }
 
-  case class RandomlyWeightedOneHiddenTopologyNeuralNetwork(override val topology: OneHiddenTopology)
+  case class RandomlyWeightedOneHiddenTopologyNeuralNetwork(override val topology: OLDOneHiddenTopology)
       extends OneHiddenTopologyNeuralNetwork(topology) {
     override val weightsAndBiases = ZeroesOneHiddenNeuralNetworkWeightsAndBiases(topology)
   }
@@ -131,7 +131,7 @@ object HalfAdderAnnealedWeightsNNExpl extends App {
 
 
   def makeHalfAdderNetwork: OneHiddenTopologyNeuralNetwork =
-    RandomlyWeightedOneHiddenTopologyNeuralNetwork(OneHiddenTopology(3, 4, 2))
+    RandomlyWeightedOneHiddenTopologyNeuralNetwork(OLDOneHiddenTopology(3, 4, 2))
 
   def makeDerivedHalfAdderNetwork(base: OneHiddenTopologyNeuralNetwork): OneHiddenTopologyNeuralNetwork =
     DerivedRandomlyWeightedOneHiddenTopologyNeuralNetwork(base)
