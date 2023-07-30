@@ -5,7 +5,7 @@ import com.us.dsb.colorlines.expl.nn2.types.NeuralNetworkSimpleImpl.{
 import com.us.dsb.colorlines.expl.nn2.types.LowlevelTypes.{
   Activation, Bias, LayerActivations, Weight}
 import com.us.dsb.colorlines.expl.nn2.ActivationComputation.{
-  ActivationFunction, computeNeuronActivation}
+  ActivationFunction, computeNetworkOutputActivation, computeNeuronActivation}
 import com.us.dsb.colorlines.expl.nn2.ActivationFunctions
 
 import org.scalatest.funspec.AnyFunSpec
@@ -17,7 +17,7 @@ class NeuralNetworkSimpleImplTest extends AnyFunSpec {
 
   it("") {
 
-    val nn5 = {
+    val network = {
       val inputCount = 2
       Network(
         inputCount,
@@ -50,19 +50,12 @@ class NeuralNetworkSimpleImplTest extends AnyFunSpec {
     def actFn: ActivationFunction =
       raw => Activation(ActivationFunctions.standardLogisticFunction(raw))
 
-    val outputActivations: LayerActivations = {
-      val inputActivations = makeInputActivations(nn5.inputCount)
-      nn5.layers.foldLeft(inputActivations) { (inActs, layer) =>
-        val outActs =
-          layer.neurons.map { neuronData =>
-            computeNeuronActivation(inputActivations   = inActs,
-                                    weights            = neuronData.weights,
-                                    bias               = neuronData.bias,
-                                    activationFunction = actFn)
-          }
-        LayerActivations(outActs)
-      }
-    }
+    val inputActivations = makeInputActivations(network.inputCount)
+
+    val outputActivations: LayerActivations =
+      computeNetworkOutputActivation(network            = network,
+                                     activationFunction = actFn,
+                                     inputActivations   = inputActivations)
     println(s"outputActivations = $outputActivations")
     outputActivations.vector(0) shouldBe Activation(0.5632537687417511)
   }

@@ -2,6 +2,7 @@ package com.us.dsb.colorlines.expl.nn2
 
 import com.us.dsb.colorlines.expl.nn2.types.LowlevelTypes.{
   Activation, Bias, LayerActivations, Weight, raw}
+import com.us.dsb.colorlines.expl.nn2.types.NeuralNetworkReadView.NetworkConfig
 
 object ActivationComputation {
 
@@ -40,5 +41,25 @@ object ActivationComputation {
       inputIdx += 1
     activationFunction(sumAccum + bias.raw)
   }
+
+  def computeNetworkOutputActivation(network           : NetworkConfig,
+                                     activationFunction: ActivationFunction,
+                                     inputActivations  : LayerActivations
+                                    ): LayerActivations = {
+    val outputActivations: LayerActivations = {
+      network.layers.foldLeft(inputActivations) { (layerInputActs, layer) =>
+        val outActs =
+          layer.neurons.map { neuronData =>
+            computeNeuronActivation(inputActivations   = layerInputActs,
+                                    weights            = neuronData.weights,
+                                    bias               = neuronData.bias,
+                                    activationFunction = activationFunction)
+          }
+        LayerActivations(outActs)
+      }
+    }
+    outputActivations
+  }
+
 
 }

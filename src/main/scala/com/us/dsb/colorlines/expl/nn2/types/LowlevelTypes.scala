@@ -33,6 +33,6 @@ object LowlevelTypes {
    * @param vector
    *   ...; _should_ be an `IndexedSeq` for speed
    */
-  case class LayerActivations(vector: Seq[Activation])  //??????? revisit:  have a wrapper type?
+  case class LayerActivations(vector: Seq[Activation]) derives CanEqual //??????? revisit:  have a wrapper type?
 
 }
