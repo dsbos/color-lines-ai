@@ -56,8 +56,8 @@ class NeuralNetworkSimpleImplTest extends AnyFunSpec {
         val outActs =
           layer.neurons.map { neuronData =>
             computeNeuronActivation(inputActivations   = inActs,
-                                    neuronInputWeights = neuronData.weights,
-                                    neuronBias         = neuronData.bias,
+                                    weights            = neuronData.weights,
+                                    bias               = neuronData.bias,
                                     activationFunction = actFn)
           }
         LayerActivations(outActs)

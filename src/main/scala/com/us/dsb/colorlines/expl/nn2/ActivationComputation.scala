@@ -5,23 +5,27 @@ import com.us.dsb.colorlines.expl.nn2.types.LowlevelTypes.{
 
 object ActivationComputation {
 
-  type ActivationFunction = Double => Activation //??????? clean to Activation -> Activation
+  type ActivationFunction = Double => Activation  //???????? from Double or Activation?
 
-  def computeNeuronActivation(inputActivations : LayerActivations,
-                              neuronInputWeights: Seq[Weight],
-                              neuronBias        : Bias,
+  def computeNeuronActivation(inputActivations  : LayerActivations,  //??????? wrapped or just Seq[Activation]?
+                              weights           : Seq[Weight],       //??????? wrapped or just Seq[Weight]?
+                              bias              : Bias,
                               activationFunction: ActivationFunction
                              ): Activation = {
-    require(inputActivations.vector.size == neuronInputWeights.size,
+    require(inputActivations.vector.size == weights.size,
             s"inputActivations.vector.size = ${inputActivations.vector.size}"
-                +  s" != neuronInputWeights.size = ${neuronInputWeights.size}")
+                +  s" != weights.size = ${weights.size}")
+    // Optimization:  Accumulating sum and using explicit while loop to avoid
+    // creating collection of products or intermediate Tuples.  Over twice as
+    // fast as .zip/.lazyZip, .map, and .sum.  (10-15% faster overall for
+    // half-adder app as of 2023-07-13.)
     var sumAccum: Double = 0  //?????? add bias here?
-    for (inputIdx <- inputActivations.vector.indices) {  //???????? update to fast "while" version
-      sumAccum +=
-          inputActivations.vector(inputIdx).raw
-              * neuronInputWeights(inputIdx).raw
-    }
-    activationFunction(sumAccum + neuronBias.raw)
+    val end = inputActivations.vector.indices.end // avoiding re-accessing is significant
+    var inputIdx = inputActivations.vector.indices.start
+    while inputIdx < end do
+      sumAccum += inputActivations.vector(inputIdx).raw * weights(inputIdx).raw
+      inputIdx += 1
+    activationFunction(sumAccum + bias.raw)
   }
 
 }
