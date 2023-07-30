@@ -5,10 +5,12 @@ import com.us.dsb.colorlines.expl.nn2.types.LowlevelTypes.{
 
 object ActivationComputation {
 
+  type ActivationFunction = Double => Activation //??????? clean to Activation -> Activation
+
   def computeNeuronActivation(inputActivations : LayerActivations,
                               neuronInputWeights: Seq[Weight],
-                              neuronBias        : Bias
-                              //???????? add activation function parameter
+                              neuronBias        : Bias,
+                              activationFunction: ActivationFunction
                              ): Activation = {
     require(inputActivations.vector.size == neuronInputWeights.size,
             s"inputActivations.vector.size = ${inputActivations.vector.size}"
@@ -19,7 +21,7 @@ object ActivationComputation {
           inputActivations.vector(inputIdx).raw
               * neuronInputWeights(inputIdx).raw
     }
-    Activation(ActivationFunctions.standardLogisticFunction(sumAccum + neuronBias.raw))
+    activationFunction(sumAccum + neuronBias.raw)
   }
 
 }
