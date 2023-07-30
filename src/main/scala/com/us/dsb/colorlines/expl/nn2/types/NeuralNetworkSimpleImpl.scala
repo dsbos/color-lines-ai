@@ -21,17 +21,17 @@ object NeuralNetworkSimpleImpl {
                    override val neurons   : Seq[Neuron]  //?????? impl. Neuron or intf. NeuronConfig?
                   ) extends LayerConfig {
     require(neurons.forall(n => n.inputCount == inputCount),
-            s"inputCount = $inputCount, neurons.map(_.xxinputCount) = ${neurons.map(_.inputCount)}")
+            s"inputCount = $inputCount, neurons.map(_.inputCount) = ${neurons.map(_.inputCount)}")
   }
 
   case class Network(override val inputCount: Int,
                      override val layers    : Seq[Layer]  //?????? impl. Layer or intf. LayerConfig?
                     ) extends NetworkConfig {
     require(
-      layers.map(_.inputCount) == inputCount +: layers.map(_.neurons.size).dropRight(1),
+      layers.map(_.inputCount) == (inputCount +: layers.map(_.neurons.size)).dropRight(1),
       s"A layer input count(s) doesn't match predecessor size: "
           + s"layers.map(_.inputCount) = ${layers.map(_.inputCount)}"
-          + s" != ${inputCount +: layers.dropRight(1).map(_.neurons.size)}"
-          + s" = inputCount +: layers.dropRight(1).map(_.neurons.size)")
+          + s" != ${(inputCount +: layers.map(_.neurons.size)).dropRight(1)}"
+          + s" = (inputCount +: layers.map(_.neurons.size)).dropRight(1)")
   }
 }

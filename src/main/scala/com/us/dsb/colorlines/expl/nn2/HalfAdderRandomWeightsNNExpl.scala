@@ -70,7 +70,8 @@ object HalfAdderRandomWeightsNNExpl extends App {
     val inputActivations = LayerActivations(IndexedSeq(Activation(inputs._1),
                                                        Activation(inputs._2),
                                                        Activation(inputs._3)))
-    val outputActivations = computeNetworkOutputActivation(nw, activationFunction, inputActivations)
+    val outputActivations =
+      computeNetworkOutputActivation(nw, activationFunction, inputActivations)
     (outputActivations.vector(0).raw,
         outputActivations.vector(1).raw)
   }
@@ -80,12 +81,14 @@ object HalfAdderRandomWeightsNNExpl extends App {
   def computeFitness(nw: NetworkConfig): Double =
     HalfAdderCommon.computeFitness((a1: Byte, a2: Byte, a3: Byte) => eval(nw, (a1, a2, a3)))
 
-  def makeHalfAdderNetwork: NetworkConfig = makeRandomNetwork(3, 4, 2)
+  //def makeHalfAdderNetwork: NetworkConfig = makeRandomNetwork(3, 4, 2)
+  //?????????
+  def makeHalfAdderNetwork: NetworkConfig = makeRandomNetwork(3, 5, 2)
 
   val startMs = System.currentTimeMillis()
   var curr = makeHalfAdderNetwork
   var currFitness = computeFitness(curr)
-  val maxIterations = 100_000_000
+  val maxIterations = 10_000_000
   var iterations = 0
   while iterations < maxIterations do {
     iterations += 1
