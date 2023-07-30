@@ -7,6 +7,19 @@ object ActivationComputation {
 
   type ActivationFunction = Double => Activation  //???????? from Double or Activation?
 
+  /**
+   * Computes activation of a neuron.
+   * @param inputActivations
+   *   activations of input neurons; size and order must correspond to those of
+   *   `weights`  //??????: ; _should_ be an `IndexedSeq` for speed
+   * @param weights
+   *   per-input weights of neuron; per input activation; _should_ be an
+   *  `IndexedSeq` for speed
+   * @param bias
+   *   bias of neuron
+   * @return
+   *   ...
+   */
   def computeNeuronActivation(inputActivations  : LayerActivations,  //??????? wrapped or just Seq[Activation]?
                               weights           : Seq[Weight],       //??????? wrapped or just Seq[Weight]?
                               bias              : Bias,

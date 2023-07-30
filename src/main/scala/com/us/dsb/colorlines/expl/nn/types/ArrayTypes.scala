@@ -1,5 +1,6 @@
 package com.us.dsb.colorlines.expl.nn.types
 
+import com.us.dsb.colorlines.expl.nn2.ActivationComputation.computeNeuronActivation
 import com.us.dsb.colorlines.expl.nn2.types.LowlevelTypes.{
   Activation, Bias, LayerActivations, Weight}
 
@@ -43,39 +44,6 @@ object ArrayTypes {
     assert(weights.matrix.forall(_.size == inputSize))
   }
 
-  /**
-   * Computes activation of a neuron; uses standard logistic function.
-   * @param inputActivations
-   *   activations of input neurons; size and order must correspond to those of
-   *   `weights`; _should_ be an `IndexedSeq` for speed
-   * @param weights
-   *   per-input weights of neuron; per input activation; _should_ be an
-   *  `IndexedSeq` for speed
-   * @param bias
-   *   bias of neuron
-   * @return
-   */
-  // ?????? TODO:  Pass in activation function.
-  private def computeNeuronActivation(inputActivations: Seq[Activation],
-                                      weights: Seq[Weight],
-                                      bias: Bias,
-                                      activationFunction: Double => Activation  //???????? Double or Activation?
-                                     ): Activation = {
-    // Optimization:  Accumulating sum and using explicit while loop to avoid
-    // creating collection of products or intermediate Tuples.  Over twice as
-    // fast as .zip/.lazyZip, .map, and .sum.  (10-15% faster overall for
-    // half-adder app as of 2023-07-13.)
-    var sumAccum: Double = 0d
-    {
-      val end = inputActivations.indices.end  // avoiding re-accessing is significant
-      var inputIdx = inputActivations.indices.start
-      while inputIdx < end do
-        sumAccum += inputActivations(inputIdx).raw * weights(inputIdx).raw
-        inputIdx += 1
-    }
-    activationFunction(sumAccum + bias.raw)
-  }
-
   def computeLayerActivation(prevLayerActivations: LayerActivations,
                              thisLayer           : LayerParameters,
                              activationFunction  : Double => Activation  //???????? Double or Activation?
@@ -83,7 +51,7 @@ object ArrayTypes {
     assert(thisLayer.biases.vector.size == thisLayer.weights.matrix.size)
     val thisLayerActivations =
       for (neuronIdx <- thisLayer.biases.vector.indices) yield {
-        computeNeuronActivation(inputActivations   = prevLayerActivations.vector,
+        computeNeuronActivation(inputActivations   = prevLayerActivations,
                                 bias               = thisLayer.biases.vector(neuronIdx),
                                 weights            = thisLayer.weights.matrix(neuronIdx),
                                 activationFunction = activationFunction)
