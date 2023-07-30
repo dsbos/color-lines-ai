@@ -4,7 +4,7 @@ import com.us.dsb.colorlines.expl.nn2.types.NeuralNetworkSimpleImpl.{
   Layer, Network, Neuron}
 import com.us.dsb.colorlines.expl.nn2.types.LowlevelTypes.{
   Activation, Bias, LayerActivations, Weight}
-import com.us.dsb.colorlines.expl.nn.AssimilateTheseNNModelTypes.Temp.computeNeuronActivationViaSeqs //???????? assim. into nn2
+import com.us.dsb.colorlines.expl.nn2.ActivationComputation.computeNeuronActivation
 
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers.*
@@ -51,9 +51,9 @@ class NeuralNetworkSimpleImplTest extends AnyFunSpec {
       nn5.layers.foldLeft(inputActivations) { (inActs, layer) =>
         val outActs =
           layer.neurons.map { neuronData =>
-            computeNeuronActivationViaSeqs(inputActivations   = inActs,
-                                           neuronInputWeights = neuronData.weights,
-                                           neuronBias         = neuronData.bias)
+            computeNeuronActivation(inputActivations   = inActs,
+                                    neuronInputWeights = neuronData.weights,
+                                    neuronBias         = neuronData.bias)
           }
         LayerActivations(outActs)
       }
