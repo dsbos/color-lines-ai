@@ -97,19 +97,23 @@ object HalfAdderCommon {
     val startMs = System.currentTimeMillis()
     var curr = makeInitialNetwork
     var currFitness = computeNetworkFitness(curr)
-    val maxIterations = 100_000_000
-    var iterations = 0
-    while iterations < maxIterations do {
-      iterations += 1
-      if (1 == iterations % 1_000_000) {
-        val pct = 100.0 * iterations / maxIterations
-        println(f"@ $iterations (/$maxIterations, ${pct}%4.1f%%) currFitness = $currFitness%8.5f ...")
+    var improvementCount = 0
+    var lastImprovementInterationNumber = 0
+    val maxIterations = 10_000_000
+    var iteration = 0
+    while iteration < maxIterations do {
+      iteration += 1
+      if (1 == iteration % 1_000_000) {
+        val pct = 100.0 * iteration / maxIterations
+        println(f"@ $iteration (/$maxIterations, ${pct}%4.1f%%) currFitness = $currFitness%8.5f ...")
       }
       val cand = makeCandidateNetwork(curr)
       val candFitness = computeNetworkFitness(cand)
 
       if candFitness > currFitness then {
-        println(f"@ $iterations: base: $currFitness%8.5f -> cand: $candFitness%8.5f")
+        improvementCount += 1
+        lastImprovementInterationNumber = iteration
+        println(f"@ $iteration: base: $currFitness%8.5f -> cand: $candFitness%8.5f (#$improvementCount)")
         HalfAdderCommon.cases.foreach { case ((a1, a2, a3), (c, s)) =>
           val nnOutput = executeNetwork(cand, (a1, a2, a3))
           val cRepr = bitOutputActivationRepresentation(c)
@@ -125,8 +129,9 @@ object HalfAdderCommon {
     }
     val endMs = System.currentTimeMillis()
     val durationMs = endMs - startMs
-    println(s"for $iterations iterations, durationMs = $durationMs ms"
-                + s" (${durationMs * 1.0 / iterations} ms/iteration)")
+    println(f"@ $iteration: result fitness: $currFitness%8.5f ($improvementCount steps, last @ $lastImprovementInterationNumber)")
+    println(s"for $iteration iterations, durationMs = $durationMs ms"
+                + s" (${durationMs * 1.0 / iteration} ms/iteration)")
   }
 
 }
