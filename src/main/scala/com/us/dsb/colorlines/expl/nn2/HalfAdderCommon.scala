@@ -35,6 +35,14 @@ object HalfAdderCommon {
   // - case execution function
   // - network evaluation/fitness function
 
+  private val zeroOutputActivationRepresentation = 0
+  private val oneOutputActivationRepresentation = 1 - zeroOutputActivationRepresentation
+
+  private def bitOutputActivationRepresentation(bit: Byte): Double/*??????Activation?*/ = {
+    val actOutDiff = oneOutputActivationRepresentation - zeroOutputActivationRepresentation
+    zeroOutputActivationRepresentation + actOutDiff * bit
+  }
+
   /**
    * Fitness function for network for half adder, give abstract execution function.
    */
@@ -42,8 +50,10 @@ object HalfAdderCommon {
     val fitness =
       cases.map { case ((a1, a2, a3), (c, s)) =>
         val nnOutput = executeNetwork(a1, a2, a3)
-        val cError = nnOutput._1 - c
-        val sError = nnOutput._2 - s
+        val cRepr = bitOutputActivationRepresentation(c)
+        val sRepr = bitOutputActivationRepresentation(s)
+        val cError = nnOutput._1 - cRepr
+        val sError = nnOutput._2 - sRepr
         val error = cError * cError + sError * sError
         val caseFitness = -error
         caseFitness
@@ -102,9 +112,12 @@ object HalfAdderCommon {
         println(f"@ $iterations: base: $currFitness%8.5f -> cand: $candFitness%8.5f")
         HalfAdderCommon.cases.foreach { case ((a1, a2, a3), (c, s)) =>
           val nnOutput = executeNetwork(cand, (a1, a2, a3))
-          println(f"$a1 + $a2 + $a3 = $c $s: ${nnOutput._1}%8.5f, ${nnOutput._2}%8.5f"
-                      + f";  ∆c = ${nnOutput._1 - c}%8.5f"
-                      + f", ∆s = ${nnOutput._2 - s}%8.5f")
+          val cRepr = bitOutputActivationRepresentation(c)
+          val sRepr = bitOutputActivationRepresentation(s)
+          println(f"$a1 + $a2 + $a3 = $c $s ($cRepr%4.2f, $sRepr%4.2f)"
+                      + f": ${nnOutput._1}%8.5f, ${nnOutput._2}%8.5f"
+                      + f";  ∆c = ${nnOutput._1 - cRepr}%8.5f"
+                      + f", ∆s = ${nnOutput._2 - sRepr}%8.5f")
         }
         curr = cand
         currFitness = candFitness
