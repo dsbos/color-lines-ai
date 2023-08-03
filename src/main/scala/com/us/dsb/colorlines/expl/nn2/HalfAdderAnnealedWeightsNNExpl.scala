@@ -12,21 +12,29 @@ import scala.util.Random
 
 object HalfAdderAnnealedWeightsNNExpl extends App {
 
-  private def randomSomething: Double = {
+  private def randomSomething(probabilityNonzero: Float): Double = {
     if true then {
-      val `rand_0_to_1`: Double = Random.nextFloat()
-      //?????? parameterize
-      val `rand_-1_to_1`: Double = (`rand_0_to_1` - 0.5) * 2
-      val `rand_-x_to_x`: Double = `rand_-1_to_1` * 20 // 5 // 20 //????
-      //println(s"randomSomething: ${`rand_-x_to_x`}")
-      `rand_-x_to_x`
+      val nameThis = Random.nextFloat()
+      if (nameThis > probabilityNonzero) {
+        0
+      }
+      else {
+        val `rand_0_to_1`: Double = Random.nextFloat()
+        //?????? parameterize
+        val `rand_-1_to_1`: Double = (`rand_0_to_1` - 0.5) * 2
+        val `rand_-x_to_x`: Double = `rand_-1_to_1` * 20 // 5 // 20 //????
+        //println(s"randomSomething: ${`rand_-x_to_x`}")
+        `rand_-x_to_x`
+      }
     }
     else {
       Random.nextGaussian() * 20
     }
   }
-  private def randomWeightIncr: Weight = Weight(randomSomething / 10)  // ?? same for now
-  private def randomBiasIncr  : Bias   = Bias(randomSomething   / 10)  // ?? same for now
+  private def randomWeightIncr(probabilityNonzero: Float): Weight =
+    Weight(randomSomething(probabilityNonzero) / 10)  // ?? same for now
+  private def randomBiasIncr(probabilityNonzero: Float)  : Bias   =
+    Bias(randomSomething(probabilityNonzero)   / 10)  // ?? same for now
 
   /** ... zero biases and unity weights
    * @param inputSize
@@ -53,14 +61,19 @@ object HalfAdderAnnealedWeightsNNExpl extends App {
 
   // ?????? TODO:  Add temperature parameter; other?
   def randomlyDeriveNetwork(nw: NetworkConfig): NetworkConfig = {
+    val parameterCount =
+      nw.layers.map (layer => layer.neurons.size * (layer.inputCount + 1)).sum
+    // on average, adjust one bias or weight:
+    val paramNonzeroProb = 1.0f / parameterCount
+
     Network(nw.inputCount,
             nw.layers.map { layer =>
               Layer(layer.inputCount,
                     layer.neurons.map { neuron =>
                       Neuron(neuron.inputCount,
-                             Bias(neuron.bias.raw + randomBiasIncr.raw),
+                             Bias(neuron.bias.raw + randomBiasIncr(paramNonzeroProb).raw),
                              neuron.weights.map { weight =>
-                                Weight(weight.raw + randomWeightIncr.raw)
+                                Weight(weight.raw + randomWeightIncr(paramNonzeroProb).raw)
                              })
                     })
             })
