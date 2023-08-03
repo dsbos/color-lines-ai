@@ -14,8 +14,7 @@ object HalfAdderAnnealedWeightsNNExpl extends App {
 
   private def randomSomething(probabilityNonzero: Float): Double = {
     if true then {
-      val nameThis = Random.nextFloat()
-      if (nameThis > probabilityNonzero) {
+      if (Random.nextFloat() /* 0 - 0.99... */ >= probabilityNonzero /* 0 - 1 */ ) {
         0
       }
       else {
