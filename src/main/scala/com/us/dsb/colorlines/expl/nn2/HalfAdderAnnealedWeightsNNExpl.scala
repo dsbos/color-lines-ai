@@ -13,6 +13,7 @@ import scala.util.Random
 object HalfAdderAnnealedWeightsNNExpl extends App {
 
   private def randomSomething(probabilityNonzero: Float): Double = {
+    // ?????? TODO:  Parameterize:
     if true then {
       if (Random.nextFloat() /* 0 - 0.99... */ >= probabilityNonzero /* 0 - 1 */ ) {
         0
@@ -21,19 +22,21 @@ object HalfAdderAnnealedWeightsNNExpl extends App {
         val `rand_0_to_1`: Double = Random.nextFloat()
         //?????? parameterize
         val `rand_-1_to_1`: Double = (`rand_0_to_1` - 0.5) * 2
-        val `rand_-x_to_x`: Double = `rand_-1_to_1` * 20 // 5 // 20 //????
+        // ?????? TODO:  Parameterize:
+        val `rand_-x_to_x`: Double = `rand_-1_to_1` * 10 // 5 // 20 //????
         //println(s"randomSomething: ${`rand_-x_to_x`}")
         `rand_-x_to_x`
       }
     }
     else {
+      // ?????? TODO:  Parameterize:
       Random.nextGaussian() * 20
     }
   }
   private def randomWeightIncr(probabilityNonzero: Float): Weight =
-    Weight(randomSomething(probabilityNonzero) / 10)  // ?? same for now
+    Weight(randomSomething(probabilityNonzero))  // ?? same for now
   private def randomBiasIncr(probabilityNonzero: Float)  : Bias   =
-    Bias(randomSomething(probabilityNonzero)   / 10)  // ?? same for now
+    Bias(randomSomething(probabilityNonzero))  // ?? same for now
 
   /** ... zero biases and unity weights
    * @param inputSize
@@ -61,9 +64,10 @@ object HalfAdderAnnealedWeightsNNExpl extends App {
   // ?????? TODO:  Add temperature parameter; other?
   def randomlyDeriveNetwork(nw: NetworkConfig): NetworkConfig = {
     val parameterCount =
-      nw.layers.map (layer => layer.neurons.size * (layer.inputCount + 1)).sum
+      nw.layers.map(layer => layer.neurons.size * (1 + layer.inputCount)).sum
     // on average, adjust one bias or weight:
-    val paramNonzeroProb = 1.0f / parameterCount
+    // ?????? TODO:  Parameterize:
+    val paramNonzeroProb = 1.0f / parameterCount  // * 3
 
     Network(nw.inputCount,
             nw.layers.map { layer =>

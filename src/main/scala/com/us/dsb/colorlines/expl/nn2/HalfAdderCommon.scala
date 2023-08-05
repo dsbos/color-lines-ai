@@ -35,7 +35,8 @@ object HalfAdderCommon {
   // - case execution function
   // - network evaluation/fitness function
 
-  private val zeroOutputActivationRepresentation = 0
+  // ?????? TODO:  Maybe parameterize:
+  private val zeroOutputActivationRepresentation = 0.25 // 0
   private val oneOutputActivationRepresentation = 1 - zeroOutputActivationRepresentation
 
   private def bitOutputActivationRepresentation(bit: Byte): Double/*??????Activation?*/ = {
@@ -55,6 +56,8 @@ object HalfAdderCommon {
         val cError = nnOutput._1 - cRepr
         val sError = nnOutput._2 - sRepr
         val error = cError * cError + sError * sError
+        // ?????? TODO:  Maybe parameterize:
+        //val error = math.abs(cError) + math.abs(sError)
         val caseFitness = -error
         caseFitness
       }.sum
@@ -105,7 +108,7 @@ object HalfAdderCommon {
       iteration += 1
       if (1 == iteration % 1_000_000) {
         val pct = 100.0 * iteration / maxIterations
-        println(f"@ $iteration (/$maxIterations, ${pct}%4.1f%%) currFitness = $currFitness%8.5f ...")
+        println(f"@ $iteration (/$maxIterations, ${pct}%4.1f%%):  currFitness = $currFitness%8.5f  (#$improvementCount) ...")
       }
       val cand = makeCandidateNetwork(curr)
       val candFitness = computeNetworkFitness(cand)
@@ -113,15 +116,17 @@ object HalfAdderCommon {
       if candFitness > currFitness then {
         improvementCount += 1
         lastImprovementInterationNumber = iteration
-        println(f"@ $iteration: base: $currFitness%8.5f -> cand: $candFitness%8.5f (#$improvementCount)")
-        HalfAdderCommon.cases.foreach { case ((a1, a2, a3), (c, s)) =>
-          val nnOutput = executeNetwork(cand, (a1, a2, a3))
-          val cRepr = bitOutputActivationRepresentation(c)
-          val sRepr = bitOutputActivationRepresentation(s)
-          println(f"$a1 + $a2 + $a3 = $c $s ($cRepr%4.2f, $sRepr%4.2f)"
-                      + f": ${nnOutput._1}%8.5f, ${nnOutput._2}%8.5f"
-                      + f";  ∆c = ${nnOutput._1 - cRepr}%8.5f"
-                      + f", ∆s = ${nnOutput._2 - sRepr}%8.5f")
+        println(f"@ $iteration: base: $currFitness%8.5g -> cand: $candFitness%8.5g (#$improvementCount)")
+        if true then {
+          HalfAdderCommon.cases.foreach { case ((a1, a2, a3), (c, s)) =>
+            val nnOutput = executeNetwork(cand, (a1, a2, a3))
+            val cRepr = bitOutputActivationRepresentation(c)
+            val sRepr = bitOutputActivationRepresentation(s)
+            println(f"$a1 + $a2 + $a3 = $c $s ($cRepr%4.2f, $sRepr%4.2f)"
+                        + f": ${nnOutput._1}%8.5f, ${nnOutput._2}%8.5f"
+                        + f";  ∆c = ${nnOutput._1 - cRepr}%8.5f"
+                        + f", ∆s = ${nnOutput._2 - sRepr}%8.5f")
+          }
         }
         curr = cand
         currFitness = candFitness
@@ -129,7 +134,7 @@ object HalfAdderCommon {
     }
     val endMs = System.currentTimeMillis()
     val durationMs = endMs - startMs
-    println(f"@ $iteration: result fitness: $currFitness%8.5f ($improvementCount steps, last @ $lastImprovementInterationNumber)")
+    println(f"@ $iteration: result fitness: $currFitness ($improvementCount steps, last @ $lastImprovementInterationNumber)")
     println(s"for $iteration iterations, durationMs = $durationMs ms"
                 + s" (${durationMs * 1.0 / iteration} ms/iteration)")
   }
