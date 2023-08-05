@@ -85,7 +85,7 @@ object HalfAdderAnnealedWeightsNNExpl extends App {
   private val activationFunction: ActivationFunction =
     raw => Activation(ActivationFunctions.standardLogisticFunction(raw))  //??????
 
-  def makeHalfAdderNetwork: NetworkConfig = makeBaseNetwork(3, 5, 2)
+  def makeHalfAdderNetwork: NetworkConfig = makeBaseNetwork(3, 4, 2)
 
   def makeDerivedHalfAdderNetwork(base: NetworkConfig): NetworkConfig =
     randomlyDeriveNetwork(base)
