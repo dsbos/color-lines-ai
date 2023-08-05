@@ -48,19 +48,21 @@ object HalfAdderCommon {
    * Fitness function for network for half adder, give abstract execution function.
    */
   def computeFunctionFitness(executeNetwork: ExecutionFunction): Double = {
-    val fitness =
+    val caseError =
       cases.map { case ((a1, a2, a3), (c, s)) =>
         val nnOutput = executeNetwork(a1, a2, a3)
         val cRepr = bitOutputActivationRepresentation(c)
         val sRepr = bitOutputActivationRepresentation(s)
         val cError = nnOutput._1 - cRepr
         val sError = nnOutput._2 - sRepr
-        val error = cError * cError + sError * sError
         // ?????? TODO:  Maybe parameterize:
+        val caseError = cError * cError + sError * sError
         //val error = math.abs(cError) + math.abs(sError)
-        val caseFitness = -error
-        caseFitness
-      }.sum
+        //maybe biggest difference
+        caseError
+      }
+          .sum  // ?? maybe biggest error
+    val fitness = -caseError
     //println(s"fitness = $fitness")
     fitness
   }
@@ -135,6 +137,15 @@ object HalfAdderCommon {
     val endMs = System.currentTimeMillis()
     val durationMs = endMs - startMs
     println(f"@ $iteration: result fitness: $currFitness ($improvementCount steps, last @ $lastImprovementInterationNumber)")
+    HalfAdderCommon.cases.foreach { case ((a1, a2, a3), (c, s)) =>
+      val nnOutput = executeNetwork(curr, (a1, a2, a3))
+      val cRepr = bitOutputActivationRepresentation(c)
+      val sRepr = bitOutputActivationRepresentation(s)
+      println(f"$a1 + $a2 + $a3 = $c $s ($cRepr%4.2f, $sRepr%4.2f)"
+                  + f": ${nnOutput._1}%8.5f, ${nnOutput._2}%8.5f"
+                  + f";  ∆c = ${nnOutput._1 - cRepr}%8.5f"
+                  + f", ∆s = ${nnOutput._2 - sRepr}%8.5f")
+    }
     println(s"for $iteration iterations, durationMs = $durationMs ms"
                 + s" (${durationMs * 1.0 / iteration} ms/iteration)")
   }
