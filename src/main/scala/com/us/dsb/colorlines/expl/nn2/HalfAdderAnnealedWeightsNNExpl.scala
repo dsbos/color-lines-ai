@@ -47,9 +47,11 @@ object HalfAdderAnnealedWeightsNNExpl extends App {
   // ????? TODO:  Probably add random-bias/-weight function parameters
   def makeBaseNetwork(inputSize: Int, layerSizes: Int*): NetworkConfig = {
     def unityWeights(count: Int): Seq[Weight] = Vector.fill(count)(Weight(1))
+    def zeroWeights(count: Int): Seq[Weight] = Vector.fill(count)(Weight(0))
+    def evenWeights(count: Int): Seq[Weight] = Vector.fill(count)(Weight(1.0 / inputSize))
     def baseNeurons(neuronCount: Int, inputSize: Int): Seq[Neuron] =
       Vector.fill(neuronCount)(
-        Neuron(inputSize, Bias(0), unityWeights(inputSize))
+        Neuron(inputSize, Bias(0), zeroWeights(inputSize))
         )
 
     // Pair each non-input layer's size with predecessor's size:

@@ -110,7 +110,8 @@ object HalfAdderCommon {
       iteration += 1
       if (1 == iteration % 1_000_000) {
         val pct = 100.0 * iteration / maxIterations
-        println(f"@ $iteration (/$maxIterations, ${pct}%4.1f%%):  currFitness = $currFitness%8.5f  (#$improvementCount) ...")
+        println(f"@ $iteration (/$maxIterations, ${pct}%4.1f%%)"
+                    + f":  currFitness = $currFitness%8.5f  (#$improvementCount) ...")
       }
       val cand = makeCandidateNetwork(curr)
       val candFitness = computeNetworkFitness(cand)
@@ -118,7 +119,8 @@ object HalfAdderCommon {
       if candFitness > currFitness then {
         improvementCount += 1
         lastImprovementInterationNumber = iteration
-        println(f"@ $iteration: base: $currFitness%8.5g -> cand: $candFitness%8.5g (#$improvementCount)")
+        println(f"@ $iteration: base: $currFitness%8.5g -> cand: "
+                    + f"$candFitness%8.5g (#$improvementCount)")
         if true then {
           HalfAdderCommon.cases.foreach { case ((a1, a2, a3), (c, s)) =>
             val nnOutput = executeNetwork(cand, (a1, a2, a3))
