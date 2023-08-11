@@ -2,6 +2,9 @@ package com.us.dsb.colorlines.expl.ga
 
 import scala.util.Random
 
+/**
+ * GA re maximizing 2's-complement interpretation of bits.
+ */
 object GenAlgExpl1 extends App {
 
   val bitWidth = 32
@@ -98,7 +101,7 @@ object GenAlgExpl1 extends App {
       else {
         println(s"6. better child        = ${child}")
         println(s"6.        childFitness = ${childFitness}")
-        highestFitness = childFitness  //???? clean re updating var
+        highestFitness = math.max(highestFitness, childFitness) //???? clean re updating var
         if (maFitness < paFitness) {
           println("6. replace ma")
           population.updated(maOffset, child)
