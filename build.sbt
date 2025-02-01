@@ -3,7 +3,7 @@ version := "0.1"
 
 // https://medium.com/@awesomeorji/sbt-for-the-absolute-beginner-2-settings-and-tasks-6f3b00be1a81
 
-scalaVersion := "3.3.0"
+scalaVersion := "3.6.3"
 
 // Re 3.x options, see:
 // - https://docs.scala-lang.org/overviews/compiler-options/index.html
